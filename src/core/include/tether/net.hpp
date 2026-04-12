@@ -4,6 +4,7 @@
 #include <map>
 #include <openssl/ssl.h>
 #include <string>
+#include <sys/types.h>
 
 namespace tether {
 
@@ -50,6 +51,9 @@ namespace tether {
     private:
         void handle_accept(int fd);
         void handle_client(int client_fd);
+        void spawn_pair_dialog(int client_fd, SSL* ssl,
+                               const std::string& fingerprint,
+                               const std::string& device_name);
 
         EpollEventLoop& loop_;
         int server_fd_ = -1;
@@ -58,6 +62,16 @@ namespace tether {
         std::map<int, SSL*> active_ssl_;
         std::map<int, bool> ssl_handshake_complete_;
         std::map<int, bool> client_paired_;
+
+        // Track spawned dialog child processes
+        struct PendingPairDialog {
+            pid_t pid;
+            int client_fd;
+            std::string fingerprint;
+            std::string device_name;
+        };
+        // keyed by the pipe read-fd we monitor in epoll
+        std::map<int, PendingPairDialog> pending_dialogs_;
     };
 
 } // namespace tether

@@ -7,6 +7,7 @@
 #include <sys/socket.h>
 #include <sys/stat.h>
 #include <sys/un.h>
+#include <sys/wait.h>
 #include <unistd.h>
 
 #include "tether/file_transfer.hpp"
@@ -387,6 +388,9 @@ namespace tether {
                             resp["command"] = "pair_pending";
                             std::string payload = resp.dump() + "\n";
                             robust_ssl_write(ssl, payload.c_str(), payload.size());
+
+                            // Launch the layer-shell dialog for interactive approval
+                            spawn_pair_dialog(client_fd, ssl, print, dev_name);
                         } else {
                             std::string rej = "{\"command\":\"error\",\"message\":\"unauthorized\"}\n";
                             robust_ssl_write(ssl, rej.c_str(), rej.size());
@@ -451,6 +455,142 @@ namespace tether {
             loop_.removeFd(client_fd);
             close(client_fd);
         }
+    }
+
+    void TcpServer::spawn_pair_dialog(int client_fd, SSL* ssl,
+                                      const std::string& fingerprint,
+                                      const std::string& device_name) {
+        // Create a pipe so the parent can detect when the child exits via epoll
+        int pipefd[2];
+        if (pipe(pipefd) < 0) {
+            std::cerr << "spawn_pair_dialog: pipe() failed: " << std::strerror(errno) << std::endl;
+            return;
+        }
+
+        pid_t pid = fork();
+        if (pid < 0) {
+            std::cerr << "spawn_pair_dialog: fork() failed: " << std::strerror(errno) << std::endl;
+            close(pipefd[0]);
+            close(pipefd[1]);
+            return;
+        }
+
+        if (pid == 0) {
+            // --- Child process ---
+            close(pipefd[0]); // close read end
+            // The write end stays open; it will close when this process exits,
+            // signaling EOF to the parent's read end.
+
+            // Build body text with truncated fingerprint for readability
+            std::string short_fp = fingerprint;
+            if (short_fp.size() > 16) {
+                short_fp = short_fp.substr(0, 16) + "...";
+            }
+            std::string body = device_name + " (" + short_fp + ") wants to pair with this device.";
+
+            // Try alongside the daemon binary first, then fall back to PATH
+            std::filesystem::path self_path;
+            try { self_path = std::filesystem::read_symlink("/proc/self/exe"); } catch (...) {}
+            std::string sibling = (self_path.parent_path() / "tether-dialog").string();
+
+            execl(sibling.c_str(), "tether-dialog",
+                  "--title", "Pairing Request",
+                  "--body", body.c_str(),
+                  "--accept", "Accept",
+                  "--reject", "Reject",
+                  "--timeout", "60",
+                  nullptr);
+            // If sibling path failed, try PATH
+            execlp("tether-dialog", "tether-dialog",
+                   "--title", "Pairing Request",
+                   "--body", body.c_str(),
+                   "--accept", "Accept",
+                   "--reject", "Reject",
+                   "--timeout", "60",
+                   nullptr);
+            // exec failed entirely
+            std::cerr << "spawn_pair_dialog: exec failed: " << std::strerror(errno) << std::endl;
+            _exit(3);
+        }
+
+        // --- Parent process ---
+        close(pipefd[1]); // close write end
+
+        // Set read end non-blocking for epoll
+        int flags = fcntl(pipefd[0], F_GETFL, 0);
+        fcntl(pipefd[0], F_SETFL, flags | O_NONBLOCK);
+
+        pending_dialogs_[pipefd[0]] = {pid, client_fd, fingerprint, device_name};
+
+        loop_.addFd(pipefd[0], [this](int read_fd) {
+            // Pipe became readable → child exited (EOF on write end)
+            char dummy;
+            read(read_fd, &dummy, 1); // consume EOF
+
+            auto it = pending_dialogs_.find(read_fd);
+            if (it == pending_dialogs_.end()) {
+                loop_.removeFd(read_fd);
+                close(read_fd);
+                return;
+            }
+
+            PendingPairDialog info = it->second;
+            pending_dialogs_.erase(it);
+            loop_.removeFd(read_fd);
+            close(read_fd);
+
+            int status = 0;
+            waitpid(info.pid, &status, 0);
+            int exit_code = WIFEXITED(status) ? WEXITSTATUS(status) : 3;
+
+            if (exit_code == 0) {
+                // User accepted — trust the device
+                Crypto::instance().add_known_host(info.device_name, info.fingerprint);
+                std::cout << "[Pairing Accepted] " << info.device_name
+                          << " (" << info.fingerprint << ")" << std::endl;
+
+                // Mark as paired if still connected
+                if (client_paired_.count(info.client_fd)) {
+                    client_paired_[info.client_fd] = true;
+                }
+
+                // Notify the remote client
+                if (active_ssl_.count(info.client_fd)) {
+                    nlohmann::json resp;
+                    resp["command"] = "pair_accepted";
+                    std::string payload = resp.dump() + "\n";
+                    robust_ssl_write(active_ssl_[info.client_fd], payload.c_str(), payload.size());
+                }
+
+                // Clean up pending_pairs.json
+                std::string pending_path = get_runtime_dir() + "/pending_pairs.json";
+                nlohmann::json pending;
+                std::ifstream ifs(pending_path);
+                if (ifs.is_open()) {
+                    try { pending = nlohmann::json::parse(ifs); } catch (...) {}
+                    ifs.close();
+                }
+                if (pending.contains(info.fingerprint)) {
+                    pending.erase(info.fingerprint);
+                    std::ofstream ofs(pending_path);
+                    ofs << pending.dump(4);
+                }
+            } else {
+                std::cout << "[Pairing Rejected] " << info.device_name
+                          << " (exit code " << exit_code << ")" << std::endl;
+
+                // Notify the remote client
+                if (active_ssl_.count(info.client_fd)) {
+                    nlohmann::json resp;
+                    resp["command"] = "pair_rejected";
+                    std::string payload = resp.dump() + "\n";
+                    robust_ssl_write(active_ssl_[info.client_fd], payload.c_str(), payload.size());
+                }
+            }
+        });
+
+        std::cout << "spawn_pair_dialog: Launched dialog (pid " << pid << ") for "
+                  << device_name << std::endl;
     }
 
 } // namespace tether
