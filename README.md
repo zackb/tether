@@ -7,8 +7,8 @@ If you have migrated away from macOS but still carry an iPhone, Tether provides 
 ## Scope & Features
 
 * **Clipboard Sync:** Seamlessly shares your Wayland compositor (`wlr-data-control`) clipboard over the Tether network so copied text propagates instantly to the iPhone app, and vice-versa.
+* **File Transfer:** Drag and drop files from Linux directly into the iPhone app natively, or Vice Versa using Base64 JSON chunking automatically deposited to your `$XDG_DOWNLOAD_DIR`.
 * **TOTP/OTP Vault (WIP):** Encrypted TOTP secret management synced across your daemon and phone, with Safari autofill via `ASCredentialProviderExtension` on iOS, and Wayland browser autofill via a WebExtension.
-* **File Transfer (WIP):** Drag and drop files from Linux directly into the iPhone app natively.
 
 ## Architecture
 

@@ -3,6 +3,7 @@
 #include <tether/net.hpp>
 #include <tether/event_loop.hpp>
 #include <tether/wayland.hpp>
+#include <tether/file_transfer.hpp>
 #include <nlohmann/json.hpp>
 #include <csignal>
 
@@ -54,6 +55,9 @@ int main(int argc, char** argv) {
             tether::broadcast_message(j.dump());
         });
     }
+
+    tether::FileReceiveManager file_mgr;
+    tether::g_file_manager = &file_mgr;
 
     std::cout << "tetherd is running. Press Ctrl-C to stop." << std::endl;
     loop.run();

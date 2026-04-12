@@ -1,0 +1,45 @@
+BasedOnStyle: LLVM
+
+# --- Indentation ---
+IndentWidth: 4
+TabWidth: 4
+UseTab: Never
+
+# --- Access Modifiers ---
+AccessModifierOffset: -4
+
+ConstructorInitializerAllOnOneLineOrOnePerLine: true
+
+# --- Braces ---
+BreakBeforeBraces: Attach  # Opening brace stays on same line
+
+# --- Pointers & References ---
+PointerAlignment: Left
+DerivePointerAlignment: false
+
+# --- Line Length ---
+ColumnLimit: 120
+
+# --- Namespace formatting ---
+NamespaceIndentation: All
+
+# --- Include formatting ---
+SortIncludes: true
+IncludeBlocks: Preserve
+
+# --- Function arguments ---
+BinPackParameters: false
+BinPackArguments: false
+AllowAllParametersOfDeclarationOnNextLine: true
+
+# --- Constructor initializer formatting ---
+BreakConstructorInitializersBeforeComma: true
+
+# --- Lists ---
+Cpp11BracedListStyle: true
+SpacesInContainerLiterals: true
+
+# --- Misc ---
+AlignAfterOpenBracket: Align
+IndentWrappedFunctionNames: true
+

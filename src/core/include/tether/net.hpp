@@ -32,6 +32,7 @@ private:
     EpollEventLoop& loop_;
     int server_fd_ = -1;
     std::string socket_path_;
+    std::map<int, std::string> client_buffers_;
 };
 
 class TcpServer {
@@ -50,6 +51,7 @@ private:
     EpollEventLoop& loop_;
     int server_fd_ = -1;
     int bind_port_;
+    std::map<int, std::string> client_buffers_;
 };
 
 } // namespace tether

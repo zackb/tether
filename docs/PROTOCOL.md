@@ -45,3 +45,58 @@ The clipboard capabilities allow seamless copying and pasting between the Host (
 ```
 
 **Daemon Behavior**: Fired asynchronously whenever the `wlr_data_control_device` `setDataOffer` informs the daemon that the primary clipboard selection has rotated.
+
+---
+
+## 2. File Transfers
+
+Tether supports streaming large binary files seamlessly through JSON using Base64 chunks to adhere to extension native messaging payload restrictions.
+
+### `file_start` (Client -> Daemon)
+
+**Description**: Announces an incoming binary transmission.
+
+**Payload**:
+```json
+{
+  "command": "file_start",
+  "filename": "image.png",
+  "size": 2048500,
+  "transfer_id": "unique_string"
+}
+```
+
+### `file_chunk` (Client -> Daemon)
+
+**Description**: Sends a sequential Base64 chunk of the file data.
+
+**Payload**:
+```json
+{
+  "command": "file_chunk",
+  "transfer_id": "unique_string",
+  "chunk_index": 0,
+  "data": "iVBORw0KGgoAAAANSUhEUgAA..."
+}
+```
+
+### `file_end` (Client -> Daemon)
+
+**Description**: Closes the file handle on the daemon and returns a success status back.
+
+**Payload**:
+```json
+{
+  "command": "file_end",
+  "transfer_id": "unique_string"
+}
+```
+
+**Response (Daemon -> Client):**
+```json
+{
+  "command": "file_status",
+  "transfer_id": "unique_string",
+  "status": "success"
+}
+```

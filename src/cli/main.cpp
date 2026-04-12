@@ -1,11 +1,13 @@
 #include <cstring>
 #include <filesystem>
+#include <fstream>
 #include <iostream>
 #include <nlohmann/json.hpp>
 #include <string>
 #include <sys/socket.h>
 #include <sys/un.h>
 #include <sys/wait.h>
+#include <tether/base64.hpp>
 #include <tether/net.hpp> // for get_runtime_dir
 #include <unistd.h>
 #include <vector>
@@ -16,7 +18,8 @@ void print_help() {
               << "  -h, --help               Show this help message.\n"
               << "  -g, --get-clipboard      Retrieve the current Wayland clipboard text.\n"
               << "  -s, --set-clipboard      Take string input and copy it to the local Wayland clipboard.\n"
-              << "                           If no argument is given, it reads from STDIN.\n\n"
+              << "                           If no argument is given, it reads from STDIN.\n"
+              << "  -f, --send-file          Send a file securely to the local Wayland download directory.\n\n"
               << "Examples:\n"
               << "  tether -g\n"
               << "  tether -s \"Hello world\"\n"
@@ -99,6 +102,11 @@ int main(int argc, char* argv[]) {
             return 0;
         } else if (arg == "-g" || arg == "--get-clipboard") {
             action = "get";
+        } else if (arg == "-f" || arg == "--send-file") {
+            action = "file";
+            if (i + 1 < argc && argv[i + 1][0] != '-') {
+                arg_val = argv[++i];
+            }
         } else if (arg == "-s" || arg == "--set-clipboard") {
             action = "set";
             // Check if there is an argument immediately following the flag
@@ -150,6 +158,62 @@ int main(int argc, char* argv[]) {
         j["content"] = arg_val;
         std::string payload = j.dump() + "\n";
         send_and_wait(sock, payload); // Ignore daemon's "OK\n"
+    } else if (action == "file") {
+        if (arg_val.empty() || !std::filesystem::exists(arg_val)) {
+            std::cerr << "Invalid or missing file path: " << arg_val << "\n";
+            return 1;
+        }
+
+        std::ifstream file(arg_val, std::ios::binary);
+        if (!file.is_open()) {
+            std::cerr << "Failed to open file.\n";
+            return 1;
+        }
+
+        size_t file_size = std::filesystem::file_size(arg_val);
+        std::string filename = std::filesystem::path(arg_val).filename().string();
+        std::string transfer_id = "cli_" + std::to_string(time(nullptr));
+
+        std::cout << "Uploading " << filename << " (" << file_size << " bytes)..." << std::endl;
+
+        nlohmann::json j_start;
+        j_start["command"] = "file_start";
+        j_start["filename"] = filename;
+        j_start["size"] = file_size;
+        j_start["transfer_id"] = transfer_id;
+        send_and_wait(sock, j_start.dump() + "\n");
+
+        const size_t chunk_size = 512 * 1024;
+        std::vector<unsigned char> buffer(chunk_size);
+        int chunk_idx = 0;
+
+        while (file) {
+            file.read(reinterpret_cast<char*>(buffer.data()), chunk_size);
+            size_t bytes_read = file.gcount();
+            if (bytes_read == 0)
+                break;
+
+            nlohmann::json j_chunk;
+            j_chunk["command"] = "file_chunk";
+            j_chunk["chunk_index"] = chunk_idx++;
+            j_chunk["transfer_id"] = transfer_id;
+            j_chunk["data"] = tether::base64_encode(buffer.data(), bytes_read);
+
+            send_and_wait(sock, j_chunk.dump() + "\n");
+        }
+
+        nlohmann::json j_end;
+        j_end["command"] = "file_end";
+        j_end["transfer_id"] = transfer_id;
+
+        std::string resp = send_and_wait(sock, j_end.dump() + "\n");
+        try {
+            nlohmann::json r = nlohmann::json::parse(resp);
+            if (r.contains("status") && r["status"] == "success") {
+                std::cout << "File transfer successfully saved.\n";
+            }
+        } catch (...) {
+        }
     }
 
     close(sock);
