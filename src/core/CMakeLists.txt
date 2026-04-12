@@ -5,6 +5,7 @@ add_library(tether_core STATIC
     src/clipboard.cpp
     src/base64.cpp
     src/file_transfer.cpp
+    src/crypto.cpp
     src/wayland.cpp
     src/wayland_protocols/wayland.cpp
     src/wayland_protocols/wlr-data-control-unstable-v1.cpp
@@ -17,4 +18,6 @@ target_include_directories(tether_core PUBLIC
 target_link_libraries(tether_core PUBLIC 
     nlohmann_json::nlohmann_json
     PkgConfig::WAYLAND
+    OpenSSL::SSL
+    OpenSSL::Crypto
 )

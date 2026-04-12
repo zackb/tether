@@ -4,6 +4,7 @@
 #include <tether/event_loop.hpp>
 #include <tether/wayland.hpp>
 #include <tether/file_transfer.hpp>
+#include <tether/crypto.hpp>
 #include <nlohmann/json.hpp>
 #include <csignal>
 
@@ -23,6 +24,11 @@ int main(int argc, char** argv) {
         tether::ensure_single_instance();
     } catch(const std::exception& e) {
         std::cerr << "Initialization error: " << e.what() << std::endl;
+        return 1;
+    }
+
+    if (!tether::Crypto::instance().init()) {
+        std::cerr << "Fatal: Failed to initialize OpenSSL mTLS engine." << std::endl;
         return 1;
     }
 

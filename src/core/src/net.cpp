@@ -11,6 +11,7 @@
 
 #include "tether/file_transfer.hpp"
 #include "tether/wayland.hpp"
+#include "tether/crypto.hpp"
 #include <cstring>
 #include <filesystem>
 #include <iostream>
@@ -252,28 +253,63 @@ namespace tether {
         sockaddr_in client_addr{};
         socklen_t addrlen = sizeof(client_addr);
         int client_fd = accept(fd, reinterpret_cast<sockaddr*>(&client_addr), &addrlen);
-        if (client_fd < 0) {
-            if (errno != EAGAIN && errno != EWOULDBLOCK) {
-                std::cerr << "TcpServer accept error: " << std::strerror(errno) << std::endl;
-            }
-            return;
-        }
+        if (client_fd < 0) return;
 
         // Set non-blocking
         int flags = fcntl(client_fd, F_GETFL, 0);
         fcntl(client_fd, F_SETFL, flags | O_NONBLOCK);
 
-        register_client_fd(client_fd);
-        loop_.addFd(client_fd, [this](int cfd) { handle_client(cfd); });
-
         char ip[INET_ADDRSTRLEN];
         inet_ntop(AF_INET, &(client_addr.sin_addr), ip, INET_ADDRSTRLEN);
         std::cout << "TcpServer: New connection from " << ip << " (fd: " << client_fd << ")" << std::endl;
+
+        // SSL Wrapping
+        SSL* ssl = SSL_new(Crypto::instance().get_server_context());
+        SSL_set_fd(ssl, client_fd);
+        SSL_set_accept_state(ssl);
+
+        active_ssl_[client_fd] = ssl;
+        ssl_handshake_complete_[client_fd] = false;
+        client_paired_[client_fd] = false;
+
+        register_client_fd(client_fd);
+        loop_.addFd(client_fd, [this](int cfd) { handle_client(cfd); });
     }
 
     void TcpServer::handle_client(int client_fd) {
+        SSL* ssl = active_ssl_[client_fd];
+
+        if (!ssl_handshake_complete_[client_fd]) {
+            int ret = SSL_accept(ssl);
+            if (ret == 1) {
+                ssl_handshake_complete_[client_fd] = true;
+                std::string print = Crypto::get_peer_fingerprint(ssl);
+                if (Crypto::instance().is_host_known(print)) {
+                    client_paired_[client_fd] = true;
+                } else {
+                    std::cout << "TcpServer: Untrusted client connected. Fingerprint: " << print << std::endl;
+                }
+            } else {
+                int err = SSL_get_error(ssl, ret);
+                if (err == SSL_ERROR_WANT_READ || err == SSL_ERROR_WANT_WRITE) {
+                    return; // Wait for Epoll to re-trigger
+                }
+                
+                // Handshake strictly failed
+                SSL_free(ssl);
+                active_ssl_.erase(client_fd);
+                client_buffers_.erase(client_fd);
+                ssl_handshake_complete_.erase(client_fd);
+                client_paired_.erase(client_fd);
+                unregister_client_fd(client_fd);
+                loop_.removeFd(client_fd);
+                close(client_fd);
+                return;
+            }
+        }
+
         char buf[65536];
-        ssize_t n = read(client_fd, buf, sizeof(buf) - 1);
+        int n = SSL_read(ssl, buf, sizeof(buf) - 1);
         if (n > 0) {
             buf[n] = '\0';
             client_buffers_[client_fd] += std::string(buf, n);
@@ -286,6 +322,24 @@ namespace tether {
                 try {
                     nlohmann::json j = nlohmann::json::parse(msg);
 
+                    if (!client_paired_[client_fd]) {
+                        if (j.contains("command") && j["command"] == "pair_request") {
+                            std::string print = Crypto::get_peer_fingerprint(ssl);
+                            std::string dev_name = j.value("device_name", "Unknown Device");
+                            std::cout << "[Pairing Request Pending] from " << dev_name 
+                                      << ". Accept by running: tether --accept " << print << std::endl;
+                            
+                            nlohmann::json resp;
+                            resp["command"] = "pair_pending";
+                            std::string payload = resp.dump() + "\n";
+                            SSL_write(ssl, payload.c_str(), payload.size());
+                        } else {
+                            std::string rej = "{\"command\":\"error\",\"message\":\"unauthorized\"}\n";
+                            SSL_write(ssl, rej.c_str(), rej.size());
+                        }
+                        continue;
+                    }
+
                     if (j.contains("command") && j["command"] == "clipboard_set" && j.contains("content")) {
                         std::string content = j["content"];
                         if (g_wayland)
@@ -296,7 +350,7 @@ namespace tether {
                             resp["command"] = "clipboard_content";
                             resp["content"] = g_wayland->get_clipboard();
                             std::string payload = resp.dump() + "\n";
-                            write(client_fd, payload.c_str(), payload.size());
+                            SSL_write(ssl, payload.c_str(), payload.size());
                             continue;
                         }
                     } else if (j.contains("command") && j["command"] == "file_start") {
@@ -312,7 +366,7 @@ namespace tether {
                             resp["transfer_id"] = j["transfer_id"];
                             resp["status"] = "success";
                             std::string payload = resp.dump() + "\n";
-                            write(client_fd, payload.c_str(), payload.size());
+                            SSL_write(ssl, payload.c_str(), payload.size());
                             continue;
                         }
                     }
@@ -320,11 +374,20 @@ namespace tether {
                 }
 
                 std::string response = "OK\n";
-                write(client_fd, response.c_str(), response.size());
+                SSL_write(ssl, response.c_str(), response.size());
             }
-        } else if (n == 0 || (n < 0 && errno != EAGAIN && errno != EWOULDBLOCK)) {
+        } else {
+            int err = SSL_get_error(ssl, n);
+            if (err == SSL_ERROR_WANT_READ || err == SSL_ERROR_WANT_WRITE) {
+                return;
+            }
+
             std::cout << "TcpServer: Client disconnected (fd: " << client_fd << ")" << std::endl;
+            SSL_free(ssl);
+            active_ssl_.erase(client_fd);
             client_buffers_.erase(client_fd);
+            ssl_handshake_complete_.erase(client_fd);
+            client_paired_.erase(client_fd);
             unregister_client_fd(client_fd);
             loop_.removeFd(client_fd);
             close(client_fd);

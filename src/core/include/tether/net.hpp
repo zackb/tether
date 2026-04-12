@@ -1,6 +1,8 @@
 #pragma once
 
 #include "tether/event_loop.hpp"
+#include <map>
+#include <openssl/ssl.h>
 #include <string>
 
 namespace tether {
@@ -52,6 +54,9 @@ namespace tether {
         int server_fd_ = -1;
         int bind_port_;
         std::map<int, std::string> client_buffers_;
+        std::map<int, SSL*> active_ssl_;
+        std::map<int, bool> ssl_handshake_complete_;
+        std::map<int, bool> client_paired_;
     };
 
 } // namespace tether

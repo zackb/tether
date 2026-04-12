@@ -100,3 +100,34 @@ Tether supports streaming large binary files seamlessly through JSON using Base6
   "status": "success"
 }
 ```
+
+---
+
+## 3. Device Pairing (mTLS)
+
+Because the `tetherd` daemon natively binds to `0.0.0.0:5134` over TCP, it explicitly employs OpenSSL **Mutually Authenticated TLS (mTLS)** to natively reject malicious local-network payloads. 
+
+### `pair_request` (Untrusted Client -> Daemon)
+
+**Description**: Emitted natively by a new client over standard TLS to gracefully present its identity and X.509 fingerprint. The Daemon immediately intercepts the payload, extracts the fingerprint natively from the `SSL*` pipe, and flags it locally as "Pending Authentication". Anything other than `pair_request` results in the TLS socket securely disconnecting.
+
+**Payload**:
+```json
+{
+  "command": "pair_request",
+  "device_name": "My iPhone"
+}
+```
+
+### `pair_pending` (Daemon -> Untrusted Client)
+
+**Description**: Emitted immediately by the Daemon natively over the pending TLS pipe confirming the Request is actively intercepting user approval on local stdout.
+
+**Payload**:
+```json
+{
+  "command": "pair_pending"
+}
+```
+
+Once explicitly paired (via `tether --accept <fingerprint>`), native mTLS fingerprint-matching activates permanently, unblocking future payload operations instantly!
