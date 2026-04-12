@@ -1,4 +1,5 @@
 build
+.DS_Store
 .cache
 compile_commands.json
 **/*.o
