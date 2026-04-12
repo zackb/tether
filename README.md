@@ -1,14 +1,14 @@
 # Tether
 
-**Tether** is a modern, open-source companion device integration suite designed to bridge the gap between iOS (iPhone/iPad) and the Linux Wayland desktop universe.
+**Tether** is an open-source companion device integration suite designed to bridge the gap between iOS (iPhone/iPad) and the Linux Wayland desktop universe.
 
 If you have migrated away from macOS but still carry an iPhone, Tether provides the missing ecosystem integration, acting as your self-hosted equivalent to Apple's Continuity and Universal Clipboard.
 
 ## Scope & Features
 
 * **Clipboard Sync:** Seamlessly shares your Wayland compositor (`wlr-data-control`) clipboard over the Tether network so copied text propagates instantly to the iPhone app, and vice-versa.
-* **File Transfer:** Drag and drop files from Linux directly into the iPhone app natively, or Vice Versa using Base64 JSON chunking automatically deposited to your `$XDG_DOWNLOAD_DIR`.
-* **Device Pairing:** Securely pair devices using **Mutually Authenticated TLS (mTLS)**, restricting TCP traffic securely employing X.509 RSA Certificates dynamically.
+* **File Transfer:** Drag and drop files from Linux directly into the iPhone app natively, or Vice Versa automatically deposited to your `$XDG_DOWNLOAD_DIR`.
+* **Device Pairing:** Securely pair devices using **Mutually Authenticated TLS (mTLS)**, restricting TCP traffic securely using X.509 RSA Certificates dynamically.
 * **TOTP/OTP Vault (WIP):** Encrypted TOTP secret management synced across your daemon and phone, with Safari autofill via `ASCredentialProviderExtension` on iOS, and Wayland browser autofill via a WebExtension.
 
 ## Architecture
