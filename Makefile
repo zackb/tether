@@ -10,6 +10,9 @@ release:
 	cmake --build --preset release
 	ln -sf build/release/compile_commands.json
 
+test: debug
+	ctest --test-dir build/debug --output-on-failure
+
 install: release
 	cmake --install build/release
 
