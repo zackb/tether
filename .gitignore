@@ -1,0 +1,8 @@
+build
+.cache
+compile_commands.json
+**/*.o
+_CPack_Packages
+*.deb
+*.rpm
+*.tar.gz

@@ -1,0 +1,292 @@
+#include "tether/net.hpp"
+
+#include <sys/socket.h>
+#include <sys/un.h>
+#include <sys/file.h>
+#include <sys/stat.h>
+#include <arpa/inet.h>
+#include <unistd.h>
+#include <fcntl.h>
+#include <errno.h>
+
+#include <iostream>
+#include <cstring>
+#include <filesystem>
+#include <set>
+#include <nlohmann/json.hpp>
+#include "tether/wayland.hpp"
+
+namespace tether {
+
+// Global list of active connected clients
+static std::set<int> active_clients;
+
+void register_client_fd(int fd) {
+    active_clients.insert(fd);
+}
+
+void unregister_client_fd(int fd) {
+    active_clients.erase(fd);
+}
+
+void broadcast_message(const std::string& msg) {
+    std::string packet = msg;
+    if (packet.back() != '\n') packet += '\n';
+
+    for(int fd : active_clients) {
+        write(fd, packet.c_str(), packet.size());
+    }
+}
+
+std::string get_runtime_dir() {
+    const char* xdg_runtime = std::getenv("XDG_RUNTIME_DIR");
+    if (!xdg_runtime) {
+        throw std::runtime_error("XDG_RUNTIME_DIR is not set");
+    }
+    std::filesystem::path tether_dir = std::filesystem::path(xdg_runtime) / "tether";
+    if (!std::filesystem::exists(tether_dir)) {
+        std::filesystem::create_directories(tether_dir);
+        std::filesystem::permissions(tether_dir, 
+            std::filesystem::perms::owner_all,
+            std::filesystem::perm_options::replace);
+    }
+    return tether_dir.string();
+}
+
+void ensure_single_instance() {
+    std::string lock_file = get_runtime_dir() + "/tetherd.lock";
+    int fd = open(lock_file.c_str(), O_RDWR | O_CREAT, 0600);
+    if (fd < 0) {
+        throw std::system_error(errno, std::system_category(), "Failed to open lock file");
+    }
+
+    if (flock(fd, LOCK_EX | LOCK_NB) < 0) {
+        if (errno == EWOULDBLOCK) {
+            std::cerr << "tetherd is already running." << std::endl;
+            exit(1);
+        } else {
+            throw std::system_error(errno, std::system_category(), "Failed to lock file");
+        }
+    }
+    // We intentionally leak the fd so the lock is held for the lifetime of the process.
+    // lock is automatically released by OS on exit.
+}
+
+
+// --- UnixServer ---
+
+UnixServer::UnixServer(EpollEventLoop& loop) : loop_(loop) {
+    socket_path_ = get_runtime_dir() + "/tetherd.sock";
+}
+
+UnixServer::~UnixServer() {
+    stop();
+}
+
+bool UnixServer::start() {
+    server_fd_ = socket(AF_UNIX, SOCK_STREAM, 0);
+    if (server_fd_ < 0) {
+        std::cerr << "Failed to create unix socket" << std::endl;
+        return false;
+    }
+
+    // Set non-blocking
+    int flags = fcntl(server_fd_, F_GETFL, 0);
+    fcntl(server_fd_, F_SETFL, flags | O_NONBLOCK);
+
+    unlink(socket_path_.c_str());
+
+    sockaddr_un addr{};
+    addr.sun_family = AF_UNIX;
+    std::strncpy(addr.sun_path, socket_path_.c_str(), sizeof(addr.sun_path) - 1);
+
+    if (bind(server_fd_, reinterpret_cast<sockaddr*>(&addr), sizeof(addr)) < 0) {
+        std::cerr << "Failed to bind unix socket: " << std::strerror(errno) << std::endl;
+        return false;
+    }
+
+    if (listen(server_fd_, SOMAXCONN) < 0) {
+        std::cerr << "Failed to listen on unix socket" << std::endl;
+        return false;
+    }
+
+    loop_.addFd(server_fd_, [this](int fd) { handle_accept(fd); });
+    std::cout << "UnixServer listening on " << socket_path_ << std::endl;
+    return true;
+}
+
+void UnixServer::stop() {
+    if (server_fd_ >= 0) {
+        loop_.removeFd(server_fd_);
+        close(server_fd_);
+        server_fd_ = -1;
+        unlink(socket_path_.c_str());
+    }
+}
+
+void UnixServer::handle_accept(int fd) {
+    int client_fd = accept(fd, nullptr, nullptr);
+    if (client_fd < 0) {
+        if (errno != EAGAIN && errno != EWOULDBLOCK) {
+            std::cerr << "UnixServer accept error: " << std::strerror(errno) << std::endl;
+        }
+        return;
+    }
+
+    // Set non-blocking
+    int flags = fcntl(client_fd, F_GETFL, 0);
+    fcntl(client_fd, F_SETFL, flags | O_NONBLOCK);
+
+    // Register client
+    loop_.addFd(client_fd, [this](int cfd) { handle_client(cfd); });
+    std::cout << "UnixServer: New connection (fd: " << client_fd << ")" << std::endl;
+}
+
+void UnixServer::handle_client(int client_fd) {
+    char buf[1024];
+    ssize_t n = read(client_fd, buf, sizeof(buf) - 1);
+    if (n > 0) {
+        buf[n] = '\0';
+        std::string msg(buf);
+        std::cout << "UnixServer received: " << msg << std::endl;
+
+        // Try to parse json just to show we can
+        try {
+            nlohmann::json j = nlohmann::json::parse(msg);
+            std::cout << "   (Parsed JSON: " << j.dump() << ")" << std::endl;
+
+            if (j.contains("command") && j["command"] == "clipboard_set" && j.contains("content")) {
+                std::string content = j["content"];
+                // Externally hooked up in main
+                extern WaylandContext* g_wayland;
+                if (g_wayland) {
+                    g_wayland->copy_to_clipboard(content);
+                }
+            }
+        } catch (...) {
+            // Ignore parse errors for raw text protocol
+        }
+
+        std::string response = "OK\n";
+        write(client_fd, response.c_str(), response.size());
+    } else if (n == 0 || (n < 0 && errno != EAGAIN && errno != EWOULDBLOCK)) {
+        // Disconnected
+        std::cout << "UnixServer: Client disconnected (fd: " << client_fd << ")" << std::endl;
+        unregister_client_fd(client_fd);
+        loop_.removeFd(client_fd);
+        close(client_fd);
+    }
+}
+
+// --- TcpServer ---
+
+TcpServer::TcpServer(EpollEventLoop& loop, int bind_port) 
+    : loop_(loop), bind_port_(bind_port) {}
+
+TcpServer::~TcpServer() {
+    stop();
+}
+
+bool TcpServer::start() {
+    server_fd_ = socket(AF_INET, SOCK_STREAM, 0);
+    if (server_fd_ < 0) {
+        std::cerr << "Failed to create tcp socket" << std::endl;
+        return false;
+    }
+
+    int opt = 1;
+    if (setsockopt(server_fd_, SOL_SOCKET, SO_REUSEADDR | SO_REUSEPORT, &opt, sizeof(opt)) < 0) {
+        std::cerr << "TcpServer setsockopt reuse failed" << std::endl;
+    }
+
+    // Set non-blocking
+    int flags = fcntl(server_fd_, F_GETFL, 0);
+    fcntl(server_fd_, F_SETFL, flags | O_NONBLOCK);
+
+    sockaddr_in addr{};
+    addr.sin_family = AF_INET;
+    addr.sin_addr.s_addr = INADDR_ANY;
+    addr.sin_port = htons(bind_port_);
+
+    if (bind(server_fd_, reinterpret_cast<sockaddr*>(&addr), sizeof(addr)) < 0) {
+        std::cerr << "Failed to bind tcp socket on port " << bind_port_ << ": " << std::strerror(errno) << std::endl;
+        return false;
+    }
+
+    if (listen(server_fd_, SOMAXCONN) < 0) {
+        std::cerr << "Failed to listen on tcp socket" << std::endl;
+        return false;
+    }
+
+    loop_.addFd(server_fd_, [this](int fd) { handle_accept(fd); });
+    std::cout << "TcpServer listening on 0.0.0.0:" << bind_port_ << std::endl;
+    return true;
+}
+
+void TcpServer::stop() {
+    if (server_fd_ >= 0) {
+        loop_.removeFd(server_fd_);
+        close(server_fd_);
+        server_fd_ = -1;
+    }
+}
+
+void TcpServer::handle_accept(int fd) {
+    sockaddr_in client_addr{};
+    socklen_t addrlen = sizeof(client_addr);
+    int client_fd = accept(fd, reinterpret_cast<sockaddr*>(&client_addr), &addrlen);
+    if (client_fd < 0) {
+        if (errno != EAGAIN && errno != EWOULDBLOCK) {
+            std::cerr << "TcpServer accept error: " << std::strerror(errno) << std::endl;
+        }
+        return;
+    }
+
+    // Set non-blocking
+    int flags = fcntl(client_fd, F_GETFL, 0);
+    fcntl(client_fd, F_SETFL, flags | O_NONBLOCK);
+
+    register_client_fd(client_fd);
+    loop_.addFd(client_fd, [this](int cfd) { handle_client(cfd); });
+    
+    char ip[INET_ADDRSTRLEN];
+    inet_ntop(AF_INET, &(client_addr.sin_addr), ip, INET_ADDRSTRLEN);
+    std::cout << "TcpServer: New connection from " << ip << " (fd: " << client_fd << ")" << std::endl;
+}
+
+void TcpServer::handle_client(int client_fd) {
+    char buf[1024];
+    ssize_t n = read(client_fd, buf, sizeof(buf) - 1);
+    if (n > 0) {
+        buf[n] = '\0';
+        std::string msg(buf);
+        std::cout << "TcpServer received: " << msg << std::endl;
+
+        // Try to parse json just to show we can
+        try {
+            nlohmann::json j = nlohmann::json::parse(msg);
+            std::cout << "   (Parsed JSON: " << j.dump() << ")" << std::endl;
+
+            if (j.contains("command") && j["command"] == "clipboard_set" && j.contains("content")) {
+                std::string content = j["content"];
+                extern WaylandContext* g_wayland;
+                if (g_wayland) {
+                    g_wayland->copy_to_clipboard(content);
+                }
+            }
+        } catch (...) {
+            // Ignore parse errors for raw text protocol
+        }
+
+        std::string response = "OK\n";
+        write(client_fd, response.c_str(), response.size());
+    } else if (n == 0 || (n < 0 && errno != EAGAIN && errno != EWOULDBLOCK)) {
+        // Disconnected
+        std::cout << "TcpServer: Client disconnected (fd: " << client_fd << ")" << std::endl;
+        unregister_client_fd(client_fd);
+        loop_.removeFd(client_fd);
+        close(client_fd);
+    }
+}
+
+} // namespace tether
