@@ -1,0 +1,88 @@
+<svg width="680" height="380" viewBox="0 0 680 380" role="img" xmlns="http://www.w3.org/2000/svg">
+  <title>Tether</title>
+  <desc>Tether logo — iPhone and Linux terminal connected by colored data streams</desc>
+
+  <defs>
+    <marker id="arr-blue" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="5" markerHeight="5" orient="auto">
+      <path d="M2 1L8 5L2 9" fill="none" stroke="#58a6ff" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+    </marker>
+    <marker id="arr-amber" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="5" markerHeight="5" orient="auto">
+      <path d="M2 1L8 5L2 9" fill="none" stroke="#f9c74f" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+    </marker>
+    <marker id="arr-purple" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="5" markerHeight="5" orient="auto">
+      <path d="M2 1L8 5L2 9" fill="none" stroke="#cba6f7" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+    </marker>
+    <marker id="arr-green" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="5" markerHeight="5" orient="auto">
+      <path d="M2 1L8 5L2 9" fill="none" stroke="#3ddc84" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+    </marker>
+  </defs>
+
+  <!-- dark background -->
+  <rect x="0" y="0" width="680" height="380" fill="#0d1117"/>
+
+  <!-- corner brackets -->
+  <path d="M 44 44 L 44 56 M 44 44 L 56 44" fill="none" stroke="#30363d" stroke-width="1.5" stroke-linecap="square"/>
+  <path d="M 636 44 L 636 56 M 636 44 L 624 44" fill="none" stroke="#30363d" stroke-width="1.5" stroke-linecap="square"/>
+  <path d="M 44 336 L 44 324 M 44 336 L 56 336" fill="none" stroke="#30363d" stroke-width="1.5" stroke-linecap="square"/>
+  <path d="M 636 336 L 636 324 M 636 336 L 624 336" fill="none" stroke="#30363d" stroke-width="1.5" stroke-linecap="square"/>
+
+  <!-- PHONE -->
+  <rect x="68" y="60" width="72" height="120" rx="12" fill="#161b22" stroke="#30363d" stroke-width="1"/>
+  <rect x="74" y="72" width="60" height="88" rx="4" fill="#0d1117"/>
+  <rect x="74" y="72" width="60" height="10" rx="4" fill="#21262d"/>
+  <rect x="96" y="63" width="16" height="4" rx="2" fill="#21262d"/>
+  <rect x="89" y="168" width="30" height="3" rx="1.5" fill="#21262d"/>
+  <circle cx="90" cy="92" r="3" fill="#58a6ff"/>
+  <circle cx="102" cy="92" r="3" fill="#3ddc84"/>
+  <circle cx="114" cy="92" r="3" fill="#cba6f7"/>
+  <rect x="84" y="100" width="40" height="2" rx="1" fill="#21262d"/>
+  <rect x="84" y="106" width="32" height="2" rx="1" fill="#21262d"/>
+  <rect x="84" y="112" width="36" height="2" rx="1" fill="#21262d"/>
+  <rect x="84" y="120" width="28" height="2" rx="1" fill="#21262d"/>
+  <rect x="84" y="126" width="40" height="2" rx="1" fill="#21262d"/>
+  <rect x="84" y="132" width="34" height="2" rx="1" fill="#21262d"/>
+  <rect x="84" y="138" width="38" height="2" rx="1" fill="#21262d"/>
+  <rect x="84" y="148" width="22" height="8" rx="2" fill="#21262d" opacity="0.5"/>
+
+  <!-- TERMINAL -->
+  <rect x="510" y="55" width="148" height="100" rx="6" fill="#161b22" stroke="#30363d" stroke-width="1"/>
+  <rect x="510" y="55" width="148" height="18" rx="6" fill="#21262d"/>
+  <rect x="510" y="61" width="148" height="12" fill="#21262d"/>
+  <circle cx="523" cy="64" r="3.5" fill="#ff5f57"/>
+  <circle cx="535" cy="64" r="3.5" fill="#febc2e"/>
+  <circle cx="547" cy="64" r="3.5" fill="#28c840"/>
+  <text x="584" y="68" text-anchor="middle" font-family="monospace" font-size="10" fill="#8b949e">tetherd</text>
+  <text x="518" y="86" font-family="monospace" font-size="10" fill="#3ddc84">$</text>
+  <text x="528" y="86" font-family="monospace" font-size="10" fill="#e6edf3">tetherd --start</text>
+  <text x="518" y="98" font-family="monospace" font-size="10" fill="#3ddc84">listening :7777</text>
+  <text x="518" y="110" font-family="monospace" font-size="10" fill="#58a6ff">clipboard synced</text>
+  <text x="518" y="122" font-family="monospace" font-size="10" fill="#cba6f7">totp vault ready</text>
+  <text x="518" y="134" font-family="monospace" font-size="10" fill="#f9c74f">file rx: active</text>
+
+  <!-- clipboard — blue -->
+  <path d="M 140 82 C 270 18, 380 18, 510 82" fill="none" stroke="#58a6ff" stroke-width="1.5" stroke-linecap="round" marker-end="url(#arr-blue)"/>
+  <text x="325" y="14" text-anchor="middle" font-family="monospace" font-size="10" fill="#58a6ff">clipboard</text>
+
+  <!-- files — amber -->
+  <path d="M 140 96 C 270 46, 380 46, 510 96" fill="none" stroke="#f9c74f" stroke-width="1.5" stroke-linecap="round" stroke-dasharray="5 3" marker-end="url(#arr-amber)"/>
+  <text x="325" y="42" text-anchor="middle" font-family="monospace" font-size="10" fill="#f9c74f">files</text>
+
+  <!-- totp — purple -->
+  <path d="M 510 120 C 380 172, 270 172, 140 120" fill="none" stroke="#cba6f7" stroke-width="1.5" stroke-linecap="round" marker-end="url(#arr-purple)"/>
+  <text x="325" y="183" text-anchor="middle" font-family="monospace" font-size="10" fill="#cba6f7">totp</text>
+
+  <!-- otp — green -->
+  <path d="M 510 134 C 380 200, 270 200, 140 134" fill="none" stroke="#3ddc84" stroke-width="1.5" stroke-linecap="round" stroke-dasharray="5 3" marker-end="url(#arr-green)"/>
+  <text x="325" y="210" text-anchor="middle" font-family="monospace" font-size="10" fill="#3ddc84">otp</text>
+
+  <!-- wordmark -->
+  <text x="340" y="288" text-anchor="middle" font-family="monospace" font-size="64" font-weight="500" letter-spacing="-3" fill="#e6edf3">tether</text>
+
+  <!-- tagline -->
+  <text x="340" y="314" text-anchor="middle" font-family="monospace" font-size="11" letter-spacing="3" fill="#8b949e">iphone + linux continuity</text>
+
+  <!-- version pill -->
+  <rect x="298" y="323" width="84" height="16" rx="8" fill="none" stroke="#58a6ff" stroke-width="1" opacity="0.6"/>
+  <text x="340" y="335" text-anchor="middle" font-family="monospace" font-size="9" letter-spacing="1" fill="#58a6ff">v0.1.0-alpha</text>
+
+</svg>

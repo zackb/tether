@@ -1,3 +1,9 @@
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset="docs/img/tether-dark.svg">
+  <source media="(prefers-color-scheme: light)" srcset="docs/img/tether-light.svg">
+  <img src="docs/tether-light.svg" alt="Tether - iPhone + Linux continuity" width="680">
+</picture>
+
 # Tether
 
 **Tether** is an open-source companion device integration suite designed to bridge the gap between iOS (iPhone/iPad) and the Linux Wayland desktop universe.
