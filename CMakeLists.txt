@@ -24,7 +24,9 @@ FetchContent_Declare(
   GIT_TAG release-1.12.1
 )
 set(gtest_force_shared_crt ON CACHE BOOL "" FORCE)
+set(CMAKE_WARN_DEPRECATED OFF CACHE BOOL "" FORCE)
 FetchContent_MakeAvailable(googletest)
+set(CMAKE_WARN_DEPRECATED ON CACHE BOOL "" FORCE)
 
 enable_testing()
 
