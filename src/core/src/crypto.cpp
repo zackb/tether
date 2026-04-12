@@ -40,6 +40,10 @@ bool Crypto::init() {
     server_ctx_ = SSL_CTX_new(server_method);
     if (!server_ctx_) return false;
     
+    // Pin to TLS 1.2 to ensure stability with iOS BoringSSL client
+    SSL_CTX_set_min_proto_version(server_ctx_, TLS1_2_VERSION);
+    SSL_CTX_set_max_proto_version(server_ctx_, TLS1_2_VERSION);
+    
     SSL_CTX_use_certificate_file(server_ctx_, cert_path_.c_str(), SSL_FILETYPE_PEM);
     SSL_CTX_use_PrivateKey_file(server_ctx_, key_path_.c_str(), SSL_FILETYPE_PEM);
     if (!SSL_CTX_check_private_key(server_ctx_)) return false;
@@ -53,6 +57,9 @@ bool Crypto::init() {
     const SSL_METHOD* client_method = TLS_client_method();
     client_ctx_ = SSL_CTX_new(client_method);
     if (!client_ctx_) return false;
+    
+    SSL_CTX_set_min_proto_version(client_ctx_, TLS1_2_VERSION);
+    SSL_CTX_set_max_proto_version(client_ctx_, TLS1_2_VERSION);
     
     SSL_CTX_use_certificate_file(client_ctx_, cert_path_.c_str(), SSL_FILETYPE_PEM);
     SSL_CTX_use_PrivateKey_file(client_ctx_, key_path_.c_str(), SSL_FILETYPE_PEM);

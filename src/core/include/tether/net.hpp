@@ -16,6 +16,7 @@ namespace tether {
 
     // Simple registry for active clients to support broadcasting
     void register_client_fd(int fd);
+    void register_client_ssl(int fd, SSL* ssl);
     void unregister_client_fd(int fd);
     void broadcast_message(const std::string& msg);
 

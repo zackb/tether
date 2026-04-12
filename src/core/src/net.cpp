@@ -20,20 +20,57 @@
 
 namespace tether {
 
-    // Global list of active connected clients
-    static std::set<int> active_clients;
+    struct ClientSession {
+        int fd;
+        SSL* ssl; // nullptr for plain unix clients
+    };
 
-    void register_client_fd(int fd) { active_clients.insert(fd); }
+    // Global list of active connected sessions
+    static std::map<int, ClientSession> active_sessions;
 
-    void unregister_client_fd(int fd) { active_clients.erase(fd); }
+    void register_client_fd(int fd) { 
+        active_sessions[fd] = {fd, nullptr}; 
+    }
+
+    void register_client_ssl(int fd, SSL* ssl) {
+        active_sessions[fd] = {fd, ssl};
+    }
+
+    void unregister_client_fd(int fd) { 
+        active_sessions.erase(fd); 
+    }
+
+    // Helper for robust SSL writes on non-blocking sockets.
+    // Handles SSL_ERROR_WANT_WRITE by retrying.
+    static int robust_ssl_write(SSL* ssl, const void* buf, int num) {
+        if (!ssl) return -1;
+        int total_written = 0;
+        const char* p = static_cast<const char*>(buf);
+        while (total_written < num) {
+            int n = SSL_write(ssl, p + total_written, num - total_written);
+            if (n <= 0) {
+                int err = SSL_get_error(ssl, n);
+                if (err == SSL_ERROR_WANT_WRITE || err == SSL_ERROR_WANT_READ) {
+                    continue; // Busy-wait retry for simplicity in this daemon
+                }
+                return n; // Fatal error
+            }
+            total_written += n;
+        }
+        return total_written;
+    }
 
     void broadcast_message(const std::string& msg) {
         std::string packet = msg;
         if (packet.back() != '\n')
             packet += '\n';
 
-        for (int fd : active_clients) {
-            write(fd, packet.c_str(), packet.size());
+        for (auto const& [fd, session] : active_sessions) {
+            if (session.ssl) {
+                robust_ssl_write(session.ssl, packet.c_str(), packet.size());
+            } else {
+                write(fd, packet.c_str(), packet.size());
+            }
         }
     }
 
@@ -131,7 +168,8 @@ namespace tether {
         int flags = fcntl(client_fd, F_GETFL, 0);
         fcntl(client_fd, F_SETFL, flags | O_NONBLOCK);
 
-        // Register client
+        // Register client for broadcasts
+        register_client_fd(client_fd);
         loop_.addFd(client_fd, [this](int cfd) { handle_client(cfd); });
         std::cout << "UnixServer: New connection (fd: " << client_fd << ")" << std::endl;
     }
@@ -272,7 +310,7 @@ namespace tether {
         ssl_handshake_complete_[client_fd] = false;
         client_paired_[client_fd] = false;
 
-        register_client_fd(client_fd);
+        // We do NOT register for broadcasts until SSL handshake is complete
         loop_.addFd(client_fd, [this](int cfd) { handle_client(cfd); });
     }
 
@@ -289,6 +327,8 @@ namespace tether {
                 } else {
                     std::cout << "TcpServer: Untrusted client connected. Fingerprint: " << print << std::endl;
                 }
+                // Now that handshake is done, we can safely receive broadcasts
+                register_client_ssl(client_fd, ssl);
             } else {
                 int err = SSL_get_error(ssl, ret);
                 if (err == SSL_ERROR_WANT_READ || err == SSL_ERROR_WANT_WRITE) {
@@ -346,10 +386,10 @@ namespace tether {
                             nlohmann::json resp;
                             resp["command"] = "pair_pending";
                             std::string payload = resp.dump() + "\n";
-                            SSL_write(ssl, payload.c_str(), payload.size());
+                            robust_ssl_write(ssl, payload.c_str(), payload.size());
                         } else {
                             std::string rej = "{\"command\":\"error\",\"message\":\"unauthorized\"}\n";
-                            SSL_write(ssl, rej.c_str(), rej.size());
+                            robust_ssl_write(ssl, rej.c_str(), rej.size());
                         }
                         continue;
                     }
@@ -358,13 +398,18 @@ namespace tether {
                         std::string content = j["content"];
                         if (g_wayland)
                             g_wayland->copy_to_clipboard(content);
+                        // Broadcast to everyone (including sender) to ensure robust transport
+                        nlohmann::json bc;
+                        bc["command"] = "clipboard_updated";
+                        bc["content"] = content;
+                        broadcast_message(bc.dump());
                     } else if (j.contains("command") && j["command"] == "clipboard_get") {
                         if (g_wayland) {
                             nlohmann::json resp;
                             resp["command"] = "clipboard_content";
                             resp["content"] = g_wayland->get_clipboard();
                             std::string payload = resp.dump() + "\n";
-                            SSL_write(ssl, payload.c_str(), payload.size());
+                            robust_ssl_write(ssl, payload.c_str(), payload.size());
                             continue;
                         }
                     } else if (j.contains("command") && j["command"] == "file_start") {
@@ -380,7 +425,7 @@ namespace tether {
                             resp["transfer_id"] = j["transfer_id"];
                             resp["status"] = "success";
                             std::string payload = resp.dump() + "\n";
-                            SSL_write(ssl, payload.c_str(), payload.size());
+                            robust_ssl_write(ssl, payload.c_str(), payload.size());
                             continue;
                         }
                     }
@@ -388,7 +433,7 @@ namespace tether {
                 }
 
                 std::string response = "OK\n";
-                SSL_write(ssl, response.c_str(), response.size());
+                robust_ssl_write(ssl, response.c_str(), response.size());
             }
         } else {
             int err = SSL_get_error(ssl, n);
