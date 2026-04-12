@@ -1,0 +1,101 @@
+# =========================
+# Xcode
+# =========================
+
+## User settings
+xcuserdata/
+*.xcuserstate
+*.xcscmblueprint
+
+## Workspace settings
+*.xcworkspace
+!default.xcworkspace/
+
+## Derived data
+DerivedData/
+build/
+
+## Xcode build products
+*.ipa
+*.dSYM.zip
+*.dSYM
+
+## Swift Package Manager
+.swiftpm/
+.build/
+Packages/
+
+## Playgrounds
+timeline.xctimeline
+playground.xcworkspace
+
+# =========================
+# macOS
+# =========================
+
+.DS_Store
+.AppleDouble
+.LSOverride
+
+# Thumbnails
+._*
+
+# Files that might appear in the root of a volume
+.DocumentRevisions-V100
+.fseventsd
+.Spotlight-V100
+.TemporaryItems
+.Trashes
+.VolumeIcon.icns
+.com.apple.timemachine.donotpresent
+
+# =========================
+# Logs & temp
+# =========================
+
+*.log
+*.tmp
+*.swp
+*.lock
+
+# =========================
+# Dependency Managers
+# =========================
+
+## CocoaPods
+Pods/
+
+## Carthage
+Carthage/Build/
+
+## Accio / other
+Dependencies/
+.accio/
+
+# =========================
+# Fastlane
+# =========================
+
+fastlane/report.xml
+fastlane/Preview.html
+fastlane/screenshots/
+fastlane/test_output/
+
+# =========================
+# Secrets / Config
+# =========================
+
+*.env
+*.env.local
+*.key
+*.pem
+*.p12
+*.mobileprovision
+
+# =========================
+# Misc
+# =========================
+
+*.orig
+*.rej
+*.backup
