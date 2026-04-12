@@ -58,8 +58,9 @@ final class TetherConnection {
         let secIdentity = sec_identity_create(identity)!
         sec_protocol_options_set_local_identity(secOptions, secIdentity)
 
-        // TLS 1.2 minimum
+        // TLS 1.2 minimum, allow negotiation up to highest supported (1.3)
         sec_protocol_options_set_min_tls_protocol_version(secOptions, .TLSv12)
+        sec_protocol_options_set_max_tls_protocol_version(secOptions, .TLSv13)
 
         // Accept any server certificate (daemon uses self-signed)
         // and capture the server's fingerprint.
