@@ -161,7 +161,27 @@ std::string Client::list_devices() {
 
 bool Client::accept_device(const std::string& fingerprint, const std::string& name) {
     tether::Crypto::instance().init();
-    tether::Crypto::instance().add_known_host(name, fingerprint);
+
+    // Check if the daemon stored a name from the pair_request
+    std::string resolved_name = name;
+    std::string pending_path = tether::get_runtime_dir() + "/pending_pairs.json";
+    nlohmann::json pending;
+
+    std::ifstream ifs(pending_path);
+    if (ifs.is_open()) {
+        try { pending = nlohmann::json::parse(ifs); } catch (...) {}
+        ifs.close();
+    }
+
+    if (pending.contains(fingerprint) && pending[fingerprint].is_string()) {
+        resolved_name = pending[fingerprint].get<std::string>();
+        // Remove the accepted entry
+        pending.erase(fingerprint);
+        std::ofstream ofs(pending_path);
+        ofs << pending.dump(4);
+    }
+
+    tether::Crypto::instance().add_known_host(resolved_name, fingerprint);
     return true;
 }
 

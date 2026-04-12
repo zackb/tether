@@ -328,6 +328,20 @@ namespace tether {
                             std::string dev_name = j.value("device_name", "Unknown Device");
                             std::cout << "[Pairing Request Pending] from " << dev_name 
                                       << ". Accept by running: tether --accept " << print << std::endl;
+
+                            // Persist the pending request so accept_device can retrieve the name
+                            {
+                                std::string pending_path = get_runtime_dir() + "/pending_pairs.json";
+                                nlohmann::json pending;
+                                std::ifstream ifs(pending_path);
+                                if (ifs.is_open()) {
+                                    try { pending = nlohmann::json::parse(ifs); } catch (...) {}
+                                    ifs.close();
+                                }
+                                pending[print] = dev_name;
+                                std::ofstream ofs(pending_path);
+                                ofs << pending.dump(4);
+                            }
                             
                             nlohmann::json resp;
                             resp["command"] = "pair_pending";

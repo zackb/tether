@@ -5,6 +5,7 @@
 #include <iostream>
 #include <string>
 #include <thread>
+#include <unistd.h>
 #include <nlohmann/json.hpp>
 
 // Always-connected local unix socket client.
@@ -299,7 +300,9 @@ static void on_btn_pair_clicked(GtkWidget* widget, gpointer) {
     }
 
     std::string err;
-    std::string resp = pair_client.pair("Tether GTK", err);
+    char hostname[256] = {};
+    gethostname(hostname, sizeof(hostname) - 1);
+    std::string resp = pair_client.pair(hostname, err);
 
     GtkWidget* dlg = gtk_message_dialog_new(
         GTK_WINDOW(gtk_widget_get_toplevel(widget)),

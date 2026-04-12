@@ -1,5 +1,6 @@
 #include <iostream>
 #include <string>
+#include <unistd.h>
 #include <tether/client.hpp>
 #include <tether/discovery.hpp>
 #include <tether/crypto.hpp>
@@ -113,7 +114,9 @@ int main(int argc, char* argv[]) {
 
     std::string err;
     if (action == "pair") {
-        std::string resp = client.pair("CLI", err);
+        char hostname[256] = {};
+        gethostname(hostname, sizeof(hostname) - 1);
+        std::string resp = client.pair(hostname, err);
         if (!err.empty()) {
             std::cerr << err << "\n";
             return 1;
