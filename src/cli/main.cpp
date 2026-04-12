@@ -1,18 +1,6 @@
-#include <cstring>
-#include <filesystem>
-#include <fstream>
 #include <iostream>
-#include <nlohmann/json.hpp>
 #include <string>
-#include <sys/socket.h>
-#include <sys/un.h>
-#include <sys/wait.h>
-#include <arpa/inet.h>
-#include <tether/base64.hpp>
-#include <tether/net.hpp> 
-#include <tether/crypto.hpp>
-#include <unistd.h>
-#include <vector>
+#include <tether/client.hpp>
 
 void print_help() {
     std::cout << "tether - Wayland companion CLI\n\n"
@@ -33,89 +21,13 @@ void print_help() {
               << "  tether --accept 9a4f21...\n";
 }
 
-int connect_to_daemon(bool retry = true) {
-    int sock = socket(AF_UNIX, SOCK_STREAM, 0);
-    if (sock < 0)
-        return -1;
-
-    sockaddr_un addr{};
-    addr.sun_family = AF_UNIX;
-    std::string path = tether::get_runtime_dir() + "/tetherd.sock";
-    std::strncpy(addr.sun_path, path.c_str(), sizeof(addr.sun_path) - 1);
-
-    if (connect(sock, (sockaddr*)&addr, sizeof(addr)) < 0) {
-        close(sock);
-        if (!retry)
-            return -1;
-
-        // Let's spawn the daemon in the background
-        pid_t pid = fork();
-        if (pid == 0) {
-            // Child process
-            std::filesystem::path self_path = std::filesystem::read_symlink("/proc/self/exe");
-            std::string daemon_path = (self_path.parent_path() / "tetherd").string();
-
-            // Double fork trick to detach completely without zombies
-            if (fork() == 0) {
-                // Grandchild - disconnects standard output to not spam CLI calling terminal
-                freopen("/dev/null", "w", stdout);
-                freopen("/dev/null", "w", stderr);
-                freopen("/dev/null", "r", stdin);
-
-                execl(daemon_path.c_str(), "tetherd", nullptr);
-                // Fallback to path lookup if it wasn't strictly adjacent
-                execlp("tetherd", "tetherd", nullptr);
-                exit(1); // Abort if launch failed
-            }
-            exit(0); // Intermediate child exits immediately
-        } else if (pid > 0) {
-            // Parent waits for intermediate child
-            int status;
-            waitpid(pid, &status, 0);
-
-            // Give daemon a generous 300ms to spin up epoll and wayland
-            usleep(300000);
-            return connect_to_daemon(false);
-        }
-        return -1;
-    }
-    return sock;
-}
-
-SSL* g_ssl = nullptr;
-int g_sock = -1;
-
-std::string send_and_wait(const std::string& cmd) {
-    char buf[65536];
-    
-    if (g_ssl) {
-        int w = SSL_write(g_ssl, cmd.c_str(), cmd.size());
-        if (w <= 0) return "";
-        int n = SSL_read(g_ssl, buf, sizeof(buf) - 1);
-        if (n > 0) {
-            buf[n] = '\0';
-            return std::string(buf);
-        }
-    } else {
-        write(g_sock, cmd.c_str(), cmd.size());
-        ssize_t n = read(g_sock, buf, sizeof(buf) - 1);
-        if (n > 0) {
-            buf[n] = '\0';
-            return std::string(buf);
-        }
-    }
-    return "";
-}
-
 int main(int argc, char* argv[]) {
     if (argc < 2) {
         print_help();
         return 0;
     }
 
-    std::string action;
-    std::string arg_val;
-    std::string host = "";
+    std::string action, arg_val, host = "";
     int port = 5134;
 
     for (int i = 1; i < argc; ++i) {
@@ -123,29 +35,18 @@ int main(int argc, char* argv[]) {
         if (arg == "-h" || arg == "--help") {
             print_help();
             return 0;
-        } else if (arg == "-g" || arg == "--get-clipboard") {
-            action = "get";
-        } else if (arg == "--list-devices") {
-            action = "list";
-        } else if (arg == "--accept") {
-            action = "accept";
-            if (i + 1 < argc && argv[i + 1][0] != '-') arg_val = argv[++i];
-        } else if (arg == "--pair") {
-            action = "pair";
-        } else if (arg == "--host") {
-            if (i + 1 < argc && argv[i + 1][0] != '-') host = argv[++i];
-        } else if (arg == "--port") {
-            if (i + 1 < argc && argv[i + 1][0] != '-') port = std::stoi(argv[++i]);
-        } else if (arg == "-f" || arg == "--send-file") {
+        } else if (arg == "-g" || arg == "--get-clipboard") { action = "get"; }
+        else if (arg == "--list-devices") { action = "list"; }
+        else if (arg == "--pair") { action = "pair"; }
+        else if (arg == "--accept") { action = "accept"; if (i + 1 < argc && argv[i + 1][0] != '-') arg_val = argv[++i]; }
+        else if (arg == "--host") { if (i + 1 < argc && argv[i + 1][0] != '-') host = argv[++i]; }
+        else if (arg == "--port") { if (i + 1 < argc && argv[i + 1][0] != '-') port = std::stoi(argv[++i]); }
+        else if (arg == "-f" || arg == "--send-file") {
             action = "file";
-            if (i + 1 < argc && argv[i + 1][0] != '-') {
-                arg_val = argv[++i];
-            }
+            if (i + 1 < argc && argv[i + 1][0] != '-') arg_val = argv[++i];
         } else if (arg == "-s" || arg == "--set-clipboard") {
             action = "set";
-            if (i + 1 < argc && argv[i + 1][0] != '-') {
-                arg_val = argv[++i];
-            }
+            if (i + 1 < argc && argv[i + 1][0] != '-') arg_val = argv[++i];
         }
     }
 
@@ -154,157 +55,53 @@ int main(int argc, char* argv[]) {
         return 1;
     }
 
+    tether::Client client;
+
+    // Fast-path local operations that don't need active daemon connection fundamentally
     if (action == "list") {
-        tether::Crypto::instance().init();
-        std::cout << tether::Crypto::instance().get_known_hosts_dump() << "\n";
+        std::cout << client.list_devices() << "\n";
         return 0;
     } else if (action == "accept") {
-        tether::Crypto::instance().init();
-        tether::Crypto::instance().add_known_host("Paired Device", arg_val);
+        client.accept_device(arg_val);
         std::cout << "Successfully paired device: " << arg_val << "\n";
         return 0;
     }
 
     if (action == "set" && arg_val.empty()) {
-        // Read from stdin ...
         std::string line;
-        while (std::getline(std::cin, line)) {
-            arg_val += line + "\n";
-        }
-        if (!arg_val.empty() && arg_val.back() == '\n') {
-            arg_val.pop_back();
-        }
+        while (std::getline(std::cin, line)) arg_val += line + "\n";
+        if (!arg_val.empty() && arg_val.back() == '\n') arg_val.pop_back();
     }
 
-    if (!host.empty()) {
-        // TCP TLS Connection
-        g_sock = socket(AF_INET, SOCK_STREAM, 0);
-        sockaddr_in addr{};
-        addr.sin_family = AF_INET;
-        addr.sin_port = htons(port);
-        inet_pton(AF_INET, host.c_str(), &addr.sin_addr);
-        
-        if (connect(g_sock, (sockaddr*)&addr, sizeof(addr)) < 0) {
-            std::cerr << "Failed to connect strictly over TCP.\n";
-            return 1;
-        }
-
-        tether::Crypto::instance().init();
-        SSL* ssl = SSL_new(tether::Crypto::instance().get_client_context());
-        SSL_set_fd(ssl, g_sock);
-        if (SSL_connect(ssl) <= 0) {
-            std::cerr << "Network paired strictly rejected: SSL Handshake Failed.\n";
-            return 1;
-        }
-        g_ssl = ssl;
-    } else {
-        // Unix Socket Fallback
-        g_sock = connect_to_daemon();
-        if (g_sock < 0) {
-            std::cerr << "Failed to connect to daemon and automatic launch failed.\n";
-            return 1;
-        }
+    // Bind network abstraction natively
+    if (!client.connect(host, port)) {
+        std::cerr << "Explicit framework connection locally rejected! Did you target explicitly invalid TLS or is daemon broken?\n";
+        return 1;
     }
 
+    std::string err;
     if (action == "pair") {
-        nlohmann::json j;
-        j["command"] = "pair_request";
-        j["device_name"] = "CLI Test Tools";
-        std::string payload = j.dump() + "\n";
-        std::string response = send_and_wait(payload);
-        std::cout << "Pairing response: " << response << std::flush;
-        if (g_ssl) SSL_free(g_ssl);
-        close(g_sock);
-        return 0;
-    }
-
-    if (action == "get") {
-        nlohmann::json j;
-        j["command"] = "clipboard_get";
-        std::string payload = j.dump() + "\n";
-
-        std::string response = send_and_wait(payload);
-        try {
-            nlohmann::json r = nlohmann::json::parse(response);
-            if (r.contains("content")) {
-                std::cout << r["content"].get<std::string>() << std::flush;
-            } else if (r.contains("message") && r["message"] == "unauthorized") {
-                std::cerr << "Unauthorized. You must pair this device first using a pair_request.\n";
-            }
-        } catch (...) {}
+        std::cout << "Pairing response: " << client.pair(err) << std::flush;
+    } else if (action == "get") {
+        std::string clip = client.get_clipboard(err);
+        if (!err.empty()) {
+            std::cerr << err << "\n";
+            return 1;
+        }
+        std::cout << clip << std::flush;
     } else if (action == "set") {
-        nlohmann::json j;
-        j["command"] = "clipboard_set";
-        j["content"] = arg_val;
-        std::string payload = j.dump() + "\n";
-        std::string s_resp = send_and_wait(payload);
-        if (s_resp.find("unauthorized") != std::string::npos) {
-             std::cerr << "Unauthorized. Device not paired.\n";
-             return 1;
+        if (!client.set_clipboard(arg_val, err)) {
+            std::cerr << err << "\n";
+            return 1;
         }
     } else if (action == "file") {
-        if (arg_val.empty() || !std::filesystem::exists(arg_val)) {
-            std::cerr << "Invalid or missing file path: " << arg_val << "\n";
+        std::cout << "Uploading " << arg_val << "..." << std::endl;
+        if (!client.send_file(arg_val, err)) {
+            std::cerr << "Transfer Failed: " << err << "\n";
             return 1;
         }
-
-        std::ifstream file(arg_val, std::ios::binary);
-        if (!file.is_open()) {
-            std::cerr << "Failed to open file.\n";
-            return 1;
-        }
-
-        size_t file_size = std::filesystem::file_size(arg_val);
-        std::string filename = std::filesystem::path(arg_val).filename().string();
-        std::string transfer_id = "cli_" + std::to_string(time(nullptr));
-
-        std::cout << "Uploading " << filename << " (" << file_size << " bytes)..." << std::endl;
-
-        nlohmann::json j_start;
-        j_start["command"] = "file_start";
-        j_start["filename"] = filename;
-        j_start["size"] = file_size;
-        j_start["transfer_id"] = transfer_id;
-        std::string s_resp = send_and_wait(j_start.dump() + "\n");
-        if (s_resp.find("unauthorized") != std::string::npos) {
-             std::cerr << "Unauthorized. Device not paired.\n";
-             return 1;
-        }
-
-        const size_t chunk_size = 512 * 1024;
-        std::vector<unsigned char> buffer(chunk_size);
-        int chunk_idx = 0;
-
-        while (file) {
-            file.read(reinterpret_cast<char*>(buffer.data()), chunk_size);
-            size_t bytes_read = file.gcount();
-            if (bytes_read == 0)
-                break;
-
-            nlohmann::json j_chunk;
-            j_chunk["command"] = "file_chunk";
-            j_chunk["chunk_index"] = chunk_idx++;
-            j_chunk["transfer_id"] = transfer_id;
-            j_chunk["data"] = tether::base64_encode(buffer.data(), bytes_read);
-
-            send_and_wait(j_chunk.dump() + "\n");
-        }
-
-        nlohmann::json j_end;
-        j_end["command"] = "file_end";
-        j_end["transfer_id"] = transfer_id;
-
-        std::string resp = send_and_wait(j_end.dump() + "\n");
-        try {
-            nlohmann::json r = nlohmann::json::parse(resp);
-            if (r.contains("status") && r["status"] == "success") {
-                std::cout << "File transfer successfully saved.\n";
-            }
-        } catch (...) {
-        }
+        std::cout << "File transfer successfully saved.\n";
     }
 
-    if (g_ssl) SSL_free(g_ssl);
-    close(g_sock);
     return 0;
 }

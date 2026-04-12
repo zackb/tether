@@ -6,6 +6,7 @@ add_library(tether STATIC
     src/base64.cpp
     src/file_transfer.cpp
     src/crypto.cpp
+    src/client.cpp
     src/wayland.cpp
     src/wayland_protocols/wayland.cpp
     src/wayland_protocols/wlr-data-control-unstable-v1.cpp

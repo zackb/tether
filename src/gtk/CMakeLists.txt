@@ -1,8 +1,13 @@
+find_package(PkgConfig REQUIRED)
+pkg_check_modules(GTK3 REQUIRED gtk+-3.0)
+
 add_executable(tether-gtk
     main.cpp
 )
 
-target_link_libraries(tether-gtk PRIVATE tether)
+target_include_directories(tether-gtk PRIVATE ${GTK3_INCLUDE_DIRS})
+target_link_libraries(tether-gtk PRIVATE tether ${GTK3_LIBRARIES})
+target_compile_options(tether-gtk PRIVATE ${GTK3_CFLAGS_OTHER})
 
 # Output into root build dir instead of nested build/src/gtk
 set_target_properties(tether-gtk PROPERTIES RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}")
