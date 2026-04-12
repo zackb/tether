@@ -36,6 +36,11 @@ struct ClipboardEntry: Identifiable {
             case .remote(let name): return name
             }
         }
+
+        var isRemote: Bool {
+            if case .remote = self { return true }
+            return false
+        }
     }
 }
 

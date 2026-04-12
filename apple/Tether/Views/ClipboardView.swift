@@ -141,9 +141,9 @@ struct ClipboardView: View {
             viewModel.copyToLocalClipboard(entry.content)
         } label: {
             HStack(alignment: .top, spacing: 12) {
-                Image(systemName: entry.source == .remote ? "desktopcomputer" : "iphone")
+                Image(systemName: entry.source.isRemote ? "desktopcomputer" : "iphone")
                     .font(.subheadline)
-                    .foregroundStyle(entry.source == .remote ? .indigo : .teal)
+                    .foregroundStyle(entry.source.isRemote ? .indigo : .teal)
                     .frame(width: 24)
                     .padding(.top, 2)
 
@@ -156,7 +156,7 @@ struct ClipboardView: View {
                     HStack(spacing: 6) {
                         Text(entry.source.displayName)
                             .font(.caption2.weight(.medium))
-                            .foregroundStyle(entry.source == .remote ? .indigo : .teal)
+                            .foregroundStyle(entry.source.isRemote ? .indigo : .teal)
 
                         Text("·")
                             .foregroundStyle(.quaternary)

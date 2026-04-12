@@ -9,6 +9,7 @@
 import Foundation
 import Security
 import CryptoKit
+import UIKit
 
 /// Manages the app's TLS identity (self-signed RSA cert + private key)
 /// and the set of known remote host fingerprints.
