@@ -80,23 +80,26 @@ int main(int argc, char* argv[]) {
 
         tether::Discovery discovery;
         auto hosts = discovery.discover(timeout_ms);
+        auto devices = tether::group_discovered_hosts(hosts);
 
-        if (hosts.empty()) {
+        if (devices.empty()) {
             std::cout << "  No tetherd instances found.\n";
         } else {
             tether::Crypto::instance().init();
-            for (const auto& h : hosts) {
+            for (const auto& dev : devices) {
                 std::string status = "[new]";
-                if (!h.fingerprint.empty() && tether::Crypto::instance().is_host_known(h.fingerprint)) {
+                if (!dev.fingerprint.empty() && tether::Crypto::instance().is_host_known(dev.fingerprint)) {
                     status = "[known]";
                 }
-                // Pad columns for clean output
-                printf("  %-20s  %s:%-5d  %s\n",
-                       h.name.c_str(), h.address.c_str(), h.port, status.c_str());
+                printf("  %-20s  %s\n", dev.name.c_str(), status.c_str());
+                for (const auto& addr : dev.addresses) {
+                    printf("    %s:%d\n", addr.address.c_str(), addr.port);
+                }
+                printf("\n");
             }
         }
 
-        printf("\nFound %zu device(s) in %.1fs\n", hosts.size(), timeout_ms / 1000.0);
+        printf("Found %zu device(s) in %.1fs\n", devices.size(), timeout_ms / 1000.0);
         return 0;
     }
 

@@ -7,13 +7,30 @@
 
 namespace tether {
 
-    /// Represents a tetherd instance discovered via mDNS/DNS-SD on the local network.
+    /// A single network address where a tetherd instance is reachable.
+    struct DiscoveredAddress {
+        std::string address;  ///< IPv4 or IPv6 address
+        uint16_t port = 0;    ///< TCP port
+    };
+
+    /// Raw per-interface mDNS result (one entry per resolved address).
     struct DiscoveredHost {
         std::string name;         ///< Advertised service name (e.g. hostname)
         std::string address;      ///< Resolved IPv4/IPv6 address
         uint16_t port = 0;        ///< TCP port the daemon is listening on
         std::string fingerprint;  ///< TLS certificate SHA-256 fingerprint from TXT record
     };
+
+    /// A logical device, grouping all network interfaces that share the same
+    /// TLS fingerprint (i.e. the same tetherd instance).
+    struct DiscoveredDevice {
+        std::string name;                        ///< Advertised service name
+        std::string fingerprint;                 ///< Shared TLS fingerprint
+        std::vector<DiscoveredAddress> addresses; ///< All reachable addresses
+    };
+
+    /// Group raw per-interface results into logical devices by fingerprint.
+    std::vector<DiscoveredDevice> group_discovered_hosts(const std::vector<DiscoveredHost>& hosts);
 
     /// mDNS service discovery using Avahi.
     ///
@@ -44,7 +61,7 @@ namespace tether {
         /// Scan the local network for tetherd instances.
         /// Blocks for up to @p timeout_ms milliseconds and returns all hosts found.
         /// @param timeout_ms  How long to listen for mDNS responses (default 3 s).
-        /// @return A list of discovered hosts, possibly empty.
+        /// @return A list of discovered hosts (one per interface), possibly empty.
         std::vector<DiscoveredHost> discover(int timeout_ms = 3000);
 
     private:
@@ -53,3 +70,4 @@ namespace tether {
     };
 
 } // namespace tether
+
