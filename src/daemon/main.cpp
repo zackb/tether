@@ -5,8 +5,10 @@
 #include <tether/wayland.hpp>
 #include <tether/file_transfer.hpp>
 #include <tether/crypto.hpp>
+#include <tether/discovery.hpp>
 #include <nlohmann/json.hpp>
 #include <csignal>
+#include <unistd.h>
 
 tether::EpollEventLoop* g_loop = nullptr;
 
@@ -51,6 +53,17 @@ int main(int argc, char** argv) {
         return 1;
     }
 
+    // Advertise this daemon on the local network via mDNS
+    tether::Discovery discovery;
+    {
+        char hostname[256] = {};
+        gethostname(hostname, sizeof(hostname) - 1);
+        std::string my_fp = tether::Crypto::instance().get_my_fingerprint();
+        if (!discovery.publish(hostname, 5134, my_fp)) {
+            std::cerr << "Warning: mDNS advertisement failed (is avahi-daemon running?)" << std::endl;
+        }
+    }
+
     tether::WaylandContext wayland_srv(loop);
     tether::g_wayland = &wayland_srv;
     if (wayland_srv.init()) {
@@ -68,6 +81,7 @@ int main(int argc, char** argv) {
     std::cout << "tetherd is running. Press Ctrl-C to stop." << std::endl;
     loop.run();
 
+    // discovery destructor calls unpublish() automatically
     std::cout << "tetherd shutdown complete." << std::endl;
     return 0;
 }

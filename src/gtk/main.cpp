@@ -1,8 +1,10 @@
 #include <gtk/gtk.h>
 #include <tether/client.hpp>
 #include <tether/crypto.hpp>
+#include <tether/discovery.hpp>
 #include <iostream>
 #include <string>
+#include <thread>
 #include <nlohmann/json.hpp>
 
 // Always-connected local unix socket client.
@@ -15,6 +17,8 @@ static tether::Client* g_remote = nullptr;
 static GtkWidget* text_view_clip;
 static GtkWidget* lbl_status;
 static GtkWidget* devices_list_box;
+static GtkWidget* discovered_list_box;
+static GtkWidget* lbl_discover_status;
 static GtkWidget* entry_fingerprint;
 static GtkWidget* entry_pair_host;
 static GtkWidget* entry_pair_port;
@@ -168,6 +172,105 @@ static void refresh_device_list() {
     gtk_widget_show_all(devices_list_box);
 }
 
+// ─── mDNS Discovery ───
+
+struct DiscoverResult {
+    std::vector<tether::DiscoveredHost> hosts;
+};
+
+static gboolean on_discover_complete(gpointer data) {
+    auto* result = static_cast<DiscoverResult*>(data);
+
+    // Clear previous discovered list
+    GList* children = gtk_container_get_children(GTK_CONTAINER(discovered_list_box));
+    for (GList* iter = children; iter; iter = g_list_next(iter))
+        gtk_widget_destroy(GTK_WIDGET(iter->data));
+    g_list_free(children);
+
+    if (result->hosts.empty()) {
+        GtkWidget* row = gtk_label_new("No tetherd instances found on the network.");
+        gtk_widget_set_halign(row, GTK_ALIGN_START);
+        gtk_container_add(GTK_CONTAINER(discovered_list_box), row);
+    } else {
+        tether::Crypto::instance().init();
+        for (const auto& h : result->hosts) {
+            bool known = !h.fingerprint.empty() &&
+                         tether::Crypto::instance().is_host_known(h.fingerprint);
+            std::string status_str = known ? "paired" : "new";
+            std::string addr_str = h.address + ":" + std::to_string(h.port);
+            std::string markup = "<b>" + h.name + "</b>  <small>" + addr_str +
+                                 "</small>  <span foreground='" +
+                                 (known ? "#8ec07c" : "#fabd2f") + "'>[" +
+                                 status_str + "]</span>";
+
+            GtkWidget* row_box = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, 8);
+            gtk_container_set_border_width(GTK_CONTAINER(row_box), 6);
+
+            const char* icon_name = known ? "network-wired-symbolic" : "network-wireless-symbolic";
+            GtkWidget* icon = gtk_image_new_from_icon_name(icon_name, GTK_ICON_SIZE_LARGE_TOOLBAR);
+            gtk_box_pack_start(GTK_BOX(row_box), icon, FALSE, FALSE, 0);
+
+            GtkWidget* label = gtk_label_new(NULL);
+            gtk_label_set_markup(GTK_LABEL(label), markup.c_str());
+            gtk_label_set_xalign(GTK_LABEL(label), 0.0);
+            gtk_box_pack_start(GTK_BOX(row_box), label, TRUE, TRUE, 0);
+
+            // "Connect" button auto-fills the connection bar
+            std::string* host_copy = new std::string(h.address);
+            int port_val = h.port;
+            GtkWidget* btn_use = gtk_button_new_with_label("Connect");
+            g_signal_connect(btn_use, "clicked",
+                G_CALLBACK(+[](GtkWidget*, gpointer data) {
+                    auto* host_str = static_cast<std::string*>(data);
+                    gtk_entry_set_text(GTK_ENTRY(entry_connect_host), host_str->c_str());
+                    // Trigger the connect action
+                    on_btn_connect_clicked(btn_connect, nullptr);
+                }),
+                host_copy);
+            // Clean up the heap string when the button is destroyed
+            g_signal_connect(btn_use, "destroy",
+                G_CALLBACK(+[](GtkWidget*, gpointer data) {
+                    delete static_cast<std::string*>(data);
+                }),
+                host_copy);
+            gtk_box_pack_end(GTK_BOX(row_box), btn_use, FALSE, FALSE, 0);
+
+            gtk_list_box_insert(GTK_LIST_BOX(discovered_list_box), row_box, -1);
+        }
+    }
+
+    std::string status = "Found " + std::to_string(result->hosts.size()) + " device(s)";
+    gtk_label_set_text(GTK_LABEL(lbl_discover_status), status.c_str());
+    gtk_widget_show_all(discovered_list_box);
+
+    delete result;
+    return G_SOURCE_REMOVE;
+}
+
+static void on_btn_scan_clicked(GtkWidget*, gpointer) {
+    gtk_label_set_text(GTK_LABEL(lbl_discover_status), "Scanning...");
+
+    // Clear the list immediately to show scanning state
+    GList* children = gtk_container_get_children(GTK_CONTAINER(discovered_list_box));
+    for (GList* iter = children; iter; iter = g_list_next(iter))
+        gtk_widget_destroy(GTK_WIDGET(iter->data));
+    g_list_free(children);
+
+    GtkWidget* spinner_row = gtk_label_new("Scanning the local network...");
+    gtk_widget_set_halign(spinner_row, GTK_ALIGN_START);
+    gtk_container_add(GTK_CONTAINER(discovered_list_box), spinner_row);
+    gtk_widget_show_all(discovered_list_box);
+
+    // Run discovery in a background thread to avoid blocking the GTK main loop
+    std::thread([]() {
+        tether::Discovery discovery;
+        auto hosts = discovery.discover(3000);
+
+        auto* result = new DiscoverResult{std::move(hosts)};
+        g_idle_add(on_discover_complete, result);
+    }).detach();
+}
+
 static void on_btn_accept_clicked(GtkWidget*, gpointer) {
     const gchar* fp = gtk_entry_get_text(GTK_ENTRY(entry_fingerprint));
     if (!fp || strlen(fp) == 0) return;
@@ -212,6 +315,37 @@ static void on_btn_pair_clicked(GtkWidget* widget, gpointer) {
 static GtkWidget* build_devices_tab() {
     GtkWidget* box = gtk_box_new(GTK_ORIENTATION_VERTICAL, 10);
     gtk_container_set_border_width(GTK_CONTAINER(box), 16);
+
+    // ── Discovered on Network ──
+    GtkWidget* discover_header_row = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, 8);
+    GtkWidget* discover_lbl = gtk_label_new(NULL);
+    gtk_label_set_markup(GTK_LABEL(discover_lbl), "<b>Discovered on Network</b>");
+    gtk_widget_set_halign(discover_lbl, GTK_ALIGN_START);
+    gtk_box_pack_start(GTK_BOX(discover_header_row), discover_lbl, TRUE, TRUE, 0);
+
+    lbl_discover_status = gtk_label_new("");
+    gtk_style_context_add_class(gtk_widget_get_style_context(lbl_discover_status), "dim-label");
+    gtk_box_pack_start(GTK_BOX(discover_header_row), lbl_discover_status, FALSE, FALSE, 0);
+
+    GtkWidget* btn_scan = gtk_button_new_with_label("Scan");
+    g_signal_connect(btn_scan, "clicked", G_CALLBACK(on_btn_scan_clicked), NULL);
+    gtk_box_pack_end(GTK_BOX(discover_header_row), btn_scan, FALSE, FALSE, 0);
+    gtk_box_pack_start(GTK_BOX(box), discover_header_row, FALSE, FALSE, 0);
+
+    GtkWidget* discover_frame = gtk_frame_new(NULL);
+    GtkWidget* discover_scroll = gtk_scrolled_window_new(NULL, NULL);
+    gtk_scrolled_window_set_min_content_height(GTK_SCROLLED_WINDOW(discover_scroll), 100);
+    discovered_list_box = gtk_list_box_new();
+    gtk_list_box_set_selection_mode(GTK_LIST_BOX(discovered_list_box), GTK_SELECTION_NONE);
+    GtkWidget* placeholder = gtk_label_new("Click Scan to discover devices.");
+    gtk_container_add(GTK_CONTAINER(discovered_list_box), placeholder);
+    gtk_container_add(GTK_CONTAINER(discover_scroll), discovered_list_box);
+    gtk_container_add(GTK_CONTAINER(discover_frame), discover_scroll);
+    gtk_box_pack_start(GTK_BOX(box), discover_frame, FALSE, FALSE, 0);
+
+    // ── Trusted Devices ──
+    GtkWidget* sep0 = gtk_separator_new(GTK_ORIENTATION_HORIZONTAL);
+    gtk_box_pack_start(GTK_BOX(box), sep0, FALSE, FALSE, 2);
 
     GtkWidget* header = gtk_label_new(NULL);
     gtk_label_set_markup(GTK_LABEL(header), "<b>Trusted Devices</b>");

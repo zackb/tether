@@ -1,6 +1,8 @@
 #include <iostream>
 #include <string>
 #include <tether/client.hpp>
+#include <tether/discovery.hpp>
+#include <tether/crypto.hpp>
 
 void print_help() {
     std::cout << "tether - Wayland companion CLI\n\n"
@@ -9,8 +11,10 @@ void print_help() {
               << "  -g, --get-clipboard      Retrieve the current Wayland clipboard text.\n"
               << "  -s, --set-clipboard      Take string input and copy it to the local Wayland clipboard.\n"
               << "  -f, --send-file          Send a file securely to the local Wayland download directory.\n"
+              << "  -d, --discover           Scan the local network for tetherd instances via mDNS.\n"
               << "  --host <ip>              Connect over TCP to daemon ip instead of UNIX Socket.\n"
               << "  --port <num>             Connect over TCP port (default 5134).\n"
+              << "  --timeout <ms>           Discovery scan duration in milliseconds (default 3000).\n"
               << "  --list-devices           List all paired connection devices.\n"
               << "  --accept <fingerprint>   Accept a pending pairing request locally.\n"
               << "  --pair                   Send a pair_request over TCP to the daemon.\n\n"
@@ -18,6 +22,8 @@ void print_help() {
               << "  tether -g\n"
               << "  tether -g --host 127.0.0.1\n"
               << "  echo \"pipe\" | tether -s\n"
+              << "  tether --discover\n"
+              << "  tether --discover --timeout 5000\n"
               << "  tether --accept 9a4f21...\n";
 }
 
@@ -29,6 +35,7 @@ int main(int argc, char* argv[]) {
 
     std::string action, arg_val, host = "";
     int port = 5134;
+    int timeout_ms = 3000;
 
     for (int i = 1; i < argc; ++i) {
         std::string arg = argv[i];
@@ -36,11 +43,13 @@ int main(int argc, char* argv[]) {
             print_help();
             return 0;
         } else if (arg == "-g" || arg == "--get-clipboard") { action = "get"; }
+        else if (arg == "-d" || arg == "--discover") { action = "discover"; }
         else if (arg == "--list-devices") { action = "list"; }
         else if (arg == "--pair") { action = "pair"; }
         else if (arg == "--accept") { action = "accept"; if (i + 1 < argc && argv[i + 1][0] != '-') arg_val = argv[++i]; }
         else if (arg == "--host") { if (i + 1 < argc && argv[i + 1][0] != '-') host = argv[++i]; }
         else if (arg == "--port") { if (i + 1 < argc && argv[i + 1][0] != '-') port = std::stoi(argv[++i]); }
+        else if (arg == "--timeout") { if (i + 1 < argc && argv[i + 1][0] != '-') timeout_ms = std::stoi(argv[++i]); }
         else if (arg == "-f" || arg == "--send-file") {
             action = "file";
             if (i + 1 < argc && argv[i + 1][0] != '-') arg_val = argv[++i];
@@ -64,6 +73,29 @@ int main(int argc, char* argv[]) {
     } else if (action == "accept") {
         client.accept_device(arg_val);
         std::cout << "Successfully paired device: " << arg_val << "\n";
+        return 0;
+    } else if (action == "discover") {
+        std::cout << "Scanning for tetherd instances on the local network...\n\n";
+
+        tether::Discovery discovery;
+        auto hosts = discovery.discover(timeout_ms);
+
+        if (hosts.empty()) {
+            std::cout << "  No tetherd instances found.\n";
+        } else {
+            tether::Crypto::instance().init();
+            for (const auto& h : hosts) {
+                std::string status = "[new]";
+                if (!h.fingerprint.empty() && tether::Crypto::instance().is_host_known(h.fingerprint)) {
+                    status = "[known]";
+                }
+                // Pad columns for clean output
+                printf("  %-20s  %s:%-5d  %s\n",
+                       h.name.c_str(), h.address.c_str(), h.port, status.c_str());
+            }
+        }
+
+        printf("\nFound %zu device(s) in %.1fs\n", hosts.size(), timeout_ms / 1000.0);
         return 0;
     }
 
@@ -110,3 +142,4 @@ int main(int argc, char* argv[]) {
 
     return 0;
 }
+

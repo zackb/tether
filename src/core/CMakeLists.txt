@@ -7,6 +7,7 @@ add_library(tether STATIC
     src/file_transfer.cpp
     src/crypto.cpp
     src/client.cpp
+    src/discovery.cpp
     src/wayland.cpp
     src/wayland_protocols/wayland.cpp
     src/wayland_protocols/wlr-data-control-unstable-v1.cpp
@@ -21,4 +22,5 @@ target_link_libraries(tether PUBLIC
     PkgConfig::WAYLAND
     OpenSSL::SSL
     OpenSSL::Crypto
+    PkgConfig::AVAHI
 )
