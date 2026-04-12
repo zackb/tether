@@ -96,9 +96,9 @@ extension TetherMessage {
     static func fileChunk(transferId: String, chunkIndex: Int, data: String) -> TetherMessage {
         TetherMessage(
             command: TetherCommand.fileChunk.rawValue,
+            transferId: transferId,
             chunkIndex: chunkIndex,
-            data: data,
-            transferId: transferId
+            data: data
         )
     }
 
