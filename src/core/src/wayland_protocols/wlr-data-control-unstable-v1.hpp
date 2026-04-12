@@ -28,20 +28,19 @@
     AN ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION,
     ARISING OUT OF OR IN CONNECTION WITH THE USE OR PERFORMANCE OF
     THIS SOFTWARE.
-  
+
 */
 
 #pragma once
 
-#include <functional>
 #include <cstdint>
+#include <functional>
 #include <string>
 #include <wayland-client.h>
 
 #define F std::function
 
 struct wl_proxy;
-
 
 class CCZwlrDataControlManagerV1;
 class CCZwlrDataControlSourceV1;
@@ -64,40 +63,47 @@ extern const wl_interface zwlr_data_control_offer_v1_interface;
 
 #endif
 
-
 class CCZwlrDataControlManagerV1 {
-  public:
+public:
     CCZwlrDataControlManagerV1(wl_proxy*);
     ~CCZwlrDataControlManagerV1();
 
-
     // set the data for this resource
-    void setData(void* data) {{
-        pData = data;
-    }}
+    void setData(void* data) {
+        {
+            pData = data;
+        }
+    }
 
     // get the data for this resource
-    void* data() {{
-        return pData;
-    }}
+    void* data() {
+        {
+            return pData;
+        }
+    }
 
     // get the raw wl_resource (wl_proxy) ptr
-    wl_proxy* resource() {{
-        return pResource;
-    }}
+    wl_proxy* resource() {
+        {
+            return pResource;
+        }
+    }
 
     // get the raw wl_proxy ptr
-    wl_proxy* proxy() {{
-        return pResource;
-    }}
+    wl_proxy* proxy() {
+        {
+            return pResource;
+        }
+    }
 
     // get the resource version
-    int version() {{
-        return wl_proxy_get_version(pResource);
-    }}
-            
-    // --------------- Requests --------------- //
+    int version() {
+        {
+            return wl_proxy_get_version(pResource);
+        }
+    }
 
+    // --------------- Requests --------------- //
 
     // --------------- Events --------------- //
 
@@ -105,7 +111,7 @@ class CCZwlrDataControlManagerV1 {
     wl_proxy* sendGetDataDevice(wl_proxy*);
     void sendDestroy();
 
-  private:
+private:
     struct {
     } requests;
 
@@ -116,39 +122,46 @@ class CCZwlrDataControlManagerV1 {
     void* pData = nullptr;
 };
 
-
-
 class CCZwlrDataControlDeviceV1 {
-  public:
+public:
     CCZwlrDataControlDeviceV1(wl_proxy*);
     ~CCZwlrDataControlDeviceV1();
 
-
     // set the data for this resource
-    void setData(void* data) {{
-        pData = data;
-    }}
+    void setData(void* data) {
+        {
+            pData = data;
+        }
+    }
 
     // get the data for this resource
-    void* data() {{
-        return pData;
-    }}
+    void* data() {
+        {
+            return pData;
+        }
+    }
 
     // get the raw wl_resource (wl_proxy) ptr
-    wl_proxy* resource() {{
-        return pResource;
-    }}
+    wl_proxy* resource() {
+        {
+            return pResource;
+        }
+    }
 
     // get the raw wl_proxy ptr
-    wl_proxy* proxy() {{
-        return pResource;
-    }}
+    wl_proxy* proxy() {
+        {
+            return pResource;
+        }
+    }
 
     // get the resource version
-    int version() {{
-        return wl_proxy_get_version(pResource);
-    }}
-            
+    int version() {
+        {
+            return wl_proxy_get_version(pResource);
+        }
+    }
+
     // --------------- Requests --------------- //
 
     void setDataOffer(F<void(CCZwlrDataControlDeviceV1*, wl_proxy*)> handler);
@@ -162,7 +175,7 @@ class CCZwlrDataControlDeviceV1 {
     void sendDestroy();
     void sendSetPrimarySelection(CCZwlrDataControlSourceV1*);
 
-  private:
+private:
     struct {
         F<void(CCZwlrDataControlDeviceV1*, wl_proxy*)> dataOffer;
         F<void(CCZwlrDataControlDeviceV1*, wl_proxy*)> selection;
@@ -177,39 +190,46 @@ class CCZwlrDataControlDeviceV1 {
     void* pData = nullptr;
 };
 
-
-
 class CCZwlrDataControlSourceV1 {
-  public:
+public:
     CCZwlrDataControlSourceV1(wl_proxy*);
     ~CCZwlrDataControlSourceV1();
 
-
     // set the data for this resource
-    void setData(void* data) {{
-        pData = data;
-    }}
+    void setData(void* data) {
+        {
+            pData = data;
+        }
+    }
 
     // get the data for this resource
-    void* data() {{
-        return pData;
-    }}
+    void* data() {
+        {
+            return pData;
+        }
+    }
 
     // get the raw wl_resource (wl_proxy) ptr
-    wl_proxy* resource() {{
-        return pResource;
-    }}
+    wl_proxy* resource() {
+        {
+            return pResource;
+        }
+    }
 
     // get the raw wl_proxy ptr
-    wl_proxy* proxy() {{
-        return pResource;
-    }}
+    wl_proxy* proxy() {
+        {
+            return pResource;
+        }
+    }
 
     // get the resource version
-    int version() {{
-        return wl_proxy_get_version(pResource);
-    }}
-            
+    int version() {
+        {
+            return wl_proxy_get_version(pResource);
+        }
+    }
+
     // --------------- Requests --------------- //
 
     void setSend(F<void(CCZwlrDataControlSourceV1*, const char*, int32_t)> handler);
@@ -220,7 +240,7 @@ class CCZwlrDataControlSourceV1 {
     void sendOffer(const char*);
     void sendDestroy();
 
-  private:
+private:
     struct {
         F<void(CCZwlrDataControlSourceV1*, const char*, int32_t)> send;
         F<void(CCZwlrDataControlSourceV1*)> cancelled;
@@ -233,39 +253,46 @@ class CCZwlrDataControlSourceV1 {
     void* pData = nullptr;
 };
 
-
-
 class CCZwlrDataControlOfferV1 {
-  public:
+public:
     CCZwlrDataControlOfferV1(wl_proxy*);
     ~CCZwlrDataControlOfferV1();
 
-
     // set the data for this resource
-    void setData(void* data) {{
-        pData = data;
-    }}
+    void setData(void* data) {
+        {
+            pData = data;
+        }
+    }
 
     // get the data for this resource
-    void* data() {{
-        return pData;
-    }}
+    void* data() {
+        {
+            return pData;
+        }
+    }
 
     // get the raw wl_resource (wl_proxy) ptr
-    wl_proxy* resource() {{
-        return pResource;
-    }}
+    wl_proxy* resource() {
+        {
+            return pResource;
+        }
+    }
 
     // get the raw wl_proxy ptr
-    wl_proxy* proxy() {{
-        return pResource;
-    }}
+    wl_proxy* proxy() {
+        {
+            return pResource;
+        }
+    }
 
     // get the resource version
-    int version() {{
-        return wl_proxy_get_version(pResource);
-    }}
-            
+    int version() {
+        {
+            return wl_proxy_get_version(pResource);
+        }
+    }
+
     // --------------- Requests --------------- //
 
     void setOffer(F<void(CCZwlrDataControlOfferV1*, const char*)> handler);
@@ -275,7 +302,7 @@ class CCZwlrDataControlOfferV1 {
     void sendReceive(const char*, int32_t);
     void sendDestroy();
 
-  private:
+private:
     struct {
         F<void(CCZwlrDataControlOfferV1*, const char*)> offer;
     } requests;
@@ -286,7 +313,5 @@ class CCZwlrDataControlOfferV1 {
 
     void* pData = nullptr;
 };
-
-
 
 #undef F

@@ -29,20 +29,19 @@
     ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
     CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
     SOFTWARE.
-  
+
 */
 
 #pragma once
 
-#include <functional>
 #include <cstdint>
+#include <functional>
 #include <string>
 #include <wayland-client.h>
 
 #define F std::function
 
 struct wl_proxy;
-
 
 class CCWlDisplay;
 class CCWlCallback;
@@ -142,38 +141,46 @@ extern const wl_interface wl_fixes_interface;
 
 #endif
 
-
 class CCWlDisplay {
-  public:
+public:
     CCWlDisplay(wl_proxy*);
     ~CCWlDisplay();
 
-
     // set the data for this resource
-    void setData(void* data) {{
-        pData = data;
-    }}
+    void setData(void* data) {
+        {
+            pData = data;
+        }
+    }
 
     // get the data for this resource
-    void* data() {{
-        return pData;
-    }}
+    void* data() {
+        {
+            return pData;
+        }
+    }
 
     // get the raw wl_resource (wl_proxy) ptr
-    wl_proxy* resource() {{
-        return pResource;
-    }}
+    wl_proxy* resource() {
+        {
+            return pResource;
+        }
+    }
 
     // get the raw wl_proxy ptr
-    wl_proxy* proxy() {{
-        return pResource;
-    }}
+    wl_proxy* proxy() {
+        {
+            return pResource;
+        }
+    }
 
     // get the resource version
-    int version() {{
-        return wl_proxy_get_version(pResource);
-    }}
-            
+    int version() {
+        {
+            return wl_proxy_get_version(pResource);
+        }
+    }
+
     // --------------- Requests --------------- //
 
     void setError(F<void(CCWlDisplay*, wl_proxy*, uint32_t, const char*)> handler);
@@ -184,7 +191,7 @@ class CCWlDisplay {
     wl_proxy* sendSync();
     wl_proxy* sendGetRegistry();
 
-  private:
+private:
     struct {
         F<void(CCWlDisplay*, wl_proxy*, uint32_t, const char*)> error;
         F<void(CCWlDisplay*, uint32_t)> deleteId;
@@ -197,39 +204,46 @@ class CCWlDisplay {
     void* pData = nullptr;
 };
 
-
-
 class CCWlRegistry {
-  public:
+public:
     CCWlRegistry(wl_proxy*);
     ~CCWlRegistry();
 
-
     // set the data for this resource
-    void setData(void* data) {{
-        pData = data;
-    }}
+    void setData(void* data) {
+        {
+            pData = data;
+        }
+    }
 
     // get the data for this resource
-    void* data() {{
-        return pData;
-    }}
+    void* data() {
+        {
+            return pData;
+        }
+    }
 
     // get the raw wl_resource (wl_proxy) ptr
-    wl_proxy* resource() {{
-        return pResource;
-    }}
+    wl_proxy* resource() {
+        {
+            return pResource;
+        }
+    }
 
     // get the raw wl_proxy ptr
-    wl_proxy* proxy() {{
-        return pResource;
-    }}
+    wl_proxy* proxy() {
+        {
+            return pResource;
+        }
+    }
 
     // get the resource version
-    int version() {{
-        return wl_proxy_get_version(pResource);
-    }}
-            
+    int version() {
+        {
+            return wl_proxy_get_version(pResource);
+        }
+    }
+
     // --------------- Requests --------------- //
 
     void setGlobal(F<void(CCWlRegistry*, uint32_t, const char*, uint32_t)> handler);
@@ -239,7 +253,7 @@ class CCWlRegistry {
 
     void sendBind(uint32_t);
 
-  private:
+private:
     struct {
         F<void(CCWlRegistry*, uint32_t, const char*, uint32_t)> global;
         F<void(CCWlRegistry*, uint32_t)> globalRemove;
@@ -252,47 +266,53 @@ class CCWlRegistry {
     void* pData = nullptr;
 };
 
-
-
 class CCWlCallback {
-  public:
+public:
     CCWlCallback(wl_proxy*);
     ~CCWlCallback();
 
-
     // set the data for this resource
-    void setData(void* data) {{
-        pData = data;
-    }}
+    void setData(void* data) {
+        {
+            pData = data;
+        }
+    }
 
     // get the data for this resource
-    void* data() {{
-        return pData;
-    }}
+    void* data() {
+        {
+            return pData;
+        }
+    }
 
     // get the raw wl_resource (wl_proxy) ptr
-    wl_proxy* resource() {{
-        return pResource;
-    }}
+    wl_proxy* resource() {
+        {
+            return pResource;
+        }
+    }
 
     // get the raw wl_proxy ptr
-    wl_proxy* proxy() {{
-        return pResource;
-    }}
+    wl_proxy* proxy() {
+        {
+            return pResource;
+        }
+    }
 
     // get the resource version
-    int version() {{
-        return wl_proxy_get_version(pResource);
-    }}
-            
+    int version() {
+        {
+            return wl_proxy_get_version(pResource);
+        }
+    }
+
     // --------------- Requests --------------- //
 
     void setDone(F<void(CCWlCallback*, uint32_t)> handler);
 
     // --------------- Events --------------- //
 
-
-  private:
+private:
     struct {
         F<void(CCWlCallback*, uint32_t)> done;
     } requests;
@@ -304,48 +324,54 @@ class CCWlCallback {
     void* pData = nullptr;
 };
 
-
-
 class CCWlCompositor {
-  public:
+public:
     CCWlCompositor(wl_proxy*);
     ~CCWlCompositor();
 
-
     // set the data for this resource
-    void setData(void* data) {{
-        pData = data;
-    }}
+    void setData(void* data) {
+        {
+            pData = data;
+        }
+    }
 
     // get the data for this resource
-    void* data() {{
-        return pData;
-    }}
+    void* data() {
+        {
+            return pData;
+        }
+    }
 
     // get the raw wl_resource (wl_proxy) ptr
-    wl_proxy* resource() {{
-        return pResource;
-    }}
+    wl_proxy* resource() {
+        {
+            return pResource;
+        }
+    }
 
     // get the raw wl_proxy ptr
-    wl_proxy* proxy() {{
-        return pResource;
-    }}
+    wl_proxy* proxy() {
+        {
+            return pResource;
+        }
+    }
 
     // get the resource version
-    int version() {{
-        return wl_proxy_get_version(pResource);
-    }}
-            
-    // --------------- Requests --------------- //
+    int version() {
+        {
+            return wl_proxy_get_version(pResource);
+        }
+    }
 
+    // --------------- Requests --------------- //
 
     // --------------- Events --------------- //
 
     wl_proxy* sendCreateSurface();
     wl_proxy* sendCreateRegion();
 
-  private:
+private:
     struct {
     } requests;
 
@@ -356,41 +382,47 @@ class CCWlCompositor {
     void* pData = nullptr;
 };
 
-
-
 class CCWlShmPool {
-  public:
+public:
     CCWlShmPool(wl_proxy*);
     ~CCWlShmPool();
 
-
     // set the data for this resource
-    void setData(void* data) {{
-        pData = data;
-    }}
+    void setData(void* data) {
+        {
+            pData = data;
+        }
+    }
 
     // get the data for this resource
-    void* data() {{
-        return pData;
-    }}
+    void* data() {
+        {
+            return pData;
+        }
+    }
 
     // get the raw wl_resource (wl_proxy) ptr
-    wl_proxy* resource() {{
-        return pResource;
-    }}
+    wl_proxy* resource() {
+        {
+            return pResource;
+        }
+    }
 
     // get the raw wl_proxy ptr
-    wl_proxy* proxy() {{
-        return pResource;
-    }}
+    wl_proxy* proxy() {
+        {
+            return pResource;
+        }
+    }
 
     // get the resource version
-    int version() {{
-        return wl_proxy_get_version(pResource);
-    }}
-            
-    // --------------- Requests --------------- //
+    int version() {
+        {
+            return wl_proxy_get_version(pResource);
+        }
+    }
 
+    // --------------- Requests --------------- //
 
     // --------------- Events --------------- //
 
@@ -398,7 +430,7 @@ class CCWlShmPool {
     void sendDestroy();
     void sendResize(int32_t);
 
-  private:
+private:
     struct {
     } requests;
 
@@ -409,39 +441,46 @@ class CCWlShmPool {
     void* pData = nullptr;
 };
 
-
-
 class CCWlShm {
-  public:
+public:
     CCWlShm(wl_proxy*);
     ~CCWlShm();
 
-
     // set the data for this resource
-    void setData(void* data) {{
-        pData = data;
-    }}
+    void setData(void* data) {
+        {
+            pData = data;
+        }
+    }
 
     // get the data for this resource
-    void* data() {{
-        return pData;
-    }}
+    void* data() {
+        {
+            return pData;
+        }
+    }
 
     // get the raw wl_resource (wl_proxy) ptr
-    wl_proxy* resource() {{
-        return pResource;
-    }}
+    wl_proxy* resource() {
+        {
+            return pResource;
+        }
+    }
 
     // get the raw wl_proxy ptr
-    wl_proxy* proxy() {{
-        return pResource;
-    }}
+    wl_proxy* proxy() {
+        {
+            return pResource;
+        }
+    }
 
     // get the resource version
-    int version() {{
-        return wl_proxy_get_version(pResource);
-    }}
-            
+    int version() {
+        {
+            return wl_proxy_get_version(pResource);
+        }
+    }
+
     // --------------- Requests --------------- //
 
     void setFormat(F<void(CCWlShm*, enum wl_shm_format)> handler);
@@ -451,7 +490,7 @@ class CCWlShm {
     wl_proxy* sendCreatePool(int32_t, int32_t);
     void sendRelease();
 
-  private:
+private:
     struct {
         F<void(CCWlShm*, enum wl_shm_format)> format;
     } requests;
@@ -463,39 +502,46 @@ class CCWlShm {
     void* pData = nullptr;
 };
 
-
-
 class CCWlBuffer {
-  public:
+public:
     CCWlBuffer(wl_proxy*);
     ~CCWlBuffer();
 
-
     // set the data for this resource
-    void setData(void* data) {{
-        pData = data;
-    }}
+    void setData(void* data) {
+        {
+            pData = data;
+        }
+    }
 
     // get the data for this resource
-    void* data() {{
-        return pData;
-    }}
+    void* data() {
+        {
+            return pData;
+        }
+    }
 
     // get the raw wl_resource (wl_proxy) ptr
-    wl_proxy* resource() {{
-        return pResource;
-    }}
+    wl_proxy* resource() {
+        {
+            return pResource;
+        }
+    }
 
     // get the raw wl_proxy ptr
-    wl_proxy* proxy() {{
-        return pResource;
-    }}
+    wl_proxy* proxy() {
+        {
+            return pResource;
+        }
+    }
 
     // get the resource version
-    int version() {{
-        return wl_proxy_get_version(pResource);
-    }}
-            
+    int version() {
+        {
+            return wl_proxy_get_version(pResource);
+        }
+    }
+
     // --------------- Requests --------------- //
 
     void setRelease(F<void(CCWlBuffer*)> handler);
@@ -504,7 +550,7 @@ class CCWlBuffer {
 
     void sendDestroy();
 
-  private:
+private:
     struct {
         F<void(CCWlBuffer*)> release;
     } requests;
@@ -516,39 +562,46 @@ class CCWlBuffer {
     void* pData = nullptr;
 };
 
-
-
 class CCWlDataOffer {
-  public:
+public:
     CCWlDataOffer(wl_proxy*);
     ~CCWlDataOffer();
 
-
     // set the data for this resource
-    void setData(void* data) {{
-        pData = data;
-    }}
+    void setData(void* data) {
+        {
+            pData = data;
+        }
+    }
 
     // get the data for this resource
-    void* data() {{
-        return pData;
-    }}
+    void* data() {
+        {
+            return pData;
+        }
+    }
 
     // get the raw wl_resource (wl_proxy) ptr
-    wl_proxy* resource() {{
-        return pResource;
-    }}
+    wl_proxy* resource() {
+        {
+            return pResource;
+        }
+    }
 
     // get the raw wl_proxy ptr
-    wl_proxy* proxy() {{
-        return pResource;
-    }}
+    wl_proxy* proxy() {
+        {
+            return pResource;
+        }
+    }
 
     // get the resource version
-    int version() {{
-        return wl_proxy_get_version(pResource);
-    }}
-            
+    int version() {
+        {
+            return wl_proxy_get_version(pResource);
+        }
+    }
+
     // --------------- Requests --------------- //
 
     void setOffer(F<void(CCWlDataOffer*, const char*)> handler);
@@ -563,7 +616,7 @@ class CCWlDataOffer {
     void sendFinish();
     void sendSetActions(uint32_t, uint32_t);
 
-  private:
+private:
     struct {
         F<void(CCWlDataOffer*, const char*)> offer;
         F<void(CCWlDataOffer*, uint32_t)> sourceActions;
@@ -577,39 +630,46 @@ class CCWlDataOffer {
     void* pData = nullptr;
 };
 
-
-
 class CCWlDataSource {
-  public:
+public:
     CCWlDataSource(wl_proxy*);
     ~CCWlDataSource();
 
-
     // set the data for this resource
-    void setData(void* data) {{
-        pData = data;
-    }}
+    void setData(void* data) {
+        {
+            pData = data;
+        }
+    }
 
     // get the data for this resource
-    void* data() {{
-        return pData;
-    }}
+    void* data() {
+        {
+            return pData;
+        }
+    }
 
     // get the raw wl_resource (wl_proxy) ptr
-    wl_proxy* resource() {{
-        return pResource;
-    }}
+    wl_proxy* resource() {
+        {
+            return pResource;
+        }
+    }
 
     // get the raw wl_proxy ptr
-    wl_proxy* proxy() {{
-        return pResource;
-    }}
+    wl_proxy* proxy() {
+        {
+            return pResource;
+        }
+    }
 
     // get the resource version
-    int version() {{
-        return wl_proxy_get_version(pResource);
-    }}
-            
+    int version() {
+        {
+            return wl_proxy_get_version(pResource);
+        }
+    }
+
     // --------------- Requests --------------- //
 
     void setTarget(F<void(CCWlDataSource*, const char*)> handler);
@@ -625,7 +685,7 @@ class CCWlDataSource {
     void sendDestroy();
     void sendSetActions(uint32_t);
 
-  private:
+private:
     struct {
         F<void(CCWlDataSource*, const char*)> target;
         F<void(CCWlDataSource*, const char*, int32_t)> send;
@@ -642,39 +702,46 @@ class CCWlDataSource {
     void* pData = nullptr;
 };
 
-
-
 class CCWlDataDevice {
-  public:
+public:
     CCWlDataDevice(wl_proxy*);
     ~CCWlDataDevice();
 
-
     // set the data for this resource
-    void setData(void* data) {{
-        pData = data;
-    }}
+    void setData(void* data) {
+        {
+            pData = data;
+        }
+    }
 
     // get the data for this resource
-    void* data() {{
-        return pData;
-    }}
+    void* data() {
+        {
+            return pData;
+        }
+    }
 
     // get the raw wl_resource (wl_proxy) ptr
-    wl_proxy* resource() {{
-        return pResource;
-    }}
+    wl_proxy* resource() {
+        {
+            return pResource;
+        }
+    }
 
     // get the raw wl_proxy ptr
-    wl_proxy* proxy() {{
-        return pResource;
-    }}
+    wl_proxy* proxy() {
+        {
+            return pResource;
+        }
+    }
 
     // get the resource version
-    int version() {{
-        return wl_proxy_get_version(pResource);
-    }}
-            
+    int version() {
+        {
+            return wl_proxy_get_version(pResource);
+        }
+    }
+
     // --------------- Requests --------------- //
 
     void setDataOffer(F<void(CCWlDataDevice*, wl_proxy*)> handler);
@@ -690,7 +757,7 @@ class CCWlDataDevice {
     void sendSetSelection(CCWlDataSource*, uint32_t);
     void sendRelease();
 
-  private:
+private:
     struct {
         F<void(CCWlDataDevice*, wl_proxy*)> dataOffer;
         F<void(CCWlDataDevice*, uint32_t, wl_proxy*, wl_fixed_t, wl_fixed_t, wl_proxy*)> enter;
@@ -707,48 +774,54 @@ class CCWlDataDevice {
     void* pData = nullptr;
 };
 
-
-
 class CCWlDataDeviceManager {
-  public:
+public:
     CCWlDataDeviceManager(wl_proxy*);
     ~CCWlDataDeviceManager();
 
-
     // set the data for this resource
-    void setData(void* data) {{
-        pData = data;
-    }}
+    void setData(void* data) {
+        {
+            pData = data;
+        }
+    }
 
     // get the data for this resource
-    void* data() {{
-        return pData;
-    }}
+    void* data() {
+        {
+            return pData;
+        }
+    }
 
     // get the raw wl_resource (wl_proxy) ptr
-    wl_proxy* resource() {{
-        return pResource;
-    }}
+    wl_proxy* resource() {
+        {
+            return pResource;
+        }
+    }
 
     // get the raw wl_proxy ptr
-    wl_proxy* proxy() {{
-        return pResource;
-    }}
+    wl_proxy* proxy() {
+        {
+            return pResource;
+        }
+    }
 
     // get the resource version
-    int version() {{
-        return wl_proxy_get_version(pResource);
-    }}
-            
-    // --------------- Requests --------------- //
+    int version() {
+        {
+            return wl_proxy_get_version(pResource);
+        }
+    }
 
+    // --------------- Requests --------------- //
 
     // --------------- Events --------------- //
 
     wl_proxy* sendCreateDataSource();
     wl_proxy* sendGetDataDevice(CCWlSeat*);
 
-  private:
+private:
     struct {
     } requests;
 
@@ -759,47 +832,53 @@ class CCWlDataDeviceManager {
     void* pData = nullptr;
 };
 
-
-
 class CCWlShell {
-  public:
+public:
     CCWlShell(wl_proxy*);
     ~CCWlShell();
 
-
     // set the data for this resource
-    void setData(void* data) {{
-        pData = data;
-    }}
+    void setData(void* data) {
+        {
+            pData = data;
+        }
+    }
 
     // get the data for this resource
-    void* data() {{
-        return pData;
-    }}
+    void* data() {
+        {
+            return pData;
+        }
+    }
 
     // get the raw wl_resource (wl_proxy) ptr
-    wl_proxy* resource() {{
-        return pResource;
-    }}
+    wl_proxy* resource() {
+        {
+            return pResource;
+        }
+    }
 
     // get the raw wl_proxy ptr
-    wl_proxy* proxy() {{
-        return pResource;
-    }}
+    wl_proxy* proxy() {
+        {
+            return pResource;
+        }
+    }
 
     // get the resource version
-    int version() {{
-        return wl_proxy_get_version(pResource);
-    }}
-            
-    // --------------- Requests --------------- //
+    int version() {
+        {
+            return wl_proxy_get_version(pResource);
+        }
+    }
 
+    // --------------- Requests --------------- //
 
     // --------------- Events --------------- //
 
     wl_proxy* sendGetShellSurface(CCWlSurface*);
 
-  private:
+private:
     struct {
     } requests;
 
@@ -810,39 +889,46 @@ class CCWlShell {
     void* pData = nullptr;
 };
 
-
-
 class CCWlShellSurface {
-  public:
+public:
     CCWlShellSurface(wl_proxy*);
     ~CCWlShellSurface();
 
-
     // set the data for this resource
-    void setData(void* data) {{
-        pData = data;
-    }}
+    void setData(void* data) {
+        {
+            pData = data;
+        }
+    }
 
     // get the data for this resource
-    void* data() {{
-        return pData;
-    }}
+    void* data() {
+        {
+            return pData;
+        }
+    }
 
     // get the raw wl_resource (wl_proxy) ptr
-    wl_proxy* resource() {{
-        return pResource;
-    }}
+    wl_proxy* resource() {
+        {
+            return pResource;
+        }
+    }
 
     // get the raw wl_proxy ptr
-    wl_proxy* proxy() {{
-        return pResource;
-    }}
+    wl_proxy* proxy() {
+        {
+            return pResource;
+        }
+    }
 
     // get the resource version
-    int version() {{
-        return wl_proxy_get_version(pResource);
-    }}
-            
+    int version() {
+        {
+            return wl_proxy_get_version(pResource);
+        }
+    }
+
     // --------------- Requests --------------- //
 
     void setPing(F<void(CCWlShellSurface*, uint32_t)> handler);
@@ -862,7 +948,7 @@ class CCWlShellSurface {
     void sendSetTitle(const char*);
     void sendSetClass(const char*);
 
-  private:
+private:
     struct {
         F<void(CCWlShellSurface*, uint32_t)> ping;
         F<void(CCWlShellSurface*, enum wl_shell_surface_resize, int32_t, int32_t)> configure;
@@ -876,39 +962,46 @@ class CCWlShellSurface {
     void* pData = nullptr;
 };
 
-
-
 class CCWlSurface {
-  public:
+public:
     CCWlSurface(wl_proxy*);
     ~CCWlSurface();
 
-
     // set the data for this resource
-    void setData(void* data) {{
-        pData = data;
-    }}
+    void setData(void* data) {
+        {
+            pData = data;
+        }
+    }
 
     // get the data for this resource
-    void* data() {{
-        return pData;
-    }}
+    void* data() {
+        {
+            return pData;
+        }
+    }
 
     // get the raw wl_resource (wl_proxy) ptr
-    wl_proxy* resource() {{
-        return pResource;
-    }}
+    wl_proxy* resource() {
+        {
+            return pResource;
+        }
+    }
 
     // get the raw wl_proxy ptr
-    wl_proxy* proxy() {{
-        return pResource;
-    }}
+    wl_proxy* proxy() {
+        {
+            return pResource;
+        }
+    }
 
     // get the resource version
-    int version() {{
-        return wl_proxy_get_version(pResource);
-    }}
-            
+    int version() {
+        {
+            return wl_proxy_get_version(pResource);
+        }
+    }
+
     // --------------- Requests --------------- //
 
     void setEnter(F<void(CCWlSurface*, wl_proxy*)> handler);
@@ -930,7 +1023,7 @@ class CCWlSurface {
     void sendDamageBuffer(int32_t, int32_t, int32_t, int32_t);
     void sendOffset(int32_t, int32_t);
 
-  private:
+private:
     struct {
         F<void(CCWlSurface*, wl_proxy*)> enter;
         F<void(CCWlSurface*, wl_proxy*)> leave;
@@ -945,39 +1038,46 @@ class CCWlSurface {
     void* pData = nullptr;
 };
 
-
-
 class CCWlSeat {
-  public:
+public:
     CCWlSeat(wl_proxy*);
     ~CCWlSeat();
 
-
     // set the data for this resource
-    void setData(void* data) {{
-        pData = data;
-    }}
+    void setData(void* data) {
+        {
+            pData = data;
+        }
+    }
 
     // get the data for this resource
-    void* data() {{
-        return pData;
-    }}
+    void* data() {
+        {
+            return pData;
+        }
+    }
 
     // get the raw wl_resource (wl_proxy) ptr
-    wl_proxy* resource() {{
-        return pResource;
-    }}
+    wl_proxy* resource() {
+        {
+            return pResource;
+        }
+    }
 
     // get the raw wl_proxy ptr
-    wl_proxy* proxy() {{
-        return pResource;
-    }}
+    wl_proxy* proxy() {
+        {
+            return pResource;
+        }
+    }
 
     // get the resource version
-    int version() {{
-        return wl_proxy_get_version(pResource);
-    }}
-            
+    int version() {
+        {
+            return wl_proxy_get_version(pResource);
+        }
+    }
+
     // --------------- Requests --------------- //
 
     void setCapabilities(F<void(CCWlSeat*, enum wl_seat_capability)> handler);
@@ -990,7 +1090,7 @@ class CCWlSeat {
     wl_proxy* sendGetTouch();
     void sendRelease();
 
-  private:
+private:
     struct {
         F<void(CCWlSeat*, enum wl_seat_capability)> capabilities;
         F<void(CCWlSeat*, const char*)> name;
@@ -1003,39 +1103,46 @@ class CCWlSeat {
     void* pData = nullptr;
 };
 
-
-
 class CCWlPointer {
-  public:
+public:
     CCWlPointer(wl_proxy*);
     ~CCWlPointer();
 
-
     // set the data for this resource
-    void setData(void* data) {{
-        pData = data;
-    }}
+    void setData(void* data) {
+        {
+            pData = data;
+        }
+    }
 
     // get the data for this resource
-    void* data() {{
-        return pData;
-    }}
+    void* data() {
+        {
+            return pData;
+        }
+    }
 
     // get the raw wl_resource (wl_proxy) ptr
-    wl_proxy* resource() {{
-        return pResource;
-    }}
+    wl_proxy* resource() {
+        {
+            return pResource;
+        }
+    }
 
     // get the raw wl_proxy ptr
-    wl_proxy* proxy() {{
-        return pResource;
-    }}
+    wl_proxy* proxy() {
+        {
+            return pResource;
+        }
+    }
 
     // get the resource version
-    int version() {{
-        return wl_proxy_get_version(pResource);
-    }}
-            
+    int version() {
+        {
+            return wl_proxy_get_version(pResource);
+        }
+    }
+
     // --------------- Requests --------------- //
 
     void setEnter(F<void(CCWlPointer*, uint32_t, wl_proxy*, wl_fixed_t, wl_fixed_t)> handler);
@@ -1048,14 +1155,15 @@ class CCWlPointer {
     void setAxisStop(F<void(CCWlPointer*, uint32_t, enum wl_pointer_axis)> handler);
     void setAxisDiscrete(F<void(CCWlPointer*, enum wl_pointer_axis, int32_t)> handler);
     void setAxisValue120(F<void(CCWlPointer*, enum wl_pointer_axis, int32_t)> handler);
-    void setAxisRelativeDirection(F<void(CCWlPointer*, enum wl_pointer_axis, enum wl_pointer_axis_relative_direction)> handler);
+    void setAxisRelativeDirection(
+        F<void(CCWlPointer*, enum wl_pointer_axis, enum wl_pointer_axis_relative_direction)> handler);
 
     // --------------- Events --------------- //
 
     void sendSetCursor(uint32_t, CCWlSurface*, int32_t, int32_t);
     void sendRelease();
 
-  private:
+private:
     struct {
         F<void(CCWlPointer*, uint32_t, wl_proxy*, wl_fixed_t, wl_fixed_t)> enter;
         F<void(CCWlPointer*, uint32_t, wl_proxy*)> leave;
@@ -1077,39 +1185,46 @@ class CCWlPointer {
     void* pData = nullptr;
 };
 
-
-
 class CCWlKeyboard {
-  public:
+public:
     CCWlKeyboard(wl_proxy*);
     ~CCWlKeyboard();
 
-
     // set the data for this resource
-    void setData(void* data) {{
-        pData = data;
-    }}
+    void setData(void* data) {
+        {
+            pData = data;
+        }
+    }
 
     // get the data for this resource
-    void* data() {{
-        return pData;
-    }}
+    void* data() {
+        {
+            return pData;
+        }
+    }
 
     // get the raw wl_resource (wl_proxy) ptr
-    wl_proxy* resource() {{
-        return pResource;
-    }}
+    wl_proxy* resource() {
+        {
+            return pResource;
+        }
+    }
 
     // get the raw wl_proxy ptr
-    wl_proxy* proxy() {{
-        return pResource;
-    }}
+    wl_proxy* proxy() {
+        {
+            return pResource;
+        }
+    }
 
     // get the resource version
-    int version() {{
-        return wl_proxy_get_version(pResource);
-    }}
-            
+    int version() {
+        {
+            return wl_proxy_get_version(pResource);
+        }
+    }
+
     // --------------- Requests --------------- //
 
     void setKeymap(F<void(CCWlKeyboard*, enum wl_keyboard_keymap_format, int32_t, uint32_t)> handler);
@@ -1123,7 +1238,7 @@ class CCWlKeyboard {
 
     void sendRelease();
 
-  private:
+private:
     struct {
         F<void(CCWlKeyboard*, enum wl_keyboard_keymap_format, int32_t, uint32_t)> keymap;
         F<void(CCWlKeyboard*, uint32_t, wl_proxy*, wl_array*)> enter;
@@ -1140,39 +1255,46 @@ class CCWlKeyboard {
     void* pData = nullptr;
 };
 
-
-
 class CCWlTouch {
-  public:
+public:
     CCWlTouch(wl_proxy*);
     ~CCWlTouch();
 
-
     // set the data for this resource
-    void setData(void* data) {{
-        pData = data;
-    }}
+    void setData(void* data) {
+        {
+            pData = data;
+        }
+    }
 
     // get the data for this resource
-    void* data() {{
-        return pData;
-    }}
+    void* data() {
+        {
+            return pData;
+        }
+    }
 
     // get the raw wl_resource (wl_proxy) ptr
-    wl_proxy* resource() {{
-        return pResource;
-    }}
+    wl_proxy* resource() {
+        {
+            return pResource;
+        }
+    }
 
     // get the raw wl_proxy ptr
-    wl_proxy* proxy() {{
-        return pResource;
-    }}
+    wl_proxy* proxy() {
+        {
+            return pResource;
+        }
+    }
 
     // get the resource version
-    int version() {{
-        return wl_proxy_get_version(pResource);
-    }}
-            
+    int version() {
+        {
+            return wl_proxy_get_version(pResource);
+        }
+    }
+
     // --------------- Requests --------------- //
 
     void setDown(F<void(CCWlTouch*, uint32_t, uint32_t, wl_proxy*, int32_t, wl_fixed_t, wl_fixed_t)> handler);
@@ -1187,7 +1309,7 @@ class CCWlTouch {
 
     void sendRelease();
 
-  private:
+private:
     struct {
         F<void(CCWlTouch*, uint32_t, uint32_t, wl_proxy*, int32_t, wl_fixed_t, wl_fixed_t)> down;
         F<void(CCWlTouch*, uint32_t, uint32_t, int32_t)> up;
@@ -1205,42 +1327,50 @@ class CCWlTouch {
     void* pData = nullptr;
 };
 
-
-
 class CCWlOutput {
-  public:
+public:
     CCWlOutput(wl_proxy*);
     ~CCWlOutput();
 
-
     // set the data for this resource
-    void setData(void* data) {{
-        pData = data;
-    }}
+    void setData(void* data) {
+        {
+            pData = data;
+        }
+    }
 
     // get the data for this resource
-    void* data() {{
-        return pData;
-    }}
+    void* data() {
+        {
+            return pData;
+        }
+    }
 
     // get the raw wl_resource (wl_proxy) ptr
-    wl_proxy* resource() {{
-        return pResource;
-    }}
+    wl_proxy* resource() {
+        {
+            return pResource;
+        }
+    }
 
     // get the raw wl_proxy ptr
-    wl_proxy* proxy() {{
-        return pResource;
-    }}
+    wl_proxy* proxy() {
+        {
+            return pResource;
+        }
+    }
 
     // get the resource version
-    int version() {{
-        return wl_proxy_get_version(pResource);
-    }}
-            
+    int version() {
+        {
+            return wl_proxy_get_version(pResource);
+        }
+    }
+
     // --------------- Requests --------------- //
 
-    void setGeometry(F<void(CCWlOutput*, int32_t, int32_t, int32_t, int32_t, int32_t, const char*, const char*, int32_t)> handler);
+    void setGeometry(
+        F<void(CCWlOutput*, int32_t, int32_t, int32_t, int32_t, int32_t, const char*, const char*, int32_t)> handler);
     void setMode(F<void(CCWlOutput*, enum wl_output_mode, int32_t, int32_t, int32_t)> handler);
     void setDone(F<void(CCWlOutput*)> handler);
     void setScale(F<void(CCWlOutput*, int32_t)> handler);
@@ -1251,7 +1381,7 @@ class CCWlOutput {
 
     void sendRelease();
 
-  private:
+private:
     struct {
         F<void(CCWlOutput*, int32_t, int32_t, int32_t, int32_t, int32_t, const char*, const char*, int32_t)> geometry;
         F<void(CCWlOutput*, enum wl_output_mode, int32_t, int32_t, int32_t)> mode;
@@ -1268,41 +1398,47 @@ class CCWlOutput {
     void* pData = nullptr;
 };
 
-
-
 class CCWlRegion {
-  public:
+public:
     CCWlRegion(wl_proxy*);
     ~CCWlRegion();
 
-
     // set the data for this resource
-    void setData(void* data) {{
-        pData = data;
-    }}
+    void setData(void* data) {
+        {
+            pData = data;
+        }
+    }
 
     // get the data for this resource
-    void* data() {{
-        return pData;
-    }}
+    void* data() {
+        {
+            return pData;
+        }
+    }
 
     // get the raw wl_resource (wl_proxy) ptr
-    wl_proxy* resource() {{
-        return pResource;
-    }}
+    wl_proxy* resource() {
+        {
+            return pResource;
+        }
+    }
 
     // get the raw wl_proxy ptr
-    wl_proxy* proxy() {{
-        return pResource;
-    }}
+    wl_proxy* proxy() {
+        {
+            return pResource;
+        }
+    }
 
     // get the resource version
-    int version() {{
-        return wl_proxy_get_version(pResource);
-    }}
-            
-    // --------------- Requests --------------- //
+    int version() {
+        {
+            return wl_proxy_get_version(pResource);
+        }
+    }
 
+    // --------------- Requests --------------- //
 
     // --------------- Events --------------- //
 
@@ -1310,7 +1446,7 @@ class CCWlRegion {
     void sendAdd(int32_t, int32_t, int32_t, int32_t);
     void sendSubtract(int32_t, int32_t, int32_t, int32_t);
 
-  private:
+private:
     struct {
     } requests;
 
@@ -1321,48 +1457,54 @@ class CCWlRegion {
     void* pData = nullptr;
 };
 
-
-
 class CCWlSubcompositor {
-  public:
+public:
     CCWlSubcompositor(wl_proxy*);
     ~CCWlSubcompositor();
 
-
     // set the data for this resource
-    void setData(void* data) {{
-        pData = data;
-    }}
+    void setData(void* data) {
+        {
+            pData = data;
+        }
+    }
 
     // get the data for this resource
-    void* data() {{
-        return pData;
-    }}
+    void* data() {
+        {
+            return pData;
+        }
+    }
 
     // get the raw wl_resource (wl_proxy) ptr
-    wl_proxy* resource() {{
-        return pResource;
-    }}
+    wl_proxy* resource() {
+        {
+            return pResource;
+        }
+    }
 
     // get the raw wl_proxy ptr
-    wl_proxy* proxy() {{
-        return pResource;
-    }}
+    wl_proxy* proxy() {
+        {
+            return pResource;
+        }
+    }
 
     // get the resource version
-    int version() {{
-        return wl_proxy_get_version(pResource);
-    }}
-            
-    // --------------- Requests --------------- //
+    int version() {
+        {
+            return wl_proxy_get_version(pResource);
+        }
+    }
 
+    // --------------- Requests --------------- //
 
     // --------------- Events --------------- //
 
     void sendDestroy();
     wl_proxy* sendGetSubsurface(CCWlSurface*, CCWlSurface*);
 
-  private:
+private:
     struct {
     } requests;
 
@@ -1373,41 +1515,47 @@ class CCWlSubcompositor {
     void* pData = nullptr;
 };
 
-
-
 class CCWlSubsurface {
-  public:
+public:
     CCWlSubsurface(wl_proxy*);
     ~CCWlSubsurface();
 
-
     // set the data for this resource
-    void setData(void* data) {{
-        pData = data;
-    }}
+    void setData(void* data) {
+        {
+            pData = data;
+        }
+    }
 
     // get the data for this resource
-    void* data() {{
-        return pData;
-    }}
+    void* data() {
+        {
+            return pData;
+        }
+    }
 
     // get the raw wl_resource (wl_proxy) ptr
-    wl_proxy* resource() {{
-        return pResource;
-    }}
+    wl_proxy* resource() {
+        {
+            return pResource;
+        }
+    }
 
     // get the raw wl_proxy ptr
-    wl_proxy* proxy() {{
-        return pResource;
-    }}
+    wl_proxy* proxy() {
+        {
+            return pResource;
+        }
+    }
 
     // get the resource version
-    int version() {{
-        return wl_proxy_get_version(pResource);
-    }}
-            
-    // --------------- Requests --------------- //
+    int version() {
+        {
+            return wl_proxy_get_version(pResource);
+        }
+    }
 
+    // --------------- Requests --------------- //
 
     // --------------- Events --------------- //
 
@@ -1418,7 +1566,7 @@ class CCWlSubsurface {
     void sendSetSync();
     void sendSetDesync();
 
-  private:
+private:
     struct {
     } requests;
 
@@ -1429,48 +1577,54 @@ class CCWlSubsurface {
     void* pData = nullptr;
 };
 
-
-
 class CCWlFixes {
-  public:
+public:
     CCWlFixes(wl_proxy*);
     ~CCWlFixes();
 
-
     // set the data for this resource
-    void setData(void* data) {{
-        pData = data;
-    }}
+    void setData(void* data) {
+        {
+            pData = data;
+        }
+    }
 
     // get the data for this resource
-    void* data() {{
-        return pData;
-    }}
+    void* data() {
+        {
+            return pData;
+        }
+    }
 
     // get the raw wl_resource (wl_proxy) ptr
-    wl_proxy* resource() {{
-        return pResource;
-    }}
+    wl_proxy* resource() {
+        {
+            return pResource;
+        }
+    }
 
     // get the raw wl_proxy ptr
-    wl_proxy* proxy() {{
-        return pResource;
-    }}
+    wl_proxy* proxy() {
+        {
+            return pResource;
+        }
+    }
 
     // get the resource version
-    int version() {{
-        return wl_proxy_get_version(pResource);
-    }}
-            
-    // --------------- Requests --------------- //
+    int version() {
+        {
+            return wl_proxy_get_version(pResource);
+        }
+    }
 
+    // --------------- Requests --------------- //
 
     // --------------- Events --------------- //
 
     void sendDestroy();
     void sendDestroyRegistry(CCWlRegistry*);
 
-  private:
+private:
     struct {
     } requests;
 
@@ -1480,7 +1634,5 @@ class CCWlFixes {
 
     void* pData = nullptr;
 };
-
-
 
 #undef F

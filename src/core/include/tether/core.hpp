@@ -4,6 +4,6 @@
 
 namespace tether {
 
-std::string get_version();
+    std::string get_version();
 
 } // namespace tether

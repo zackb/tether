@@ -1,11 +1,11 @@
 #pragma once
 
-#include "tether/event_loop.hpp"
 #include "tether/clipboard.hpp"
-#include <memory>
+#include "tether/event_loop.hpp"
 #include <functional>
-#include <string>
+#include <memory>
 #include <mutex>
+#include <string>
 
 class CCWlDisplay;
 class CCWlRegistry;
@@ -15,31 +15,31 @@ struct wl_display;
 
 namespace tether {
 
-class WaylandContext {
-public:
-    WaylandContext(EpollEventLoop& loop);
-    ~WaylandContext();
+    class WaylandContext {
+    public:
+        WaylandContext(EpollEventLoop& loop);
+        ~WaylandContext();
 
-    bool init();
-    void set_clipboard_callback(std::function<void(const std::string&)> cb);
-    void copy_to_clipboard(const std::string& text);
-    std::string get_clipboard();
+        bool init();
+        void set_clipboard_callback(std::function<void(const std::string&)> cb);
+        void copy_to_clipboard(const std::string& text);
+        std::string get_clipboard();
 
-private:
-    std::mutex clip_mutex_;
-    std::string cached_clipboard_;
-    EpollEventLoop& loop_;
-    wl_display* raw_display_ = nullptr;
-    std::unique_ptr<CCWlDisplay> display_;
-    std::unique_ptr<CCWlRegistry> registry_;
-    
-    std::unique_ptr<CCWlSeat> seat_;
-    std::unique_ptr<CCZwlrDataControlManagerV1> data_control_manager_;
-    std::unique_ptr<ClipboardManager> clipboard_;
+    private:
+        std::mutex clip_mutex_;
+        std::string cached_clipboard_;
+        EpollEventLoop& loop_;
+        wl_display* raw_display_ = nullptr;
+        std::unique_ptr<CCWlDisplay> display_;
+        std::unique_ptr<CCWlRegistry> registry_;
 
-    std::function<void(const std::string&)> clipboard_cb_;
-};
+        std::unique_ptr<CCWlSeat> seat_;
+        std::unique_ptr<CCZwlrDataControlManagerV1> data_control_manager_;
+        std::unique_ptr<ClipboardManager> clipboard_;
 
-extern WaylandContext* g_wayland;
+        std::function<void(const std::string&)> clipboard_cb_;
+    };
+
+    extern WaylandContext* g_wayland;
 
 } // namespace tether
