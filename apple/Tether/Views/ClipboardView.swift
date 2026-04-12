@@ -154,7 +154,7 @@ struct ClipboardView: View {
                         .lineLimit(3)
 
                     HStack(spacing: 6) {
-                        Text(entry.source.rawValue)
+                        Text(entry.source.displayName)
                             .font(.caption2.weight(.medium))
                             .foregroundStyle(entry.source == .remote ? .indigo : .teal)
 

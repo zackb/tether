@@ -26,9 +26,16 @@ struct ClipboardEntry: Identifiable {
     let timestamp: Date
     let source: ClipboardSource
 
-    enum ClipboardSource: String {
-        case local = "iPhone"
-        case remote = "Desktop"
+    enum ClipboardSource: Equatable {
+        case local(String)
+        case remote(String)
+        
+        var displayName: String {
+            switch self {
+            case .local(let name): return name
+            case .remote(let name): return name
+            }
+        }
     }
 }
 
@@ -158,7 +165,8 @@ final class TetherViewModel {
 
         connection.send(.clipboardSet(text))
 
-        let entry = ClipboardEntry(content: text, timestamp: Date(), source: .local)
+        let localName = certificateManager.localDeviceName
+        let entry = ClipboardEntry(content: text, timestamp: Date(), source: .local(localName))
         clipboardHistory.insert(entry, at: 0)
 
         // Keep the history manageable
@@ -299,12 +307,7 @@ final class TetherViewModel {
             showPairingSheet = true
             pairingStatus = "Sending pairing request..."
 
-            let deviceName: String
-            #if canImport(UIKit)
-            deviceName = UIDevice.current.name
-            #else
-            deviceName = Host.current().localizedName ?? "Mac"
-            #endif
+            let deviceName = certificateManager.localDeviceName
 
             connection.send(.pairRequest(deviceName: deviceName))
         }
@@ -314,7 +317,8 @@ final class TetherViewModel {
         switch message.parsedCommand {
         case .clipboardUpdated:
             if let content = message.content {
-                let entry = ClipboardEntry(content: content, timestamp: Date(), source: .remote)
+                let sourceName = connectedDeviceName ?? "Desktop"
+                let entry = ClipboardEntry(content: content, timestamp: Date(), source: .remote(sourceName))
                 clipboardHistory.insert(entry, at: 0)
                 if clipboardHistory.count > 50 {
                     clipboardHistory = Array(clipboardHistory.prefix(50))
@@ -323,7 +327,8 @@ final class TetherViewModel {
 
         case .clipboardContent:
             if let content = message.content {
-                let entry = ClipboardEntry(content: content, timestamp: Date(), source: .remote)
+                let sourceName = connectedDeviceName ?? "Desktop"
+                let entry = ClipboardEntry(content: content, timestamp: Date(), source: .remote(sourceName))
                 clipboardHistory.insert(entry, at: 0)
             }
 

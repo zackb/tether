@@ -36,13 +36,9 @@ struct SettingsView: View {
                         }
 
                         VStack(alignment: .leading, spacing: 2) {
-                            #if canImport(UIKit)
-                            Text(UIDevice.current.name)
+                            TextField("Device Name", text: Bindable(viewModel.certificateManager).localDeviceName)
                                 .font(.body.weight(.medium))
-                            #else
-                            Text(Host.current().localizedName ?? "This Mac")
-                                .font(.body.weight(.medium))
-                            #endif
+                                .submitLabel(.done)
 
                             Text("This device")
                                 .font(.caption)

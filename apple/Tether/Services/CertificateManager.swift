@@ -17,12 +17,20 @@ final class CertificateManager {
     private static let keyTag = "net.jeedup.Tether.key"
     private static let certLabel = "net.jeedup.Tether.cert"
     private static let knownHostsKey = "TetherKnownHosts"
+    private static let localDeviceNameKey = "TetherLocalDeviceName"
 
     /// SHA-256 fingerprint of our own certificate (lowercase hex, no separators).
     private(set) var myFingerprint: String = ""
 
     /// Map of known host fingerprints → device name.
     private(set) var knownHosts: [String: String] = [:]
+
+    /// Name of this device as presented to others.
+    var localDeviceName: String = "" {
+        didSet {
+            UserDefaults.standard.set(localDeviceName, forKey: Self.localDeviceNameKey)
+        }
+    }
 
     /// The `SecIdentity` used for mTLS client authentication.
     private var identity: SecIdentity?
@@ -32,6 +40,7 @@ final class CertificateManager {
     /// Load or create the TLS identity and populate known hosts.
     func initialize() {
         loadKnownHosts()
+        loadLocalDeviceName()
 
         if let existing = loadIdentityFromKeychain() {
             identity = existing
@@ -126,6 +135,19 @@ final class CertificateManager {
     private func saveKnownHosts() {
         if let data = try? JSONEncoder().encode(knownHosts) {
             UserDefaults.standard.set(data, forKey: Self.knownHostsKey)
+        }
+    }
+
+    private func loadLocalDeviceName() {
+        if let name = UserDefaults.standard.string(forKey: Self.localDeviceNameKey) {
+            localDeviceName = name
+        } else {
+            // Default name
+            #if canImport(UIKit)
+            localDeviceName = UIDevice.current.name
+            #else
+            localDeviceName = Host.current().localizedName ?? "Mac"
+            #endif
         }
     }
 
