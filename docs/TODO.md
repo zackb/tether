@@ -1,9 +1,10 @@
-- mDNS discovery
-- TOTP vault
-- iPhone app
-- WebExtension
-- TUI
-- layershell popups for
-  - device pairing request
-  - file received notification
-  - TOTP code display
+- [x]  mDNS discovery
+- [ ] TOTP vault
+- [-] iPhone app
+    - [ ] iOS sharesheet thing
+- [ ] WebExtension
+- [ ] TUI
+- [ ] layershell popups for
+  - [ ] device pairing request
+  - [ ] file received notification
+  - [ ] TOTP code display
