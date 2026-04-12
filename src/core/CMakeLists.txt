@@ -1,4 +1,4 @@
-add_library(tether_core STATIC
+add_library(tether STATIC
     src/core.cpp
     src/event_loop.cpp
     src/net.cpp
@@ -11,11 +11,11 @@ add_library(tether_core STATIC
     src/wayland_protocols/wlr-data-control-unstable-v1.cpp
 )
 
-target_include_directories(tether_core PUBLIC
+target_include_directories(tether PUBLIC
     include
 )
 
-target_link_libraries(tether_core PUBLIC 
+target_link_libraries(tether PUBLIC 
     nlohmann_json::nlohmann_json
     PkgConfig::WAYLAND
     OpenSSL::SSL

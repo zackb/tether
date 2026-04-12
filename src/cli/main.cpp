@@ -237,7 +237,11 @@ int main(int argc, char* argv[]) {
         j["command"] = "clipboard_set";
         j["content"] = arg_val;
         std::string payload = j.dump() + "\n";
-        send_and_wait(payload);
+        std::string s_resp = send_and_wait(payload);
+        if (s_resp.find("unauthorized") != std::string::npos) {
+             std::cerr << "Unauthorized. Device not paired.\n";
+             return 1;
+        }
     } else if (action == "file") {
         if (arg_val.empty() || !std::filesystem::exists(arg_val)) {
             std::cerr << "Invalid or missing file path: " << arg_val << "\n";

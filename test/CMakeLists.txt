@@ -9,7 +9,7 @@ target_include_directories(tether_test PRIVATE
 )
 
 target_link_libraries(tether_test PRIVATE
-    tether_core
+    tether
     GTest::gtest_main
 )
 
