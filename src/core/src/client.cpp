@@ -34,6 +34,10 @@ void Client::disconnect() {
     }
 }
 
+bool Client::is_connected() const {
+    return sock_ >= 0;
+}
+
 int Client::connect_unix(bool retry) {
     int sock = socket(AF_UNIX, SOCK_STREAM, 0);
     if (sock < 0) return -1;
@@ -155,17 +159,24 @@ std::string Client::list_devices() {
     return tether::Crypto::instance().get_known_hosts_dump();
 }
 
-bool Client::accept_device(const std::string& fingerprint) {
+bool Client::accept_device(const std::string& fingerprint, const std::string& name) {
     tether::Crypto::instance().init();
-    tether::Crypto::instance().add_known_host("Paired App Instance", fingerprint);
+    tether::Crypto::instance().add_known_host(name, fingerprint);
     return true;
 }
 
-std::string Client::pair(std::string& err_out) {
+std::string Client::pair(const std::string& device_name, std::string& err_out) {
+    if (!ssl_) {
+        err_out = "Pairing requires a TCP+TLS connection. Use --host to specify a target.";
+        return "";
+    }
     nlohmann::json j;
     j["command"] = "pair_request";
-    j["device_name"] = "Tether Desktop Environment";
+    j["device_name"] = device_name;
     std::string response = send_and_wait(j.dump() + "\n");
+    if (response.empty()) {
+        err_out = "No response from daemon.";
+    }
     return response;
 }
 

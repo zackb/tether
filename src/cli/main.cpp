@@ -81,7 +81,12 @@ int main(int argc, char* argv[]) {
 
     std::string err;
     if (action == "pair") {
-        std::cout << "Pairing response: " << client.pair(err) << std::flush;
+        std::string resp = client.pair("CLI", err);
+        if (!err.empty()) {
+            std::cerr << err << "\n";
+            return 1;
+        }
+        std::cout << "Pairing response: " << resp << std::flush;
     } else if (action == "get") {
         std::string clip = client.get_clipboard(err);
         if (!err.empty()) {

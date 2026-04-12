@@ -148,6 +148,7 @@ void Crypto::add_known_host(const std::string& name, const std::string& fingerpr
     std::ifstream iff(hosts_path_);
     if (iff.is_open()) {
         try { j = nlohmann::json::parse(iff); } catch (...) {}
+        iff.close();
     }
     j[fingerprint] = name;
     
@@ -160,7 +161,7 @@ std::string Crypto::get_known_hosts_dump() const {
     if (iff.is_open()) {
         try { 
             nlohmann::json j = nlohmann::json::parse(iff);
-            return j.dump();
+            return j.dump(2);
         } catch (...) {}
     }
     return "{}";
