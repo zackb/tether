@@ -3,6 +3,8 @@
   <source media="(prefers-color-scheme: light)" srcset="docs/img/tether-light.svg">
   <img src="docs/tether-light.svg" alt="Tether - iPhone + Linux continuity" width="680">
 </picture>
+![tether](docs/img/tether_header.png)
+
 
 # Tether
 
