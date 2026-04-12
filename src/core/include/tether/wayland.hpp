@@ -5,6 +5,7 @@
 #include <memory>
 #include <functional>
 #include <string>
+#include <mutex>
 
 class CCWlDisplay;
 class CCWlRegistry;
@@ -22,8 +23,11 @@ public:
     bool init();
     void set_clipboard_callback(std::function<void(const std::string&)> cb);
     void copy_to_clipboard(const std::string& text);
+    std::string get_clipboard();
 
 private:
+    std::mutex clip_mutex_;
+    std::string cached_clipboard_;
     EpollEventLoop& loop_;
     wl_display* raw_display_ = nullptr;
     std::unique_ptr<CCWlDisplay> display_;
@@ -35,5 +39,7 @@ private:
 
     std::function<void(const std::string&)> clipboard_cb_;
 };
+
+extern WaylandContext* g_wayland;
 
 } // namespace tether

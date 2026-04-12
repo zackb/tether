@@ -8,6 +8,8 @@
 
 namespace tether {
 
+WaylandContext* g_wayland = nullptr;
+
 WaylandContext::WaylandContext(EpollEventLoop& loop) : loop_(loop) {}
 
 WaylandContext::~WaylandContext() {
@@ -51,9 +53,15 @@ bool WaylandContext::init() {
 
     clipboard_ = std::make_unique<ClipboardManager>(data_control_manager_.get(), seat_.get());
     
-    if (clipboard_cb_) {
-        clipboard_->set_update_callback(clipboard_cb_);
-    }
+    clipboard_->set_update_callback([this](const std::string& text) {
+        {
+            std::lock_guard<std::mutex> lock(clip_mutex_);
+            cached_clipboard_ = text;
+        }
+        if (clipboard_cb_) {
+            clipboard_cb_(text);
+        }
+    });
 
     // Attach to event loop!
     int fd = wl_display_get_fd(raw_display_);
@@ -72,16 +80,22 @@ bool WaylandContext::init() {
 
 void WaylandContext::set_clipboard_callback(std::function<void(const std::string&)> cb) {
     clipboard_cb_ = std::move(cb);
-    if (clipboard_) {
-        clipboard_->set_update_callback(clipboard_cb_);
-    }
 }
 
 void WaylandContext::copy_to_clipboard(const std::string& text) {
+    {
+        std::lock_guard<std::mutex> lock(clip_mutex_);
+        cached_clipboard_ = text;
+    }
     if (clipboard_) {
         clipboard_->copy(text);
         wl_display_flush(raw_display_);
     }
+}
+
+std::string WaylandContext::get_clipboard() {
+    std::lock_guard<std::mutex> lock(clip_mutex_);
+    return cached_clipboard_;
 }
 
 } // namespace tether

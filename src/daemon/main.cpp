@@ -8,10 +8,6 @@
 
 tether::EpollEventLoop* g_loop = nullptr;
 
-namespace tether {
-    WaylandContext* g_wayland = nullptr;
-}
-
 void signal_handler(int) {
     if (g_loop) {
         std::cout << "\nStopping tetherd..." << std::endl;

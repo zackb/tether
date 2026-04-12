@@ -157,10 +157,17 @@ void UnixServer::handle_client(int client_fd) {
 
             if (j.contains("command") && j["command"] == "clipboard_set" && j.contains("content")) {
                 std::string content = j["content"];
-                // Externally hooked up in main
-                extern WaylandContext* g_wayland;
                 if (g_wayland) {
                     g_wayland->copy_to_clipboard(content);
+                }
+            } else if (j.contains("command") && j["command"] == "clipboard_get") {
+                if (g_wayland) {
+                    nlohmann::json resp;
+                    resp["command"] = "clipboard_content";
+                    resp["content"] = g_wayland->get_clipboard();
+                    std::string payload = resp.dump() + "\n";
+                    write(client_fd, payload.c_str(), payload.size());
+                    return;
                 }
             }
         } catch (...) {
@@ -269,9 +276,17 @@ void TcpServer::handle_client(int client_fd) {
 
             if (j.contains("command") && j["command"] == "clipboard_set" && j.contains("content")) {
                 std::string content = j["content"];
-                extern WaylandContext* g_wayland;
                 if (g_wayland) {
                     g_wayland->copy_to_clipboard(content);
+                }
+            } else if (j.contains("command") && j["command"] == "clipboard_get") {
+                if (g_wayland) {
+                    nlohmann::json resp;
+                    resp["command"] = "clipboard_content";
+                    resp["content"] = g_wayland->get_clipboard();
+                    std::string payload = resp.dump() + "\n";
+                    write(client_fd, payload.c_str(), payload.size());
+                    return;
                 }
             }
         } catch (...) {
