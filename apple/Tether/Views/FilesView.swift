@@ -10,6 +10,7 @@ import UniformTypeIdentifiers
 
 struct FilesView: View {
     @Environment(TetherViewModel.self) private var viewModel
+    @Environment(\.openURL) private var openURL
 
     @State private var showDocumentPicker = false
 
@@ -167,7 +168,7 @@ struct FilesView: View {
     // MARK: - Transfer Row
 
     private func transferRow(_ transfer: FileTransfer, isActive: Bool) -> some View {
-        HStack(spacing: 14) {
+        let content = HStack(spacing: 14) {
             Image(systemName: fileIcon(for: transfer.filename))
                 .font(.title3)
                 .foregroundStyle(transfer.direction == .incoming ? .blue : (isActive ? .teal : .secondary))
@@ -202,6 +203,17 @@ struct FilesView: View {
         }
         .padding(14)
         .background(.ultraThinMaterial, in: RoundedRectangle(cornerRadius: 12))
+
+        if let savedURL = transfer.savedURL, transfer.direction == .incoming, !isActive, !transfer.failed {
+            Button {
+                openTransfer(savedURL)
+            } label: {
+                content
+            }
+            .buttonStyle(.plain)
+        } else {
+            content
+        }
     }
 
     // MARK: - Helpers
@@ -234,10 +246,18 @@ struct FilesView: View {
 
     private func completedText(for transfer: FileTransfer) -> String {
         if transfer.direction == .incoming {
-            return "Saved to On My iPhone/Tether/Received • " + formatBytes(transfer.totalSize)
+            return "Tap to open • " + formatBytes(transfer.totalSize)
         }
 
         return "Delivered • " + formatBytes(transfer.totalSize)
+    }
+
+    private func openTransfer(_ url: URL) {
+        openURL(url) { accepted in
+            if !accepted {
+                viewModel.errorMessage = "Unable to open \(url.lastPathComponent)."
+            }
+        }
     }
 }
 
