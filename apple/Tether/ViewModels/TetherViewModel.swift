@@ -432,10 +432,21 @@ final class TetherViewModel {
               let fingerprint = certificateManager.knownHosts.keys.first else { return }
 
         let matchingHosts = discovery.hosts.filter { $0.fingerprint == fingerprint }
-        guard matchingHosts.count == 1 else { return }
+        let targetHost: DiscoveredHost?
+
+        if matchingHosts.count == 1 {
+            targetHost = matchingHosts[0]
+        } else if discovery.hosts.count == 1 {
+            let soleHost = discovery.hosts[0]
+            targetHost = soleHost.fingerprint.isEmpty || soleHost.fingerprint == fingerprint ? soleHost : nil
+        } else {
+            targetHost = nil
+        }
+
+        guard let targetHost else { return }
 
         autoConnectingFingerprint = fingerprint
-        connectTo(host: matchingHosts[0])
+        connectTo(host: targetHost)
     }
 
     private func suspendForBackground() {
