@@ -116,6 +116,7 @@ final class TetherViewModel {
     private var pendingReconnectTask: Task<Void, Never>?
     private var autoConnectingFingerprint: String?
     private var manualDisconnect = false
+    private var currentScenePhase: ScenePhase = .active
 
     private struct IncomingTransferBuffer {
         let filename: String
@@ -161,6 +162,8 @@ final class TetherViewModel {
     }
 
     func handleScenePhase(_ phase: ScenePhase) {
+        currentScenePhase = phase
+
         switch phase {
         case .active:
             manualDisconnect = false
@@ -168,6 +171,7 @@ final class TetherViewModel {
         case .background:
             pendingReconnectTask?.cancel()
             pendingReconnectTask = nil
+            suspendForBackground()
         default:
             break
         }
@@ -354,15 +358,19 @@ final class TetherViewModel {
             case .disconnected:
                 self.autoConnectingFingerprint = nil
                 self.appState = .disconnected
-                self.scheduleAutoReconnectAttempt()
+                if self.currentScenePhase == .active {
+                    self.scheduleAutoReconnectAttempt()
+                }
             case .failed(let msg):
                 let wasAutoReconnect = self.autoConnectingFingerprint != nil
                 self.autoConnectingFingerprint = nil
                 self.appState = .disconnected
-                if !wasAutoReconnect {
+                if self.currentScenePhase == .active && !wasAutoReconnect {
                     self.errorMessage = "Connection failed: \(msg)"
                 }
-                self.scheduleAutoReconnectAttempt()
+                if self.currentScenePhase == .active {
+                    self.scheduleAutoReconnectAttempt()
+                }
             case .connecting:
                 self.appState = .connecting
             }
@@ -428,6 +436,15 @@ final class TetherViewModel {
 
         autoConnectingFingerprint = fingerprint
         connectTo(host: matchingHosts[0])
+    }
+
+    private func suspendForBackground() {
+        guard !manualDisconnect else { return }
+
+        autoConnectingFingerprint = nil
+        connection.disconnect()
+        appState = .disconnected
+        connectedDeviceName = nil
     }
 
     private func handleMessage(_ message: TetherMessage) {
