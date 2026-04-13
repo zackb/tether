@@ -167,6 +167,7 @@ struct FilesView: View {
 
     // MARK: - Transfer Row
 
+    @ViewBuilder
     private func transferRow(_ transfer: FileTransfer, isActive: Bool) -> some View {
         let content = HStack(spacing: 14) {
             Image(systemName: fileIcon(for: transfer.filename))
