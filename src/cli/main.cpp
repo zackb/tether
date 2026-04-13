@@ -11,7 +11,7 @@ void print_help() {
               << "  -h, --help               Show this help message.\n"
               << "  -g, --get-clipboard      Retrieve the current Wayland clipboard text.\n"
               << "  -s, --set-clipboard      Take string input and copy it to the local Wayland clipboard.\n"
-              << "  -f, --send-file          Send a file securely to the local Wayland download directory.\n"
+              << "  -f, --send-file          Send a file through tether.\n"
               << "  -d, --discover           Scan the local network for tetherd instances via mDNS.\n"
               << "  --host <ip>              Connect over TCP to daemon ip instead of UNIX Socket.\n"
               << "  --port <num>             Connect over TCP port (default 5134).\n"
@@ -25,6 +25,7 @@ void print_help() {
               << "  echo \"pipe\" | tether -s\n"
               << "  tether --discover\n"
               << "  tether --discover --timeout 5000\n"
+              << "  tether -f ./report.pdf\n"
               << "  tether --accept 9a4f21...\n";
 }
 
@@ -138,14 +139,13 @@ int main(int argc, char* argv[]) {
             return 1;
         }
     } else if (action == "file") {
-        std::cout << "Uploading " << arg_val << "..." << std::endl;
+        std::cout << "Sending " << arg_val << "..." << std::endl;
         if (!client.send_file(arg_val, err)) {
             std::cerr << "Transfer Failed: " << err << "\n";
             return 1;
         }
-        std::cout << "File transfer successfully saved.\n";
+        std::cout << "File transfer delivered.\n";
     }
 
     return 0;
 }
-

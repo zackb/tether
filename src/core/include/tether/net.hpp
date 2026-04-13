@@ -20,6 +20,7 @@ namespace tether {
     void register_client_ssl(int fd, SSL* ssl);
     void unregister_client_fd(int fd);
     void broadcast_message(const std::string& msg, int exclude_fd = -1);
+    size_t broadcast_tcp_message(const std::string& msg, int exclude_fd = -1);
 
     class UnixServer {
     public:

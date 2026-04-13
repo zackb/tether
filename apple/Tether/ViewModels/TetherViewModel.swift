@@ -47,16 +47,23 @@ struct ClipboardEntry: Identifiable {
 
 /// Tracks an active file transfer.
 struct FileTransfer: Identifiable {
+    enum Direction {
+        case outgoing
+        case incoming
+    }
+
     let id: String // transfer_id
-    let filename: String
+    var filename: String
     let totalSize: Int64
-    var bytesSent: Int64 = 0
+    var direction: Direction
+    var bytesTransferred: Int64 = 0
     var isComplete = false
     var failed = false
+    var savedURL: URL?
 
     var progress: Double {
         guard totalSize > 0 else { return 0 }
-        return Double(bytesSent) / Double(totalSize)
+        return Double(bytesTransferred) / Double(totalSize)
     }
 }
 
@@ -105,6 +112,14 @@ final class TetherViewModel {
 
     /// The chunk size for file transfers (48KB raw → 64KB base64).
     private let fileChunkSize = 48 * 1024
+
+    private struct IncomingTransferBuffer {
+        let filename: String
+        let expectedSize: Int64
+        var data = Data()
+    }
+
+    private var incomingTransfers: [String: IncomingTransferBuffer] = [:]
 
     // MARK: - Initialization
 
@@ -222,6 +237,7 @@ final class TetherViewModel {
 
         Task.detached { [weak self] in
             guard let self else { return }
+            defer { url.stopAccessingSecurityScopedResource() }
 
             do {
                 let fileData = try Data(contentsOf: url)
@@ -231,7 +247,8 @@ final class TetherViewModel {
                     let transfer = FileTransfer(
                         id: transferId,
                         filename: filename,
-                        totalSize: totalSize
+                        totalSize: totalSize,
+                        direction: .outgoing
                     )
                     self.activeTransfers.append(transfer)
                 }
@@ -261,7 +278,7 @@ final class TetherViewModel {
                         ))
 
                         if let idx = self.activeTransfers.firstIndex(where: { $0.id == transferId }) {
-                            self.activeTransfers[idx].bytesSent = Int64(end)
+                            self.activeTransfers[idx].bytesTransferred = Int64(end)
                         }
                     }
 
@@ -284,8 +301,6 @@ final class TetherViewModel {
                     self.errorMessage = "File transfer failed: \(error.localizedDescription)"
                 }
             }
-
-            url.stopAccessingSecurityScopedResource()
         }
     }
 
@@ -373,6 +388,46 @@ final class TetherViewModel {
                 }
             }
 
+        case .fileStart:
+            guard let transferId = message.transferId,
+                  let filename = message.filename,
+                  let size = message.size else { break }
+
+            incomingTransfers[transferId] = IncomingTransferBuffer(
+                filename: filename,
+                expectedSize: size
+            )
+
+            if let idx = activeTransfers.firstIndex(where: { $0.id == transferId }) {
+                activeTransfers[idx].filename = filename
+                activeTransfers[idx].direction = .incoming
+                activeTransfers[idx].bytesTransferred = 0
+            } else {
+                activeTransfers.append(FileTransfer(
+                    id: transferId,
+                    filename: filename,
+                    totalSize: size,
+                    direction: .incoming
+                ))
+            }
+
+        case .fileChunk:
+            guard let transferId = message.transferId,
+                  let data = message.data,
+                  let chunkData = Data(base64Encoded: data),
+                  var transfer = incomingTransfers[transferId] else { break }
+
+            transfer.data.append(chunkData)
+            incomingTransfers[transferId] = transfer
+
+            if let idx = activeTransfers.firstIndex(where: { $0.id == transferId }) {
+                activeTransfers[idx].bytesTransferred = Int64(transfer.data.count)
+            }
+
+        case .fileEnd:
+            guard let transferId = message.transferId else { break }
+            finalizeIncomingTransfer(transferId: transferId)
+
         case .error:
             if message.message == "unauthorized" {
                 // The daemon rejected us — we're not paired yet.
@@ -396,5 +451,56 @@ final class TetherViewModel {
         certificateManager.addKnownHost(fingerprint: serverFP, name: name)
         showPairingSheet = false
         appState = .connected
+    }
+
+    private func finalizeIncomingTransfer(transferId: String) {
+        guard let buffered = incomingTransfers.removeValue(forKey: transferId) else { return }
+
+        do {
+            guard Int64(buffered.data.count) == buffered.expectedSize else {
+                throw CocoaError(.fileReadCorruptFile)
+            }
+
+            let destination = try incomingFileURL(for: buffered.filename)
+            try buffered.data.write(to: destination, options: .atomic)
+
+            if let idx = activeTransfers.firstIndex(where: { $0.id == transferId }) {
+                var transfer = activeTransfers.remove(at: idx)
+                transfer.bytesTransferred = Int64(buffered.data.count)
+                transfer.isComplete = true
+                transfer.savedURL = destination
+                completedTransfers.insert(transfer, at: 0)
+            }
+        } catch {
+            if let idx = activeTransfers.firstIndex(where: { $0.id == transferId }) {
+                activeTransfers[idx].failed = true
+            }
+            errorMessage = "Failed to save incoming file: \(error.localizedDescription)"
+        }
+    }
+
+    private func incomingFileURL(for filename: String) throws -> URL {
+        let fm = FileManager.default
+        let docs = try fm.url(
+            for: .documentDirectory,
+            in: .userDomainMask,
+            appropriateFor: nil,
+            create: true
+        )
+        let incomingDir = docs.appendingPathComponent("Received", isDirectory: true)
+        try fm.createDirectory(at: incomingDir, withIntermediateDirectories: true, attributes: nil)
+
+        let base = URL(fileURLWithPath: filename).deletingPathExtension().lastPathComponent
+        let ext = URL(fileURLWithPath: filename).pathExtension
+        var candidate = incomingDir.appendingPathComponent(filename)
+        var counter = 1
+
+        while fm.fileExists(atPath: candidate.path) {
+            let deduped = ext.isEmpty ? "\(base)(\(counter))" : "\(base)(\(counter)).\(ext)"
+            candidate = incomingDir.appendingPathComponent(deduped)
+            counter += 1
+        }
+
+        return candidate
     }
 }

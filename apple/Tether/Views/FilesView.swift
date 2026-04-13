@@ -170,7 +170,7 @@ struct FilesView: View {
         HStack(spacing: 14) {
             Image(systemName: fileIcon(for: transfer.filename))
                 .font(.title3)
-                .foregroundStyle(isActive ? .teal : .secondary)
+                .foregroundStyle(transfer.direction == .incoming ? .blue : (isActive ? .teal : .secondary))
                 .frame(width: 32)
 
             VStack(alignment: .leading, spacing: 6) {
@@ -178,11 +178,15 @@ struct FilesView: View {
                     .font(.subheadline.weight(.medium))
                     .lineLimit(1)
 
+                Text(transfer.direction == .incoming ? "Incoming to iPhone" : "Outgoing to desktop")
+                    .font(.caption2)
+                    .foregroundStyle(.secondary)
+
                 if isActive && !transfer.failed {
                     ProgressView(value: transfer.progress)
-                        .tint(.teal)
+                        .tint(transfer.direction == .incoming ? .blue : .teal)
 
-                    Text(formatBytes(transfer.bytesSent) + " / " + formatBytes(transfer.totalSize))
+                    Text(formatBytes(transfer.bytesTransferred) + " / " + formatBytes(transfer.totalSize))
                         .font(.caption2)
                         .foregroundStyle(.tertiary)
                 } else if transfer.failed {
@@ -190,15 +194,9 @@ struct FilesView: View {
                         .font(.caption)
                         .foregroundStyle(.red)
                 } else {
-                    HStack(spacing: 4) {
-                        Image(systemName: "checkmark.circle.fill")
-                            .font(.caption2)
-                            .foregroundStyle(.green)
-
-                        Text(formatBytes(transfer.totalSize))
-                            .font(.caption)
-                            .foregroundStyle(.tertiary)
-                    }
+                    Text(completedText(for: transfer))
+                        .font(.caption)
+                        .foregroundStyle(.tertiary)
                 }
             }
         }
@@ -232,6 +230,14 @@ struct FilesView: View {
         let formatter = ByteCountFormatter()
         formatter.countStyle = .file
         return formatter.string(fromByteCount: bytes)
+    }
+
+    private func completedText(for transfer: FileTransfer) -> String {
+        if transfer.direction == .incoming {
+            return "Saved to On My iPhone/Tether/Received • " + formatBytes(transfer.totalSize)
+        }
+
+        return "Delivered • " + formatBytes(transfer.totalSize)
     }
 }
 

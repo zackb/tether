@@ -17,6 +17,22 @@
 
 namespace tether {
 
+namespace {
+
+std::string extract_protocol_error(const std::string& response) {
+    try {
+        nlohmann::json parsed = nlohmann::json::parse(response);
+        if (parsed.value("command", "") == "error") {
+            return parsed.value("message", "unknown_error");
+        }
+    } catch (...) {
+    }
+
+    return "";
+}
+
+}
+
 Client::Client() {}
 
 Client::~Client() {
@@ -223,9 +239,15 @@ bool Client::send_file(const std::string& path, std::string& err_out) {
     j_start["transfer_id"] = transfer_id;
     
     std::string s_resp = send_and_wait(j_start.dump() + "\n");
-    if (s_resp.find("unauthorized") != std::string::npos) {
-         err_out = "Unauthorized. Device not paired.";
-         return false;
+    if (std::string protocol_error = extract_protocol_error(s_resp); !protocol_error.empty()) {
+        if (protocol_error == "unauthorized") {
+            err_out = "Unauthorized. Device not paired.";
+        } else if (protocol_error == "no_connected_mobile_client") {
+            err_out = "No connected iPhone client is available.";
+        } else {
+            err_out = protocol_error;
+        }
+        return false;
     }
 
     const size_t chunk_size = 512 * 1024;
@@ -243,7 +265,15 @@ bool Client::send_file(const std::string& path, std::string& err_out) {
         j_chunk["transfer_id"] = transfer_id;
         j_chunk["data"] = tether::base64_encode(buffer.data(), bytes_read);
 
-        send_and_wait(j_chunk.dump() + "\n");
+        std::string chunk_resp = send_and_wait(j_chunk.dump() + "\n");
+        if (std::string protocol_error = extract_protocol_error(chunk_resp); !protocol_error.empty()) {
+            if (protocol_error == "no_connected_mobile_client") {
+                err_out = "No connected iPhone client is available.";
+            } else {
+                err_out = protocol_error;
+            }
+            return false;
+        }
     }
 
     nlohmann::json j_end;
@@ -255,6 +285,15 @@ bool Client::send_file(const std::string& path, std::string& err_out) {
         nlohmann::json r = nlohmann::json::parse(resp);
         if (r.contains("status") && r["status"] == "success") {
             return true;
+        }
+        if (r.value("command", "") == "error") {
+            std::string message = r.value("message", "Transfer sequence explicitly rejected externally.");
+            if (message == "no_connected_mobile_client") {
+                err_out = "No connected iPhone client is available.";
+            } else {
+                err_out = message;
+            }
+            return false;
         }
     } catch (...) {
     }

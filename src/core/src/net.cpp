@@ -72,6 +72,23 @@ namespace tether {
         }
     }
 
+    size_t broadcast_tcp_message(const std::string& msg, int exclude_fd) {
+        std::string packet = msg;
+        if (packet.back() != '\n')
+            packet += '\n';
+
+        size_t recipients = 0;
+        for (auto const& [fd, session] : active_sessions) {
+            if (fd == exclude_fd || !session.ssl)
+                continue;
+
+            robust_ssl_write(session.ssl, packet.c_str(), packet.size());
+            recipients++;
+        }
+
+        return recipients;
+    }
+
     std::string get_runtime_dir() {
         const char* xdg_runtime = std::getenv("XDG_RUNTIME_DIR");
         if (!xdg_runtime) {
@@ -214,21 +231,40 @@ namespace tether {
                             continue;
                         }
                     } else if (j.contains("command") && j["command"] == "file_start") {
-                        if (g_file_manager)
-                            g_file_manager->handle_start(j["transfer_id"], j["filename"], j["size"]);
-                    } else if (j.contains("command") && j["command"] == "file_chunk") {
-                        if (g_file_manager)
-                            g_file_manager->handle_chunk(j["transfer_id"], j["chunk_index"], j["data"]);
-                    } else if (j.contains("command") && j["command"] == "file_end") {
-                        if (g_file_manager && g_file_manager->handle_end(j["transfer_id"])) {
+                        if (broadcast_tcp_message(msg) == 0) {
                             nlohmann::json resp;
-                            resp["command"] = "file_status";
-                            resp["transfer_id"] = j["transfer_id"];
-                            resp["status"] = "success";
+                            resp["command"] = "error";
+                            resp["message"] = "no_connected_mobile_client";
                             std::string payload = resp.dump() + "\n";
                             write(client_fd, payload.c_str(), payload.size());
                             continue;
                         }
+                    } else if (j.contains("command") && j["command"] == "file_chunk") {
+                        if (broadcast_tcp_message(msg) == 0) {
+                            nlohmann::json resp;
+                            resp["command"] = "error";
+                            resp["message"] = "no_connected_mobile_client";
+                            std::string payload = resp.dump() + "\n";
+                            write(client_fd, payload.c_str(), payload.size());
+                            continue;
+                        }
+                    } else if (j.contains("command") && j["command"] == "file_end") {
+                        if (broadcast_tcp_message(msg) == 0) {
+                            nlohmann::json resp;
+                            resp["command"] = "error";
+                            resp["message"] = "no_connected_mobile_client";
+                            std::string payload = resp.dump() + "\n";
+                            write(client_fd, payload.c_str(), payload.size());
+                            continue;
+                        }
+
+                        nlohmann::json resp;
+                        resp["command"] = "file_status";
+                        resp["transfer_id"] = j["transfer_id"];
+                        resp["status"] = "success";
+                        std::string payload = resp.dump() + "\n";
+                        write(client_fd, payload.c_str(), payload.size());
+                        continue;
                     }
                 } catch (...) {
                 }
@@ -355,11 +391,10 @@ namespace tether {
                 std::string print = Crypto::get_peer_fingerprint(ssl);
                 if (Crypto::instance().is_host_known(print)) {
                     client_paired_[client_fd] = true;
+                    register_client_ssl(client_fd, ssl);
                 } else {
                     std::cout << "TcpServer: Untrusted client connected. Fingerprint: " << print << std::endl;
                 }
-                // Now that handshake is done, we can safely receive broadcasts
-                register_client_ssl(client_fd, ssl);
             } else {
                 int err = SSL_get_error(ssl, ret);
                 if (err == SSL_ERROR_WANT_READ || err == SSL_ERROR_WANT_WRITE) {
@@ -598,6 +633,10 @@ namespace tether {
                 // Mark as paired if still connected
                 if (client_paired_.count(info.client_fd)) {
                     client_paired_[info.client_fd] = true;
+                }
+
+                if (active_ssl_.count(info.client_fd)) {
+                    register_client_ssl(info.client_fd, active_ssl_[info.client_fd]);
                 }
 
                 // Notify the remote client

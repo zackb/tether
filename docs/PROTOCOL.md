@@ -52,9 +52,13 @@ The clipboard capabilities allow seamless copying and pasting between the Host (
 
 Tether supports streaming large binary files seamlessly through JSON using Base64 chunks to adhere to extension native messaging payload restrictions.
 
-### `file_start` (Client -> Daemon)
+### `file_start`
 
 **Description**: Announces an incoming binary transmission.
+
+**Direction**:
+- `Client -> Daemon` when a remote device uploads into the Linux host.
+- `Daemon -> Client` when a local Unix client asks `tetherd` to push a file to a connected mobile app.
 
 **Payload**:
 ```json
@@ -66,9 +70,13 @@ Tether supports streaming large binary files seamlessly through JSON using Base6
 }
 ```
 
-### `file_chunk` (Client -> Daemon)
+### `file_chunk`
 
 **Description**: Sends a sequential Base64 chunk of the file data.
+
+**Direction**:
+- `Client -> Daemon` for mobile-to-Linux uploads.
+- `Daemon -> Client` for Linux-to-mobile sends.
 
 **Payload**:
 ```json
@@ -80,9 +88,13 @@ Tether supports streaming large binary files seamlessly through JSON using Base6
 }
 ```
 
-### `file_end` (Client -> Daemon)
+### `file_end`
 
-**Description**: Closes the file handle on the daemon and returns a success status back.
+**Description**: Marks the end of the streamed file.
+
+**Direction**:
+- `Client -> Daemon` for mobile-to-Linux uploads.
+- `Daemon -> Client` for Linux-to-mobile sends.
 
 **Payload**:
 ```json
@@ -98,6 +110,15 @@ Tether supports streaming large binary files seamlessly through JSON using Base6
   "command": "file_status",
   "transfer_id": "unique_string",
   "status": "success"
+}
+```
+
+For local Unix clients, `tetherd` returns `file_status` once the stream has been forwarded to at least one connected TCP client. If no mobile client is connected, the daemon returns:
+
+```json
+{
+  "command": "error",
+  "message": "no_connected_mobile_client"
 }
 ```
 

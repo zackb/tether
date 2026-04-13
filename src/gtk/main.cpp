@@ -468,8 +468,8 @@ static GtkWidget* build_file_transfer_tab() {
     gtk_box_pack_start(GTK_BOX(box), header, FALSE, FALSE, 0);
 
     GtkWidget* desc = gtk_label_new(
-        "Pick a file to send to the connected host.\n"
-        "Files are chunked via Base64 and saved to the remote Downloads directory.");
+        "Pick a file to send through tether.\n"
+        "The local daemon forwards files to connected iPhone clients.");
     gtk_label_set_xalign(GTK_LABEL(desc), 0.0);
     gtk_label_set_line_wrap(GTK_LABEL(desc), TRUE);
     gtk_style_context_add_class(gtk_widget_get_style_context(desc), "dim-label");
