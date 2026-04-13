@@ -51,9 +51,7 @@ namespace tether {
     private:
         void handle_accept(int fd);
         void handle_client(int client_fd);
-        void spawn_pair_dialog(int client_fd, SSL* ssl,
-                               const std::string& fingerprint,
-                               const std::string& device_name);
+        void spawn_pair_dialog(int client_fd, SSL* ssl, const std::string& fingerprint, const std::string& device_name);
 
         EpollEventLoop& loop_;
         int server_fd_ = -1;

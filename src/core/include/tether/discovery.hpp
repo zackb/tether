@@ -9,23 +9,23 @@ namespace tether {
 
     /// A single network address where a tetherd instance is reachable.
     struct DiscoveredAddress {
-        std::string address;  ///< IPv4 or IPv6 address
-        uint16_t port = 0;    ///< TCP port
+        std::string address; ///< IPv4 or IPv6 address
+        uint16_t port = 0;   ///< TCP port
     };
 
     /// Raw per-interface mDNS result (one entry per resolved address).
     struct DiscoveredHost {
-        std::string name;         ///< Advertised service name (e.g. hostname)
-        std::string address;      ///< Resolved IPv4/IPv6 address
-        uint16_t port = 0;        ///< TCP port the daemon is listening on
-        std::string fingerprint;  ///< TLS certificate SHA-256 fingerprint from TXT record
+        std::string name;        ///< Advertised service name (e.g. hostname)
+        std::string address;     ///< Resolved IPv4/IPv6 address
+        uint16_t port = 0;       ///< TCP port the daemon is listening on
+        std::string fingerprint; ///< TLS certificate SHA-256 fingerprint from TXT record
     };
 
     /// A logical device, grouping all network interfaces that share the same
     /// TLS fingerprint (i.e. the same tetherd instance).
     struct DiscoveredDevice {
-        std::string name;                        ///< Advertised service name
-        std::string fingerprint;                 ///< Shared TLS fingerprint
+        std::string name;                         ///< Advertised service name
+        std::string fingerprint;                  ///< Shared TLS fingerprint
         std::vector<DiscoveredAddress> addresses; ///< All reachable addresses
     };
 
@@ -52,8 +52,7 @@ namespace tether {
         /// @param port     TCP port the daemon is listening on.
         /// @param fingerprint  SHA-256 fingerprint of the daemon's TLS certificate.
         /// @return true if the service was successfully registered.
-        bool publish(const std::string& name, uint16_t port,
-                     const std::string& fingerprint);
+        bool publish(const std::string& name, uint16_t port, const std::string& fingerprint);
 
         /// Stop advertising this instance.  Called automatically by the destructor.
         void unpublish();
@@ -70,4 +69,3 @@ namespace tether {
     };
 
 } // namespace tether
-
