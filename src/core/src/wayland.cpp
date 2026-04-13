@@ -42,7 +42,8 @@ bool WaylandContext::init() {
         }
     });
 
-    // synchronous roundtrips to populate globals
+    // synchronous roundtrips to populate globals and capture initial selection
+    wl_display_roundtrip(raw_display_);
     wl_display_roundtrip(raw_display_);
     wl_display_roundtrip(raw_display_);
 

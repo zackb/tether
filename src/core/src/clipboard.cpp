@@ -38,8 +38,12 @@ ClipboardManager::ClipboardManager(CCZwlrDataControlManagerV1* manager, CCWlSeat
         
         static const std::vector<std::string> priorities = {
             "text/plain;charset=utf-8",
+            "text/plain;charset=UTF-8",
             "UTF8_STRING",
-            "text/plain"
+            "text/plain;charset=utf8",
+            "text/plain",
+            "TEXT",
+            "STRING"
         };
 
         for (const auto& p : priorities) {
@@ -52,6 +56,15 @@ ClipboardManager::ClipboardManager(CCZwlrDataControlManagerV1* manager, CCWlSeat
             }
             if (found) break;
         }
+
+        // Catch-all fallback: if none of our preferred types are found, 
+        // try the first thing the compositor offered.
+        if (!found && !current_mimes_.empty()) {
+            best_mime = current_mimes_[0];
+            found = true;
+        }
+
+        if (!found) return;
 
         int pipefs[2];
         if (pipe(pipefs) < 0) return;
