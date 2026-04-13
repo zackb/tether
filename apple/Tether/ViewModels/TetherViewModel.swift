@@ -60,9 +60,16 @@ struct FileTransfer: Identifiable {
 }
 
 /// Main app ViewModel — owns all services and coordinates their interactions.
-@Observable
-final class TetherViewModel {
+    private static let autoSyncClipboardKey = "TetherAutoSyncClipboard"
+
     // MARK: - Published State
+
+    /// Whether clipboard updates from remote devices are automatically written to the local pasteboard.
+    var autoSyncClipboard: Bool = true {
+        didSet {
+            UserDefaults.standard.set(autoSyncClipboard, forKey: Self.autoSyncClipboardKey)
+        }
+    }
 
     /// Overall connection state.
     private(set) var appState: AppConnectionState = .disconnected
@@ -101,6 +108,10 @@ final class TetherViewModel {
 
     /// Call once at app startup.
     func initialize() {
+        if UserDefaults.standard.object(forKey: Self.autoSyncClipboardKey) != nil {
+            autoSyncClipboard = UserDefaults.standard.bool(forKey: Self.autoSyncClipboardKey)
+        }
+        
         certificateManager.initialize()
         setupConnectionHandlers()
         startDiscovery()
@@ -328,6 +339,10 @@ final class TetherViewModel {
                 if clipboardHistory.count > 50 {
                     clipboardHistory = Array(clipboardHistory.prefix(50))
                 }
+                
+                if autoSyncClipboard {
+                    copyToLocalClipboard(content)
+                }
             }
 
         case .clipboardContent:
@@ -335,6 +350,9 @@ final class TetherViewModel {
                 let sourceName = connectedDeviceName ?? "Desktop"
                 let entry = ClipboardEntry(content: content, timestamp: Date(), source: .remote(sourceName))
                 clipboardHistory.insert(entry, at: 0)
+                
+                // Manual requests ALWAYS write to the pasteboard
+                copyToLocalClipboard(content)
             }
 
         case .pairPending:

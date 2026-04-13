@@ -119,6 +119,31 @@ struct SettingsView: View {
                     }
                 }
 
+                // Sync Settings
+                Section {
+                    Toggle(isOn: Bindable(viewModel).autoSyncClipboard) {
+                        HStack(spacing: 14) {
+                            Image(systemName: "arrow.triangle.2.circlepath")
+                                .font(.title3)
+                                .foregroundStyle(.teal)
+                                .frame(width: 32)
+                            
+                            VStack(alignment: .leading, spacing: 2) {
+                                Text("Automatic Clipboard Sync")
+                                    .font(.body.weight(.medium))
+                                
+                                Text("Write remote updates to system pasteboard")
+                                    .font(.caption2)
+                                    .foregroundStyle(.tertiary)
+                            }
+                        }
+                    }
+                } header: {
+                    Text("Sync Settings")
+                } footer: {
+                    Text("When enabled, the iPhone's clipboard will be updated immediately when a connected desktop clipboard changes.")
+                }
+
                 // Connection
                 Section {
                     HStack {
