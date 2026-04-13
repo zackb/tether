@@ -10,9 +10,9 @@
 #include <sys/wait.h>
 #include <unistd.h>
 
+#include "tether/crypto.hpp"
 #include "tether/file_transfer.hpp"
 #include "tether/wayland.hpp"
-#include "tether/crypto.hpp"
 #include <cstring>
 #include <filesystem>
 #include <iostream>
@@ -29,22 +29,17 @@ namespace tether {
     // Global list of active connected sessions
     static std::map<int, ClientSession> active_sessions;
 
-    void register_client_fd(int fd) { 
-        active_sessions[fd] = {fd, nullptr}; 
-    }
+    void register_client_fd(int fd) { active_sessions[fd] = {fd, nullptr}; }
 
-    void register_client_ssl(int fd, SSL* ssl) {
-        active_sessions[fd] = {fd, ssl};
-    }
+    void register_client_ssl(int fd, SSL* ssl) { active_sessions[fd] = {fd, ssl}; }
 
-    void unregister_client_fd(int fd) { 
-        active_sessions.erase(fd); 
-    }
+    void unregister_client_fd(int fd) { active_sessions.erase(fd); }
 
     // Helper for robust SSL writes on non-blocking sockets.
     // Handles SSL_ERROR_WANT_WRITE by retrying.
     static int robust_ssl_write(SSL* ssl, const void* buf, int num) {
-        if (!ssl) return -1;
+        if (!ssl)
+            return -1;
         int total_written = 0;
         const char* p = static_cast<const char*>(buf);
         while (total_written < num) {
@@ -67,7 +62,8 @@ namespace tether {
             packet += '\n';
 
         for (auto const& [fd, session] : active_sessions) {
-            if (fd == exclude_fd) continue;
+            if (fd == exclude_fd)
+                continue;
             if (session.ssl) {
                 robust_ssl_write(session.ssl, packet.c_str(), packet.size());
             } else {
@@ -154,6 +150,18 @@ namespace tether {
             close(server_fd_);
             server_fd_ = -1;
             unlink(socket_path_.c_str());
+        }
+
+        // Clean up any remaining clients
+        std::vector<int> client_fds;
+        for (auto const& [fd, _] : client_buffers_) {
+            client_fds.push_back(fd);
+        }
+        for (int fd : client_fds) {
+            loop_.removeFd(fd);
+            close(fd);
+            unregister_client_fd(fd);
+            client_buffers_.erase(fd);
         }
     }
 
@@ -287,13 +295,34 @@ namespace tether {
             close(server_fd_);
             server_fd_ = -1;
         }
+
+        // Clean up all active clients and SSL sessions
+        std::vector<int> client_fds;
+        for (auto const& [fd, _] : active_ssl_) {
+            client_fds.push_back(fd);
+        }
+        for (int fd : client_fds) {
+            SSL* ssl = active_ssl_[fd];
+            if (ssl)
+                SSL_free(ssl);
+
+            loop_.removeFd(fd);
+            close(fd);
+            unregister_client_fd(fd);
+
+            active_ssl_.erase(fd);
+            client_buffers_.erase(fd);
+            ssl_handshake_complete_.erase(fd);
+            client_paired_.erase(fd);
+        }
     }
 
     void TcpServer::handle_accept(int fd) {
         sockaddr_in client_addr{};
         socklen_t addrlen = sizeof(client_addr);
         int client_fd = accept(fd, reinterpret_cast<sockaddr*>(&client_addr), &addrlen);
-        if (client_fd < 0) return;
+        if (client_fd < 0)
+            return;
 
         // Set non-blocking
         int flags = fcntl(client_fd, F_GETFL, 0);
@@ -304,7 +333,7 @@ namespace tether {
         std::cout << "TcpServer: New connection from " << ip << " (fd: " << client_fd << ")" << std::endl;
 
         // SSL Wrapping
-        SSL* ssl = SSL_new(Crypto::instance().get_server_context());
+        SSL* ssl = SSL_new(tether::Crypto::instance().get_server_context());
         SSL_set_fd(ssl, client_fd);
         SSL_set_accept_state(ssl);
 
@@ -336,7 +365,7 @@ namespace tether {
                 if (err == SSL_ERROR_WANT_READ || err == SSL_ERROR_WANT_WRITE) {
                     return; // Wait for Epoll to re-trigger
                 }
-                
+
                 // Handshake strictly failed
                 SSL_free(ssl);
                 active_ssl_.erase(client_fd);
@@ -368,7 +397,7 @@ namespace tether {
                         if (j.contains("command") && j["command"] == "pair_request") {
                             std::string print = Crypto::get_peer_fingerprint(ssl);
                             std::string dev_name = j.value("device_name", "Unknown Device");
-                            std::cout << "[Pairing Request Pending] from " << dev_name 
+                            std::cout << "[Pairing Request Pending] from " << dev_name
                                       << ". Accept by running: tether --accept " << print << std::endl;
 
                             // Persist the pending request so accept_device can retrieve the name
@@ -377,14 +406,17 @@ namespace tether {
                                 nlohmann::json pending;
                                 std::ifstream ifs(pending_path);
                                 if (ifs.is_open()) {
-                                    try { pending = nlohmann::json::parse(ifs); } catch (...) {}
+                                    try {
+                                        pending = nlohmann::json::parse(ifs);
+                                    } catch (...) {
+                                    }
                                     ifs.close();
                                 }
                                 pending[print] = dev_name;
                                 std::ofstream ofs(pending_path);
                                 ofs << pending.dump(4);
                             }
-                            
+
                             nlohmann::json resp;
                             resp["command"] = "pair_pending";
                             std::string payload = resp.dump() + "\n";
@@ -458,7 +490,8 @@ namespace tether {
         }
     }
 
-    void TcpServer::spawn_pair_dialog(int client_fd, SSL* ssl,
+    void TcpServer::spawn_pair_dialog(int client_fd,
+                                      SSL* ssl,
                                       const std::string& fingerprint,
                                       const std::string& device_name) {
         // Create a pipe so the parent can detect when the child exits via epoll
@@ -491,23 +524,38 @@ namespace tether {
 
             // Try alongside the daemon binary first, then fall back to PATH
             std::filesystem::path self_path;
-            try { self_path = std::filesystem::read_symlink("/proc/self/exe"); } catch (...) {}
+            try {
+                self_path = std::filesystem::read_symlink("/proc/self/exe");
+            } catch (...) {
+            }
             std::string sibling = (self_path.parent_path() / "tether-dialog").string();
 
-            execl(sibling.c_str(), "tether-dialog",
-                  "--title", "Pairing Request",
-                  "--body", body.c_str(),
-                  "--accept", "Accept",
-                  "--reject", "Reject",
-                  "--timeout", "60",
+            execl(sibling.c_str(),
+                  "tether-dialog",
+                  "--title",
+                  "Pairing Request",
+                  "--body",
+                  body.c_str(),
+                  "--accept",
+                  "Accept",
+                  "--reject",
+                  "Reject",
+                  "--timeout",
+                  "60",
                   nullptr);
             // If sibling path failed, try PATH
-            execlp("tether-dialog", "tether-dialog",
-                   "--title", "Pairing Request",
-                   "--body", body.c_str(),
-                   "--accept", "Accept",
-                   "--reject", "Reject",
-                   "--timeout", "60",
+            execlp("tether-dialog",
+                   "tether-dialog",
+                   "--title",
+                   "Pairing Request",
+                   "--body",
+                   body.c_str(),
+                   "--accept",
+                   "Accept",
+                   "--reject",
+                   "Reject",
+                   "--timeout",
+                   "60",
                    nullptr);
             // exec failed entirely
             std::cerr << "spawn_pair_dialog: exec failed: " << std::strerror(errno) << std::endl;
@@ -577,7 +625,8 @@ namespace tether {
                     ofs << pending.dump(4);
                 }
             } else {
-                std::cout << "[Pairing Rejected] " << info.device_name << " (exit code " << exit_code << ")" << std::endl;
+                std::cout << "[Pairing Rejected] " << info.device_name << " (exit code " << exit_code << ")"
+                          << std::endl;
 
                 // Notify the remote client
                 if (active_ssl_.count(info.client_fd)) {
@@ -593,8 +642,7 @@ namespace tether {
             close(read_fd);
         });
 
-        std::cout << "spawn_pair_dialog: Launched dialog (pid " << pid << ") for "
-                  << device_name << std::endl;
+        std::cout << "spawn_pair_dialog: Launched dialog (pid " << pid << ") for " << device_name << std::endl;
     }
 
 } // namespace tether

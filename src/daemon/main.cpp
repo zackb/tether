@@ -1,13 +1,13 @@
+#include <csignal>
 #include <iostream>
+#include <nlohmann/json.hpp>
 #include <tether/core.hpp>
-#include <tether/net.hpp>
-#include <tether/event_loop.hpp>
-#include <tether/wayland.hpp>
-#include <tether/file_transfer.hpp>
 #include <tether/crypto.hpp>
 #include <tether/discovery.hpp>
-#include <nlohmann/json.hpp>
-#include <csignal>
+#include <tether/event_loop.hpp>
+#include <tether/file_transfer.hpp>
+#include <tether/net.hpp>
+#include <tether/wayland.hpp>
 #include <unistd.h>
 
 tether::EpollEventLoop* g_loop = nullptr;
@@ -16,15 +16,16 @@ void signal_handler(int) {
     if (g_loop) {
         std::cout << "\nStopping tetherd..." << std::endl;
         g_loop->stop();
+        g_loop = nullptr;
     }
 }
 
 int main(int argc, char** argv) {
     std::cout << "tetherd version " << tether::get_version() << "\n";
-    
+
     try {
         tether::ensure_single_instance();
-    } catch(const std::exception& e) {
+    } catch (const std::exception& e) {
         std::cerr << "Initialization error: " << e.what() << std::endl;
         return 1;
     }
@@ -34,9 +35,10 @@ int main(int argc, char** argv) {
         return 1;
     }
 
-    // Capture Ctrl-C gracefully and stop the event loop
+    // Capture signals gracefully
     std::signal(SIGINT, signal_handler);
     std::signal(SIGTERM, signal_handler);
+    std::signal(SIGPIPE, SIG_IGN); // Ignore SIGPIPE to prevent crash on closed connections
 
     tether::EpollEventLoop loop;
     g_loop = &loop;
@@ -83,5 +85,11 @@ int main(int argc, char** argv) {
 
     // discovery destructor calls unpublish() automatically
     std::cout << "tetherd shutdown complete." << std::endl;
+
+    // explicitly null globals to be safe during final stack unwinding
+    tether::g_wayland = nullptr;
+    tether::g_file_manager = nullptr;
+    g_loop = nullptr;
+
     return 0;
 }

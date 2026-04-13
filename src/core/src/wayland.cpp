@@ -13,10 +13,25 @@ WaylandContext* g_wayland = nullptr;
 WaylandContext::WaylandContext(EpollEventLoop& loop) : loop_(loop) {}
 
 WaylandContext::~WaylandContext() {
+    g_wayland = nullptr;
     if (raw_display_) {
-        // remove from poll
+        // Crucial: Destroy all regular proxies BEFORE disconnecting the display.
+        clipboard_.reset();
+        data_control_manager_.reset();
+        seat_.reset();
+        registry_.reset();
+
+        // High-level wrapper for the display itself. We must NOT let it call 
+        // wl_proxy_destroy on the raw_display_, as wl_display_disconnect 
+        // handles that. We simply release the unique_ptr here to prevent its 
+        // destructor from running.
+        if (display_) {
+            display_.release();
+        }
+
         loop_.removeFd(wl_display_get_fd(raw_display_));
         wl_display_disconnect(raw_display_);
+        raw_display_ = nullptr;
     }
 }
 
