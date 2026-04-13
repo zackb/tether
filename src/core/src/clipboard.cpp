@@ -16,28 +16,49 @@ ClipboardManager::ClipboardManager(CCZwlrDataControlManagerV1* manager, CCWlSeat
     device_ = std::make_unique<CCZwlrDataControlDeviceV1>(proxy);
 
     device_->setDataOffer([this](CCZwlrDataControlDeviceV1*, wl_proxy* offer_proxy) {
-        // We received a new offer
         current_offer_ = std::make_unique<CCZwlrDataControlOfferV1>(offer_proxy);
+        current_mimes_.clear();
         
-        current_offer_->setOffer([](CCZwlrDataControlOfferV1* offer, const char* mime_type) {
-            // we ignore the reported mime types for now and just blindly try text/plain
+        current_offer_->setOffer([this](CCZwlrDataControlOfferV1* offer, const char* mime_type) {
+            current_mimes_.push_back(mime_type);
         });
     });
 
     device_->setSelection([this](CCZwlrDataControlDeviceV1*, wl_proxy* offer_proxy) {
         if (!offer_proxy) {
+            if (cb_) cb_("");
             return;
         }
 
-        // The selection has changed. It's time to read it!
+        if (!current_offer_) return;
+
+        // Selection changed, negotiate best mime type
+        std::string best_mime = "text/plain"; // fallback
+        bool found = false;
+        
+        static const std::vector<std::string> priorities = {
+            "text/plain;charset=utf-8",
+            "UTF8_STRING",
+            "text/plain"
+        };
+
+        for (const auto& p : priorities) {
+            for (const auto& m : current_mimes_) {
+                if (m == p) {
+                    best_mime = m;
+                    found = true;
+                    break;
+                }
+            }
+            if (found) break;
+        }
+
         int pipefs[2];
         if (pipe(pipefs) < 0) return;
 
-        // Ask the offer to send the data into our pipe.
-        current_offer_->sendReceive("text/plain", pipefs[1]);
-        close(pipefs[1]); // Close our write end, wayland compositor has it now.
+        current_offer_->sendReceive(best_mime.c_str(), pipefs[1]);
+        close(pipefs[1]);
 
-        // Read in a detached thread so we don't block the event loop
         std::thread([this, fd = pipefs[0]]() {
             std::string result;
             char buf[1024];
@@ -48,7 +69,7 @@ ClipboardManager::ClipboardManager(CCZwlrDataControlManagerV1* manager, CCWlSeat
             }
             close(fd);
 
-            if (!result.empty() && cb_) {
+            if (cb_) {
                 cb_(result);
             }
         }).detach();

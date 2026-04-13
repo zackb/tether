@@ -54,11 +54,15 @@ bool WaylandContext::init() {
     clipboard_ = std::make_unique<ClipboardManager>(data_control_manager_.get(), seat_.get());
     
     clipboard_->set_update_callback([this](const std::string& text) {
+        bool changed = false;
         {
             std::lock_guard<std::mutex> lock(clip_mutex_);
-            cached_clipboard_ = text;
+            if (cached_clipboard_ != text) {
+                cached_clipboard_ = text;
+                changed = true;
+            }
         }
-        if (clipboard_cb_) {
+        if (changed && clipboard_cb_) {
             clipboard_cb_(text);
         }
     });

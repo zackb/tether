@@ -61,12 +61,13 @@ namespace tether {
         return total_written;
     }
 
-    void broadcast_message(const std::string& msg) {
+    void broadcast_message(const std::string& msg, int exclude_fd) {
         std::string packet = msg;
         if (packet.back() != '\n')
             packet += '\n';
 
         for (auto const& [fd, session] : active_sessions) {
+            if (fd == exclude_fd) continue;
             if (session.ssl) {
                 robust_ssl_write(session.ssl, packet.c_str(), packet.size());
             } else {
@@ -406,7 +407,7 @@ namespace tether {
                         nlohmann::json bc;
                         bc["command"] = "clipboard_updated";
                         bc["content"] = content;
-                        broadcast_message(bc.dump());
+                        broadcast_message(bc.dump(), client_fd);
                     } else if (j.contains("command") && j["command"] == "clipboard_get") {
                         if (g_wayland) {
                             nlohmann::json resp;

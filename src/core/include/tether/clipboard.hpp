@@ -3,6 +3,7 @@
 #include <functional>
 #include <memory>
 #include <string>
+#include <vector>
 
 class CCZwlrDataControlManagerV1;
 class CCWlSeat;
@@ -29,6 +30,7 @@ namespace tether {
 
         std::function<void(const std::string&)> cb_;
         std::unique_ptr<CCZwlrDataControlOfferV1> current_offer_;
+        std::vector<std::string> current_mimes_;
     };
 
 } // namespace tether
