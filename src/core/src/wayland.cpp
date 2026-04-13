@@ -51,7 +51,7 @@ bool WaylandContext::init() {
         return false;
     }
 
-    clipboard_ = std::make_unique<ClipboardManager>(data_control_manager_.get(), seat_.get());
+    clipboard_ = std::make_unique<ClipboardManager>(data_control_manager_.get(), seat_.get(), loop_);
     
     clipboard_->set_update_callback([this](const std::string& text) {
         bool changed = false;
@@ -87,9 +87,14 @@ void WaylandContext::set_clipboard_callback(std::function<void(const std::string
 }
 
 void WaylandContext::copy_to_clipboard(const std::string& text) {
+    std::string trimmed = text;
+    while (!trimmed.empty() && (trimmed.back() == '\0' || isspace((unsigned char)trimmed.back()))) {
+        trimmed.pop_back();
+    }
+
     {
         std::lock_guard<std::mutex> lock(clip_mutex_);
-        cached_clipboard_ = text;
+        cached_clipboard_ = trimmed;
     }
     if (clipboard_) {
         clipboard_->copy(text);

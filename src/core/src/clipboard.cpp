@@ -9,8 +9,8 @@
 
 namespace tether {
 
-ClipboardManager::ClipboardManager(CCZwlrDataControlManagerV1* manager, CCWlSeat* seat)
-    : manager_(manager), seat_(seat) {
+ClipboardManager::ClipboardManager(CCZwlrDataControlManagerV1* manager, CCWlSeat* seat, EpollEventLoop& loop)
+    : manager_(manager), seat_(seat), loop_(loop) {
     
     auto proxy = manager_->sendGetDataDevice((wl_proxy*)seat_->resource());
     device_ = std::make_unique<CCZwlrDataControlDeviceV1>(proxy);
@@ -56,27 +56,42 @@ ClipboardManager::ClipboardManager(CCZwlrDataControlManagerV1* manager, CCWlSeat
         int pipefs[2];
         if (pipe(pipefs) < 0) return;
 
+        // Use non-blocking read end for the event loop
+        fcntl(pipefs[0], F_SETFL, O_NONBLOCK);
+
         current_offer_->sendReceive(best_mime.c_str(), pipefs[1]);
         close(pipefs[1]);
 
-        std::thread([this, fd = pipefs[0]]() {
-            std::string result;
-            char buf[1024];
-            while (true) {
-                ssize_t n = read(fd, buf, sizeof(buf));
-                if (n <= 0) break;
-                result.append(buf, n);
-            }
-            close(fd);
+        loop_.addFd(pipefs[0], [this](int fd) {
+            char buf[4096];
+            ssize_t n = read(fd, buf, sizeof(buf));
+            if (n > 0) {
+                pending_reads_[fd].append(buf, n);
+            } else if (n == 0 || (n < 0 && errno != EAGAIN)) {
+                // Done reading or error
+                std::string result = pending_reads_[fd];
+                pending_reads_.erase(fd);
+                loop_.removeFd(fd);
+                close(fd);
 
-            if (cb_) {
-                cb_(result);
+                // Trim trailing nulls and whitespace
+                while (!result.empty() && (result.back() == '\0' || isspace(result.back()))) {
+                    result.pop_back();
+                }
+
+                if (cb_) {
+                    cb_(result);
+                }
             }
-        }).detach();
+        });
     });
 }
 
 ClipboardManager::~ClipboardManager() {
+    for (auto const& [fd, _] : pending_reads_) {
+        loop_.removeFd(fd);
+        close(fd);
+    }
     if (device_) {
         device_->sendDestroy();
     }
@@ -93,11 +108,16 @@ void ClipboardManager::copy(const std::string& text) {
     source->sendOffer("text/plain");
     source->sendOffer("UTF8_STRING");
 
-    // Wayland uses detached thread approach nicely too for offering data
-    std::string text_copy = text;
-    source->setSend([text_copy](CCZwlrDataControlSourceV1* s, const char* mime_type, int32_t fd) {
-        std::thread([text_copy, fd]() {
-            write(fd, text_copy.c_str(), text_copy.size());
+    // Capture text by value for the callback
+    std::string text_to_send = text;
+    source->setSend([text_to_send](CCZwlrDataControlSourceV1* s, const char* mime_type, int32_t fd) {
+        // For writing, a detached thread is safer than reading because it doesn't 
+        // trigger an immediate broadcast callback on its own; however, for 
+        // strict single-threading we could use EPOLLOUT. 
+        // Given that we are primarily fixing the READ data race, we'll keep 
+        // the write simple but ensure it doesn't touch any manager state.
+        std::thread([text_to_send, fd]() {
+            write(fd, text_to_send.c_str(), text_to_send.size());
             close(fd);
         }).detach();
     });
@@ -106,7 +126,7 @@ void ClipboardManager::copy(const std::string& text) {
         s->sendDestroy();
     });
 
-    device_->sendSetSelection(source.release()); // Leak to compositor until cancelled
+    device_->sendSetSelection(source.release());
 }
 
 } // namespace tether

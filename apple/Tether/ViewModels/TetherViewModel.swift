@@ -9,6 +9,7 @@
 import Foundation
 import SwiftUI
 import UniformTypeIdentifiers
+import UIKit
 
 /// High-level app state.
 enum AppConnectionState: Equatable {
@@ -342,7 +343,9 @@ final class TetherViewModel {
                 }
                 
                 if autoSyncClipboard {
-                    copyToLocalClipboard(content)
+                    Task { @MainActor in
+                        copyToLocalClipboard(content)
+                    }
                 }
             }
 
@@ -353,7 +356,9 @@ final class TetherViewModel {
                 clipboardHistory.insert(entry, at: 0)
                 
                 // Manual requests ALWAYS write to the pasteboard
-                copyToLocalClipboard(content)
+                Task { @MainActor in
+                    copyToLocalClipboard(content)
+                }
             }
 
         case .pairPending:
