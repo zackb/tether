@@ -112,6 +112,10 @@ final class TetherViewModel {
 
     /// The chunk size for file transfers (48KB raw → 64KB base64).
     private let fileChunkSize = 48 * 1024
+    private var hasInitialized = false
+    private var pendingReconnectTask: Task<Void, Never>?
+    private var autoConnectingFingerprint: String?
+    private var manualDisconnect = false
 
     private struct IncomingTransferBuffer {
         let filename: String
@@ -125,6 +129,9 @@ final class TetherViewModel {
 
     /// Call once at app startup.
     func initialize() {
+        guard !hasInitialized else { return }
+        hasInitialized = true
+
         if UserDefaults.standard.object(forKey: Self.autoSyncClipboardKey) != nil {
             autoSyncClipboard = UserDefaults.standard.bool(forKey: Self.autoSyncClipboardKey)
         }
@@ -132,19 +139,38 @@ final class TetherViewModel {
         certificateManager.initialize()
         setupConnectionHandlers()
         startDiscovery()
+        scheduleAutoReconnectAttempt()
     }
 
     // MARK: - Discovery
 
-    func startDiscovery() {
-        discovery.startScanning()
+    func startDiscovery(forceRestart: Bool = false) {
+        discovery.startScanning(forceRestart: forceRestart)
         if appState == .disconnected {
             appState = .discovering
         }
     }
 
-    func stopDiscovery() {
-        discovery.stopScanning()
+    func stopDiscovery(clearHosts: Bool = false) {
+        discovery.stopScanning(clearHosts: clearHosts)
+    }
+
+    func refreshDiscovery() {
+        startDiscovery(forceRestart: true)
+        scheduleAutoReconnectAttempt()
+    }
+
+    func handleScenePhase(_ phase: ScenePhase) {
+        switch phase {
+        case .active:
+            manualDisconnect = false
+            refreshDiscovery()
+        case .background:
+            pendingReconnectTask?.cancel()
+            pendingReconnectTask = nil
+        default:
+            break
+        }
     }
 
     // MARK: - Connection
@@ -156,6 +182,7 @@ final class TetherViewModel {
             return
         }
 
+        manualDisconnect = false
         appState = .connecting
         connectedDeviceName = host.name
         connection.connect(to: host.endpoint, identity: identity)
@@ -168,6 +195,7 @@ final class TetherViewModel {
             return
         }
 
+        manualDisconnect = false
         appState = .connecting
         connectedDeviceName = host
         connection.connect(host: host, port: port, identity: identity)
@@ -175,6 +203,10 @@ final class TetherViewModel {
 
     /// Disconnect from the daemon.
     func disconnect() {
+        manualDisconnect = true
+        pendingReconnectTask?.cancel()
+        pendingReconnectTask = nil
+        autoConnectingFingerprint = nil
         connection.disconnect()
         appState = .disconnected
         connectedDeviceName = nil
@@ -307,16 +339,30 @@ final class TetherViewModel {
     // MARK: - Private — Connection Handlers
 
     private func setupConnectionHandlers() {
+        discovery.onHostsChanged = { [weak self] _ in
+            self?.scheduleAutoReconnectAttempt()
+        }
+
         connection.onStateChange = { [weak self] state in
             guard let self else { return }
             switch state {
             case .connected:
+                self.pendingReconnectTask?.cancel()
+                self.pendingReconnectTask = nil
+                self.autoConnectingFingerprint = nil
                 self.handleConnected()
             case .disconnected:
+                self.autoConnectingFingerprint = nil
                 self.appState = .disconnected
+                self.scheduleAutoReconnectAttempt()
             case .failed(let msg):
+                let wasAutoReconnect = self.autoConnectingFingerprint != nil
+                self.autoConnectingFingerprint = nil
                 self.appState = .disconnected
-                self.errorMessage = "Connection failed: \(msg)"
+                if !wasAutoReconnect {
+                    self.errorMessage = "Connection failed: \(msg)"
+                }
+                self.scheduleAutoReconnectAttempt()
             case .connecting:
                 self.appState = .connecting
             }
@@ -344,6 +390,44 @@ final class TetherViewModel {
 
             connection.send(.pairRequest(deviceName: deviceName))
         }
+    }
+
+    private func scheduleAutoReconnectAttempt() {
+        guard shouldAutoReconnect else { return }
+        guard autoConnectingFingerprint == nil else { return }
+
+        pendingReconnectTask?.cancel()
+        pendingReconnectTask = Task { [weak self] in
+            try? await Task.sleep(for: .milliseconds(700))
+            await MainActor.run {
+                self?.attemptAutoReconnect()
+            }
+        }
+    }
+
+    private var shouldAutoReconnect: Bool {
+        if manualDisconnect {
+            return false
+        }
+
+        switch appState {
+        case .disconnected, .discovering:
+            return true
+        case .connecting, .pairing, .connected:
+            return false
+        }
+    }
+
+    private func attemptAutoReconnect() {
+        guard shouldAutoReconnect else { return }
+        guard certificateManager.knownHosts.count == 1,
+              let fingerprint = certificateManager.knownHosts.keys.first else { return }
+
+        let matchingHosts = discovery.hosts.filter { $0.fingerprint == fingerprint }
+        guard matchingHosts.count == 1 else { return }
+
+        autoConnectingFingerprint = fingerprint
+        connectTo(host: matchingHosts[0])
     }
 
     private func handleMessage(_ message: TetherMessage) {

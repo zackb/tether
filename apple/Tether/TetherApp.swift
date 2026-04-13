@@ -10,6 +10,7 @@ import SwiftUI
 @main
 struct TetherApp: App {
     @State private var viewModel = TetherViewModel()
+    @Environment(\.scenePhase) private var scenePhase
 
     var body: some Scene {
         WindowGroup {
@@ -18,6 +19,9 @@ struct TetherApp: App {
                 .preferredColorScheme(.dark)
                 .onAppear {
                     viewModel.initialize()
+                }
+                .onChange(of: scenePhase) { _, newPhase in
+                    viewModel.handleScenePhase(newPhase)
                 }
         }
     }

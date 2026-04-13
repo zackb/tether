@@ -29,11 +29,16 @@ final class BonjourDiscovery {
     private(set) var isScanning = false
 
     private var browser: NWBrowser?
+    var onHostsChanged: (([DiscoveredHost]) -> Void)?
 
     // MARK: - Public
 
     /// Start scanning for `_tether._tcp` services.
-    func startScanning() {
+    func startScanning(forceRestart: Bool = false) {
+        if forceRestart {
+            stopScanning(clearHosts: true)
+        }
+
         guard !isScanning else { return }
 
         let params = NWParameters()
@@ -51,8 +56,10 @@ final class BonjourDiscovery {
             case .failed(let error):
                 print("BonjourDiscovery: Browser failed: \(error)")
                 self?.isScanning = false
+                self?.browser = nil
             case .cancelled:
                 self?.isScanning = false
+                self?.browser = nil
             default:
                 break
             }
@@ -67,10 +74,14 @@ final class BonjourDiscovery {
     }
 
     /// Stop scanning.
-    func stopScanning() {
+    func stopScanning(clearHosts: Bool = false) {
         browser?.cancel()
         browser = nil
         isScanning = false
+        if clearHosts {
+            hosts = []
+            onHostsChanged?(hosts)
+        }
     }
 
     // MARK: - Private
@@ -88,6 +99,7 @@ final class BonjourDiscovery {
                 fingerprint: fingerprint
             )
         }
+        onHostsChanged?(hosts)
     }
 
     /// Extract the `fp=<sha256>` value from the Bonjour TXT record.
