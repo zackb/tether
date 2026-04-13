@@ -52,7 +52,7 @@ bool WaylandContext::init() {
         return false;
     }
 
-    clipboard_ = std::make_unique<ClipboardManager>(data_control_manager_.get(), seat_.get(), loop_);
+    clipboard_ = std::make_unique<ClipboardManager>(data_control_manager_.get(), seat_.get(), loop_, raw_display_);
     
     clipboard_->set_update_callback([this](const std::string& text) {
         bool changed = false;

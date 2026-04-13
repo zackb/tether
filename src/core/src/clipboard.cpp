@@ -9,28 +9,47 @@
 
 namespace tether {
 
-ClipboardManager::ClipboardManager(CCZwlrDataControlManagerV1* manager, CCWlSeat* seat, EpollEventLoop& loop)
-    : manager_(manager), seat_(seat), loop_(loop) {
+ClipboardManager::ClipboardManager(CCZwlrDataControlManagerV1* manager, CCWlSeat* seat, EpollEventLoop& loop, wl_display* display)
+    : manager_(manager), seat_(seat), loop_(loop), display_(display) {
     
     auto proxy = manager_->sendGetDataDevice((wl_proxy*)seat_->resource());
     device_ = std::make_unique<CCZwlrDataControlDeviceV1>(proxy);
 
     device_->setDataOffer([this](CCZwlrDataControlDeviceV1*, wl_proxy* offer_proxy) {
-        current_offer_ = std::make_unique<CCZwlrDataControlOfferV1>(offer_proxy);
-        current_mimes_.clear();
+        auto offer = std::make_unique<CCZwlrDataControlOfferV1>(offer_proxy);
         
-        current_offer_->setOffer([this](CCZwlrDataControlOfferV1* offer, const char* mime_type) {
-            current_mimes_.push_back(mime_type);
+        // Clean up previous offers that were never selected to avoid memory growth,
+        // but keep the current one and any very recent ones. 
+        // Wayland selection events usually follow data_offer events quickly.
+        if (offers_.size() > 5) {
+            offers_.erase(offers_.begin());
+            offer_mimes_.erase(offer_mimes_.begin());
+        }
+
+        offer->setOffer([this, offer_proxy](CCZwlrDataControlOfferV1*, const char* mime_type) {
+            offer_mimes_[offer_proxy].push_back(mime_type);
         });
+        
+        offers_[offer_proxy] = std::move(offer);
     });
 
     device_->setSelection([this](CCZwlrDataControlDeviceV1*, wl_proxy* offer_proxy) {
         if (!offer_proxy) {
+            offers_.clear();
+            offer_mimes_.clear();
             if (cb_) cb_("");
             return;
         }
 
-        if (!current_offer_) return;
+        auto it_mimes = offer_mimes_.find(offer_proxy);
+        auto it_offer = offers_.find(offer_proxy);
+
+        if (it_mimes == offer_mimes_.end() || it_offer == offers_.end()) {
+            return;
+        }
+
+        const auto& current_mimes = it_mimes->second;
+        auto& current_offer = it_offer->second;
 
         // Selection changed, negotiate best mime type
         std::string best_mime = "text/plain"; // fallback
@@ -47,7 +66,7 @@ ClipboardManager::ClipboardManager(CCZwlrDataControlManagerV1* manager, CCWlSeat
         };
 
         for (const auto& p : priorities) {
-            for (const auto& m : current_mimes_) {
+            for (const auto& m : current_mimes) {
                 if (m == p) {
                     best_mime = m;
                     found = true;
@@ -59,8 +78,8 @@ ClipboardManager::ClipboardManager(CCZwlrDataControlManagerV1* manager, CCWlSeat
 
         // Catch-all fallback: if none of our preferred types are found, 
         // try the first thing the compositor offered.
-        if (!found && !current_mimes_.empty()) {
-            best_mime = current_mimes_[0];
+        if (!found && !current_mimes.empty()) {
+            best_mime = current_mimes[0];
             found = true;
         }
 
@@ -72,8 +91,17 @@ ClipboardManager::ClipboardManager(CCZwlrDataControlManagerV1* manager, CCWlSeat
         // Use non-blocking read end for the event loop
         fcntl(pipefs[0], F_SETFL, O_NONBLOCK);
 
-        current_offer_->sendReceive(best_mime.c_str(), pipefs[1]);
+        current_offer->sendReceive(best_mime.c_str(), pipefs[1]);
         close(pipefs[1]);
+        wl_display_flush(display_);
+
+        // Cleanup: remove all other offers as this one is now the active selection
+        auto saved_offer = std::move(offers_[offer_proxy]);
+        auto saved_mimes = std::move(offer_mimes_[offer_proxy]);
+        offers_.clear();
+        offer_mimes_.clear();
+        offers_[offer_proxy] = std::move(saved_offer);
+        offer_mimes_[offer_proxy] = std::move(saved_mimes);
 
         loop_.addFd(pipefs[0], [this](int fd) {
             char buf[4096];

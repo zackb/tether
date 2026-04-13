@@ -1,4 +1,5 @@
 #include "tether/event_loop.hpp"
+#include <wayland-client.h>
 #include <functional>
 #include <memory>
 #include <string>
@@ -14,7 +15,7 @@ namespace tether {
 
     class ClipboardManager {
     public:
-        ClipboardManager(CCZwlrDataControlManagerV1* manager, CCWlSeat* seat, EpollEventLoop& loop);
+        ClipboardManager(CCZwlrDataControlManagerV1* manager, CCWlSeat* seat, EpollEventLoop& loop, wl_display* display);
         ~ClipboardManager();
 
         // Set callback to receive native Wayland clipboard updates
@@ -27,11 +28,12 @@ namespace tether {
         CCZwlrDataControlManagerV1* manager_;
         CCWlSeat* seat_;
         EpollEventLoop& loop_;
+        wl_display* display_;
         std::unique_ptr<CCZwlrDataControlDeviceV1> device_;
 
         std::function<void(const std::string&)> cb_;
-        std::unique_ptr<CCZwlrDataControlOfferV1> current_offer_;
-        std::vector<std::string> current_mimes_;
+        std::map<wl_proxy*, std::unique_ptr<CCZwlrDataControlOfferV1>> offers_;
+        std::map<wl_proxy*, std::vector<std::string>> offer_mimes_;
         std::map<int, std::string> pending_reads_;
     };
 
