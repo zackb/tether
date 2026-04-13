@@ -59,7 +59,8 @@ struct FileTransfer: Identifiable {
     }
 }
 
-/// Main app ViewModel — owns all services and coordinates their interactions.
+@Observable
+final class TetherViewModel {
     private static let autoSyncClipboardKey = "TetherAutoSyncClipboard"
 
     // MARK: - Published State
@@ -67,7 +68,7 @@ struct FileTransfer: Identifiable {
     /// Whether clipboard updates from remote devices are automatically written to the local pasteboard.
     var autoSyncClipboard: Bool = true {
         didSet {
-            UserDefaults.standard.set(autoSyncClipboard, forKey: Self.autoSyncClipboardKey)
+            UserDefaults.standard.set(autoSyncClipboard, forKey: TetherViewModel.autoSyncClipboardKey)
         }
     }
 
