@@ -58,8 +58,9 @@ void EpollEventLoop::run() {
             int fd = events[i].data.fd;
             auto it = callbacks_.find(fd);
             if (it != callbacks_.end()) {
-                // Execute callback for readable fd
-                it->second(fd);
+                // Copy the callback to ensure it stays alive even if removeFd is called inside it
+                auto cb = it->second;
+                cb(fd);
             }
         }
     }

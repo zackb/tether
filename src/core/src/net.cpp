@@ -536,8 +536,6 @@ namespace tether {
 
             PendingPairDialog info = it->second;
             pending_dialogs_.erase(it);
-            loop_.removeFd(read_fd);
-            close(read_fd);
 
             int status = 0;
             waitpid(info.pid, &status, 0);
@@ -546,8 +544,7 @@ namespace tether {
             if (exit_code == 0) {
                 // User accepted — trust the device
                 Crypto::instance().add_known_host(info.device_name, info.fingerprint);
-                std::cout << "[Pairing Accepted] " << info.device_name
-                          << " (" << info.fingerprint << ")" << std::endl;
+                std::cout << "[Pairing Accepted] " << info.device_name << " (" << info.fingerprint << ")" << std::endl;
 
                 // Mark as paired if still connected
                 if (client_paired_.count(info.client_fd)) {
@@ -567,7 +564,10 @@ namespace tether {
                 nlohmann::json pending;
                 std::ifstream ifs(pending_path);
                 if (ifs.is_open()) {
-                    try { pending = nlohmann::json::parse(ifs); } catch (...) {}
+                    try {
+                        pending = nlohmann::json::parse(ifs);
+                    } catch (...) {
+                    }
                     ifs.close();
                 }
                 if (pending.contains(info.fingerprint)) {
@@ -576,8 +576,7 @@ namespace tether {
                     ofs << pending.dump(4);
                 }
             } else {
-                std::cout << "[Pairing Rejected] " << info.device_name
-                          << " (exit code " << exit_code << ")" << std::endl;
+                std::cout << "[Pairing Rejected] " << info.device_name << " (exit code " << exit_code << ")" << std::endl;
 
                 // Notify the remote client
                 if (active_ssl_.count(info.client_fd)) {
@@ -587,6 +586,10 @@ namespace tether {
                     robust_ssl_write(active_ssl_[info.client_fd], payload.c_str(), payload.size());
                 }
             }
+
+            // Clean up the pipe and remove from epoll at the very end
+            loop_.removeFd(read_fd);
+            close(read_fd);
         });
 
         std::cout << "spawn_pair_dialog: Launched dialog (pid " << pid << ") for "
