@@ -11,3 +11,6 @@ target_compile_options(tether-gtk PRIVATE ${GTK3_CFLAGS_OTHER})
 
 # Output into root build dir instead of nested build/src/gtk
 set_target_properties(tether-gtk PROPERTIES RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}")
+
+install(TARGETS tether-gtk
+        RUNTIME DESTINATION bin)
