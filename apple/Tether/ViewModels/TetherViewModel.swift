@@ -627,3 +627,32 @@ final class TetherViewModel {
         return candidate
     }
 }
+
+#if DEBUG
+extension TetherViewModel {
+    static var previewMock: TetherViewModel {
+        let vm = TetherViewModel()
+        vm.appState = .connected
+        vm.connectedDeviceName = "Arch btw Linux"
+        
+        vm.clipboardHistory = [
+            ClipboardEntry(content: "https://developer.apple.com/app-store/connect/", timestamp: Date(), source: .remote(vm.connectedDeviceName!)),
+            ClipboardEntry(content: "func buildAwesomeApp() async throws -> Success", timestamp: Date().addingTimeInterval(-300), source: .local("iPhone")),
+            ClipboardEntry(content: "Meeting notes:\n- Review App Store designs\n- Approve new icon\n- Push v1.0", timestamp: Date().addingTimeInterval(-3600), source: .remote(vm.connectedDeviceName!)),
+            ClipboardEntry(content: "9A1B-2C3D-4E5F-6G7H", timestamp: Date().addingTimeInterval(-86400), source: .local("iPhone"))
+        ]
+        
+        vm.activeTransfers = [
+            FileTransfer(id: "1", filename: "App_Store_Assets.zip", totalSize: 24_500_000, direction: .outgoing, bytesTransferred: 18_200_000, isComplete: false)
+        ]
+        
+        vm.completedTransfers = [
+            FileTransfer(id: "2", filename: "Final_Designs.pdf", totalSize: 4_200_000, direction: .incoming, bytesTransferred: 4_200_000, isComplete: true),
+            FileTransfer(id: "3", filename: "architecture_diagram.png", totalSize: 1_200_000, direction: .outgoing, bytesTransferred: 1_200_000, isComplete: true),
+            FileTransfer(id: "4", filename: "auth_keys.pem", totalSize: 4_000, direction: .incoming, bytesTransferred: 4_000, isComplete: true)
+        ]
+        
+        return vm
+    }
+}
+#endif
