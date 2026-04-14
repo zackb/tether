@@ -23,6 +23,10 @@ struct TetherApp: App {
                 .onChange(of: scenePhase) { _, newPhase in
                     viewModel.handleScenePhase(newPhase)
                 }
+            /*
+            AppStoreScreenshots()
+                          .preferredColorScheme(.dark)
+             */
         }
     }
 }
