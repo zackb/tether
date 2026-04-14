@@ -5,6 +5,6 @@
 - [ ] WebExtension
 - [ ] TUI
 - [ ] layershell popups for
-  - [ ] device pairing request
+  - [x] device pairing request
   - [ ] file received notification
   - [ ] TOTP code display
