@@ -7,12 +7,14 @@
 
 import SwiftUI
 import UniformTypeIdentifiers
+import PhotosUI
 
 struct FilesView: View {
     @Environment(TetherViewModel.self) private var viewModel
     @Environment(\.openURL) private var openURL
 
     @State private var showDocumentPicker = false
+    @State private var selectedPhotoItem: PhotosPickerItem? = nil
 
     var body: some View {
         NavigationStack {
@@ -28,11 +30,17 @@ struct FilesView: View {
             .toolbar {
                 if viewModel.appState == .connected {
                     ToolbarItem(placement: .topBarTrailing) {
-                        Button {
-                            showDocumentPicker = true
-                        } label: {
-                            Image(systemName: "plus.circle.fill")
-                                .foregroundStyle(.teal)
+                        HStack(spacing: 16) {
+                            PhotosPicker(selection: $selectedPhotoItem, matching: .images) {
+                                Image(systemName: "photo.on.rectangle")
+                                    .foregroundStyle(.teal)
+                            }
+                            Button {
+                                showDocumentPicker = true
+                            } label: {
+                                Image(systemName: "plus.circle.fill")
+                                    .foregroundStyle(.teal)
+                            }
                         }
                     }
                 }
@@ -49,6 +57,19 @@ struct FilesView: View {
                     }
                 case .failure(let error):
                     viewModel.errorMessage = "File selection failed: \(error.localizedDescription)"
+                }
+            }
+            .onChange(of: selectedPhotoItem) { _, newItem in
+                guard let newItem else { return }
+                
+                Task {
+                    if let data = try? await newItem.loadTransferable(type: Data.self) {
+                        let defaultName = "Image_\(UUID().uuidString.prefix(6)).jpg"
+                        viewModel.sendFile(data: data, filename: defaultName)
+                    } else {
+                        viewModel.errorMessage = "Could not read photo data."
+                    }
+                    selectedPhotoItem = nil
                 }
             }
         }
@@ -78,47 +99,90 @@ struct FilesView: View {
     private var connectedView: some View {
         ScrollView {
             VStack(spacing: 20) {
-                // Send File Button
-                Button {
-                    showDocumentPicker = true
-                } label: {
-                    HStack(spacing: 14) {
-                        ZStack {
-                            Circle()
-                                .fill(
-                                    LinearGradient(
-                                        colors: [.teal, .teal.opacity(0.7)],
-                                        startPoint: .topLeading,
-                                        endPoint: .bottomTrailing
+                // Send Actions
+                VStack(spacing: 12) {
+                    // Send File Button
+                    Button {
+                        showDocumentPicker = true
+                    } label: {
+                        HStack(spacing: 14) {
+                            ZStack {
+                                Circle()
+                                    .fill(
+                                        LinearGradient(
+                                            colors: [.teal, .teal.opacity(0.7)],
+                                            startPoint: .topLeading,
+                                            endPoint: .bottomTrailing
+                                        )
                                     )
-                                )
-                                .frame(width: 48, height: 48)
+                                    .frame(width: 48, height: 48)
 
-                            Image(systemName: "arrow.up.doc.fill")
-                                .font(.title3)
-                                .foregroundStyle(.white)
-                        }
+                                Image(systemName: "arrow.up.doc.fill")
+                                    .font(.title3)
+                                    .foregroundStyle(.white)
+                            }
 
-                        VStack(alignment: .leading, spacing: 2) {
-                            Text("Send a File")
-                                .font(.body.weight(.semibold))
-                                .foregroundStyle(.primary)
+                            VStack(alignment: .leading, spacing: 2) {
+                                Text("Send a File")
+                                    .font(.body.weight(.semibold))
+                                    .foregroundStyle(.primary)
 
-                            Text("Transfer to your Linux desktop")
+                                Text("Transfer documents & archives")
+                                    .font(.caption)
+                                    .foregroundStyle(.secondary)
+                            }
+
+                            Spacer()
+
+                            Image(systemName: "chevron.right")
                                 .font(.caption)
-                                .foregroundStyle(.secondary)
+                                .foregroundStyle(.tertiary)
                         }
-
-                        Spacer()
-
-                        Image(systemName: "chevron.right")
-                            .font(.caption)
-                            .foregroundStyle(.tertiary)
+                        .padding(16)
+                        .background(.ultraThinMaterial, in: RoundedRectangle(cornerRadius: 16))
                     }
-                    .padding(16)
-                    .background(.ultraThinMaterial, in: RoundedRectangle(cornerRadius: 16))
+                    .buttonStyle(.plain)
+
+                    // Send Photo Button
+                    PhotosPicker(selection: $selectedPhotoItem, matching: .images, photoLibrary: .shared()) {
+                        HStack(spacing: 14) {
+                            ZStack {
+                                Circle()
+                                    .fill(
+                                        LinearGradient(
+                                            colors: [.indigo, .indigo.opacity(0.7)],
+                                            startPoint: .topLeading,
+                                            endPoint: .bottomTrailing
+                                        )
+                                    )
+                                    .frame(width: 48, height: 48)
+
+                                Image(systemName: "photo.fill")
+                                    .font(.title3)
+                                    .foregroundStyle(.white)
+                            }
+
+                            VStack(alignment: .leading, spacing: 2) {
+                                Text("Send a Photo")
+                                    .font(.body.weight(.semibold))
+                                    .foregroundStyle(.primary)
+
+                                Text("Transfer from photo library")
+                                    .font(.caption)
+                                    .foregroundStyle(.secondary)
+                            }
+
+                            Spacer()
+
+                            Image(systemName: "chevron.right")
+                                .font(.caption)
+                                .foregroundStyle(.tertiary)
+                        }
+                        .padding(16)
+                        .background(.ultraThinMaterial, in: RoundedRectangle(cornerRadius: 16))
+                    }
+                    .buttonStyle(.plain)
                 }
-                .buttonStyle(.plain)
 
                 // Active Transfers
                 if !viewModel.activeTransfers.isEmpty {

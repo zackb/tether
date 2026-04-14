@@ -10,6 +10,8 @@
 	</array>
 	<key>NSLocalNetworkUsageDescription</key>
 	<string>Used to discover and connect to Tether services on your local network.</string>
+	<key>NSPhotoLibraryUsageDescription</key>
+	<string>Used to send photos from your library to your desktop.</string>
 	<key>UIFileSharingEnabled</key>
 	<true/>
 </dict>

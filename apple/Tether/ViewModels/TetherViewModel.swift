@@ -261,24 +261,35 @@ final class TetherViewModel {
 
     // MARK: - File Transfer
 
-    /// Send a file to the daemon.
+    /// Send a file to the daemon using its URL.
     func sendFile(url: URL) {
-        guard url.startAccessingSecurityScopedResource() else {
-            errorMessage = "Cannot access file."
-            return
-        }
-
-        let transferId = UUID().uuidString
+        let isSecurityScoped = url.startAccessingSecurityScopedResource()
         let filename = url.lastPathComponent
 
         Task.detached { [weak self] in
             guard let self else { return }
-            defer { url.stopAccessingSecurityScopedResource() }
+            defer { if isSecurityScoped { url.stopAccessingSecurityScopedResource() } }
 
             do {
                 let fileData = try Data(contentsOf: url)
-                let totalSize = Int64(fileData.count)
+                self.sendFile(data: fileData, filename: filename)
+            } catch {
+                await MainActor.run {
+                    self.errorMessage = "File transfer failed: \(error.localizedDescription)"
+                }
+            }
+        }
+    }
 
+    /// Send raw data to the daemon.
+    func sendFile(data fileData: Data, filename: String) {
+        let transferId = UUID().uuidString
+        let totalSize = Int64(fileData.count)
+
+        Task.detached { [weak self] in
+            guard let self else { return }
+
+            do {
                 await MainActor.run {
                     let transfer = FileTransfer(
                         id: transferId,
@@ -334,7 +345,7 @@ final class TetherViewModel {
                     if let idx = self.activeTransfers.firstIndex(where: { $0.id == transferId }) {
                         self.activeTransfers[idx].failed = true
                     }
-                    self.errorMessage = "File transfer failed: \(error.localizedDescription)"
+                    self.errorMessage = "File transfer error from daemon: \(error.localizedDescription)"
                 }
             }
         }
