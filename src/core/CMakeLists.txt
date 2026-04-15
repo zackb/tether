@@ -13,6 +13,8 @@ add_library(tether STATIC
     src/wayland_protocols/wlr-data-control-unstable-v1.cpp
 )
 
+pkg_check_modules(GLIB REQUIRED IMPORTED_TARGET glib-2.0 gio-2.0)
+
 target_include_directories(tether PUBLIC
     include
 )
@@ -23,4 +25,5 @@ target_link_libraries(tether PUBLIC
     OpenSSL::SSL
     OpenSSL::Crypto
     PkgConfig::AVAHI
+    PkgConfig::GLIB
 )

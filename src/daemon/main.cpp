@@ -1,6 +1,7 @@
 #include <csignal>
 #include <iostream>
 #include <nlohmann/json.hpp>
+#include "notification.hpp"
 #include <tether/core.hpp>
 #include <tether/crypto.hpp>
 #include <tether/discovery.hpp>
@@ -78,6 +79,14 @@ int main(int argc, char** argv) {
     }
 
     tether::FileReceiveManager file_mgr;
+    tether::FileArrivalNotifier notifier;
+    if (!notifier.init()) {
+        std::cerr << "Warning: desktop notifications unavailable" << std::endl;
+    } else {
+        file_mgr.set_on_complete([&notifier](const std::filesystem::path& path) {
+            notifier.notify_file_arrived(path);
+        });
+    }
     tether::g_file_manager = &file_mgr;
 
     std::cout << "tetherd is running. Press Ctrl-C to stop." << std::endl;
