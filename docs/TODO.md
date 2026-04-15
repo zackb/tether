@@ -6,5 +6,5 @@
 - [ ] TUI
 - [ ] layershell popups for
   - [x] device pairing request
-  - [ ] file received notification
+  - [x] file received notification
   - [ ] TOTP code display
