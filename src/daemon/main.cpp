@@ -83,8 +83,9 @@ int main(int argc, char** argv) {
     if (!notifier.init()) {
         std::cerr << "Warning: desktop notifications unavailable" << std::endl;
     } else {
-        file_mgr.set_on_complete([&notifier](const std::filesystem::path& path) {
+        file_mgr.set_on_complete([&notifier](const std::filesystem::path& path, size_t bytes_written) {
             notifier.notify_file_arrived(path);
+            tether::record_received_file(path, bytes_written);
         });
     }
     tether::g_file_manager = &file_mgr;

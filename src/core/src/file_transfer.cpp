@@ -89,8 +89,9 @@ bool FileReceiveManager::handle_chunk(const std::string& transfer_id, int chunk_
 }
 
 bool FileReceiveManager::handle_end(const std::string& transfer_id) {
-    std::function<void(const std::filesystem::path&)> on_complete;
+    std::function<void(const std::filesystem::path&, size_t)> on_complete;
     std::filesystem::path completed_path;
+    size_t bytes_written = 0;
 
     {
         std::lock_guard<std::mutex> lock(mutex_);
@@ -102,6 +103,7 @@ bool FileReceiveManager::handle_end(const std::string& transfer_id) {
         t->stream->close();
 
         completed_path = t->filepath;
+        bytes_written = t->bytes_written;
         on_complete = on_complete_;
 
         std::cout << "FileReceiveManager: Finished transfer " << transfer_id << ". Wrote " << t->bytes_written << " bytes to " << t->filepath << std::endl;
@@ -110,13 +112,13 @@ bool FileReceiveManager::handle_end(const std::string& transfer_id) {
     }
 
     if (on_complete) {
-        on_complete(completed_path);
+        on_complete(completed_path, bytes_written);
     }
 
     return true;
 }
 
-void FileReceiveManager::set_on_complete(std::function<void(const std::filesystem::path&)> callback) {
+void FileReceiveManager::set_on_complete(std::function<void(const std::filesystem::path&, size_t)> callback) {
     std::lock_guard<std::mutex> lock(mutex_);
     on_complete_ = std::move(callback);
 }

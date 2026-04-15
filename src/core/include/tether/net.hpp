@@ -1,6 +1,7 @@
 #pragma once
 
 #include "tether/event_loop.hpp"
+#include <filesystem>
 #include <map>
 #include <openssl/ssl.h>
 #include <string>
@@ -20,6 +21,10 @@ namespace tether {
     void register_client_ssl(int fd, SSL* ssl);
     void unregister_client_fd(int fd);
     void broadcast_message(const std::string& msg, int exclude_fd = -1);
+    void register_local_subscriber(int fd);
+    void unregister_local_subscriber(int fd);
+    void broadcast_local_event(const std::string& msg, int exclude_fd = -1);
+    void record_received_file(const std::filesystem::path& path, size_t bytes_written);
     size_t broadcast_tcp_message(const std::string& msg, int exclude_fd = -1);
 
     class UnixServer {
@@ -50,6 +55,13 @@ namespace tether {
         void stop();
 
     private:
+        struct ConnectedClientInfo {
+            std::string address;
+            std::string fingerprint;
+            std::string device_name;
+            bool paired = false;
+        };
+
         void handle_accept(int fd);
         void handle_client(int client_fd);
         void spawn_pair_dialog(int client_fd, SSL* ssl, const std::string& fingerprint, const std::string& device_name);
@@ -61,6 +73,7 @@ namespace tether {
         std::map<int, SSL*> active_ssl_;
         std::map<int, bool> ssl_handshake_complete_;
         std::map<int, bool> client_paired_;
+        std::map<int, ConnectedClientInfo> client_info_;
 
         // Track spawned dialog child processes
         struct PendingPairDialog {
