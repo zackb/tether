@@ -152,3 +152,28 @@ Because the `tetherd` daemon natively binds to `0.0.0.0:5134` over TCP, it expli
 ```
 
 Once explicitly paired (via `tether --accept <fingerprint>`), native mTLS fingerprint-matching activates permanently, unblocking future payload operations instantly!
+
+---
+
+## 4. Local Daemon Control (UNIX Socket)
+
+The `tetherd.sock` UNIX socket is strict local IPC used by local clients (such as the GTK frontend or CLI) wanting to control the daemon's behavior without executing heavy operations directly.
+
+### `discover`
+Instructs the daemon to perform a synchronous mDNS scan (3 seconds) in a background thread for remote tether services.
+**Payload**: `{"command": "discover"}`
+**Response**: The daemon broadcasts a `discovery_result` payload asynchronously containing an array of active `devices`.
+
+### `pair_request` (Local Client -> Daemon)
+Instructs the daemon to asynchronously reach out to a specific host to initiate an mTLS pairing request.
+**Payload**: `{"command": "pair_request", "host": "192.168.1.5", "port": 5134}`
+
+### `accept_device` (Local Client -> Daemon)
+Trusts a pending pair request by moving the target fingerprint into the daemon's internal secure `known_hosts.json`.
+**Payload**: `{"command": "accept_device", "fingerprint": "12:aa:bb:cc..."}`
+**Response**: The daemon synchronously broadcasts `pair_accepted` with the `fingerprint` and resolved `device_name`.
+
+### `send_file` (Local Client -> Daemon)
+Offloads an entire file transfer to the daemon. The daemon spawns a thread to read the local filesystem and pushes the chunks sequence securely.
+**Payload**: `{"command": "send_file", "path": "/absolute/path/to/my_video.mp4"}`
+**Response**: `{"command": "file_send_complete", "success": true, "message": "Sent my_video.mp4"}`

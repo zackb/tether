@@ -11,9 +11,17 @@
 #include <unistd.h>
 
 #include "tether/crypto.hpp"
+#include "tether/discovery.hpp"
+#include "tether/client.hpp"
 #include "tether/file_transfer.hpp"
 #include "tether/wayland.hpp"
 #include <cstring>
+#include <filesystem>
+#include <fstream>
+#include <iostream>
+#include <mutex>
+#include <thread>
+#include <nlohmann/json.hpp>
 #include <filesystem>
 #include <fstream>
 #include <iostream>
@@ -31,6 +39,7 @@ namespace tether {
     // Global list of active connected sessions
     static std::map<int, ClientSession> active_sessions;
     static std::set<int> local_subscribers;
+    static std::mutex g_subscribers_mutex;
 
     struct ReceivedFileInfo {
         std::string path;
@@ -55,12 +64,19 @@ namespace tether {
 
     void unregister_client_fd(int fd) {
         active_sessions.erase(fd);
+        std::lock_guard<std::mutex> lock(g_subscribers_mutex);
         local_subscribers.erase(fd);
     }
 
-    void register_local_subscriber(int fd) { local_subscribers.insert(fd); }
+    void register_local_subscriber(int fd) {
+        std::lock_guard<std::mutex> lock(g_subscribers_mutex);
+        local_subscribers.insert(fd);
+    }
 
-    void unregister_local_subscriber(int fd) { local_subscribers.erase(fd); }
+    void unregister_local_subscriber(int fd) {
+        std::lock_guard<std::mutex> lock(g_subscribers_mutex);
+        local_subscribers.erase(fd);
+    }
 
     // Helper for robust SSL writes on non-blocking sockets.
     // Handles SSL_ERROR_WANT_WRITE by retrying.
@@ -108,6 +124,7 @@ namespace tether {
         if (packet.empty() || packet.back() != '\n')
             packet += '\n';
 
+        std::lock_guard<std::mutex> lock(g_subscribers_mutex);
         for (int fd : local_subscribers) {
             if (fd == exclude_fd)
                 continue;
@@ -421,6 +438,84 @@ namespace tether {
                         std::string payload = resp.dump() + "\n";
                         write(client_fd, payload.c_str(), payload.size());
                         continue;
+                    } else if (j.contains("command") && j["command"] == "accept_device" && j.contains("fingerprint")) {
+                        std::string print = j["fingerprint"];
+                        std::string resolved_name = "Unknown Device";
+                        std::string pending_path = get_runtime_dir() + "/pending_pairs.json";
+                        nlohmann::json pending;
+                        std::ifstream ifs(pending_path);
+                        if (ifs.is_open()) {
+                            try { pending = nlohmann::json::parse(ifs); } catch (...) {}
+                            ifs.close();
+                        }
+                        if (pending.contains(print) && pending[print].is_string()) {
+                            resolved_name = pending[print].get<std::string>();
+                            pending.erase(print);
+                            std::ofstream ofs(pending_path);
+                            ofs << pending.dump(4);
+                        }
+                        Crypto::instance().add_known_host(resolved_name, print);
+                        
+                        nlohmann::json event;
+                        event["command"] = "pair_accepted";
+                        event["fingerprint"] = print;
+                        event["device_name"] = resolved_name;
+                        broadcast_local_event(event.dump());
+                    } else if (j.contains("command") && j["command"] == "pair_request" && j.contains("host")) {
+                        std::string target_host = j["host"];
+                        int target_port = j.value("port", 5134);
+                        std::thread([target_host, target_port]() {
+                            Client remote;
+                            if (remote.connect(target_host, target_port)) {
+                                char hostname[256] = {};
+                                gethostname(hostname, sizeof(hostname) - 1);
+                                std::string err;
+                                remote.pair(hostname, err);
+                                // The user must accept on the remote side, and then the GTK app handles it.
+                            }
+                        }).detach();
+                    } else if (j.contains("command") && j["command"] == "discover") {
+                        std::thread([]() {
+                            Discovery discovery;
+                            auto hosts = discovery.discover(3000);
+                            auto grouped = group_discovered_hosts(hosts);
+                            
+                            nlohmann::json payload;
+                            payload["command"] = "discovery_result";
+                            payload["devices"] = nlohmann::json::array();
+                            for (const auto& dev : grouped) {
+                                nlohmann::json d;
+                                d["name"] = dev.name;
+                                d["fingerprint"] = dev.fingerprint;
+                                d["addresses"] = nlohmann::json::array();
+                                for (const auto& addr : dev.addresses) {
+                                    nlohmann::json a;
+                                    a["address"] = addr.address;
+                                    a["port"] = addr.port;
+                                    d["addresses"].push_back(a);
+                                }
+                                payload["devices"].push_back(d);
+                            }
+                            broadcast_local_event(payload.dump());
+                        }).detach();
+                    } else if (j.contains("command") && j["command"] == "send_file" && j.contains("path")) {
+                        std::string path = j["path"];
+                        int pfd = client_fd; // thread-safe capture
+                        std::thread([path, pfd]() {
+                            Client local;
+                            if (local.connect("", 0)) { // connects correctly via unix socket
+                                std::string err;
+                                bool ok = local.send_file(path, err);
+                                nlohmann::json resp;
+                                resp["command"] = "file_send_complete";
+                                resp["success"] = ok;
+                                resp["message"] = ok ? ("Sent " + std::filesystem::path(path).filename().string()) : ("Send failed: " + (err.empty() ? "unknown error" : err));
+                                std::string payload = resp.dump() + "\n";
+                                // direct write is fine, or we can use broadcast_local_event. We'll reply directly to the GUI socket.
+                                write(pfd, payload.c_str(), payload.size());
+                            }
+                        }).detach();
+                        continue; // skip the "OK\n" below because we reply asynchronously
                     }
                 } catch (...) {
                 }
@@ -571,6 +666,12 @@ namespace tether {
                     broadcast_local_event(event.dump());
                 } else {
                     std::cout << "TcpServer: Untrusted client connected. Fingerprint: " << print << std::endl;
+                    nlohmann::json event;
+                    event["command"] = "untrusted_client_connected";
+                    event["address"] = client_info_[client_fd].address;
+                    event["fingerprint"] = print;
+                    event["device_name"] = "Unknown Device";
+                    broadcast_local_event(event.dump());
                 }
             } else {
                 int err = SSL_get_error(ssl, ret);
