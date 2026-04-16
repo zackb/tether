@@ -8,3 +8,5 @@
   - [x] device pairing request
   - [x] file received notification
   - [ ] TOTP code display
+- [ ] BUGS
+  - [ ] infinite reconnect loop if tetherd is down

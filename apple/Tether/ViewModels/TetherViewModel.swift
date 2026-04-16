@@ -367,11 +367,11 @@ final class TetherViewModel {
         connection.onStateChange = { [weak self] state in
             guard let self else { return }
             switch state {
-            case .connected:
+            case .connected(let isInbound):
                 self.pendingReconnectTask?.cancel()
                 self.pendingReconnectTask = nil
                 self.autoConnectingFingerprint = nil
-                self.handleConnected()
+                self.handleConnected(isInbound: isInbound)
             case .disconnected:
                 self.autoConnectingFingerprint = nil
                 self.appState = .disconnected
@@ -420,7 +420,7 @@ final class TetherViewModel {
         )
     }
 
-    private func handleConnected() {
+    private func handleConnected(isInbound: Bool = false) {
         let serverFP = connection.serverFingerprint
 
         if certificateManager.isHostKnown(serverFP) {
@@ -429,13 +429,19 @@ final class TetherViewModel {
             connectedDeviceName = certificateManager.knownHosts[serverFP] ?? connectedDeviceName
         } else {
             // Need to pair
-            appState = .pairing
-            showPairingSheet = true
-            pairingStatus = "Sending pairing request..."
+            if isInbound {
+                // If it's an inbound connection, we wait for the client to send us a pair_request.
+                // We don't send one ourselves over their established tunnel.
+                appState = .pairing
+                // The UI will update when we actually receive the .pairRequest command 
+            } else {
+                appState = .pairing
+                showPairingSheet = true
+                pairingStatus = "Sending pairing request..."
 
-            let deviceName = certificateManager.localDeviceName
-
-            connection.send(.pairRequest(deviceName: deviceName))
+                let deviceName = certificateManager.localDeviceName
+                connection.send(.pairRequest(deviceName: deviceName))
+            }
         }
     }
 
