@@ -140,6 +140,7 @@ final class TetherViewModel {
         
         certificateManager.initialize()
         discovery.localFingerprint = certificateManager.myFingerprint
+        discovery.localDeviceName = certificateManager.localDeviceName
         
         setupConnectionHandlers()
         setupServerHandlers()
