@@ -139,6 +139,8 @@ final class TetherViewModel {
         }
         
         certificateManager.initialize()
+        discovery.localFingerprint = certificateManager.myFingerprint
+        
         setupConnectionHandlers()
         setupServerHandlers()
         startDiscovery()

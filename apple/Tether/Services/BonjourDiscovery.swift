@@ -22,6 +22,9 @@ struct DiscoveredHost: Identifiable, Sendable {
 final class BonjourDiscovery {
     private static let serviceType = "_tether._tcp"
 
+    /// Our own fingerprint, to filter ourselves out of the results.
+    var localFingerprint: String?
+
     /// Currently discovered hosts (updated live as services appear/disappear).
     private(set) var hosts: [DiscoveredHost] = []
 
@@ -93,6 +96,11 @@ final class BonjourDiscovery {
             }
 
             let fingerprint = extractFingerprint(from: result.metadata)
+            
+            if let local = self.localFingerprint, !local.isEmpty, fingerprint == local {
+                return nil
+            }
+            
             return DiscoveredHost(
                 name: name,
                 endpoint: result.endpoint,
