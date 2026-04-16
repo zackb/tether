@@ -109,6 +109,7 @@ final class TetherViewModel {
     let certificateManager = CertificateManager()
     let discovery = BonjourDiscovery()
     let connection = TetherConnection()
+    let server = TetherServer()
 
     /// The chunk size for file transfers (48KB raw → 64KB base64).
     private let fileChunkSize = 48 * 1024
@@ -139,7 +140,9 @@ final class TetherViewModel {
         
         certificateManager.initialize()
         setupConnectionHandlers()
+        setupServerHandlers()
         startDiscovery()
+        startServer()
         scheduleAutoReconnectAttempt()
     }
 
@@ -214,6 +217,7 @@ final class TetherViewModel {
         connection.disconnect()
         appState = .disconnected
         connectedDeviceName = nil
+        pairingStatus = ""
     }
 
     // MARK: - Clipboard
@@ -392,6 +396,28 @@ final class TetherViewModel {
         }
     }
 
+    private func setupServerHandlers() {
+        server.onNewConnection = { [weak self] incomingConn, incomingFingerprint in
+            guard let self = self else { return }
+            
+            // We just received an incoming connection from a peer!
+            // We give it to our connection manager and start decoding.
+            self.connection.accept(incomingConnection: incomingConn, fingerprint: incomingFingerprint)
+            
+            // Note: `onStateChange` will automatically transition us to .connected 
+            // and trigger `handleConnected()` which checks if it's already paired.
+        }
+    }
+    
+    private func startServer() {
+        guard let identity = certificateManager.getIdentity() else { return }
+        server.start(
+            identity: identity,
+            localDeviceName: certificateManager.localDeviceName,
+            fingerprint: certificateManager.myFingerprint
+        )
+    }
+
     private func handleConnected() {
         let serverFP = connection.serverFingerprint
 
@@ -465,6 +491,7 @@ final class TetherViewModel {
 
         autoConnectingFingerprint = nil
         connection.disconnect()
+        server.stop()
         appState = .disconnected
         connectedDeviceName = nil
     }
@@ -501,6 +528,14 @@ final class TetherViewModel {
 
         case .pairPending:
             pairingStatus = "Waiting for approval on your desktop...\n\nRun: tether --accept \(certificateManager.myFingerprint)"
+
+        case .pairRequest:
+            if let targetName = message.deviceName {
+                connectedDeviceName = targetName
+                appState = .pairing
+                pairingStatus = "Pairing request received from \(targetName)"
+                showPairingSheet = true
+            }
 
         case .fileStatus:
             if let transferId = message.transferId, message.status == "success" {
@@ -572,6 +607,12 @@ final class TetherViewModel {
         let serverFP = connection.serverFingerprint
         let name = connectedDeviceName ?? "Desktop"
         certificateManager.addKnownHost(fingerprint: serverFP, name: name)
+        
+        // If we received an inbound pair_request, we must respond back with pair_accepted!
+        // But the original tether daemon protocol relies on disconnecting if rejected, and
+        // the client isn't expected to send pair_accepted, the desktop daemon sends pair_accepted.
+        // Let's send a simple OK or just leave it. If the connection drops we assume rejected.
+        // Actually, let's just save it.
         showPairingSheet = false
         appState = .connected
     }

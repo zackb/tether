@@ -92,6 +92,26 @@ final class TetherConnection {
         connect(to: endpoint, identity: identity)
     }
 
+    /// Accept a pre-established incoming connection from `TetherServer`.
+    /// 
+    /// - Parameters:
+    ///   - connection: The `NWConnection` already established and in `.ready` state.
+    ///   - fingerprint: The verified TLS fingerprint of the incoming client.
+    func accept(incomingConnection conn: NWConnection, fingerprint: String) {
+        disconnect()
+        self.serverFingerprint = fingerprint
+        self.connection = conn
+        
+        // Re-bind the state update handler for the accepted connection
+        conn.stateUpdateHandler = { [weak self] nwState in
+            self?.handleStateUpdate(nwState)
+        }
+        
+        // It's already ready, so we just jump straight to receiving
+        updateState(.connected)
+        startReceiving()
+    }
+
     /// Disconnect and tear down the connection.
     func disconnect() {
         connection?.cancel()
