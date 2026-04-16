@@ -367,11 +367,11 @@ final class TetherViewModel {
         connection.onStateChange = { [weak self] state in
             guard let self else { return }
             switch state {
-            case .connected(let isInbound):
+            case .connected:
                 self.pendingReconnectTask?.cancel()
                 self.pendingReconnectTask = nil
                 self.autoConnectingFingerprint = nil
-                self.handleConnected(isInbound: isInbound)
+                self.handleConnected() // TODO: isInbound
             case .disconnected:
                 self.autoConnectingFingerprint = nil
                 self.appState = .disconnected
