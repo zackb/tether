@@ -352,7 +352,17 @@ namespace {
         if (command == "pair_request_received" || command == "untrusted_client_connected") {
             tether::DiscoveredDevice req;
             req.fingerprint = event.value("fingerprint", "");
-            req.name = event.value("device_name", "Unknown Device");
+            
+            std::string resolved_name = event.value("device_name", "Unknown Device");
+            if (resolved_name == "Unknown Device") {
+                for (const auto& d : g_app.discovered_devices) {
+                    if (d.fingerprint == req.fingerprint && !d.name.empty()) {
+                        resolved_name = d.name;
+                        break;
+                    }
+                }
+            }
+            req.name = resolved_name;
             req.addresses.push_back({event.value("address", ""), 5134});
             bool exists = false;
             for (const auto& dev : g_app.pending_pairing_requests) {
@@ -361,6 +371,20 @@ namespace {
             if (!exists) {
                 g_app.pending_pairing_requests.push_back(req);
                 refresh_device_list();
+            }
+            return;
+        }
+        if (command == "pair_accepted") {
+            std::string fp = event.value("fingerprint", "");
+            if (!fp.empty()) {
+                g_app.connected_fps.push_back(fp);
+                g_app.pending_pairing_requests.erase(
+                    std::remove_if(g_app.pending_pairing_requests.begin(), g_app.pending_pairing_requests.end(), [&](const tether::DiscoveredDevice& d) {
+                        return d.fingerprint == fp;
+                    }), g_app.pending_pairing_requests.end()
+                );
+                refresh_device_list();
+                update_right_pane();
             }
             return;
         }

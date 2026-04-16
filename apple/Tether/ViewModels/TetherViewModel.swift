@@ -610,11 +610,9 @@ final class TetherViewModel {
         let name = connectedDeviceName ?? "Desktop"
         certificateManager.addKnownHost(fingerprint: serverFP, name: name)
         
-        // If we received an inbound pair_request, we must respond back with pair_accepted!
-        // But the original tether daemon protocol relies on disconnecting if rejected, and
-        // the client isn't expected to send pair_accepted, the desktop daemon sends pair_accepted.
-        // Let's send a simple OK or just leave it. If the connection drops we assume rejected.
-        // Actually, let's just save it.
+        // Let's send pair_accepted to tell the daemon we successfully paired!
+        connection.send(.pairAccepted)
+        
         showPairingSheet = false
         appState = .connected
     }

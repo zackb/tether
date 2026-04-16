@@ -18,6 +18,7 @@ namespace tether {
 
         // Base Level payload loop
         std::string send_and_wait(const std::string& payload);
+        std::string get_peer_fingerprint() const;
 
         // High Level Features
         std::string get_clipboard(std::string& err_out);

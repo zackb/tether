@@ -24,6 +24,7 @@ enum TetherCommand: String, Codable, Sendable {
     case clipboardContent = "clipboard_content"
     case fileStatus = "file_status"
     case pairPending = "pair_pending"
+    case pairAccepted = "pair_accepted"
     case error = "error"
 }
 
@@ -80,6 +81,11 @@ extension TetherMessage {
     /// Create a `pair_request` message.
     static func pairRequest(deviceName: String) -> TetherMessage {
         TetherMessage(command: TetherCommand.pairRequest.rawValue, deviceName: deviceName)
+    }
+
+    /// Create a `pair_accepted` message (replying to a request).
+    static var pairAccepted: TetherMessage {
+        TetherMessage(command: TetherCommand.pairAccepted.rawValue)
     }
 
     /// Create a `file_start` message.

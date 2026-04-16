@@ -470,8 +470,23 @@ namespace tether {
                                 char hostname[256] = {};
                                 gethostname(hostname, sizeof(hostname) - 1);
                                 std::string err;
-                                remote.pair(hostname, err);
-                                // The user must accept on the remote side, and then the GTK app handles it.
+                                std::string response = remote.pair(hostname, err);
+                                
+                                if (response.find("\"pair_accepted\"") != std::string::npos) {
+                                    std::string print = remote.get_peer_fingerprint();
+                                    if (!print.empty()) {
+                                        // The remote device accepted! Let's save its fingerprint.
+                                        // Since we dialed outbound, we don't necessarily know its mDNS name here
+                                        // But GTK can resolve it. For now let's just use the host IP/name.
+                                        Crypto::instance().add_known_host(target_host, print);
+                                        
+                                        nlohmann::json event;
+                                        event["command"] = "pair_accepted";
+                                        event["fingerprint"] = print;
+                                        event["device_name"] = target_host;
+                                        broadcast_local_event(event.dump());
+                                    }
+                                }
                             }
                         }).detach();
                     } else if (j.contains("command") && j["command"] == "discover") {
