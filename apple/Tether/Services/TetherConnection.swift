@@ -14,7 +14,7 @@ import Security
 enum ConnectionState: Sendable, Equatable {
     case disconnected
     case connecting
-    case connected
+    case connected(isInbound: Bool)
     case failed(String)
 }
 
@@ -108,7 +108,7 @@ final class TetherConnection {
         }
         
         // It's already ready, so we just jump straight to receiving
-        updateState(.connected)
+        updateState(.connected(isInbound: true))
         startReceiving()
     }
 
@@ -123,17 +123,19 @@ final class TetherConnection {
 
     /// Send a protocol message to the daemon.
     func send(_ message: TetherMessage) {
-        guard let conn = connection, state == .connected else { return }
-
-        do {
-            let data = try TetherProtocol.encode(message)
-            conn.send(content: data, completion: .contentProcessed { error in
-                if let error {
-                    print("TetherConnection: Send error: \(error)")
-                }
-            })
-        } catch {
-            print("TetherConnection: Encode error: \(error)")
+        guard let conn = connection else { return }
+        
+        if case .connected = state {
+            do {
+                let data = try TetherProtocol.encode(message)
+                conn.send(content: data, completion: .contentProcessed { error in
+                    if let error {
+                        print("TetherConnection: Send error: \(error)")
+                    }
+                })
+            } catch {
+                print("TetherConnection: Encode error: \(error)")
+            }
         }
     }
 
@@ -147,7 +149,10 @@ final class TetherConnection {
     private func handleStateUpdate(_ nwState: NWConnection.State) {
         switch nwState {
         case .ready:
-            updateState(.connected)
+            // Since `handleStateUpdate` is only bound for outbound connections
+            // (inbound re-binds but already transitions manually in accept),
+            // if this fires we assume it's outbound.
+            updateState(.connected(isInbound: false))
             startReceiving()
         case .waiting(let error):
             print("TetherConnection: Waiting: \(error)")
