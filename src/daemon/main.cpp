@@ -65,6 +65,26 @@ int main(int argc, char** argv) {
         if (!discovery.publish(hostname, 5134, my_fp)) {
             std::cerr << "Warning: mDNS advertisement failed (is avahi-daemon running?)" << std::endl;
         }
+        
+        discovery.start_continuous_browse([](const std::vector<tether::DiscoveredDevice>& devices) {
+            nlohmann::json payload;
+            payload["command"] = "discovery_result";
+            payload["devices"] = nlohmann::json::array();
+            for (const auto& dev : devices) {
+                nlohmann::json d;
+                d["name"] = dev.name;
+                d["fingerprint"] = dev.fingerprint;
+                d["addresses"] = nlohmann::json::array();
+                for (const auto& addr : dev.addresses) {
+                    nlohmann::json a;
+                    a["address"] = addr.address;
+                    a["port"] = addr.port;
+                    d["addresses"].push_back(a);
+                }
+                payload["devices"].push_back(d);
+            }
+            tether::broadcast_local_event(payload.dump());
+        });
     }
 
     tether::WaylandContext wayland_srv(loop);

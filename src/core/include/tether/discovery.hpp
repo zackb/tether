@@ -1,6 +1,7 @@
 #pragma once
 
 #include <cstdint>
+#include <functional>
 #include <memory>
 #include <string>
 #include <vector>
@@ -62,6 +63,15 @@ namespace tether {
         /// @param timeout_ms  How long to listen for mDNS responses (default 3 s).
         /// @return A list of discovered hosts (one per interface), possibly empty.
         std::vector<DiscoveredHost> discover(int timeout_ms = 3000);
+
+        /// Start continuous background discovery.
+        /// The callback is invoked whenever a new device is found or an existing device is removed.
+        /// The callback is executed on the background Avahi thread.
+        /// Only one continuous browse session can run per Discovery instance.
+        void start_continuous_browse(std::function<void(const std::vector<DiscoveredDevice>&)> callback);
+        
+        /// Stop continuous background discovery.
+        void stop_continuous_browse();
 
     private:
         struct Impl;

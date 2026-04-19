@@ -172,13 +172,34 @@ namespace {
             return row;
         };
 
+        auto create_header_row = [](const std::string& title_text) {
+            GtkWidget* row = gtk_list_box_row_new();
+            gtk_list_box_row_set_selectable(GTK_LIST_BOX_ROW(row), FALSE);
+            GtkWidget* box = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, 0);
+            gtk_container_set_border_width(GTK_CONTAINER(box), 8);
+            GtkWidget* lbl = gtk_label_new(nullptr);
+            gtk_label_set_markup(GTK_LABEL(lbl), ("<b><span size='small' color='gray'>" + escape_markup(title_text) + "</span></b>").c_str());
+            gtk_label_set_xalign(GTK_LABEL(lbl), 0.0);
+            gtk_box_pack_start(GTK_BOX(box), lbl, TRUE, TRUE, 0);
+            gtk_container_add(GTK_CONTAINER(row), box);
+            return row;
+        };
+
         std::string my_fp = tether::Crypto::instance().get_my_fingerprint();
+
+        std::vector<GtkWidget*> connected_rows;
+        std::vector<GtkWidget*> remembered_rows;
+        std::vector<GtkWidget*> discovered_rows;
 
         for (const auto& paired : g_app.paired_devices) {
             bool online = std::find(g_app.connected_fps.begin(), g_app.connected_fps.end(), paired.first) !=
                           g_app.connected_fps.end();
             GtkWidget* r = create_row(paired.second, paired.first, "", 5134, true, online);
-            gtk_list_box_insert(GTK_LIST_BOX(g_app.list_devices), r, -1);
+            if (online) {
+                connected_rows.push_back(r);
+            } else {
+                remembered_rows.push_back(r);
+            }
         }
 
         for (const auto& disc : g_app.discovered_devices) {
@@ -196,7 +217,7 @@ namespace {
             std::string ip = disc.addresses.empty() ? "" : disc.addresses[0].address;
             uint16_t port = disc.addresses.empty() ? 5134 : disc.addresses[0].port;
             GtkWidget* r = create_row(disc.name, disc.fingerprint, ip, port, false, false);
-            gtk_list_box_insert(GTK_LIST_BOX(g_app.list_devices), r, -1);
+            discovered_rows.push_back(r);
         }
 
         // Render Pending Pair Requests
@@ -224,7 +245,22 @@ namespace {
             std::string ip = req.addresses.empty() ? "" : req.addresses[0].address;
             uint16_t port = req.addresses.empty() ? 5134 : req.addresses[0].port;
             GtkWidget* r = create_row(req.name, req.fingerprint, ip, port, false, false);
-            gtk_list_box_insert(GTK_LIST_BOX(g_app.list_devices), r, -1);
+            discovered_rows.push_back(r);
+        }
+        
+        if (!connected_rows.empty()) {
+            gtk_list_box_insert(GTK_LIST_BOX(g_app.list_devices), create_header_row("CONNECTED"), -1);
+            for (auto* r : connected_rows) gtk_list_box_insert(GTK_LIST_BOX(g_app.list_devices), r, -1);
+        }
+        
+        if (!remembered_rows.empty()) {
+            gtk_list_box_insert(GTK_LIST_BOX(g_app.list_devices), create_header_row("REMEMBERED"), -1);
+            for (auto* r : remembered_rows) gtk_list_box_insert(GTK_LIST_BOX(g_app.list_devices), r, -1);
+        }
+        
+        if (!discovered_rows.empty()) {
+            gtk_list_box_insert(GTK_LIST_BOX(g_app.list_devices), create_header_row("DISCOVERED"), -1);
+            for (auto* r : discovered_rows) gtk_list_box_insert(GTK_LIST_BOX(g_app.list_devices), r, -1);
         }
 
         gtk_widget_show_all(g_app.list_devices);
@@ -610,33 +646,9 @@ namespace {
         return G_SOURCE_REMOVE;
     }
 
-    void apply_css() {
-        GtkCssProvider* provider = gtk_css_provider_new();
-        const gchar* css = "window { background-color: #0d1117; color: #c9d1d9; }"
-                           ".card { background-color: #161b22; border: 1px solid #30363d; border-radius: 12px; }"
-                           ".muted { color: #8b949e; }"
-                           "button { border-radius: 8px; padding: 12px 24px; background-color: #21262d; color: "
-                           "#c9d1d9; border: 1px solid #30363d; font-weight: 600; }"
-                           "button:hover { background-color: #30363d; }"
-                           "button.suggested-action { background-color: #238636; color: #ffffff; border-color: "
-                           "rgba(240,246,252,0.1); }"
-                           "button.suggested-action:hover { background-color: #2ea043; }"
-                           "list { background-color: transparent; }"
-                           "list row { background-color: transparent; border-bottom: 1px solid #21262d; padding: 4px; "
-                           "transition: all 150ms ease-in-out; }"
-                           "list row:selected { background-color: rgba(56,139,253,0.15); border-radius: 8px; }"
-                           "scrolledwindow { background: transparent; }";
-        gtk_css_provider_load_from_data(provider, css, -1, nullptr);
-        gtk_style_context_add_provider_for_screen(
-            gdk_screen_get_default(), GTK_STYLE_PROVIDER(provider), GTK_STYLE_PROVIDER_PRIORITY_APPLICATION);
-        g_object_unref(provider);
-    }
-
     void activate(GtkApplication* app, gpointer) {
         g_app.app = app;
         tether::Crypto::instance().init();
-        g_object_set(gtk_settings_get_default(), "gtk-application-prefer-dark-theme", TRUE, nullptr);
-        apply_css();
 
         g_app.window = gtk_application_window_new(app);
         gtk_window_set_title(GTK_WINDOW(g_app.window), "Tether");
@@ -720,6 +732,15 @@ namespace {
         gtk_style_context_add_class(gtk_widget_get_style_context(btn_send_file), "suggested-action");
         g_signal_connect(btn_send_file, "clicked", G_CALLBACK(on_choose_file), nullptr);
         gtk_box_pack_start(GTK_BOX(btn_grid), btn_send_file, FALSE, FALSE, 0);
+
+        GtkWidget* btn_send_clip = gtk_button_new_with_label("Send Clipboard");
+        g_signal_connect(btn_send_clip, "clicked", G_CALLBACK(+[](GtkWidget*, gpointer) {
+            nlohmann::json j;
+            j["command"] = "clipboard_set"; // triggers clipboard send
+            send_async_daemon_message(j);
+            set_status_action("Clipboard sync requested...");
+        }), nullptr);
+        gtk_box_pack_start(GTK_BOX(btn_grid), btn_send_clip, FALSE, FALSE, 0);
 
         gtk_box_pack_start(GTK_BOX(action_box), btn_grid, FALSE, FALSE, 0);
 
