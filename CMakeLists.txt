@@ -16,6 +16,7 @@ FetchContent_Declare(
   GIT_REPOSITORY https://github.com/nlohmann/json.git
   GIT_TAG v3.11.3
 )
+set(JSON_Install OFF CACHE BOOL "" FORCE)
 FetchContent_MakeAvailable(json)
 
 FetchContent_Declare(
@@ -24,6 +25,7 @@ FetchContent_Declare(
   GIT_TAG release-1.12.1
 )
 set(gtest_force_shared_crt ON CACHE BOOL "" FORCE)
+set(INSTALL_GTEST OFF CACHE BOOL "" FORCE)
 set(CMAKE_WARN_DEPRECATED OFF CACHE BOOL "" FORCE)
 FetchContent_MakeAvailable(googletest)
 set(CMAKE_WARN_DEPRECATED ON CACHE BOOL "" FORCE)
@@ -33,3 +35,14 @@ enable_testing()
 # subdirectories for the targets
 add_subdirectory(src)
 add_subdirectory(test)
+
+# Add uninstall target
+if(NOT TARGET uninstall)
+    configure_file(
+        "${CMAKE_CURRENT_SOURCE_DIR}/cmake_uninstall.cmake.in"
+        "${CMAKE_CURRENT_BINARY_DIR}/cmake_uninstall.cmake"
+        IMMEDIATE @ONLY)
+
+    add_custom_target(uninstall
+        COMMAND ${CMAKE_COMMAND} -P ${CMAKE_CURRENT_BINARY_DIR}/cmake_uninstall.cmake)
+endif()

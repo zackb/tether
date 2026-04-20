@@ -35,6 +35,13 @@ namespace tether {
         // Discovery state (per-call, not persistent)
         std::mutex results_mutex;
         std::vector<DiscoveredHost> results;
+        
+        // Continuous browse state
+        AvahiThreadedPoll* browse_poll = nullptr;
+        AvahiClient* browse_client = nullptr;
+        AvahiServiceBrowser* browse_browser = nullptr;
+        std::function<void(const std::vector<DiscoveredDevice>&)> browse_callback;
+        void* browse_ctx = nullptr;
     };
 
     // Wire the pimpl to use DiscoveryImpl
@@ -185,6 +192,11 @@ namespace tether {
                 if (!exists) {
                     ctx->impl->results.push_back(std::move(host));
                 }
+                
+                if (ctx->impl->browse_callback) {
+                    auto grouped = group_discovered_hosts(ctx->impl->results);
+                    ctx->impl->browse_callback(grouped);
+                }
             }
         }
 
@@ -216,6 +228,20 @@ namespace tether {
                 (AvahiLookupFlags)0,
                 resolve_callback,
                 userdata);
+        } else if (event == AVAHI_BROWSER_REMOVE) {
+            std::lock_guard<std::mutex> lock(ctx->impl->results_mutex);
+            ctx->impl->results.erase(
+                std::remove_if(ctx->impl->results.begin(), ctx->impl->results.end(),
+                    [&](const DiscoveredHost& h) {
+                        return h.name == name;
+                    }),
+                ctx->impl->results.end()
+            );
+            
+            if (ctx->impl->browse_callback) {
+                auto grouped = group_discovered_hosts(ctx->impl->results);
+                ctx->impl->browse_callback(grouped);
+            }
         }
     }
 
@@ -346,6 +372,81 @@ namespace tether {
 
         std::lock_guard<std::mutex> lock(impl_->results_mutex);
         return impl_->results;
+    }
+
+    void Discovery::start_continuous_browse(std::function<void(const std::vector<DiscoveredDevice>&)> callback) {
+        stop_continuous_browse();
+        
+        {
+            std::lock_guard<std::mutex> lock(impl_->results_mutex);
+            impl_->results.clear();
+        }
+        
+        impl_->browse_callback = std::move(callback);
+        
+        impl_->browse_poll = avahi_threaded_poll_new();
+        if (!impl_->browse_poll) {
+            std::cerr << "mDNS: Failed to create browse poll" << std::endl;
+            return;
+        }
+        
+        int error = 0;
+        impl_->browse_client = avahi_client_new(
+            avahi_threaded_poll_get(impl_->browse_poll),
+            (AvahiClientFlags)0,
+            [](AvahiClient*, AvahiClientState, void*) {},
+            nullptr,
+            &error);
+            
+        if (!impl_->browse_client) {
+            avahi_threaded_poll_free(impl_->browse_poll);
+            impl_->browse_poll = nullptr;
+            return;
+        }
+        
+        // Allocate a dedicated context
+        auto* ctx = new BrowseContext{impl_.get(), impl_->browse_client};
+        impl_->browse_ctx = ctx;
+        
+        impl_->browse_browser = avahi_service_browser_new(
+            impl_->browse_client,
+            AVAHI_IF_UNSPEC,
+            AVAHI_PROTO_UNSPEC,
+            SERVICE_TYPE,
+            nullptr,
+            (AvahiLookupFlags)0,
+            browse_callback,
+            ctx);
+            
+        if (!impl_->browse_browser) {
+            avahi_client_free(impl_->browse_client);
+            avahi_threaded_poll_free(impl_->browse_poll);
+            impl_->browse_client = nullptr;
+            impl_->browse_poll = nullptr;
+            delete ctx;
+            return;
+        }
+        
+        avahi_threaded_poll_start(impl_->browse_poll);
+    }
+    
+    void Discovery::stop_continuous_browse() {
+        if (impl_->browse_poll) {
+            avahi_threaded_poll_stop(impl_->browse_poll);
+            if (impl_->browse_browser) avahi_service_browser_free(impl_->browse_browser);
+            if (impl_->browse_client) avahi_client_free(impl_->browse_client);
+            avahi_threaded_poll_free(impl_->browse_poll);
+            
+            if (impl_->browse_ctx) {
+                delete static_cast<BrowseContext*>(impl_->browse_ctx);
+                impl_->browse_ctx = nullptr;
+            }
+            
+            impl_->browse_browser = nullptr;
+            impl_->browse_client = nullptr;
+            impl_->browse_poll = nullptr;
+            impl_->browse_callback = nullptr;
+        }
     }
 
     // ─── Grouping helper ────────────────────────────────────────────

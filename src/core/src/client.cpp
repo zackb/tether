@@ -54,6 +54,11 @@ bool Client::is_connected() const {
     return sock_ >= 0;
 }
 
+std::string Client::get_peer_fingerprint() const {
+    if (!ssl_) return "";
+    return Crypto::get_peer_fingerprint(ssl_);
+}
+
 int Client::connect_unix(bool retry) {
     int sock = socket(AF_UNIX, SOCK_STREAM, 0);
     if (sock < 0) return -1;

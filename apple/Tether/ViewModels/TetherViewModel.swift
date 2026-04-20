@@ -109,6 +109,7 @@ final class TetherViewModel {
     let certificateManager = CertificateManager()
     let discovery = BonjourDiscovery()
     let connection = TetherConnection()
+    let server = TetherServer()
 
     /// The chunk size for file transfers (48KB raw → 64KB base64).
     private let fileChunkSize = 48 * 1024
@@ -138,8 +139,13 @@ final class TetherViewModel {
         }
         
         certificateManager.initialize()
+        discovery.localFingerprint = certificateManager.myFingerprint
+        discovery.localDeviceName = certificateManager.localDeviceName
+        
         setupConnectionHandlers()
+        setupServerHandlers()
         startDiscovery()
+        startServer()
         scheduleAutoReconnectAttempt()
     }
 
@@ -214,6 +220,7 @@ final class TetherViewModel {
         connection.disconnect()
         appState = .disconnected
         connectedDeviceName = nil
+        pairingStatus = ""
     }
 
     // MARK: - Clipboard
@@ -365,7 +372,7 @@ final class TetherViewModel {
                 self.pendingReconnectTask?.cancel()
                 self.pendingReconnectTask = nil
                 self.autoConnectingFingerprint = nil
-                self.handleConnected()
+                self.handleConnected() // TODO: isInbound
             case .disconnected:
                 self.autoConnectingFingerprint = nil
                 self.appState = .disconnected
@@ -392,7 +399,29 @@ final class TetherViewModel {
         }
     }
 
-    private func handleConnected() {
+    private func setupServerHandlers() {
+        server.onNewConnection = { [weak self] incomingConn, incomingFingerprint in
+            guard let self = self else { return }
+            
+            // We just received an incoming connection from a peer!
+            // We give it to our connection manager and start decoding.
+            self.connection.accept(incomingConnection: incomingConn, fingerprint: incomingFingerprint)
+            
+            // Note: `onStateChange` will automatically transition us to .connected 
+            // and trigger `handleConnected()` which checks if it's already paired.
+        }
+    }
+    
+    private func startServer() {
+        guard let identity = certificateManager.getIdentity() else { return }
+        server.start(
+            identity: identity,
+            localDeviceName: certificateManager.localDeviceName,
+            fingerprint: certificateManager.myFingerprint
+        )
+    }
+
+    private func handleConnected(isInbound: Bool = false) {
         let serverFP = connection.serverFingerprint
 
         if certificateManager.isHostKnown(serverFP) {
@@ -401,13 +430,19 @@ final class TetherViewModel {
             connectedDeviceName = certificateManager.knownHosts[serverFP] ?? connectedDeviceName
         } else {
             // Need to pair
-            appState = .pairing
-            showPairingSheet = true
-            pairingStatus = "Sending pairing request..."
+            if isInbound {
+                // If it's an inbound connection, we wait for the client to send us a pair_request.
+                // We don't send one ourselves over their established tunnel.
+                appState = .pairing
+                // The UI will update when we actually receive the .pairRequest command 
+            } else {
+                appState = .pairing
+                showPairingSheet = true
+                pairingStatus = "Sending pairing request..."
 
-            let deviceName = certificateManager.localDeviceName
-
-            connection.send(.pairRequest(deviceName: deviceName))
+                let deviceName = certificateManager.localDeviceName
+                connection.send(.pairRequest(deviceName: deviceName))
+            }
         }
     }
 
@@ -465,6 +500,7 @@ final class TetherViewModel {
 
         autoConnectingFingerprint = nil
         connection.disconnect()
+        server.stop()
         appState = .disconnected
         connectedDeviceName = nil
     }
@@ -501,6 +537,14 @@ final class TetherViewModel {
 
         case .pairPending:
             pairingStatus = "Waiting for approval on your desktop...\n\nRun: tether --accept \(certificateManager.myFingerprint)"
+
+        case .pairRequest:
+            if let targetName = message.deviceName {
+                connectedDeviceName = targetName
+                appState = .pairing
+                pairingStatus = "Pairing request received from \(targetName)"
+                showPairingSheet = true
+            }
 
         case .fileStatus:
             if let transferId = message.transferId, message.status == "success" {
@@ -572,6 +616,10 @@ final class TetherViewModel {
         let serverFP = connection.serverFingerprint
         let name = connectedDeviceName ?? "Desktop"
         certificateManager.addKnownHost(fingerprint: serverFP, name: name)
+        
+        // Let's send pair_accepted to tell the daemon we successfully paired!
+        connection.send(.pairAccepted)
+        
         showPairingSheet = false
         appState = .connected
     }

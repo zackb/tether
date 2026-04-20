@@ -22,6 +22,12 @@ struct DiscoveredHost: Identifiable, Sendable {
 final class BonjourDiscovery {
     private static let serviceType = "_tether._tcp"
 
+    /// Our own fingerprint, to filter ourselves out of the results.
+    var localFingerprint: String?
+
+    /// Our own device name, as a fallback filter if the TXT record hasn't arrived.
+    var localDeviceName: String?
+
     /// Currently discovered hosts (updated live as services appear/disappear).
     private(set) var hosts: [DiscoveredHost] = []
 
@@ -93,6 +99,15 @@ final class BonjourDiscovery {
             }
 
             let fingerprint = extractFingerprint(from: result.metadata)
+            
+            if let local = self.localFingerprint, !local.isEmpty, fingerprint == local {
+                return nil
+            }
+            
+            if let localName = self.localDeviceName, !localName.isEmpty, name == localName {
+                return nil
+            }
+            
             return DiscoveredHost(
                 name: name,
                 endpoint: result.endpoint,
@@ -102,16 +117,20 @@ final class BonjourDiscovery {
         onHostsChanged?(hosts)
     }
 
-    /// Extract the `fp=<sha256>` value from the Bonjour TXT record.
     private func extractFingerprint(from metadata: NWBrowser.Result.Metadata) -> String {
         guard case .bonjour(let txtRecord) = metadata else {
             return ""
         }
 
-        if let fpEntry = txtRecord.getEntry(for: "fp"),
-           case .string(let value) = fpEntry
-        {
-            return value
+        if let fpEntry = txtRecord.getEntry(for: "fp") {
+            switch fpEntry {
+            case .string(let value):
+                return value
+            case .data(let data):
+                return String(data: data, encoding: .utf8) ?? ""
+            @unknown default:
+                return ""
+            }
         }
         return ""
     }

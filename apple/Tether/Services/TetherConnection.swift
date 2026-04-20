@@ -14,7 +14,7 @@ import Security
 enum ConnectionState: Sendable, Equatable {
     case disconnected
     case connecting
-    case connected
+    case connected(isInbound: Bool)
     case failed(String)
 }
 
@@ -92,6 +92,26 @@ final class TetherConnection {
         connect(to: endpoint, identity: identity)
     }
 
+    /// Accept a pre-established incoming connection from `TetherServer`.
+    /// 
+    /// - Parameters:
+    ///   - connection: The `NWConnection` already established and in `.ready` state.
+    ///   - fingerprint: The verified TLS fingerprint of the incoming client.
+    func accept(incomingConnection conn: NWConnection, fingerprint: String) {
+        disconnect()
+        self.serverFingerprint = fingerprint
+        self.connection = conn
+        
+        // Re-bind the state update handler for the accepted connection
+        conn.stateUpdateHandler = { [weak self] nwState in
+            self?.handleStateUpdate(nwState)
+        }
+        
+        // It's already ready, so we just jump straight to receiving
+        updateState(.connected(isInbound: true))
+        startReceiving()
+    }
+
     /// Disconnect and tear down the connection.
     func disconnect() {
         connection?.cancel()
@@ -103,17 +123,19 @@ final class TetherConnection {
 
     /// Send a protocol message to the daemon.
     func send(_ message: TetherMessage) {
-        guard let conn = connection, state == .connected else { return }
-
-        do {
-            let data = try TetherProtocol.encode(message)
-            conn.send(content: data, completion: .contentProcessed { error in
-                if let error {
-                    print("TetherConnection: Send error: \(error)")
-                }
-            })
-        } catch {
-            print("TetherConnection: Encode error: \(error)")
+        guard let conn = connection else { return }
+        
+        if case .connected = state {
+            do {
+                let data = try TetherProtocol.encode(message)
+                conn.send(content: data, completion: .contentProcessed { error in
+                    if let error {
+                        print("TetherConnection: Send error: \(error)")
+                    }
+                })
+            } catch {
+                print("TetherConnection: Encode error: \(error)")
+            }
         }
     }
 
@@ -127,7 +149,10 @@ final class TetherConnection {
     private func handleStateUpdate(_ nwState: NWConnection.State) {
         switch nwState {
         case .ready:
-            updateState(.connected)
+            // Since `handleStateUpdate` is only bound for outbound connections
+            // (inbound re-binds but already transitions manually in accept),
+            // if this fires we assume it's outbound.
+            updateState(.connected(isInbound: false))
             startReceiving()
         case .waiting(let error):
             print("TetherConnection: Waiting: \(error)")

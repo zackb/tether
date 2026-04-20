@@ -16,6 +16,9 @@ test: debug
 install: release
 	cmake --install build/release
 
+uninstall:
+	cmake --build build/release --target uninstall
+
 run-daemon: debug
 	./build/debug/tetherd
 
