@@ -1,4 +1,5 @@
 - [x]  mDNS discovery
+- [ ] PKGBUILD
 - [ ] TOTP vault
 - [-] iPhone app
     - [ ] iOS sharesheet thing
@@ -9,4 +10,4 @@
   - [x] file received notification
   - [ ] TOTP code display
 - [ ] BUGS
-  - [ ] infinite reconnect loop if tetherd is down
+  - [x] infinite reconnect loop if tetherd is down
