@@ -11,8 +11,8 @@ import Security
 import CryptoKit
 import UIKit
 
-/// Manages the app's TLS identity (self-signed RSA cert + private key)
-/// and the set of known remote host fingerprints.
+// Manages the app's TLS identity (self-signed RSA cert + private key)
+// and the set of known remote host fingerprints.
 @Observable
 final class CertificateManager {
     private static let keyTag = "net.jeedup.Tether.key"
@@ -20,25 +20,25 @@ final class CertificateManager {
     private static let knownHostsKey = "TetherKnownHosts"
     private static let localDeviceNameKey = "TetherLocalDeviceName"
 
-    /// SHA-256 fingerprint of our own certificate (lowercase hex, no separators).
+    // SHA-256 fingerprint of our own certificate (lowercase hex, no separators).
     private(set) var myFingerprint: String = ""
 
-    /// Map of known host fingerprints → device name.
+    // Map of known host fingerprints → device name.
     private(set) var knownHosts: [String: String] = [:]
 
-    /// Name of this device as presented to others.
+    // Name of this device as presented to others.
     var localDeviceName: String = "" {
         didSet {
             UserDefaults.standard.set(localDeviceName, forKey: Self.localDeviceNameKey)
         }
     }
 
-    /// The `SecIdentity` used for mTLS client authentication.
+    // The `SecIdentity` used for mTLS client authentication.
     private var identity: SecIdentity?
 
     // MARK: - Initialization
 
-    /// Load or create the TLS identity and populate known hosts.
+    // Load or create the TLS identity and populate known hosts.
     func initialize() {
         loadKnownHosts()
         loadLocalDeviceName()
@@ -58,7 +58,7 @@ final class CertificateManager {
         myFingerprint = fingerprintFromIdentity(newIdentity) ?? ""
     }
 
-    /// Returns the `SecIdentity` for use with `Network.framework` TLS options.
+    // Returns the `SecIdentity` for use with `Network.framework` TLS options.
     func getIdentity() -> SecIdentity? {
         identity
     }
@@ -81,8 +81,8 @@ final class CertificateManager {
 
     // MARK: - Fingerprint
 
-    /// Compute the SHA-256 fingerprint of a DER-encoded certificate.
-    /// Output matches the daemon's `generate_fingerprint`: lowercase hex, no separators.
+    // Compute the SHA-256 fingerprint of a DER-encoded certificate.
+    // Output matches the daemon's `generate_fingerprint`: lowercase hex, no separators.
     static func fingerprint(ofCertificate cert: SecCertificate) -> String {
         let der = SecCertificateCopyData(cert) as Data
         let hash = SHA256.hash(data: der)
@@ -154,8 +154,8 @@ final class CertificateManager {
 
     // MARK: - Private — Certificate Generation
 
-    /// Generate a 2048-bit RSA keypair + self-signed X.509v3 certificate and
-    /// store both in the Keychain as a `SecIdentity`.
+    // Generate a 2048-bit RSA keypair + self-signed X.509v3 certificate and
+    // store both in the Keychain as a `SecIdentity`.
     private func generateAndStoreIdentity() -> SecIdentity? {
         // 1. Generate RSA 2048 keypair in Keychain
         let keyAttrs: [String: Any] = [
@@ -219,7 +219,7 @@ final class CertificateManager {
 
     // MARK: - ASN.1 DER Construction
 
-    /// Build a minimal self-signed X.509v3 certificate in DER format.
+    // Build a minimal self-signed X.509v3 certificate in DER format.
     private func buildSelfSignedCertificate(
         publicKeyDER: Data,
         privateKey: SecKey,

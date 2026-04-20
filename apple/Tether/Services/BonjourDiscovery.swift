@@ -8,7 +8,7 @@
 import Foundation
 import Network
 
-/// A single discovered `tetherd` instance on the local network.
+// A single discovered `tetherd` instance on the local network.
 struct DiscoveredHost: Identifiable, Sendable {
     let id = UUID()
     let name: String
@@ -16,22 +16,22 @@ struct DiscoveredHost: Identifiable, Sendable {
     let fingerprint: String
 }
 
-/// Scans the local network for `tetherd` daemons advertising `_tether._tcp`
-/// via Bonjour/mDNS and exposes the results as an observable list.
+// Scans the local network for `tetherd` daemons advertising `_tether._tcp`
+// via Bonjour/mDNS and exposes the results as an observable list.
 @Observable
 final class BonjourDiscovery {
     private static let serviceType = "_tether._tcp"
 
-    /// Our own fingerprint, to filter ourselves out of the results.
+    // Our own fingerprint, to filter ourselves out of the results.
     var localFingerprint: String?
 
-    /// Our own device name, as a fallback filter if the TXT record hasn't arrived.
+    // Our own device name, as a fallback filter if the TXT record hasn't arrived.
     var localDeviceName: String?
 
-    /// Currently discovered hosts (updated live as services appear/disappear).
+    // Currently discovered hosts (updated live as services appear/disappear).
     private(set) var hosts: [DiscoveredHost] = []
 
-    /// Whether the browser is actively scanning.
+    // Whether the browser is actively scanning.
     private(set) var isScanning = false
 
     private var browser: NWBrowser?
@@ -39,7 +39,7 @@ final class BonjourDiscovery {
 
     // MARK: - Public
 
-    /// Start scanning for `_tether._tcp` services.
+    // Start scanning for `_tether._tcp` services.
     func startScanning(forceRestart: Bool = false) {
         if forceRestart {
             stopScanning(clearHosts: true)
@@ -79,7 +79,7 @@ final class BonjourDiscovery {
         self.browser = browser
     }
 
-    /// Stop scanning.
+    // Stop scanning.
     func stopScanning(clearHosts: Bool = false) {
         browser?.cancel()
         browser = nil

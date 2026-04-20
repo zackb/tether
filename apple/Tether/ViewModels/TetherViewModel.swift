@@ -11,7 +11,7 @@ import SwiftUI
 import UniformTypeIdentifiers
 import UIKit
 
-/// High-level app state.
+// High-level app state.
 enum AppConnectionState: Equatable {
     case disconnected
     case discovering
@@ -20,7 +20,7 @@ enum AppConnectionState: Equatable {
     case connected
 }
 
-/// A clipboard history entry.
+// A clipboard history entry.
 struct ClipboardEntry: Identifiable {
     let id = UUID()
     let content: String
@@ -45,7 +45,7 @@ struct ClipboardEntry: Identifiable {
     }
 }
 
-/// Tracks an active file transfer.
+// Tracks an active file transfer.
 struct FileTransfer: Identifiable {
     enum Direction {
         case outgoing
@@ -73,35 +73,35 @@ final class TetherViewModel {
 
     // MARK: - Published State
 
-    /// Whether clipboard updates from remote devices are automatically written to the local pasteboard.
+    // Whether clipboard updates from remote devices are automatically written to the local pasteboard.
     var autoSyncClipboard: Bool = true {
         didSet {
             UserDefaults.standard.set(autoSyncClipboard, forKey: TetherViewModel.autoSyncClipboardKey)
         }
     }
 
-    /// Overall connection state.
+    // Overall connection state.
     private(set) var appState: AppConnectionState = .disconnected
 
-    /// Name of the connected device, if any.
+    // Name of the connected device, if any.
     private(set) var connectedDeviceName: String?
 
-    /// Clipboard history (most recent first).
+    // Clipboard history (most recent first).
     private(set) var clipboardHistory: [ClipboardEntry] = []
 
-    /// Active file transfers.
+    // Active file transfers.
     private(set) var activeTransfers: [FileTransfer] = []
 
-    /// Completed file transfers.
+    // Completed file transfers.
     private(set) var completedTransfers: [FileTransfer] = []
 
-    /// Whether the pairing sheet should be presented.
+    // Whether the pairing sheet should be presented.
     var showPairingSheet = false
 
-    /// Status message for the pairing flow.
+    // Status message for the pairing flow.
     private(set) var pairingStatus: String = ""
 
-    /// Error message to display, if any.
+    // Error message to display, if any.
     var errorMessage: String?
 
     // MARK: - Services
@@ -111,7 +111,7 @@ final class TetherViewModel {
     let connection = TetherConnection()
     let server = TetherServer()
 
-    /// The chunk size for file transfers (48KB raw → 64KB base64).
+    // The chunk size for file transfers (48KB raw → 64KB base64).
     private let fileChunkSize = 48 * 1024
     private var hasInitialized = false
     private var pendingReconnectTask: Task<Void, Never>?
@@ -129,7 +129,7 @@ final class TetherViewModel {
 
     // MARK: - Initialization
 
-    /// Call once at app startup.
+    // Call once at app startup.
     func initialize() {
         guard !hasInitialized else { return }
         hasInitialized = true
@@ -185,7 +185,7 @@ final class TetherViewModel {
 
     // MARK: - Connection
 
-    /// Connect to a discovered host.
+    // Connect to a discovered host.
     func connectTo(host: DiscoveredHost) {
         guard let identity = certificateManager.getIdentity() else {
             errorMessage = "TLS identity not available. Please restart the app."
@@ -198,7 +198,7 @@ final class TetherViewModel {
         connection.connect(to: host.endpoint, identity: identity)
     }
 
-    /// Connect by IP address and port.
+    // Connect by IP address and port.
     func connectTo(host: String, port: UInt16) {
         guard let identity = certificateManager.getIdentity() else {
             errorMessage = "TLS identity not available. Please restart the app."
@@ -211,7 +211,7 @@ final class TetherViewModel {
         connection.connect(host: host, port: port, identity: identity)
     }
 
-    /// Disconnect from the daemon.
+    // Disconnect from the daemon.
     func disconnect() {
         manualDisconnect = true
         pendingReconnectTask?.cancel()
@@ -225,7 +225,7 @@ final class TetherViewModel {
 
     // MARK: - Clipboard
 
-    /// Send the current iOS clipboard content to the daemon.
+    // Send the current iOS clipboard content to the daemon.
     func sendClipboard() {
         #if canImport(UIKit)
         guard let text = UIPasteboard.general.string, !text.isEmpty else {
@@ -251,12 +251,12 @@ final class TetherViewModel {
         }
     }
 
-    /// Request the current clipboard from the daemon.
+    // Request the current clipboard from the daemon.
     func requestClipboard() {
         connection.send(.clipboardGet())
     }
 
-    /// Copy a clipboard entry to the iOS pasteboard.
+    // Copy a clipboard entry to the iOS pasteboard.
     func copyToLocalClipboard(_ text: String) {
         #if canImport(UIKit)
         UIPasteboard.general.string = text
@@ -268,7 +268,7 @@ final class TetherViewModel {
 
     // MARK: - File Transfer
 
-    /// Send a file to the daemon using its URL.
+    // Send a file to the daemon using its URL.
     func sendFile(url: URL) {
         let isSecurityScoped = url.startAccessingSecurityScopedResource()
         let filename = url.lastPathComponent
@@ -288,7 +288,7 @@ final class TetherViewModel {
         }
     }
 
-    /// Send raw data to the daemon.
+    // Send raw data to the daemon.
     func sendFile(data fileData: Data, filename: String) {
         let transferId = UUID().uuidString
         let totalSize = Int64(fileData.count)
@@ -609,9 +609,9 @@ final class TetherViewModel {
         }
     }
 
-    /// Call after the daemon accepts the pairing request.
-    /// The daemon will start accepting our commands, so we just need to
-    /// save the server fingerprint and transition to connected state.
+    // Call after the daemon accepts the pairing request.
+    // The daemon will start accepting our commands, so we just need to
+    // save the server fingerprint and transition to connected state.
     func confirmPairing() {
         let serverFP = connection.serverFingerprint
         let name = connectedDeviceName ?? "Desktop"

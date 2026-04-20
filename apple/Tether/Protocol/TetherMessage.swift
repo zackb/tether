@@ -9,7 +9,7 @@ import Foundation
 
 // MARK: - Command Enum
 
-/// All known command types in the Tether protocol.
+// All known command types in the Tether protocol.
 enum TetherCommand: String, Codable, Sendable {
     // Client → Daemon
     case clipboardSet = "clipboard_set"
@@ -30,11 +30,11 @@ enum TetherCommand: String, Codable, Sendable {
 
 // MARK: - Message
 
-/// A single Tether protocol message.
-///
-/// Uses a flat structure with optional fields — the daemon's JSON payloads
-/// share a unified shape where only the relevant fields are present
-/// for each command type.
+// A single Tether protocol message.
+//
+// Uses a flat structure with optional fields — the daemon's JSON payloads
+// share a unified shape where only the relevant fields are present
+// for each command type.
 struct TetherMessage: Codable, Sendable {
     let command: String
 
@@ -68,27 +68,27 @@ struct TetherMessage: Codable, Sendable {
 // MARK: - Convenience Initializers
 
 extension TetherMessage {
-    /// Create a `clipboard_set` message.
+    // Create a `clipboard_set` message.
     static func clipboardSet(_ text: String) -> TetherMessage {
         TetherMessage(command: TetherCommand.clipboardSet.rawValue, content: text)
     }
 
-    /// Create a `clipboard_get` request.
+    // Create a `clipboard_get` request.
     static func clipboardGet() -> TetherMessage {
         TetherMessage(command: TetherCommand.clipboardGet.rawValue)
     }
 
-    /// Create a `pair_request` message.
+    // Create a `pair_request` message.
     static func pairRequest(deviceName: String) -> TetherMessage {
         TetherMessage(command: TetherCommand.pairRequest.rawValue, deviceName: deviceName)
     }
 
-    /// Create a `pair_accepted` message (replying to a request).
+    // Create a `pair_accepted` message (replying to a request).
     static var pairAccepted: TetherMessage {
         TetherMessage(command: TetherCommand.pairAccepted.rawValue)
     }
 
-    /// Create a `file_start` message.
+    // Create a `file_start` message.
     static func fileStart(filename: String, size: Int64, transferId: String) -> TetherMessage {
         TetherMessage(
             command: TetherCommand.fileStart.rawValue,
@@ -98,7 +98,7 @@ extension TetherMessage {
         )
     }
 
-    /// Create a `file_chunk` message.
+    // Create a `file_chunk` message.
     static func fileChunk(transferId: String, chunkIndex: Int, data: String) -> TetherMessage {
         TetherMessage(
             command: TetherCommand.fileChunk.rawValue,
@@ -108,12 +108,12 @@ extension TetherMessage {
         )
     }
 
-    /// Create a `file_end` message.
+    // Create a `file_end` message.
     static func fileEnd(transferId: String) -> TetherMessage {
         TetherMessage(command: TetherCommand.fileEnd.rawValue, transferId: transferId)
     }
 
-    /// The parsed command enum, if recognized.
+    // The parsed command enum, if recognized.
     var parsedCommand: TetherCommand? {
         TetherCommand(rawValue: command)
     }

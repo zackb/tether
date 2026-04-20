@@ -7,8 +7,8 @@
 
 import Foundation
 
-/// Handles encoding and decoding of `TetherMessage` values using the
-/// newline-delimited JSON wire format spoken by `tetherd`.
+// Handles encoding and decoding of `TetherMessage` values using the
+// newline-delimited JSON wire format spoken by `tetherd`.
 enum TetherProtocol {
     private static let encoder: JSONEncoder = {
         let e = JSONEncoder()
@@ -26,7 +26,7 @@ enum TetherProtocol {
 
     // MARK: - Encoding
 
-    /// Encode a message to its wire representation (JSON + trailing newline).
+    // Encode a message to its wire representation (JSON + trailing newline).
     static func encode(_ message: TetherMessage) throws -> Data {
         var data = try encoder.encode(message)
         data.append(newline)
@@ -35,13 +35,13 @@ enum TetherProtocol {
 
     // MARK: - Decoding
 
-    /// Scan a mutable buffer for complete newline-delimited messages.
-    ///
-    /// Parsed messages are returned and their bytes are consumed from `buffer`.
-    /// Any trailing partial line is left in `buffer` for the next call.
-    ///
-    /// Lines that fail JSON parsing (e.g. the daemon's bare `OK\n` response)
-    /// are silently skipped.
+    // Scan a mutable buffer for complete newline-delimited messages.
+    //
+    // Parsed messages are returned and their bytes are consumed from `buffer`.
+    // Any trailing partial line is left in `buffer` for the next call.
+    //
+    // Lines that fail JSON parsing (e.g. the daemon's bare `OK\n` response)
+    // are silently skipped.
     static func decode(buffer: inout Data) -> [TetherMessage] {
         var messages: [TetherMessage] = []
 

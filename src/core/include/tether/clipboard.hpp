@@ -1,10 +1,10 @@
 #include "tether/event_loop.hpp"
-#include <wayland-client.h>
 #include <functional>
+#include <map>
 #include <memory>
 #include <string>
 #include <vector>
-#include <map>
+#include <wayland-client.h>
 
 class CCZwlrDataControlManagerV1;
 class CCWlSeat;
@@ -15,7 +15,10 @@ namespace tether {
 
     class ClipboardManager {
     public:
-        ClipboardManager(CCZwlrDataControlManagerV1* manager, CCWlSeat* seat, EpollEventLoop& loop, wl_display* display);
+        ClipboardManager(CCZwlrDataControlManagerV1* manager,
+                         CCWlSeat* seat,
+                         EpollEventLoop& loop,
+                         wl_display* display);
         ~ClipboardManager();
 
         // Set callback to receive native Wayland clipboard updates

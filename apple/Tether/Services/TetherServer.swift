@@ -17,7 +17,7 @@ final class TetherServer: NSObject, NetServiceDelegate {
     
     var isListening = false
     
-    /// Callback when a verified inbound connection is received
+    // Callback when a verified inbound connection is received
     var onNewConnection: ((NWConnection, String) -> Void)?
     
     func start(identity: SecIdentity, localDeviceName: String, fingerprint: String) {

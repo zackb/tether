@@ -12,8 +12,8 @@ import SwiftUI
 
 // MARK: - Screenshot Configurations
 
-/// A container view designed perfectly to show off the App Store screenshots 
-/// for the main active states of the Tether application.
+// A container view designed perfectly to show off the App Store screenshots 
+// for the main active states of the Tether application.
 struct AppStoreScreenshots: View {
     @State private var selectedTab = 0
     
@@ -42,9 +42,9 @@ struct AppStoreScreenshots: View {
 
 // MARK: - Previews
 
-/// Use Xcode Previews to configure your simulator to exactly what you need.
-/// Run this specific preview on the Simulator and use the simulator's
-/// built-in "Save Screen" (Cmd+S) or `xcrun simctl io booted screenshot` feature.
+// Use Xcode Previews to configure your simulator to exactly what you need.
+// Run this specific preview on the Simulator and use the simulator's
+// built-in "Save Screen" (Cmd+S) or `xcrun simctl io booted screenshot` feature.
 #Preview("App Store: Full App (Dark)") {
     AppStoreScreenshots()
         .preferredColorScheme(.dark)
