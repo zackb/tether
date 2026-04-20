@@ -1,0 +1,9 @@
+[Desktop Entry]
+Name=Tether
+GenericName=Device Synchronization
+Comment=Pair devices and synchronize clipboard across the network
+Exec=tether-gtk
+Icon=tether
+Terminal=false
+Type=Application
+Categories=Network;Utility;
