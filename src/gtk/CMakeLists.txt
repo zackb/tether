@@ -17,7 +17,9 @@ include(GNUInstallDirs)
 install(TARGETS tether-gtk
         RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR})
 
-install(FILES tether-gtk.desktop
+configure_file(tether-gtk.desktop.in tether-gtk.desktop @ONLY)
+
+install(FILES ${CMAKE_CURRENT_BINARY_DIR}/tether-gtk.desktop
         DESTINATION ${CMAKE_INSTALL_DATADIR}/applications)
 
 install(FILES tether.png
