@@ -28,9 +28,16 @@ struct FilesView: View {
             .background(Color(.systemGroupedBackground))
             .navigationTitle("Files")
             .toolbar {
-                if viewModel.appState == .connected {
-                    ToolbarItem(placement: .topBarTrailing) {
-                        HStack(spacing: 16) {
+                ToolbarItem(placement: .topBarTrailing) {
+                    HStack(spacing: 16) {
+                        Button {
+                            openFilesApp()
+                        } label: {
+                            Image(systemName: "folder")
+                                .foregroundStyle(.teal)
+                        }
+
+                        if viewModel.appState == .connected {
                             PhotosPicker(selection: $selectedPhotoItem, matching: .images) {
                                 Image(systemName: "photo.on.rectangle")
                                     .foregroundStyle(.teal)
@@ -270,9 +277,7 @@ struct FilesView: View {
         .background(.ultraThinMaterial, in: RoundedRectangle(cornerRadius: 12))
 
         if let savedURL = transfer.savedURL, transfer.direction == .incoming, !isActive, !transfer.failed {
-            Button {
-                openTransfer(savedURL)
-            } label: {
+            ShareLink(item: savedURL) {
                 content
             }
             .buttonStyle(.plain)
@@ -317,10 +322,12 @@ struct FilesView: View {
         return "Delivered • " + formatBytes(transfer.totalSize)
     }
 
-    private func openTransfer(_ url: URL) {
-        openURL(url) { accepted in
-            if !accepted {
-                viewModel.errorMessage = "Unable to open \(url.lastPathComponent)."
+    private func openFilesApp() {
+        if let docs = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask).first {
+            let receivedDir = docs.appendingPathComponent("Received", isDirectory: true)
+            let sharedURLString = receivedDir.absoluteString.replacingOccurrences(of: "file://", with: "shareddocuments://")
+            if let url = URL(string: sharedURLString) {
+                openURL(url)
             }
         }
     }
