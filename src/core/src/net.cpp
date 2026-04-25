@@ -18,13 +18,13 @@
 #include <cstring>
 #include <filesystem>
 #include <fstream>
-#include <iostream>
+#include <tether/log.hpp>
 #include <mutex>
 #include <thread>
 #include <nlohmann/json.hpp>
 #include <filesystem>
 #include <fstream>
-#include <iostream>
+#include <tether/log.hpp>
 #include <nlohmann/json.hpp>
 #include <set>
 #include <vector>
@@ -110,13 +110,13 @@ namespace tether {
             if (session.ssl) {
                 robust_ssl_write(session.ssl, packet.c_str(), packet.size());
             } else {
-                if (write(fd, packet.c_str(), packet.size()) < 0) { std::cerr << "net write error\n"; }
+                if (write(fd, packet.c_str(), packet.size()) < 0) { debug::log(ERR, "net write error\n"); }
             }
         }
     }
 
     static void write_plain_packet(int fd, const std::string& packet) {
-        if (write(fd, packet.c_str(), packet.size()) < 0) { std::cerr << "net write error\n"; }
+        if (write(fd, packet.c_str(), packet.size()) < 0) { debug::log(ERR, "net write error\n"); }
     }
 
     void broadcast_local_event(const std::string& msg, int exclude_fd) {
@@ -271,7 +271,7 @@ namespace tether {
 
         if (flock(fd, LOCK_EX | LOCK_NB) < 0) {
             if (errno == EWOULDBLOCK) {
-                std::cerr << "tetherd is already running." << std::endl;
+                debug::log(ERR, "tetherd is already running.");
                 exit(1);
             } else {
                 throw std::system_error(errno, std::system_category(), "Failed to lock file");
@@ -291,7 +291,7 @@ namespace tether {
     bool UnixServer::start() {
         server_fd_ = socket(AF_UNIX, SOCK_STREAM, 0);
         if (server_fd_ < 0) {
-            std::cerr << "Failed to create unix socket" << std::endl;
+            debug::log(ERR, "Failed to create unix socket");
             return false;
         }
 
@@ -306,17 +306,17 @@ namespace tether {
         std::strncpy(addr.sun_path, socket_path_.c_str(), sizeof(addr.sun_path) - 1);
 
         if (bind(server_fd_, reinterpret_cast<sockaddr*>(&addr), sizeof(addr)) < 0) {
-            std::cerr << "Failed to bind unix socket: " << std::strerror(errno) << std::endl;
+            debug::log(ERR, "Failed to bind unix socket: {}", std::strerror(errno));
             return false;
         }
 
         if (listen(server_fd_, SOMAXCONN) < 0) {
-            std::cerr << "Failed to listen on unix socket" << std::endl;
+            debug::log(ERR, "Failed to listen on unix socket");
             return false;
         }
 
         loop_.addFd(server_fd_, [this](int fd) { handle_accept(fd); });
-        std::cout << "UnixServer listening on " << socket_path_ << std::endl;
+        debug::log(INFO, "UnixServer listening on {}", socket_path_);
         return true;
     }
 
@@ -345,7 +345,7 @@ namespace tether {
         int client_fd = accept(fd, nullptr, nullptr);
         if (client_fd < 0) {
             if (errno != EAGAIN && errno != EWOULDBLOCK) {
-                std::cerr << "UnixServer accept error: " << std::strerror(errno) << std::endl;
+                debug::log(ERR, "UnixServer accept error: {}", std::strerror(errno));
             }
             return;
         }
@@ -357,7 +357,7 @@ namespace tether {
         // Register client for broadcasts
         register_client_fd(client_fd);
         loop_.addFd(client_fd, [this](int cfd) { handle_client(cfd); });
-        std::cout << "UnixServer: New connection (fd: " << client_fd << ")" << std::endl;
+        debug::log(INFO, "UnixServer: New connection (fd: {})", client_fd);
     }
 
     void UnixServer::handle_client(int client_fd) {
@@ -379,16 +379,16 @@ namespace tether {
                     if (j.contains("command") && j["command"] == "subscribe") {
                         register_local_subscriber(client_fd);
                         std::string payload = build_local_state_snapshot().dump() + "\n";
-                        if (write(client_fd, payload.c_str(), payload.size()) < 0) { std::cerr << "net write error\n"; }
+                        if (write(client_fd, payload.c_str(), payload.size()) < 0) { debug::log(ERR, "net write error\n"); }
                         continue;
                     } else if (j.contains("command") && j["command"] == "unsubscribe") {
                         unregister_local_subscriber(client_fd);
                         std::string payload = "{\"command\":\"unsubscribed\"}\n";
-                        if (write(client_fd, payload.c_str(), payload.size()) < 0) { std::cerr << "net write error\n"; }
+                        if (write(client_fd, payload.c_str(), payload.size()) < 0) { debug::log(ERR, "net write error\n"); }
                         continue;
                     } else if (j.contains("command") && j["command"] == "state_snapshot") {
                         std::string payload = build_local_state_snapshot().dump() + "\n";
-                        if (write(client_fd, payload.c_str(), payload.size()) < 0) { std::cerr << "net write error\n"; }
+                        if (write(client_fd, payload.c_str(), payload.size()) < 0) { debug::log(ERR, "net write error\n"); }
                         continue;
                     } else if (j.contains("command") && j["command"] == "clipboard_set" && j.contains("content")) {
                         std::string content = j["content"];
@@ -400,7 +400,7 @@ namespace tether {
                             resp["command"] = "clipboard_content";
                             resp["content"] = g_wayland->get_clipboard();
                             std::string payload = resp.dump() + "\n";
-                            if (write(client_fd, payload.c_str(), payload.size()) < 0) { std::cerr << "net write error\n"; }
+                            if (write(client_fd, payload.c_str(), payload.size()) < 0) { debug::log(ERR, "net write error\n"); }
                             continue;
                         }
                     } else if (j.contains("command") && j["command"] == "file_start") {
@@ -409,7 +409,7 @@ namespace tether {
                             resp["command"] = "error";
                             resp["message"] = "no_connected_mobile_client";
                             std::string payload = resp.dump() + "\n";
-                            if (write(client_fd, payload.c_str(), payload.size()) < 0) { std::cerr << "net write error\n"; }
+                            if (write(client_fd, payload.c_str(), payload.size()) < 0) { debug::log(ERR, "net write error\n"); }
                             continue;
                         }
                     } else if (j.contains("command") && j["command"] == "file_chunk") {
@@ -418,7 +418,7 @@ namespace tether {
                             resp["command"] = "error";
                             resp["message"] = "no_connected_mobile_client";
                             std::string payload = resp.dump() + "\n";
-                            if (write(client_fd, payload.c_str(), payload.size()) < 0) { std::cerr << "net write error\n"; }
+                            if (write(client_fd, payload.c_str(), payload.size()) < 0) { debug::log(ERR, "net write error\n"); }
                             continue;
                         }
                     } else if (j.contains("command") && j["command"] == "file_end") {
@@ -427,7 +427,7 @@ namespace tether {
                             resp["command"] = "error";
                             resp["message"] = "no_connected_mobile_client";
                             std::string payload = resp.dump() + "\n";
-                            if (write(client_fd, payload.c_str(), payload.size()) < 0) { std::cerr << "net write error\n"; }
+                            if (write(client_fd, payload.c_str(), payload.size()) < 0) { debug::log(ERR, "net write error\n"); }
                             continue;
                         }
 
@@ -436,7 +436,7 @@ namespace tether {
                         resp["transfer_id"] = j["transfer_id"];
                         resp["status"] = "success";
                         std::string payload = resp.dump() + "\n";
-                        if (write(client_fd, payload.c_str(), payload.size()) < 0) { std::cerr << "net write error\n"; }
+                        if (write(client_fd, payload.c_str(), payload.size()) < 0) { debug::log(ERR, "net write error\n"); }
                         continue;
                     } else if (j.contains("command") && j["command"] == "accept_device" && j.contains("fingerprint")) {
                         std::string print = j["fingerprint"];
@@ -527,7 +527,7 @@ namespace tether {
                                 resp["message"] = ok ? ("Sent " + std::filesystem::path(path).filename().string()) : ("Send failed: " + (err.empty() ? "unknown error" : err));
                                 std::string payload = resp.dump() + "\n";
                                 // direct write is fine, or we can use broadcast_local_event. We'll reply directly to the GUI socket.
-                                if (write(pfd, payload.c_str(), payload.size()) < 0) { std::cerr << "net write error\n"; }
+                                if (write(pfd, payload.c_str(), payload.size()) < 0) { debug::log(ERR, "net write error\n"); }
                             }
                         }).detach();
                         continue; // skip the "OK\n" below because we reply asynchronously
@@ -536,11 +536,11 @@ namespace tether {
                 }
 
                 std::string response = "OK\n";
-                if (write(client_fd, response.c_str(), response.size()) < 0) { std::cerr << "net write error\n"; }
+                if (write(client_fd, response.c_str(), response.size()) < 0) { debug::log(ERR, "net write error\n"); }
             }
         } else if (n == 0 || (n < 0 && errno != EAGAIN && errno != EWOULDBLOCK)) {
             // Disconnected
-            std::cout << "UnixServer: Client disconnected (fd: " << client_fd << ")" << std::endl;
+            debug::log(INFO, "UnixServer: Client disconnected (fd: {})", client_fd);
             client_buffers_.erase(client_fd);
             unregister_client_fd(client_fd);
             loop_.removeFd(client_fd);
@@ -557,13 +557,13 @@ namespace tether {
     bool TcpServer::start() {
         server_fd_ = socket(AF_INET, SOCK_STREAM, 0);
         if (server_fd_ < 0) {
-            std::cerr << "Failed to create tcp socket" << std::endl;
+            debug::log(ERR, "Failed to create tcp socket");
             return false;
         }
 
         int opt = 1;
         if (setsockopt(server_fd_, SOL_SOCKET, SO_REUSEADDR | SO_REUSEPORT, &opt, sizeof(opt)) < 0) {
-            std::cerr << "TcpServer setsockopt reuse failed" << std::endl;
+            debug::log(ERR, "TcpServer setsockopt reuse failed");
         }
 
         // Set non-blocking
@@ -576,18 +576,17 @@ namespace tether {
         addr.sin_port = htons(bind_port_);
 
         if (bind(server_fd_, reinterpret_cast<sockaddr*>(&addr), sizeof(addr)) < 0) {
-            std::cerr << "Failed to bind tcp socket on port " << bind_port_ << ": " << std::strerror(errno)
-                      << std::endl;
+            debug::log(ERR, "Failed to bind tcp socket on port {}: {}", bind_port_, std::strerror(errno));
             return false;
         }
 
         if (listen(server_fd_, SOMAXCONN) < 0) {
-            std::cerr << "Failed to listen on tcp socket" << std::endl;
+            debug::log(ERR, "Failed to listen on tcp socket");
             return false;
         }
 
         loop_.addFd(server_fd_, [this](int fd) { handle_accept(fd); });
-        std::cout << "TcpServer listening on 0.0.0.0:" << bind_port_ << std::endl;
+        debug::log(INFO, "TcpServer listening on 0.0.0.0:{}", bind_port_);
         return true;
     }
 
@@ -634,7 +633,7 @@ namespace tether {
 
         char ip[INET_ADDRSTRLEN];
         inet_ntop(AF_INET, &(client_addr.sin_addr), ip, INET_ADDRSTRLEN);
-        std::cout << "TcpServer: New connection from " << ip << " (fd: " << client_fd << ")" << std::endl;
+        debug::log(INFO, "TcpServer: New connection from {} (fd: {})", ip, client_fd);
 
         // SSL Wrapping
         SSL* ssl = SSL_new(tether::Crypto::instance().get_server_context());
@@ -680,7 +679,7 @@ namespace tether {
                     event["paired"] = true;
                     broadcast_local_event(event.dump());
                 } else {
-                    std::cout << "TcpServer: Untrusted client connected. Fingerprint: " << print << std::endl;
+                    debug::log(INFO, "TcpServer: Untrusted client connected. Fingerprint: {}", print);
                     nlohmann::json event;
                     event["command"] = "untrusted_client_connected";
                     event["address"] = client_info_[client_fd].address;
@@ -729,8 +728,7 @@ namespace tether {
                             std::string dev_name = j.value("device_name", "Unknown Device");
                             client_info_[client_fd].device_name = dev_name;
                             connected_remote_clients[client_fd].device_name = dev_name;
-                            std::cout << "[Pairing Request Pending] from " << dev_name
-                                      << ". Accept by running: tether --accept " << print << std::endl;
+                            debug::log(INFO, "[Pairing Request Pending] from {}. Accept by running: tether --accept {}", dev_name, print);
 
                             // Persist the pending request so accept_device can retrieve the name
                             {
@@ -817,7 +815,7 @@ namespace tether {
                 return;
             }
 
-            std::cout << "TcpServer: Client disconnected (fd: " << client_fd << ")" << std::endl;
+            debug::log(INFO, "TcpServer: Client disconnected (fd: {})", client_fd);
             if (connected_remote_clients.count(client_fd)) {
                 nlohmann::json event;
                 event["command"] = "client_disconnected";
@@ -847,13 +845,13 @@ namespace tether {
         // Create a pipe so the parent can detect when the child exits via epoll
         int pipefd[2];
         if (pipe(pipefd) < 0) {
-            std::cerr << "spawn_pair_dialog: pipe() failed: " << std::strerror(errno) << std::endl;
+            debug::log(ERR, "spawn_pair_dialog: pipe() failed: {}", std::strerror(errno));
             return;
         }
 
         pid_t pid = fork();
         if (pid < 0) {
-            std::cerr << "spawn_pair_dialog: fork() failed: " << std::strerror(errno) << std::endl;
+            debug::log(ERR, "spawn_pair_dialog: fork() failed: {}", std::strerror(errno));
             close(pipefd[0]);
             close(pipefd[1]);
             return;
@@ -908,7 +906,7 @@ namespace tether {
                    "60",
                    nullptr);
             // exec failed entirely
-            std::cerr << "spawn_pair_dialog: exec failed: " << std::strerror(errno) << std::endl;
+            debug::log(ERR, "spawn_pair_dialog: exec failed: {}", std::strerror(errno));
             _exit(3);
         }
 
@@ -924,7 +922,7 @@ namespace tether {
         loop_.addFd(pipefd[0], [this](int read_fd) {
             // Pipe became readable → child exited (EOF on write end)
             char dummy;
-            if (read(read_fd, &dummy, 1) < 0) { std::cerr << "net read error\n"; } // consume EOF
+            if (read(read_fd, &dummy, 1) < 0) { debug::log(ERR, "net read error\n"); } // consume EOF
 
             auto it = pending_dialogs_.find(read_fd);
             if (it == pending_dialogs_.end()) {
@@ -943,7 +941,7 @@ namespace tether {
             if (exit_code == 0) {
                 // User accepted — trust the device
                 Crypto::instance().add_known_host(info.device_name, info.fingerprint);
-                std::cout << "[Pairing Accepted] " << info.device_name << " (" << info.fingerprint << ")" << std::endl;
+                debug::log(INFO, "[Pairing Accepted] {} ({})", info.device_name, info.fingerprint);
 
                 // Mark as paired if still connected
                 if (client_paired_.count(info.client_fd)) {
@@ -1006,8 +1004,7 @@ namespace tether {
                     ofs << pending.dump(4);
                 }
             } else {
-                std::cout << "[Pairing Rejected] " << info.device_name << " (exit code " << exit_code << ")"
-                          << std::endl;
+                debug::log(INFO, "[Pairing Rejected] {} (exit code {})", info.device_name, exit_code);
 
                 nlohmann::json event;
                 event["command"] = "pair_rejected";
@@ -1032,7 +1029,7 @@ namespace tether {
             close(read_fd);
         });
 
-        std::cout << "spawn_pair_dialog: Launched dialog (pid " << pid << ") for " << device_name << std::endl;
+        debug::log(INFO, "spawn_pair_dialog: Launched dialog (pid {}) for {}", pid, device_name);
     }
 
 } // namespace tether

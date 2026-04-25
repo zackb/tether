@@ -3,7 +3,7 @@
 #include <filesystem>
 #include <fstream>
 #include <iomanip>
-#include <iostream>
+#include <tether/log.hpp>
 #include <nlohmann/json.hpp>
 #include <openssl/evp.h>
 #include <openssl/pem.h>
@@ -91,7 +91,7 @@ namespace tether {
             return true;
         }
 
-        std::cout << "Crypto: Generating native mTLS RSA/X509 Keypair into ~/.config/tether/..." << std::endl;
+        debug::log(INFO, "Crypto: Generating native mTLS RSA/X509 Keypair into ~/.config/tether/...");
 
         /*
         EVP_PKEY* pkey = EVP_PKEY_new();

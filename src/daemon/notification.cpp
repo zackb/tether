@@ -4,7 +4,7 @@
 #include <glib.h>
 #include <libnotify/notify.h>
 
-#include <iostream>
+#include <tether/log.hpp>
 #include <string>
 #include <thread>
 
@@ -32,12 +32,12 @@ bool launch_uri(const std::string& uri) {
     GError* error = nullptr;
     gboolean ok = g_app_info_launch_default_for_uri(uri.c_str(), nullptr, &error);
     if (!ok) {
-        std::cerr << "Failed to open URI '" << uri << "'";
+        debug::log(ERR, "Failed to open URI '{}'", uri);
         if (error) {
-            std::cerr << ": " << error->message;
+            debug::log(ERR, ": {}", error->message);
             g_error_free(error);
         }
-        std::cerr << std::endl;
+        debug::log(ERR, "");
         return false;
     }
 
@@ -69,7 +69,7 @@ gboolean show_notification_on_main(gpointer user_data) {
     if (!file_uri || !folder_uri) {
         if (file_uri) g_free(file_uri);
         if (folder_uri) g_free(folder_uri);
-        std::cerr << "Failed to create notification URI for " << file << std::endl;
+        debug::log(ERR, "Failed to create notification URI for {}", file);
         return G_SOURCE_REMOVE;
     }
 
@@ -104,12 +104,12 @@ gboolean show_notification_on_main(gpointer user_data) {
     GError* error = nullptr;
     gboolean shown = notify_notification_show(notification, &error);
     if (!shown) {
-        std::cerr << "Failed to show notification";
+        debug::log(ERR, "Failed to show notification");
         if (error) {
-            std::cerr << ": " << error->message;
+            debug::log(ERR, ": {}", error->message);
             g_error_free(error);
         }
-        std::cerr << std::endl;
+        debug::log(ERR, "");
         g_object_unref(notification);
     }
     g_free(file_uri);
@@ -154,7 +154,7 @@ bool FileArrivalNotifier::init() {
     }
 
     if (!notify_init("tetherd")) {
-        std::cerr << "Failed to initialize libnotify" << std::endl;
+        debug::log(ERR, "Failed to initialize libnotify");
         return false;
     }
 

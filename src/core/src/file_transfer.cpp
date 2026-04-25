@@ -1,7 +1,7 @@
 #include "tether/file_transfer.hpp"
 #include "tether/base64.hpp"
 #include <glib.h>
-#include <iostream>
+#include <tether/log.hpp>
 
 namespace tether {
 
@@ -64,12 +64,12 @@ bool FileReceiveManager::handle_start(const std::string& transfer_id, const std:
 
     t->stream = std::make_unique<std::ofstream>(t->filepath, std::ios::binary);
     if (!t->stream->is_open()) {
-        std::cerr << "FileReceiveManager: Failed to open output file: " << t->filepath << std::endl;
+        debug::log(ERR, "FileReceiveManager: Failed to open output file: {}", t->filepath.string());
         return false;
     }
 
     transfers_[transfer_id] = t;
-    std::cout << "FileReceiveManager: Started transfer " << transfer_id << " saving to " << t->filepath << std::endl;
+    debug::log(INFO, "FileReceiveManager: Started transfer {} saving to {}", transfer_id, t->filepath.string());
     return true;
 }
 
@@ -106,7 +106,7 @@ bool FileReceiveManager::handle_end(const std::string& transfer_id) {
         bytes_written = t->bytes_written;
         on_complete = on_complete_;
 
-        std::cout << "FileReceiveManager: Finished transfer " << transfer_id << ". Wrote " << t->bytes_written << " bytes to " << t->filepath << std::endl;
+        debug::log(INFO, "FileReceiveManager: Finished transfer {}. Wrote {} bytes to {}", transfer_id, t->bytes_written, t->filepath.string());
 
         transfers_.erase(it);
     }

@@ -2,7 +2,7 @@
 #include <sys/epoll.h>
 #include <unistd.h>
 #include <stdexcept>
-#include <iostream>
+#include <tether/log.hpp>
 
 namespace tether {
 
@@ -26,7 +26,7 @@ bool EpollEventLoop::addFd(int fd, Callback cb) {
     ev.data.fd = fd;
 
     if (epoll_ctl(epoll_fd_, EPOLL_CTL_ADD, fd, &ev) < 0) {
-        std::cerr << "Failed to add fd to epoll: " << fd << std::endl;
+        debug::log(ERR, "Failed to add fd to epoll: {}", fd);
         return false;
     }
     callbacks_[fd] = std::move(cb);
@@ -50,7 +50,7 @@ void EpollEventLoop::run() {
         int n = epoll_wait(epoll_fd_, events, MAX_EVENTS, -1);
         if (n == -1) {
             if (errno == EINTR) continue;
-            std::cerr << "epoll_wait failed" << std::endl;
+            debug::log(ERR, "epoll_wait failed");
             break;
         }
 

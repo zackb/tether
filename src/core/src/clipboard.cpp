@@ -1,7 +1,7 @@
 #include "tether/clipboard.hpp"
 #include "wayland_protocols/wlr-data-control-unstable-v1.hpp"
 #include "wayland_protocols/wayland.hpp"
-#include <iostream>
+#include <tether/log.hpp>
 #include <thread>
 #include <unistd.h>
 #include <fcntl.h>
@@ -159,7 +159,7 @@ void ClipboardManager::copy(const std::string& text) {
         // the write simple but ensure it doesn't touch any manager state.
         std::thread([text_to_send, fd]() {
             if (write(fd, text_to_send.c_str(), text_to_send.size()) < 0) {
-                std::cerr << "clipboard write error\n";
+                debug::log(ERR, "clipboard write error\n");
             }
             close(fd);
         }).detach();

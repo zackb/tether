@@ -3,7 +3,7 @@
 #include "wayland_protocols/wlr-data-control-unstable-v1.hpp"
 
 #include <wayland-client.h>
-#include <iostream>
+#include <tether/log.hpp>
 #include <cstring>
 
 namespace tether {
@@ -38,7 +38,7 @@ WaylandContext::~WaylandContext() {
 bool WaylandContext::init() {
     raw_display_ = wl_display_connect(nullptr);
     if (!raw_display_) {
-        std::cerr << "WaylandContext: Failed to connect to Wayland display" << std::endl;
+        debug::log(ERR, "WaylandContext: Failed to connect to Wayland display");
         return false;
     }
 
@@ -63,7 +63,7 @@ bool WaylandContext::init() {
     wl_display_roundtrip(raw_display_);
 
     if (!seat_ || !data_control_manager_) {
-        std::cerr << "WaylandContext: Failed to obtain necessary globals." << std::endl;
+        debug::log(ERR, "WaylandContext: Failed to obtain necessary globals.");
         return false;
     }
 
@@ -87,14 +87,14 @@ bool WaylandContext::init() {
     int fd = wl_display_get_fd(raw_display_);
     loop_.addFd(fd, [this](int) {
         if (wl_display_dispatch(raw_display_) < 0) {
-            std::cerr << "WaylandContext: Display disconnected." << std::endl;
+            debug::log(ERR, "WaylandContext: Display disconnected.");
         }
     });
 
     // Flush any pending requests
     wl_display_flush(raw_display_);
 
-    std::cout << "WaylandContext initialized successfully." << std::endl;
+    debug::log(INFO, "WaylandContext initialized successfully.");
     return true;
 }
 

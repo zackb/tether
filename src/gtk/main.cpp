@@ -8,7 +8,7 @@
 #include <cstdlib>
 #include <ctime>
 #include <filesystem>
-#include <iostream>
+#include <tether/log.hpp>
 #include <string>
 #include <sys/socket.h>
 #include <sys/un.h>
@@ -95,7 +95,7 @@ namespace {
         if (g_app.event_fd >= 0) {
             std::string payload = j.dump() + "\n";
             if (::write(g_app.event_fd, payload.c_str(), payload.size()) < 0) {
-                std::cerr << "daemon write error\n";
+                debug::log(ERR, "daemon write error\n");
             }
         }
     }
@@ -565,7 +565,7 @@ namespace {
                 }
                 if (status == G_IO_STATUS_EOF || status == G_IO_STATUS_ERROR) {
                     if (error) {
-                        std::cerr << "Stream err: " << error->message << std::endl;
+                        debug::log(ERR, "Stream err: {}", error->message);
                         g_error_free(error);
                     }
                     if (line)
@@ -644,7 +644,7 @@ namespace {
                                               nullptr);
         static const char kSubscribe[] = "{\"command\":\"subscribe\"}\n";
         if (write(fd, kSubscribe, sizeof(kSubscribe) - 1) < 0) {
-            std::cerr << "subscribe write error\n";
+            debug::log(ERR, "subscribe write error\n");
         }
         set_status_main("Daemon Online");
         return G_SOURCE_REMOVE;

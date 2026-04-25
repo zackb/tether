@@ -3,7 +3,7 @@
 
 #include <cstdlib>
 #include <cstring>
-#include <iostream>
+#include "../core/include/tether/log.hpp"
 #include <string>
 
 // Exit codes:
@@ -44,8 +44,7 @@ static gboolean on_key_press(GtkWidget*, GdkEventKey* event, gpointer has_reject
 }
 
 static void print_usage(const char* argv0) {
-    std::cerr << "Usage: " << argv0 << " --title <text> --body <text> --accept <label>"
-              << " [--reject <label>] [--timeout <seconds>]\n";
+    debug::log(ERR, "Usage: {} --title <text> --body <text> --accept <label> [--reject <label>] [--timeout <seconds>]\n", argv0);
 }
 
 static const char* CSS = R"(
@@ -125,7 +124,7 @@ int main(int argc, char** argv) {
     }
 
     if (title.empty() || body.empty() || accept_label.empty()) {
-        std::cerr << "Error: --title, --body, and --accept are required.\n";
+        debug::log(ERR, "Error: --title, --body, and --accept are required.\n");
         print_usage(argv[0]);
         return 3;
     }

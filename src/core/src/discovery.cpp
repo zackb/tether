@@ -11,7 +11,7 @@
 #include <algorithm>
 #include <chrono>
 #include <cstring>
-#include <iostream>
+#include <tether/log.hpp>
 #include <map>
 #include <mutex>
 #include <thread>
@@ -53,15 +53,13 @@ namespace tether {
         auto* impl = static_cast<DiscoveryImpl*>(userdata);
         switch (state) {
         case AVAHI_ENTRY_GROUP_ESTABLISHED:
-            std::cout << "mDNS: Published \"" << SERVICE_TYPE << "\" as \"" << impl->pub_name
-                      << "\" on port " << impl->pub_port << std::endl;
+            debug::log(INFO, "mDNS: Published \"{}\" as \"{}\" on port {}", SERVICE_TYPE, impl->pub_name, impl->pub_port);
             break;
         case AVAHI_ENTRY_GROUP_COLLISION:
-            std::cerr << "mDNS: Service name collision for \"" << impl->pub_name << "\"" << std::endl;
+            debug::log(ERR, "mDNS: Service name collision for \"{}\"", impl->pub_name);
             break;
         case AVAHI_ENTRY_GROUP_FAILURE:
-            std::cerr << "mDNS: Entry group failure: "
-                      << avahi_strerror(avahi_client_errno(avahi_entry_group_get_client(g))) << std::endl;
+            debug::log(ERR, "mDNS: Entry group failure: {}", avahi_strerror(avahi_client_errno(avahi_entry_group_get_client(g))));
             break;
         default:
             break;
@@ -74,8 +72,7 @@ namespace tether {
         if (!impl->pub_group) {
             impl->pub_group = avahi_entry_group_new(impl->pub_client, entry_group_callback, impl);
             if (!impl->pub_group) {
-                std::cerr << "mDNS: avahi_entry_group_new() failed: "
-                          << avahi_strerror(avahi_client_errno(impl->pub_client)) << std::endl;
+                debug::log(ERR, "mDNS: avahi_entry_group_new() failed: {}", avahi_strerror(avahi_client_errno(impl->pub_client)));
                 return;
             }
         }
@@ -100,13 +97,13 @@ namespace tether {
             );
 
             if (ret < 0) {
-                std::cerr << "mDNS: Failed to add service: " << avahi_strerror(ret) << std::endl;
+                debug::log(ERR, "mDNS: Failed to add service: {}", avahi_strerror(ret));
                 return;
             }
 
             ret = avahi_entry_group_commit(impl->pub_group);
             if (ret < 0) {
-                std::cerr << "mDNS: Failed to commit entry group: " << avahi_strerror(ret) << std::endl;
+                debug::log(ERR, "mDNS: Failed to commit entry group: {}", avahi_strerror(ret));
             }
         }
     }
@@ -120,7 +117,7 @@ namespace tether {
             create_services(impl);
             break;
         case AVAHI_CLIENT_FAILURE:
-            std::cerr << "mDNS: Client failure: " << avahi_strerror(avahi_client_errno(c)) << std::endl;
+            debug::log(ERR, "mDNS: Client failure: {}", avahi_strerror(avahi_client_errno(c)));
             break;
         case AVAHI_CLIENT_S_COLLISION:
         case AVAHI_CLIENT_S_REGISTERING:
@@ -265,7 +262,7 @@ namespace tether {
 
         impl_->pub_poll = avahi_threaded_poll_new();
         if (!impl_->pub_poll) {
-            std::cerr << "mDNS: Failed to create threaded poll" << std::endl;
+            debug::log(ERR, "mDNS: Failed to create threaded poll");
             return false;
         }
 
@@ -278,14 +275,14 @@ namespace tether {
             &error);
 
         if (!impl_->pub_client) {
-            std::cerr << "mDNS: Failed to create client: " << avahi_strerror(error) << std::endl;
+            debug::log(ERR, "mDNS: Failed to create client: {}", avahi_strerror(error));
             avahi_threaded_poll_free(impl_->pub_poll);
             impl_->pub_poll = nullptr;
             return false;
         }
 
         if (avahi_threaded_poll_start(impl_->pub_poll) < 0) {
-            std::cerr << "mDNS: Failed to start threaded poll" << std::endl;
+            debug::log(ERR, "mDNS: Failed to start threaded poll");
             avahi_client_free(impl_->pub_client);
             impl_->pub_client = nullptr;
             avahi_threaded_poll_free(impl_->pub_poll);
@@ -317,7 +314,7 @@ namespace tether {
     std::vector<DiscoveredHost> Discovery::discover(int timeout_ms) {
         AvahiThreadedPoll* poll = avahi_threaded_poll_new();
         if (!poll) {
-            std::cerr << "mDNS: Failed to create browse poll" << std::endl;
+            debug::log(ERR, "mDNS: Failed to create browse poll");
             return {};
         }
 
@@ -336,7 +333,7 @@ namespace tether {
             &error);
 
         if (!client) {
-            std::cerr << "mDNS: Failed to create browse client: " << avahi_strerror(error) << std::endl;
+            debug::log(ERR, "mDNS: Failed to create browse client: {}", avahi_strerror(error));
             avahi_threaded_poll_free(poll);
             return {};
         }
@@ -354,8 +351,7 @@ namespace tether {
             &ctx);
 
         if (!browser) {
-            std::cerr << "mDNS: Failed to create browser: "
-                      << avahi_strerror(avahi_client_errno(client)) << std::endl;
+            debug::log(ERR, "mDNS: Failed to create browser: {}", avahi_strerror(avahi_client_errno(client)));
             avahi_client_free(client);
             avahi_threaded_poll_free(poll);
             return {};
@@ -386,7 +382,7 @@ namespace tether {
         
         impl_->browse_poll = avahi_threaded_poll_new();
         if (!impl_->browse_poll) {
-            std::cerr << "mDNS: Failed to create browse poll" << std::endl;
+            debug::log(ERR, "mDNS: Failed to create browse poll");
             return;
         }
         
