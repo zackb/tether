@@ -11,9 +11,9 @@
 #include <algorithm>
 #include <chrono>
 #include <cstring>
-#include <tether/log.hpp>
 #include <map>
 #include <mutex>
+#include <tether/log.hpp>
 #include <thread>
 
 namespace tether {
@@ -35,7 +35,7 @@ namespace tether {
         // Discovery state (per-call, not persistent)
         std::mutex results_mutex;
         std::vector<DiscoveredHost> results;
-        
+
         // Continuous browse state
         AvahiThreadedPoll* browse_poll = nullptr;
         AvahiClient* browse_client = nullptr;
@@ -53,13 +53,16 @@ namespace tether {
         auto* impl = static_cast<DiscoveryImpl*>(userdata);
         switch (state) {
         case AVAHI_ENTRY_GROUP_ESTABLISHED:
-            debug::log(INFO, "mDNS: Published \"{}\" as \"{}\" on port {}", SERVICE_TYPE, impl->pub_name, impl->pub_port);
+            debug::log(
+                INFO, "mDNS: Published \"{}\" as \"{}\" on port {}", SERVICE_TYPE, impl->pub_name, impl->pub_port);
             break;
         case AVAHI_ENTRY_GROUP_COLLISION:
             debug::log(ERR, "mDNS: Service name collision for \"{}\"", impl->pub_name);
             break;
         case AVAHI_ENTRY_GROUP_FAILURE:
-            debug::log(ERR, "mDNS: Entry group failure: {}", avahi_strerror(avahi_client_errno(avahi_entry_group_get_client(g))));
+            debug::log(ERR,
+                       "mDNS: Entry group failure: {}",
+                       avahi_strerror(avahi_client_errno(avahi_entry_group_get_client(g))));
             break;
         default:
             break;
@@ -67,12 +70,15 @@ namespace tether {
     }
 
     static void create_services(DiscoveryImpl* impl) {
-        if (!impl->pub_client) return;
+        if (!impl->pub_client)
+            return;
 
         if (!impl->pub_group) {
             impl->pub_group = avahi_entry_group_new(impl->pub_client, entry_group_callback, impl);
             if (!impl->pub_group) {
-                debug::log(ERR, "mDNS: avahi_entry_group_new() failed: {}", avahi_strerror(avahi_client_errno(impl->pub_client)));
+                debug::log(ERR,
+                           "mDNS: avahi_entry_group_new() failed: {}",
+                           avahi_strerror(avahi_client_errno(impl->pub_client)));
                 return;
             }
         }
@@ -81,19 +87,18 @@ namespace tether {
             std::string txt_fp = "fp=" + impl->pub_fingerprint;
             std::string txt_ver = "v=1";
 
-            int ret = avahi_entry_group_add_service(
-                impl->pub_group,
-                AVAHI_IF_UNSPEC,
-                AVAHI_PROTO_UNSPEC,
-                (AvahiPublishFlags)0,
-                impl->pub_name.c_str(),
-                SERVICE_TYPE,
-                nullptr, // domain
-                nullptr, // host
-                impl->pub_port,
-                txt_fp.c_str(),
-                txt_ver.c_str(),
-                nullptr  // sentinel
+            int ret = avahi_entry_group_add_service(impl->pub_group,
+                                                    AVAHI_IF_UNSPEC,
+                                                    AVAHI_PROTO_UNSPEC,
+                                                    (AvahiPublishFlags)0,
+                                                    impl->pub_name.c_str(),
+                                                    SERVICE_TYPE,
+                                                    nullptr, // domain
+                                                    nullptr, // host
+                                                    impl->pub_port,
+                                                    txt_fp.c_str(),
+                                                    txt_ver.c_str(),
+                                                    nullptr // sentinel
             );
 
             if (ret < 0) {
@@ -137,20 +142,19 @@ namespace tether {
         AvahiClient* client;
     };
 
-    static void resolve_callback(
-        AvahiServiceResolver* r,
-        AvahiIfIndex /*interface*/,
-        AvahiProtocol /*protocol*/,
-        AvahiResolverEvent event,
-        const char* name,
-        const char* /*type*/,
-        const char* /*domain*/,
-        const char* /*host_name*/,
-        const AvahiAddress* address,
-        uint16_t port,
-        AvahiStringList* txt,
-        AvahiLookupResultFlags /*flags*/,
-        void* userdata) {
+    static void resolve_callback(AvahiServiceResolver* r,
+                                 AvahiIfIndex /*interface*/,
+                                 AvahiProtocol /*protocol*/,
+                                 AvahiResolverEvent event,
+                                 const char* name,
+                                 const char* /*type*/,
+                                 const char* /*domain*/,
+                                 const char* /*host_name*/,
+                                 const AvahiAddress* address,
+                                 uint16_t port,
+                                 AvahiStringList* txt,
+                                 AvahiLookupResultFlags /*flags*/,
+                                 void* userdata) {
 
         auto* ctx = static_cast<BrowseContext*>(userdata);
 
@@ -189,7 +193,7 @@ namespace tether {
                 if (!exists) {
                     ctx->impl->results.push_back(std::move(host));
                 }
-                
+
                 if (ctx->impl->browse_callback) {
                     auto grouped = group_discovered_hosts(ctx->impl->results);
                     ctx->impl->browse_callback(grouped);
@@ -200,41 +204,36 @@ namespace tether {
         avahi_service_resolver_free(r);
     }
 
-    static void browse_callback(
-        AvahiServiceBrowser* /*b*/,
-        AvahiIfIndex interface,
-        AvahiProtocol protocol,
-        AvahiBrowserEvent event,
-        const char* name,
-        const char* type,
-        const char* domain,
-        AvahiLookupResultFlags /*flags*/,
-        void* userdata) {
+    static void browse_callback(AvahiServiceBrowser* /*b*/,
+                                AvahiIfIndex interface,
+                                AvahiProtocol protocol,
+                                AvahiBrowserEvent event,
+                                const char* name,
+                                const char* type,
+                                const char* domain,
+                                AvahiLookupResultFlags /*flags*/,
+                                void* userdata) {
 
         auto* ctx = static_cast<BrowseContext*>(userdata);
 
         if (event == AVAHI_BROWSER_NEW) {
-            avahi_service_resolver_new(
-                ctx->client,
-                interface,
-                protocol,
-                name,
-                type,
-                domain,
-                AVAHI_PROTO_UNSPEC,
-                (AvahiLookupFlags)0,
-                resolve_callback,
-                userdata);
+            avahi_service_resolver_new(ctx->client,
+                                       interface,
+                                       protocol,
+                                       name,
+                                       type,
+                                       domain,
+                                       AVAHI_PROTO_UNSPEC,
+                                       (AvahiLookupFlags)0,
+                                       resolve_callback,
+                                       userdata);
         } else if (event == AVAHI_BROWSER_REMOVE) {
             std::lock_guard<std::mutex> lock(ctx->impl->results_mutex);
-            ctx->impl->results.erase(
-                std::remove_if(ctx->impl->results.begin(), ctx->impl->results.end(),
-                    [&](const DiscoveredHost& h) {
-                        return h.name == name;
-                    }),
-                ctx->impl->results.end()
-            );
-            
+            ctx->impl->results.erase(std::remove_if(ctx->impl->results.begin(),
+                                                    ctx->impl->results.end(),
+                                                    [&](const DiscoveredHost& h) { return h.name == name; }),
+                                     ctx->impl->results.end());
+
             if (ctx->impl->browse_callback) {
                 auto grouped = group_discovered_hosts(ctx->impl->results);
                 ctx->impl->browse_callback(grouped);
@@ -246,9 +245,7 @@ namespace tether {
 
     Discovery::Discovery() : impl_(std::make_unique<Impl>()) {}
 
-    Discovery::~Discovery() {
-        unpublish();
-    }
+    Discovery::~Discovery() { unpublish(); }
 
     Discovery::Discovery(Discovery&&) noexcept = default;
     Discovery& Discovery::operator=(Discovery&&) noexcept = default;
@@ -268,11 +265,7 @@ namespace tether {
 
         int error = 0;
         impl_->pub_client = avahi_client_new(
-            avahi_threaded_poll_get(impl_->pub_poll),
-            (AvahiClientFlags)0,
-            pub_client_callback,
-            impl_.get(),
-            &error);
+            avahi_threaded_poll_get(impl_->pub_poll), (AvahiClientFlags)0, pub_client_callback, impl_.get(), &error);
 
         if (!impl_->pub_client) {
             debug::log(ERR, "mDNS: Failed to create client: {}", avahi_strerror(error));
@@ -328,7 +321,7 @@ namespace tether {
         AvahiClient* client = avahi_client_new(
             avahi_threaded_poll_get(poll),
             (AvahiClientFlags)0,
-            [](AvahiClient*, AvahiClientState, void*) {},  // no-op callback
+            [](AvahiClient*, AvahiClientState, void*) {}, // no-op callback
             nullptr,
             &error);
 
@@ -340,15 +333,14 @@ namespace tether {
 
         BrowseContext ctx{impl_.get(), client};
 
-        AvahiServiceBrowser* browser = avahi_service_browser_new(
-            client,
-            AVAHI_IF_UNSPEC,
-            AVAHI_PROTO_UNSPEC,
-            SERVICE_TYPE,
-            nullptr, // domain (default .local)
-            (AvahiLookupFlags)0,
-            browse_callback,
-            &ctx);
+        AvahiServiceBrowser* browser = avahi_service_browser_new(client,
+                                                                 AVAHI_IF_UNSPEC,
+                                                                 AVAHI_PROTO_UNSPEC,
+                                                                 SERVICE_TYPE,
+                                                                 nullptr, // domain (default .local)
+                                                                 (AvahiLookupFlags)0,
+                                                                 browse_callback,
+                                                                 &ctx);
 
         if (!browser) {
             debug::log(ERR, "mDNS: Failed to create browser: {}", avahi_strerror(avahi_client_errno(client)));
@@ -372,20 +364,20 @@ namespace tether {
 
     void Discovery::start_continuous_browse(std::function<void(const std::vector<DiscoveredDevice>&)> callback) {
         stop_continuous_browse();
-        
+
         {
             std::lock_guard<std::mutex> lock(impl_->results_mutex);
             impl_->results.clear();
         }
-        
+
         impl_->browse_callback = std::move(callback);
-        
+
         impl_->browse_poll = avahi_threaded_poll_new();
         if (!impl_->browse_poll) {
             debug::log(ERR, "mDNS: Failed to create browse poll");
             return;
         }
-        
+
         int error = 0;
         impl_->browse_client = avahi_client_new(
             avahi_threaded_poll_get(impl_->browse_poll),
@@ -393,27 +385,26 @@ namespace tether {
             [](AvahiClient*, AvahiClientState, void*) {},
             nullptr,
             &error);
-            
+
         if (!impl_->browse_client) {
             avahi_threaded_poll_free(impl_->browse_poll);
             impl_->browse_poll = nullptr;
             return;
         }
-        
+
         // Allocate a dedicated context
         auto* ctx = new BrowseContext{impl_.get(), impl_->browse_client};
         impl_->browse_ctx = ctx;
-        
-        impl_->browse_browser = avahi_service_browser_new(
-            impl_->browse_client,
-            AVAHI_IF_UNSPEC,
-            AVAHI_PROTO_UNSPEC,
-            SERVICE_TYPE,
-            nullptr,
-            (AvahiLookupFlags)0,
-            browse_callback,
-            ctx);
-            
+
+        impl_->browse_browser = avahi_service_browser_new(impl_->browse_client,
+                                                          AVAHI_IF_UNSPEC,
+                                                          AVAHI_PROTO_UNSPEC,
+                                                          SERVICE_TYPE,
+                                                          nullptr,
+                                                          (AvahiLookupFlags)0,
+                                                          browse_callback,
+                                                          ctx);
+
         if (!impl_->browse_browser) {
             avahi_client_free(impl_->browse_client);
             avahi_threaded_poll_free(impl_->browse_poll);
@@ -422,22 +413,24 @@ namespace tether {
             delete ctx;
             return;
         }
-        
+
         avahi_threaded_poll_start(impl_->browse_poll);
     }
-    
+
     void Discovery::stop_continuous_browse() {
         if (impl_->browse_poll) {
             avahi_threaded_poll_stop(impl_->browse_poll);
-            if (impl_->browse_browser) avahi_service_browser_free(impl_->browse_browser);
-            if (impl_->browse_client) avahi_client_free(impl_->browse_client);
+            if (impl_->browse_browser)
+                avahi_service_browser_free(impl_->browse_browser);
+            if (impl_->browse_client)
+                avahi_client_free(impl_->browse_client);
             avahi_threaded_poll_free(impl_->browse_poll);
-            
+
             if (impl_->browse_ctx) {
                 delete static_cast<BrowseContext*>(impl_->browse_ctx);
                 impl_->browse_ctx = nullptr;
             }
-            
+
             impl_->browse_browser = nullptr;
             impl_->browse_client = nullptr;
             impl_->browse_poll = nullptr;
@@ -450,7 +443,7 @@ namespace tether {
     std::vector<DiscoveredDevice> group_discovered_hosts(const std::vector<DiscoveredHost>& hosts) {
         // Use fingerprint as the grouping key.  Maintain insertion order.
         std::vector<DiscoveredDevice> devices;
-        std::map<std::string, size_t> fp_index;  // fingerprint -> index into devices
+        std::map<std::string, size_t> fp_index; // fingerprint -> index into devices
 
         for (const auto& h : hosts) {
             std::string key = h.fingerprint.empty() ? ("__nokey__" + h.name) : h.fingerprint;
@@ -470,11 +463,11 @@ namespace tether {
 
         // Sort addresses within each device: IPv4 first (no ':'), then IPv6
         for (auto& dev : devices) {
-            std::stable_sort(dev.addresses.begin(), dev.addresses.end(),
-                [](const DiscoveredAddress& a, const DiscoveredAddress& b) {
+            std::stable_sort(
+                dev.addresses.begin(), dev.addresses.end(), [](const DiscoveredAddress& a, const DiscoveredAddress& b) {
                     bool a_v4 = a.address.find(':') == std::string::npos;
                     bool b_v4 = b.address.find(':') == std::string::npos;
-                    return a_v4 > b_v4;  // true (v4) sorts before false (v6)
+                    return a_v4 > b_v4; // true (v4) sorts before false (v6)
                 });
         }
 

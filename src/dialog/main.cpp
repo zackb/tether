@@ -1,9 +1,9 @@
-#include <gtk/gtk.h>
 #include <gtk-layer-shell.h>
+#include <gtk/gtk.h>
 
+#include "../core/include/tether/log.hpp"
 #include <cstdlib>
 #include <cstring>
-#include "../core/include/tether/log.hpp"
 #include <string>
 
 // Exit codes:
@@ -44,7 +44,9 @@ static gboolean on_key_press(GtkWidget*, GdkEventKey* event, gpointer has_reject
 }
 
 static void print_usage(const char* argv0) {
-    debug::log(ERR, "Usage: {} --title <text> --body <text> --accept <label> [--reject <label>] [--timeout <seconds>]\n", argv0);
+    debug::log(ERR,
+               "Usage: {} --title <text> --body <text> --accept <label> [--reject <label>] [--timeout <seconds>]\n",
+               argv0);
 }
 
 static const char* CSS = R"(
@@ -135,9 +137,7 @@ int main(int argc, char** argv) {
     GtkCssProvider* css_provider = gtk_css_provider_new();
     gtk_css_provider_load_from_data(css_provider, CSS, -1, NULL);
     gtk_style_context_add_provider_for_screen(
-        gdk_screen_get_default(),
-        GTK_STYLE_PROVIDER(css_provider),
-        GTK_STYLE_PROVIDER_PRIORITY_APPLICATION);
+        gdk_screen_get_default(), GTK_STYLE_PROVIDER(css_provider), GTK_STYLE_PROVIDER_PRIORITY_APPLICATION);
     g_object_unref(css_provider);
 
     // Create window

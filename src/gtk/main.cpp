@@ -8,7 +8,6 @@
 #include <cstdlib>
 #include <ctime>
 #include <filesystem>
-#include <tether/log.hpp>
 #include <string>
 #include <sys/socket.h>
 #include <sys/un.h>
@@ -16,6 +15,7 @@
 #include <tether/core.hpp>
 #include <tether/crypto.hpp>
 #include <tether/discovery.hpp>
+#include <tether/log.hpp>
 #include <tether/net.hpp>
 #include <unistd.h>
 #include <vector>
@@ -180,7 +180,9 @@ namespace {
             GtkWidget* box = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, 0);
             gtk_container_set_border_width(GTK_CONTAINER(box), 8);
             GtkWidget* lbl = gtk_label_new(nullptr);
-            gtk_label_set_markup(GTK_LABEL(lbl), ("<b><span size='small' color='gray'>" + escape_markup(title_text) + "</span></b>").c_str());
+            gtk_label_set_markup(
+                GTK_LABEL(lbl),
+                ("<b><span size='small' color='gray'>" + escape_markup(title_text) + "</span></b>").c_str());
             gtk_label_set_xalign(GTK_LABEL(lbl), 0.0);
             gtk_box_pack_start(GTK_BOX(box), lbl, TRUE, TRUE, 0);
             gtk_container_add(GTK_CONTAINER(row), box);
@@ -249,20 +251,23 @@ namespace {
             GtkWidget* r = create_row(req.name, req.fingerprint, ip, port, false, false);
             discovered_rows.push_back(r);
         }
-        
+
         if (!connected_rows.empty()) {
             gtk_list_box_insert(GTK_LIST_BOX(g_app.list_devices), create_header_row("CONNECTED"), -1);
-            for (auto* r : connected_rows) gtk_list_box_insert(GTK_LIST_BOX(g_app.list_devices), r, -1);
+            for (auto* r : connected_rows)
+                gtk_list_box_insert(GTK_LIST_BOX(g_app.list_devices), r, -1);
         }
-        
+
         if (!remembered_rows.empty()) {
             gtk_list_box_insert(GTK_LIST_BOX(g_app.list_devices), create_header_row("REMEMBERED"), -1);
-            for (auto* r : remembered_rows) gtk_list_box_insert(GTK_LIST_BOX(g_app.list_devices), r, -1);
+            for (auto* r : remembered_rows)
+                gtk_list_box_insert(GTK_LIST_BOX(g_app.list_devices), r, -1);
         }
-        
+
         if (!discovered_rows.empty()) {
             gtk_list_box_insert(GTK_LIST_BOX(g_app.list_devices), create_header_row("DISCOVERED"), -1);
-            for (auto* r : discovered_rows) gtk_list_box_insert(GTK_LIST_BOX(g_app.list_devices), r, -1);
+            for (auto* r : discovered_rows)
+                gtk_list_box_insert(GTK_LIST_BOX(g_app.list_devices), r, -1);
         }
 
         gtk_widget_show_all(g_app.list_devices);
@@ -615,9 +620,12 @@ namespace {
                     std::filesystem::path self_path = std::filesystem::read_symlink("/proc/self/exe");
                     std::string daemon_path = (self_path.parent_path() / "tetherd").string();
                     if (fork() == 0) {
-                        if (freopen("/dev/null", "w", stdout) == nullptr) {}
-                        if (freopen("/dev/null", "w", stderr) == nullptr) {}
-                        if (freopen("/dev/null", "r", stdin) == nullptr) {}
+                        if (freopen("/dev/null", "w", stdout) == nullptr) {
+                        }
+                        if (freopen("/dev/null", "w", stderr) == nullptr) {
+                        }
+                        if (freopen("/dev/null", "r", stdin) == nullptr) {
+                        }
                         execl(daemon_path.c_str(), "tetherd", nullptr);
                         execlp("tetherd", "tetherd", nullptr);
                         exit(1);
@@ -738,12 +746,15 @@ namespace {
         gtk_box_pack_start(GTK_BOX(btn_grid), btn_send_file, FALSE, FALSE, 0);
 
         GtkWidget* btn_send_clip = gtk_button_new_with_label("Send Clipboard");
-        g_signal_connect(btn_send_clip, "clicked", G_CALLBACK(+[](GtkWidget*, gpointer) {
-            nlohmann::json j;
-            j["command"] = "clipboard_set"; // triggers clipboard send
-            send_async_daemon_message(j);
-            set_status_action("Clipboard sync requested...");
-        }), nullptr);
+        g_signal_connect(btn_send_clip,
+                         "clicked",
+                         G_CALLBACK(+[](GtkWidget*, gpointer) {
+                             nlohmann::json j;
+                             j["command"] = "clipboard_set"; // triggers clipboard send
+                             send_async_daemon_message(j);
+                             set_status_action("Clipboard sync requested...");
+                         }),
+                         nullptr);
         gtk_box_pack_start(GTK_BOX(btn_grid), btn_send_clip, FALSE, FALSE, 0);
 
         gtk_box_pack_start(GTK_BOX(action_box), btn_grid, FALSE, FALSE, 0);

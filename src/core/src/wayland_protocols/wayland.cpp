@@ -29,7 +29,7 @@
     ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
     CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
     SOFTWARE.
-  
+
 */
 
 #define private public
@@ -38,7 +38,7 @@
 #undef private
 #define F std::function
 
-static const wl_interface* wayland_dummyTypes[] = { nullptr };
+static const wl_interface* wayland_dummyTypes[] = {nullptr};
 
 // Reference all other interfaces.
 // The reason why this is in snake is to
@@ -89,7 +89,8 @@ wl_proxy* CCWlDisplay::sendSync() {
     if (!pResource)
         return nullptr;
 
-    auto proxy = wl_proxy_marshal_flags(pResource, 0, &wl_callback_interface, wl_proxy_get_version(pResource), 0, nullptr);
+    auto proxy =
+        wl_proxy_marshal_flags(pResource, 0, &wl_callback_interface, wl_proxy_get_version(pResource), 0, nullptr);
 
     return proxy;
 }
@@ -98,7 +99,8 @@ wl_proxy* CCWlDisplay::sendGetRegistry() {
     if (!pResource)
         return nullptr;
 
-    auto proxy = wl_proxy_marshal_flags(pResource, 1, &wl_registry_interface, wl_proxy_get_version(pResource), 0, nullptr);
+    auto proxy =
+        wl_proxy_marshal_flags(pResource, 1, &wl_registry_interface, wl_proxy_get_version(pResource), 0, nullptr);
 
     return proxy;
 }
@@ -118,19 +120,22 @@ static const wl_interface* _CWlDisplayDeleteIdTypes[] = {
 };
 
 static const wl_message _CWlDisplayRequests[] = {
-    { .name = "sync", .signature = "n", .types = _CWlDisplaySyncTypes + 0},
-    { .name = "get_registry", .signature = "n", .types = _CWlDisplayGetRegistryTypes + 0},
+    {.name = "sync", .signature = "n", .types = _CWlDisplaySyncTypes + 0},
+    {.name = "get_registry", .signature = "n", .types = _CWlDisplayGetRegistryTypes + 0},
 };
 
 static const wl_message _CWlDisplayEvents[] = {
-    { .name = "error", .signature = "ous", .types = _CWlDisplayErrorTypes + 0},
-    { .name = "delete_id", .signature = "u", .types = _CWlDisplayDeleteIdTypes + 0},
+    {.name = "error", .signature = "ous", .types = _CWlDisplayErrorTypes + 0},
+    {.name = "delete_id", .signature = "u", .types = _CWlDisplayDeleteIdTypes + 0},
 };
 
 const wl_interface wl_display_interface = {
-    .name = "wl_display", .version = 1,
-    .method_count = 2, .methods = _CWlDisplayRequests,
-    .event_count = 2, .events = _CWlDisplayEvents,
+    .name = "wl_display",
+    .version = 1,
+    .method_count = 2,
+    .methods = _CWlDisplayRequests,
+    .event_count = 2,
+    .events = _CWlDisplayEvents,
 };
 
 CCWlDisplay::CCWlDisplay(wl_proxy* resource) : pResource(resource) {
@@ -150,9 +155,7 @@ void CCWlDisplay::setError(F<void(CCWlDisplay*, wl_proxy*, uint32_t, const char*
     requests.error = handler;
 }
 
-void CCWlDisplay::setDeleteId(F<void(CCWlDisplay*, uint32_t)> handler) {
-    requests.deleteId = handler;
-}
+void CCWlDisplay::setDeleteId(F<void(CCWlDisplay*, uint32_t)> handler) { requests.deleteId = handler; }
 
 static void _CWlRegistryGlobal(void* data, void* resource, uint32_t name, const char* interface, uint32_t version) {
     const auto PO = (CCWlRegistry*)data;
@@ -192,18 +195,21 @@ static const wl_interface* _CWlRegistryGlobalRemoveTypes[] = {
 };
 
 static const wl_message _CWlRegistryRequests[] = {
-    { .name = "bind", .signature = "usun", .types = _CWlRegistryBindTypes + 0},
+    {.name = "bind", .signature = "usun", .types = _CWlRegistryBindTypes + 0},
 };
 
 static const wl_message _CWlRegistryEvents[] = {
-    { .name = "global", .signature = "usu", .types = _CWlRegistryGlobalTypes + 0},
-    { .name = "global_remove", .signature = "u", .types = _CWlRegistryGlobalRemoveTypes + 0},
+    {.name = "global", .signature = "usu", .types = _CWlRegistryGlobalTypes + 0},
+    {.name = "global_remove", .signature = "u", .types = _CWlRegistryGlobalRemoveTypes + 0},
 };
 
 const wl_interface wl_registry_interface = {
-    .name = "wl_registry", .version = 1,
-    .method_count = 1, .methods = _CWlRegistryRequests,
-    .event_count = 2, .events = _CWlRegistryEvents,
+    .name = "wl_registry",
+    .version = 1,
+    .method_count = 1,
+    .methods = _CWlRegistryRequests,
+    .event_count = 2,
+    .events = _CWlRegistryEvents,
 };
 
 CCWlRegistry::CCWlRegistry(wl_proxy* resource) : pResource(resource) {
@@ -223,9 +229,7 @@ void CCWlRegistry::setGlobal(F<void(CCWlRegistry*, uint32_t, const char*, uint32
     requests.global = handler;
 }
 
-void CCWlRegistry::setGlobalRemove(F<void(CCWlRegistry*, uint32_t)> handler) {
-    requests.globalRemove = handler;
-}
+void CCWlRegistry::setGlobalRemove(F<void(CCWlRegistry*, uint32_t)> handler) { requests.globalRemove = handler; }
 
 static void _CWlCallbackDone(void* data, void* resource, uint32_t callback_data) {
     const auto PO = (CCWlCallback*)data;
@@ -241,13 +245,16 @@ static const wl_interface* _CWlCallbackDoneTypes[] = {
 };
 
 static const wl_message _CWlCallbackEvents[] = {
-    { .name = "done", .signature = "u", .types = _CWlCallbackDoneTypes + 0},
+    {.name = "done", .signature = "u", .types = _CWlCallbackDoneTypes + 0},
 };
 
 const wl_interface wl_callback_interface = {
-    .name = "wl_callback", .version = 1,
-    .method_count = 0, .methods = nullptr,
-    .event_count = 1, .events = _CWlCallbackEvents,
+    .name = "wl_callback",
+    .version = 1,
+    .method_count = 0,
+    .methods = nullptr,
+    .event_count = 1,
+    .events = _CWlCallbackEvents,
 };
 
 CCWlCallback::CCWlCallback(wl_proxy* resource) : pResource(resource) {
@@ -263,9 +270,7 @@ CCWlCallback::~CCWlCallback() {
         wl_proxy_destroy(pResource);
 }
 
-void CCWlCallback::setDone(F<void(CCWlCallback*, uint32_t)> handler) {
-    requests.done = handler;
-}
+void CCWlCallback::setDone(F<void(CCWlCallback*, uint32_t)> handler) { requests.done = handler; }
 
 static const void* _CCWlCompositorVTable[] = {
     nullptr,
@@ -275,7 +280,8 @@ wl_proxy* CCWlCompositor::sendCreateSurface() {
     if (!pResource)
         return nullptr;
 
-    auto proxy = wl_proxy_marshal_flags(pResource, 0, &wl_surface_interface, wl_proxy_get_version(pResource), 0, nullptr);
+    auto proxy =
+        wl_proxy_marshal_flags(pResource, 0, &wl_surface_interface, wl_proxy_get_version(pResource), 0, nullptr);
 
     return proxy;
 }
@@ -284,7 +290,8 @@ wl_proxy* CCWlCompositor::sendCreateRegion() {
     if (!pResource)
         return nullptr;
 
-    auto proxy = wl_proxy_marshal_flags(pResource, 1, &wl_region_interface, wl_proxy_get_version(pResource), 0, nullptr);
+    auto proxy =
+        wl_proxy_marshal_flags(pResource, 1, &wl_region_interface, wl_proxy_get_version(pResource), 0, nullptr);
 
     return proxy;
 }
@@ -296,14 +303,17 @@ static const wl_interface* _CWlCompositorCreateRegionTypes[] = {
 };
 
 static const wl_message _CWlCompositorRequests[] = {
-    { .name = "create_surface", .signature = "n", .types = _CWlCompositorCreateSurfaceTypes + 0},
-    { .name = "create_region", .signature = "n", .types = _CWlCompositorCreateRegionTypes + 0},
+    {.name = "create_surface", .signature = "n", .types = _CWlCompositorCreateSurfaceTypes + 0},
+    {.name = "create_region", .signature = "n", .types = _CWlCompositorCreateRegionTypes + 0},
 };
 
 const wl_interface wl_compositor_interface = {
-    .name = "wl_compositor", .version = 6,
-    .method_count = 2, .methods = _CWlCompositorRequests,
-    .event_count = 0, .events = nullptr,
+    .name = "wl_compositor",
+    .version = 6,
+    .method_count = 2,
+    .methods = _CWlCompositorRequests,
+    .event_count = 0,
+    .events = nullptr,
 };
 
 CCWlCompositor::CCWlCompositor(wl_proxy* resource) : pResource(resource) {
@@ -323,11 +333,22 @@ static const void* _CCWlShmPoolVTable[] = {
     nullptr,
 };
 
-wl_proxy* CCWlShmPool::sendCreateBuffer(int32_t offset, int32_t width, int32_t height, int32_t stride, uint32_t format) {
+wl_proxy*
+    CCWlShmPool::sendCreateBuffer(int32_t offset, int32_t width, int32_t height, int32_t stride, uint32_t format) {
     if (!pResource)
         return nullptr;
 
-    auto proxy = wl_proxy_marshal_flags(pResource, 0, &wl_buffer_interface, wl_proxy_get_version(pResource), 0, nullptr, offset, width, height, stride, format);
+    auto proxy = wl_proxy_marshal_flags(pResource,
+                                        0,
+                                        &wl_buffer_interface,
+                                        wl_proxy_get_version(pResource),
+                                        0,
+                                        nullptr,
+                                        offset,
+                                        width,
+                                        height,
+                                        stride,
+                                        format);
 
     return proxy;
 }
@@ -361,15 +382,18 @@ static const wl_interface* _CWlShmPoolResizeTypes[] = {
 };
 
 static const wl_message _CWlShmPoolRequests[] = {
-    { .name = "create_buffer", .signature = "niiiiu", .types = _CWlShmPoolCreateBufferTypes + 0},
-    { .name = "destroy", .signature = "", .types = wayland_dummyTypes + 0},
-    { .name = "resize", .signature = "i", .types = _CWlShmPoolResizeTypes + 0},
+    {.name = "create_buffer", .signature = "niiiiu", .types = _CWlShmPoolCreateBufferTypes + 0},
+    {.name = "destroy", .signature = "", .types = wayland_dummyTypes + 0},
+    {.name = "resize", .signature = "i", .types = _CWlShmPoolResizeTypes + 0},
 };
 
 const wl_interface wl_shm_pool_interface = {
-    .name = "wl_shm_pool", .version = 2,
-    .method_count = 3, .methods = _CWlShmPoolRequests,
-    .event_count = 0, .events = nullptr,
+    .name = "wl_shm_pool",
+    .version = 2,
+    .method_count = 3,
+    .methods = _CWlShmPoolRequests,
+    .event_count = 0,
+    .events = nullptr,
 };
 
 CCWlShmPool::CCWlShmPool(wl_proxy* resource) : pResource(resource) {
@@ -399,7 +423,8 @@ wl_proxy* CCWlShm::sendCreatePool(int32_t fd, int32_t size) {
     if (!pResource)
         return nullptr;
 
-    auto proxy = wl_proxy_marshal_flags(pResource, 0, &wl_shm_pool_interface, wl_proxy_get_version(pResource), 0, nullptr, fd, size);
+    auto proxy = wl_proxy_marshal_flags(
+        pResource, 0, &wl_shm_pool_interface, wl_proxy_get_version(pResource), 0, nullptr, fd, size);
 
     return proxy;
 }
@@ -422,18 +447,21 @@ static const wl_interface* _CWlShmFormatTypes[] = {
 };
 
 static const wl_message _CWlShmRequests[] = {
-    { .name = "create_pool", .signature = "nhi", .types = _CWlShmCreatePoolTypes + 0},
-    { .name = "release", .signature = "2", .types = wayland_dummyTypes + 0},
+    {.name = "create_pool", .signature = "nhi", .types = _CWlShmCreatePoolTypes + 0},
+    {.name = "release", .signature = "2", .types = wayland_dummyTypes + 0},
 };
 
 static const wl_message _CWlShmEvents[] = {
-    { .name = "format", .signature = "u", .types = _CWlShmFormatTypes + 0},
+    {.name = "format", .signature = "u", .types = _CWlShmFormatTypes + 0},
 };
 
 const wl_interface wl_shm_interface = {
-    .name = "wl_shm", .version = 2,
-    .method_count = 2, .methods = _CWlShmRequests,
-    .event_count = 1, .events = _CWlShmEvents,
+    .name = "wl_shm",
+    .version = 2,
+    .method_count = 2,
+    .methods = _CWlShmRequests,
+    .event_count = 1,
+    .events = _CWlShmEvents,
 };
 
 CCWlShm::CCWlShm(wl_proxy* resource) : pResource(resource) {
@@ -449,9 +477,7 @@ CCWlShm::~CCWlShm() {
         sendRelease();
 }
 
-void CCWlShm::setFormat(F<void(CCWlShm*, enum wl_shm_format)> handler) {
-    requests.format = handler;
-}
+void CCWlShm::setFormat(F<void(CCWlShm*, enum wl_shm_format)> handler) { requests.format = handler; }
 
 static void _CWlBufferRelease(void* data, void* resource) {
     const auto PO = (CCWlBuffer*)data;
@@ -473,17 +499,20 @@ void CCWlBuffer::sendDestroy() {
 }
 
 static const wl_message _CWlBufferRequests[] = {
-    { .name = "destroy", .signature = "", .types = wayland_dummyTypes + 0},
+    {.name = "destroy", .signature = "", .types = wayland_dummyTypes + 0},
 };
 
 static const wl_message _CWlBufferEvents[] = {
-    { .name = "release", .signature = "", .types = wayland_dummyTypes + 0},
+    {.name = "release", .signature = "", .types = wayland_dummyTypes + 0},
 };
 
 const wl_interface wl_buffer_interface = {
-    .name = "wl_buffer", .version = 1,
-    .method_count = 1, .methods = _CWlBufferRequests,
-    .event_count = 1, .events = _CWlBufferEvents,
+    .name = "wl_buffer",
+    .version = 1,
+    .method_count = 1,
+    .methods = _CWlBufferRequests,
+    .event_count = 1,
+    .events = _CWlBufferEvents,
 };
 
 CCWlBuffer::CCWlBuffer(wl_proxy* resource) : pResource(resource) {
@@ -499,9 +528,7 @@ CCWlBuffer::~CCWlBuffer() {
         sendDestroy();
 }
 
-void CCWlBuffer::setRelease(F<void(CCWlBuffer*)> handler) {
-    requests.release = handler;
-}
+void CCWlBuffer::setRelease(F<void(CCWlBuffer*)> handler) { requests.release = handler; }
 
 static void _CWlDataOfferOffer(void* data, void* resource, const char* mime_type) {
     const auto PO = (CCWlDataOffer*)data;
@@ -564,7 +591,8 @@ void CCWlDataOffer::sendSetActions(uint32_t dnd_actions, uint32_t preferred_acti
     if (!pResource)
         return;
 
-    auto proxy = wl_proxy_marshal_flags(pResource, 4, nullptr, wl_proxy_get_version(pResource), 0, dnd_actions, preferred_action);
+    auto proxy = wl_proxy_marshal_flags(
+        pResource, 4, nullptr, wl_proxy_get_version(pResource), 0, dnd_actions, preferred_action);
     proxy;
 }
 static const wl_interface* _CWlDataOfferAcceptTypes[] = {
@@ -590,23 +618,26 @@ static const wl_interface* _CWlDataOfferActionTypes[] = {
 };
 
 static const wl_message _CWlDataOfferRequests[] = {
-    { .name = "accept", .signature = "u?s", .types = _CWlDataOfferAcceptTypes + 0},
-    { .name = "receive", .signature = "sh", .types = _CWlDataOfferReceiveTypes + 0},
-    { .name = "destroy", .signature = "", .types = wayland_dummyTypes + 0},
-    { .name = "finish", .signature = "3", .types = wayland_dummyTypes + 0},
-    { .name = "set_actions", .signature = "3uu", .types = _CWlDataOfferSetActionsTypes + 0},
+    {.name = "accept", .signature = "u?s", .types = _CWlDataOfferAcceptTypes + 0},
+    {.name = "receive", .signature = "sh", .types = _CWlDataOfferReceiveTypes + 0},
+    {.name = "destroy", .signature = "", .types = wayland_dummyTypes + 0},
+    {.name = "finish", .signature = "3", .types = wayland_dummyTypes + 0},
+    {.name = "set_actions", .signature = "3uu", .types = _CWlDataOfferSetActionsTypes + 0},
 };
 
 static const wl_message _CWlDataOfferEvents[] = {
-    { .name = "offer", .signature = "s", .types = _CWlDataOfferOfferTypes + 0},
-    { .name = "source_actions", .signature = "3u", .types = _CWlDataOfferSourceActionsTypes + 0},
-    { .name = "action", .signature = "3u", .types = _CWlDataOfferActionTypes + 0},
+    {.name = "offer", .signature = "s", .types = _CWlDataOfferOfferTypes + 0},
+    {.name = "source_actions", .signature = "3u", .types = _CWlDataOfferSourceActionsTypes + 0},
+    {.name = "action", .signature = "3u", .types = _CWlDataOfferActionTypes + 0},
 };
 
 const wl_interface wl_data_offer_interface = {
-    .name = "wl_data_offer", .version = 3,
-    .method_count = 5, .methods = _CWlDataOfferRequests,
-    .event_count = 3, .events = _CWlDataOfferEvents,
+    .name = "wl_data_offer",
+    .version = 3,
+    .method_count = 5,
+    .methods = _CWlDataOfferRequests,
+    .event_count = 3,
+    .events = _CWlDataOfferEvents,
 };
 
 CCWlDataOffer::CCWlDataOffer(wl_proxy* resource) : pResource(resource) {
@@ -622,17 +653,11 @@ CCWlDataOffer::~CCWlDataOffer() {
         sendDestroy();
 }
 
-void CCWlDataOffer::setOffer(F<void(CCWlDataOffer*, const char*)> handler) {
-    requests.offer = handler;
-}
+void CCWlDataOffer::setOffer(F<void(CCWlDataOffer*, const char*)> handler) { requests.offer = handler; }
 
-void CCWlDataOffer::setSourceActions(F<void(CCWlDataOffer*, uint32_t)> handler) {
-    requests.sourceActions = handler;
-}
+void CCWlDataOffer::setSourceActions(F<void(CCWlDataOffer*, uint32_t)> handler) { requests.sourceActions = handler; }
 
-void CCWlDataOffer::setAction(F<void(CCWlDataOffer*, uint32_t)> handler) {
-    requests.action = handler;
-}
+void CCWlDataOffer::setAction(F<void(CCWlDataOffer*, uint32_t)> handler) { requests.action = handler; }
 
 static void _CWlDataSourceTarget(void* data, void* resource, const char* mime_type) {
     const auto PO = (CCWlDataSource*)data;
@@ -721,24 +746,27 @@ static const wl_interface* _CWlDataSourceActionTypes[] = {
 };
 
 static const wl_message _CWlDataSourceRequests[] = {
-    { .name = "offer", .signature = "s", .types = _CWlDataSourceOfferTypes + 0},
-    { .name = "destroy", .signature = "", .types = wayland_dummyTypes + 0},
-    { .name = "set_actions", .signature = "3u", .types = _CWlDataSourceSetActionsTypes + 0},
+    {.name = "offer", .signature = "s", .types = _CWlDataSourceOfferTypes + 0},
+    {.name = "destroy", .signature = "", .types = wayland_dummyTypes + 0},
+    {.name = "set_actions", .signature = "3u", .types = _CWlDataSourceSetActionsTypes + 0},
 };
 
 static const wl_message _CWlDataSourceEvents[] = {
-    { .name = "target", .signature = "?s", .types = _CWlDataSourceTargetTypes + 0},
-    { .name = "send", .signature = "sh", .types = _CWlDataSourceSendTypes + 0},
-    { .name = "cancelled", .signature = "", .types = wayland_dummyTypes + 0},
-    { .name = "dnd_drop_performed", .signature = "3", .types = wayland_dummyTypes + 0},
-    { .name = "dnd_finished", .signature = "3", .types = wayland_dummyTypes + 0},
-    { .name = "action", .signature = "3u", .types = _CWlDataSourceActionTypes + 0},
+    {.name = "target", .signature = "?s", .types = _CWlDataSourceTargetTypes + 0},
+    {.name = "send", .signature = "sh", .types = _CWlDataSourceSendTypes + 0},
+    {.name = "cancelled", .signature = "", .types = wayland_dummyTypes + 0},
+    {.name = "dnd_drop_performed", .signature = "3", .types = wayland_dummyTypes + 0},
+    {.name = "dnd_finished", .signature = "3", .types = wayland_dummyTypes + 0},
+    {.name = "action", .signature = "3u", .types = _CWlDataSourceActionTypes + 0},
 };
 
 const wl_interface wl_data_source_interface = {
-    .name = "wl_data_source", .version = 3,
-    .method_count = 3, .methods = _CWlDataSourceRequests,
-    .event_count = 6, .events = _CWlDataSourceEvents,
+    .name = "wl_data_source",
+    .version = 3,
+    .method_count = 3,
+    .methods = _CWlDataSourceRequests,
+    .event_count = 6,
+    .events = _CWlDataSourceEvents,
 };
 
 CCWlDataSource::CCWlDataSource(wl_proxy* resource) : pResource(resource) {
@@ -754,29 +782,17 @@ CCWlDataSource::~CCWlDataSource() {
         sendDestroy();
 }
 
-void CCWlDataSource::setTarget(F<void(CCWlDataSource*, const char*)> handler) {
-    requests.target = handler;
-}
+void CCWlDataSource::setTarget(F<void(CCWlDataSource*, const char*)> handler) { requests.target = handler; }
 
-void CCWlDataSource::setSend(F<void(CCWlDataSource*, const char*, int32_t)> handler) {
-    requests.send = handler;
-}
+void CCWlDataSource::setSend(F<void(CCWlDataSource*, const char*, int32_t)> handler) { requests.send = handler; }
 
-void CCWlDataSource::setCancelled(F<void(CCWlDataSource*)> handler) {
-    requests.cancelled = handler;
-}
+void CCWlDataSource::setCancelled(F<void(CCWlDataSource*)> handler) { requests.cancelled = handler; }
 
-void CCWlDataSource::setDndDropPerformed(F<void(CCWlDataSource*)> handler) {
-    requests.dndDropPerformed = handler;
-}
+void CCWlDataSource::setDndDropPerformed(F<void(CCWlDataSource*)> handler) { requests.dndDropPerformed = handler; }
 
-void CCWlDataSource::setDndFinished(F<void(CCWlDataSource*)> handler) {
-    requests.dndFinished = handler;
-}
+void CCWlDataSource::setDndFinished(F<void(CCWlDataSource*)> handler) { requests.dndFinished = handler; }
 
-void CCWlDataSource::setAction(F<void(CCWlDataSource*, uint32_t)> handler) {
-    requests.action = handler;
-}
+void CCWlDataSource::setAction(F<void(CCWlDataSource*, uint32_t)> handler) { requests.action = handler; }
 
 static void _CWlDataDeviceDataOffer(void* data, void* resource, wl_proxy* id) {
     const auto PO = (CCWlDataDevice*)data;
@@ -784,7 +800,8 @@ static void _CWlDataDeviceDataOffer(void* data, void* resource, wl_proxy* id) {
         PO->requests.dataOffer(PO, id);
 }
 
-static void _CWlDataDeviceEnter(void* data, void* resource, uint32_t serial, wl_proxy* surface, wl_fixed_t x, wl_fixed_t y, wl_proxy* id) {
+static void _CWlDataDeviceEnter(
+    void* data, void* resource, uint32_t serial, wl_proxy* surface, wl_fixed_t x, wl_fixed_t y, wl_proxy* id) {
     const auto PO = (CCWlDataDevice*)data;
     if (PO && PO->requests.enter)
         PO->requests.enter(PO, serial, surface, x, y, id);
@@ -827,7 +844,15 @@ void CCWlDataDevice::sendStartDrag(CCWlDataSource* source, CCWlSurface* origin, 
     if (!pResource)
         return;
 
-    auto proxy = wl_proxy_marshal_flags(pResource, 0, nullptr, wl_proxy_get_version(pResource), 0, source ? source->pResource : nullptr, origin ? origin->pResource : nullptr, icon ? icon->pResource : nullptr, serial);
+    auto proxy = wl_proxy_marshal_flags(pResource,
+                                        0,
+                                        nullptr,
+                                        wl_proxy_get_version(pResource),
+                                        0,
+                                        source ? source->pResource : nullptr,
+                                        origin ? origin->pResource : nullptr,
+                                        icon ? icon->pResource : nullptr,
+                                        serial);
     proxy;
 }
 
@@ -835,7 +860,8 @@ void CCWlDataDevice::sendSetSelection(CCWlDataSource* source, uint32_t serial) {
     if (!pResource)
         return;
 
-    auto proxy = wl_proxy_marshal_flags(pResource, 1, nullptr, wl_proxy_get_version(pResource), 0, source ? source->pResource : nullptr, serial);
+    auto proxy = wl_proxy_marshal_flags(
+        pResource, 1, nullptr, wl_proxy_get_version(pResource), 0, source ? source->pResource : nullptr, serial);
     proxy;
 }
 
@@ -877,24 +903,27 @@ static const wl_interface* _CWlDataDeviceSelectionTypes[] = {
 };
 
 static const wl_message _CWlDataDeviceRequests[] = {
-    { .name = "start_drag", .signature = "?oo?ou", .types = _CWlDataDeviceStartDragTypes + 0},
-    { .name = "set_selection", .signature = "?ou", .types = _CWlDataDeviceSetSelectionTypes + 0},
-    { .name = "release", .signature = "2", .types = wayland_dummyTypes + 0},
+    {.name = "start_drag", .signature = "?oo?ou", .types = _CWlDataDeviceStartDragTypes + 0},
+    {.name = "set_selection", .signature = "?ou", .types = _CWlDataDeviceSetSelectionTypes + 0},
+    {.name = "release", .signature = "2", .types = wayland_dummyTypes + 0},
 };
 
 static const wl_message _CWlDataDeviceEvents[] = {
-    { .name = "data_offer", .signature = "n", .types = _CWlDataDeviceDataOfferTypes + 0},
-    { .name = "enter", .signature = "uoff?o", .types = _CWlDataDeviceEnterTypes + 0},
-    { .name = "leave", .signature = "", .types = wayland_dummyTypes + 0},
-    { .name = "motion", .signature = "uff", .types = _CWlDataDeviceMotionTypes + 0},
-    { .name = "drop", .signature = "", .types = wayland_dummyTypes + 0},
-    { .name = "selection", .signature = "?o", .types = _CWlDataDeviceSelectionTypes + 0},
+    {.name = "data_offer", .signature = "n", .types = _CWlDataDeviceDataOfferTypes + 0},
+    {.name = "enter", .signature = "uoff?o", .types = _CWlDataDeviceEnterTypes + 0},
+    {.name = "leave", .signature = "", .types = wayland_dummyTypes + 0},
+    {.name = "motion", .signature = "uff", .types = _CWlDataDeviceMotionTypes + 0},
+    {.name = "drop", .signature = "", .types = wayland_dummyTypes + 0},
+    {.name = "selection", .signature = "?o", .types = _CWlDataDeviceSelectionTypes + 0},
 };
 
 const wl_interface wl_data_device_interface = {
-    .name = "wl_data_device", .version = 3,
-    .method_count = 3, .methods = _CWlDataDeviceRequests,
-    .event_count = 6, .events = _CWlDataDeviceEvents,
+    .name = "wl_data_device",
+    .version = 3,
+    .method_count = 3,
+    .methods = _CWlDataDeviceRequests,
+    .event_count = 6,
+    .events = _CWlDataDeviceEvents,
 };
 
 CCWlDataDevice::CCWlDataDevice(wl_proxy* resource) : pResource(resource) {
@@ -910,29 +939,22 @@ CCWlDataDevice::~CCWlDataDevice() {
         sendRelease();
 }
 
-void CCWlDataDevice::setDataOffer(F<void(CCWlDataDevice*, wl_proxy*)> handler) {
-    requests.dataOffer = handler;
-}
+void CCWlDataDevice::setDataOffer(F<void(CCWlDataDevice*, wl_proxy*)> handler) { requests.dataOffer = handler; }
 
-void CCWlDataDevice::setEnter(F<void(CCWlDataDevice*, uint32_t, wl_proxy*, wl_fixed_t, wl_fixed_t, wl_proxy*)> handler) {
+void CCWlDataDevice::setEnter(
+    F<void(CCWlDataDevice*, uint32_t, wl_proxy*, wl_fixed_t, wl_fixed_t, wl_proxy*)> handler) {
     requests.enter = handler;
 }
 
-void CCWlDataDevice::setLeave(F<void(CCWlDataDevice*)> handler) {
-    requests.leave = handler;
-}
+void CCWlDataDevice::setLeave(F<void(CCWlDataDevice*)> handler) { requests.leave = handler; }
 
 void CCWlDataDevice::setMotion(F<void(CCWlDataDevice*, uint32_t, wl_fixed_t, wl_fixed_t)> handler) {
     requests.motion = handler;
 }
 
-void CCWlDataDevice::setDrop(F<void(CCWlDataDevice*)> handler) {
-    requests.drop = handler;
-}
+void CCWlDataDevice::setDrop(F<void(CCWlDataDevice*)> handler) { requests.drop = handler; }
 
-void CCWlDataDevice::setSelection(F<void(CCWlDataDevice*, wl_proxy*)> handler) {
-    requests.selection = handler;
-}
+void CCWlDataDevice::setSelection(F<void(CCWlDataDevice*, wl_proxy*)> handler) { requests.selection = handler; }
 
 static const void* _CCWlDataDeviceManagerVTable[] = {
     nullptr,
@@ -942,7 +964,8 @@ wl_proxy* CCWlDataDeviceManager::sendCreateDataSource() {
     if (!pResource)
         return nullptr;
 
-    auto proxy = wl_proxy_marshal_flags(pResource, 0, &wl_data_source_interface, wl_proxy_get_version(pResource), 0, nullptr);
+    auto proxy =
+        wl_proxy_marshal_flags(pResource, 0, &wl_data_source_interface, wl_proxy_get_version(pResource), 0, nullptr);
 
     return proxy;
 }
@@ -951,7 +974,13 @@ wl_proxy* CCWlDataDeviceManager::sendGetDataDevice(CCWlSeat* seat) {
     if (!pResource)
         return nullptr;
 
-    auto proxy = wl_proxy_marshal_flags(pResource, 1, &wl_data_device_interface, wl_proxy_get_version(pResource), 0, nullptr, seat ? seat->pResource : nullptr);
+    auto proxy = wl_proxy_marshal_flags(pResource,
+                                        1,
+                                        &wl_data_device_interface,
+                                        wl_proxy_get_version(pResource),
+                                        0,
+                                        nullptr,
+                                        seat ? seat->pResource : nullptr);
 
     return proxy;
 }
@@ -964,14 +993,17 @@ static const wl_interface* _CWlDataDeviceManagerGetDataDeviceTypes[] = {
 };
 
 static const wl_message _CWlDataDeviceManagerRequests[] = {
-    { .name = "create_data_source", .signature = "n", .types = _CWlDataDeviceManagerCreateDataSourceTypes + 0},
-    { .name = "get_data_device", .signature = "no", .types = _CWlDataDeviceManagerGetDataDeviceTypes + 0},
+    {.name = "create_data_source", .signature = "n", .types = _CWlDataDeviceManagerCreateDataSourceTypes + 0},
+    {.name = "get_data_device", .signature = "no", .types = _CWlDataDeviceManagerGetDataDeviceTypes + 0},
 };
 
 const wl_interface wl_data_device_manager_interface = {
-    .name = "wl_data_device_manager", .version = 3,
-    .method_count = 2, .methods = _CWlDataDeviceManagerRequests,
-    .event_count = 0, .events = nullptr,
+    .name = "wl_data_device_manager",
+    .version = 3,
+    .method_count = 2,
+    .methods = _CWlDataDeviceManagerRequests,
+    .event_count = 0,
+    .events = nullptr,
 };
 
 CCWlDataDeviceManager::CCWlDataDeviceManager(wl_proxy* resource) : pResource(resource) {
@@ -995,7 +1027,13 @@ wl_proxy* CCWlShell::sendGetShellSurface(CCWlSurface* surface) {
     if (!pResource)
         return nullptr;
 
-    auto proxy = wl_proxy_marshal_flags(pResource, 0, &wl_shell_surface_interface, wl_proxy_get_version(pResource), 0, nullptr, surface ? surface->pResource : nullptr);
+    auto proxy = wl_proxy_marshal_flags(pResource,
+                                        0,
+                                        &wl_shell_surface_interface,
+                                        wl_proxy_get_version(pResource),
+                                        0,
+                                        nullptr,
+                                        surface ? surface->pResource : nullptr);
 
     return proxy;
 }
@@ -1005,13 +1043,16 @@ static const wl_interface* _CWlShellGetShellSurfaceTypes[] = {
 };
 
 static const wl_message _CWlShellRequests[] = {
-    { .name = "get_shell_surface", .signature = "no", .types = _CWlShellGetShellSurfaceTypes + 0},
+    {.name = "get_shell_surface", .signature = "no", .types = _CWlShellGetShellSurfaceTypes + 0},
 };
 
 const wl_interface wl_shell_interface = {
-    .name = "wl_shell", .version = 1,
-    .method_count = 1, .methods = _CWlShellRequests,
-    .event_count = 0, .events = nullptr,
+    .name = "wl_shell",
+    .version = 1,
+    .method_count = 1,
+    .methods = _CWlShellRequests,
+    .event_count = 0,
+    .events = nullptr,
 };
 
 CCWlShell::CCWlShell(wl_proxy* resource) : pResource(resource) {
@@ -1033,7 +1074,8 @@ static void _CWlShellSurfacePing(void* data, void* resource, uint32_t serial) {
         PO->requests.ping(PO, serial);
 }
 
-static void _CWlShellSurfaceConfigure(void* data, void* resource, enum wl_shell_surface_resize edges, int32_t width, int32_t height) {
+static void _CWlShellSurfaceConfigure(
+    void* data, void* resource, enum wl_shell_surface_resize edges, int32_t width, int32_t height) {
     const auto PO = (CCWlShellSurface*)data;
     if (PO && PO->requests.configure)
         PO->requests.configure(PO, edges, width, height);
@@ -1063,7 +1105,8 @@ void CCWlShellSurface::sendMove(CCWlSeat* seat, uint32_t serial) {
     if (!pResource)
         return;
 
-    auto proxy = wl_proxy_marshal_flags(pResource, 1, nullptr, wl_proxy_get_version(pResource), 0, seat ? seat->pResource : nullptr, serial);
+    auto proxy = wl_proxy_marshal_flags(
+        pResource, 1, nullptr, wl_proxy_get_version(pResource), 0, seat ? seat->pResource : nullptr, serial);
     proxy;
 }
 
@@ -1071,7 +1114,8 @@ void CCWlShellSurface::sendResize(CCWlSeat* seat, uint32_t serial, enum wl_shell
     if (!pResource)
         return;
 
-    auto proxy = wl_proxy_marshal_flags(pResource, 2, nullptr, wl_proxy_get_version(pResource), 0, seat ? seat->pResource : nullptr, serial, edges);
+    auto proxy = wl_proxy_marshal_flags(
+        pResource, 2, nullptr, wl_proxy_get_version(pResource), 0, seat ? seat->pResource : nullptr, serial, edges);
     proxy;
 }
 
@@ -1083,27 +1127,51 @@ void CCWlShellSurface::sendSetToplevel() {
     proxy;
 }
 
-void CCWlShellSurface::sendSetTransient(CCWlSurface* parent, int32_t x, int32_t y, enum wl_shell_surface_transient flags) {
+void CCWlShellSurface::sendSetTransient(CCWlSurface* parent,
+                                        int32_t x,
+                                        int32_t y,
+                                        enum wl_shell_surface_transient flags) {
     if (!pResource)
         return;
 
-    auto proxy = wl_proxy_marshal_flags(pResource, 4, nullptr, wl_proxy_get_version(pResource), 0, parent ? parent->pResource : nullptr, x, y, flags);
+    auto proxy = wl_proxy_marshal_flags(
+        pResource, 4, nullptr, wl_proxy_get_version(pResource), 0, parent ? parent->pResource : nullptr, x, y, flags);
     proxy;
 }
 
-void CCWlShellSurface::sendSetFullscreen(enum wl_shell_surface_fullscreen_method method, uint32_t framerate, CCWlOutput* output) {
+void CCWlShellSurface::sendSetFullscreen(enum wl_shell_surface_fullscreen_method method,
+                                         uint32_t framerate,
+                                         CCWlOutput* output) {
     if (!pResource)
         return;
 
-    auto proxy = wl_proxy_marshal_flags(pResource, 5, nullptr, wl_proxy_get_version(pResource), 0, method, framerate, output ? output->pResource : nullptr);
+    auto proxy = wl_proxy_marshal_flags(pResource,
+                                        5,
+                                        nullptr,
+                                        wl_proxy_get_version(pResource),
+                                        0,
+                                        method,
+                                        framerate,
+                                        output ? output->pResource : nullptr);
     proxy;
 }
 
-void CCWlShellSurface::sendSetPopup(CCWlSeat* seat, uint32_t serial, CCWlSurface* parent, int32_t x, int32_t y, enum wl_shell_surface_transient flags) {
+void CCWlShellSurface::sendSetPopup(
+    CCWlSeat* seat, uint32_t serial, CCWlSurface* parent, int32_t x, int32_t y, enum wl_shell_surface_transient flags) {
     if (!pResource)
         return;
 
-    auto proxy = wl_proxy_marshal_flags(pResource, 6, nullptr, wl_proxy_get_version(pResource), 0, seat ? seat->pResource : nullptr, serial, parent ? parent->pResource : nullptr, x, y, flags);
+    auto proxy = wl_proxy_marshal_flags(pResource,
+                                        6,
+                                        nullptr,
+                                        wl_proxy_get_version(pResource),
+                                        0,
+                                        seat ? seat->pResource : nullptr,
+                                        serial,
+                                        parent ? parent->pResource : nullptr,
+                                        x,
+                                        y,
+                                        flags);
     proxy;
 }
 
@@ -1111,7 +1179,8 @@ void CCWlShellSurface::sendSetMaximized(CCWlOutput* output) {
     if (!pResource)
         return;
 
-    auto proxy = wl_proxy_marshal_flags(pResource, 7, nullptr, wl_proxy_get_version(pResource), 0, output ? output->pResource : nullptr);
+    auto proxy = wl_proxy_marshal_flags(
+        pResource, 7, nullptr, wl_proxy_get_version(pResource), 0, output ? output->pResource : nullptr);
     proxy;
 }
 
@@ -1180,28 +1249,31 @@ static const wl_interface* _CWlShellSurfaceConfigureTypes[] = {
 };
 
 static const wl_message _CWlShellSurfaceRequests[] = {
-    { .name = "pong", .signature = "u", .types = _CWlShellSurfacePongTypes + 0},
-    { .name = "move", .signature = "ou", .types = _CWlShellSurfaceMoveTypes + 0},
-    { .name = "resize", .signature = "ouu", .types = _CWlShellSurfaceResizeTypes + 0},
-    { .name = "set_toplevel", .signature = "", .types = wayland_dummyTypes + 0},
-    { .name = "set_transient", .signature = "oiiu", .types = _CWlShellSurfaceSetTransientTypes + 0},
-    { .name = "set_fullscreen", .signature = "uu?o", .types = _CWlShellSurfaceSetFullscreenTypes + 0},
-    { .name = "set_popup", .signature = "ouoiiu", .types = _CWlShellSurfaceSetPopupTypes + 0},
-    { .name = "set_maximized", .signature = "?o", .types = _CWlShellSurfaceSetMaximizedTypes + 0},
-    { .name = "set_title", .signature = "s", .types = _CWlShellSurfaceSetTitleTypes + 0},
-    { .name = "set_class", .signature = "s", .types = _CWlShellSurfaceSetClassTypes + 0},
+    {.name = "pong", .signature = "u", .types = _CWlShellSurfacePongTypes + 0},
+    {.name = "move", .signature = "ou", .types = _CWlShellSurfaceMoveTypes + 0},
+    {.name = "resize", .signature = "ouu", .types = _CWlShellSurfaceResizeTypes + 0},
+    {.name = "set_toplevel", .signature = "", .types = wayland_dummyTypes + 0},
+    {.name = "set_transient", .signature = "oiiu", .types = _CWlShellSurfaceSetTransientTypes + 0},
+    {.name = "set_fullscreen", .signature = "uu?o", .types = _CWlShellSurfaceSetFullscreenTypes + 0},
+    {.name = "set_popup", .signature = "ouoiiu", .types = _CWlShellSurfaceSetPopupTypes + 0},
+    {.name = "set_maximized", .signature = "?o", .types = _CWlShellSurfaceSetMaximizedTypes + 0},
+    {.name = "set_title", .signature = "s", .types = _CWlShellSurfaceSetTitleTypes + 0},
+    {.name = "set_class", .signature = "s", .types = _CWlShellSurfaceSetClassTypes + 0},
 };
 
 static const wl_message _CWlShellSurfaceEvents[] = {
-    { .name = "ping", .signature = "u", .types = _CWlShellSurfacePingTypes + 0},
-    { .name = "configure", .signature = "uii", .types = _CWlShellSurfaceConfigureTypes + 0},
-    { .name = "popup_done", .signature = "", .types = wayland_dummyTypes + 0},
+    {.name = "ping", .signature = "u", .types = _CWlShellSurfacePingTypes + 0},
+    {.name = "configure", .signature = "uii", .types = _CWlShellSurfaceConfigureTypes + 0},
+    {.name = "popup_done", .signature = "", .types = wayland_dummyTypes + 0},
 };
 
 const wl_interface wl_shell_surface_interface = {
-    .name = "wl_shell_surface", .version = 1,
-    .method_count = 10, .methods = _CWlShellSurfaceRequests,
-    .event_count = 3, .events = _CWlShellSurfaceEvents,
+    .name = "wl_shell_surface",
+    .version = 1,
+    .method_count = 10,
+    .methods = _CWlShellSurfaceRequests,
+    .event_count = 3,
+    .events = _CWlShellSurfaceEvents,
 };
 
 CCWlShellSurface::CCWlShellSurface(wl_proxy* resource) : pResource(resource) {
@@ -1217,17 +1289,14 @@ CCWlShellSurface::~CCWlShellSurface() {
         wl_proxy_destroy(pResource);
 }
 
-void CCWlShellSurface::setPing(F<void(CCWlShellSurface*, uint32_t)> handler) {
-    requests.ping = handler;
-}
+void CCWlShellSurface::setPing(F<void(CCWlShellSurface*, uint32_t)> handler) { requests.ping = handler; }
 
-void CCWlShellSurface::setConfigure(F<void(CCWlShellSurface*, enum wl_shell_surface_resize, int32_t, int32_t)> handler) {
+void CCWlShellSurface::setConfigure(
+    F<void(CCWlShellSurface*, enum wl_shell_surface_resize, int32_t, int32_t)> handler) {
     requests.configure = handler;
 }
 
-void CCWlShellSurface::setPopupDone(F<void(CCWlShellSurface*)> handler) {
-    requests.popupDone = handler;
-}
+void CCWlShellSurface::setPopupDone(F<void(CCWlShellSurface*)> handler) { requests.popupDone = handler; }
 
 static void _CWlSurfaceEnter(void* data, void* resource, wl_proxy* output) {
     const auto PO = (CCWlSurface*)data;
@@ -1273,7 +1342,8 @@ void CCWlSurface::sendAttach(CCWlBuffer* buffer, int32_t x, int32_t y) {
     if (!pResource)
         return;
 
-    auto proxy = wl_proxy_marshal_flags(pResource, 1, nullptr, wl_proxy_get_version(pResource), 0, buffer ? buffer->pResource : nullptr, x, y);
+    auto proxy = wl_proxy_marshal_flags(
+        pResource, 1, nullptr, wl_proxy_get_version(pResource), 0, buffer ? buffer->pResource : nullptr, x, y);
     proxy;
 }
 
@@ -1289,7 +1359,8 @@ wl_proxy* CCWlSurface::sendFrame() {
     if (!pResource)
         return nullptr;
 
-    auto proxy = wl_proxy_marshal_flags(pResource, 3, &wl_callback_interface, wl_proxy_get_version(pResource), 0, nullptr);
+    auto proxy =
+        wl_proxy_marshal_flags(pResource, 3, &wl_callback_interface, wl_proxy_get_version(pResource), 0, nullptr);
 
     return proxy;
 }
@@ -1298,7 +1369,8 @@ void CCWlSurface::sendSetOpaqueRegion(CCWlRegion* region) {
     if (!pResource)
         return;
 
-    auto proxy = wl_proxy_marshal_flags(pResource, 4, nullptr, wl_proxy_get_version(pResource), 0, region ? region->pResource : nullptr);
+    auto proxy = wl_proxy_marshal_flags(
+        pResource, 4, nullptr, wl_proxy_get_version(pResource), 0, region ? region->pResource : nullptr);
     proxy;
 }
 
@@ -1306,7 +1378,8 @@ void CCWlSurface::sendSetInputRegion(CCWlRegion* region) {
     if (!pResource)
         return;
 
-    auto proxy = wl_proxy_marshal_flags(pResource, 5, nullptr, wl_proxy_get_version(pResource), 0, region ? region->pResource : nullptr);
+    auto proxy = wl_proxy_marshal_flags(
+        pResource, 5, nullptr, wl_proxy_get_version(pResource), 0, region ? region->pResource : nullptr);
     proxy;
 }
 
@@ -1399,30 +1472,33 @@ static const wl_interface* _CWlSurfacePreferredBufferTransformTypes[] = {
 };
 
 static const wl_message _CWlSurfaceRequests[] = {
-    { .name = "destroy", .signature = "", .types = wayland_dummyTypes + 0},
-    { .name = "attach", .signature = "?oii", .types = _CWlSurfaceAttachTypes + 0},
-    { .name = "damage", .signature = "iiii", .types = _CWlSurfaceDamageTypes + 0},
-    { .name = "frame", .signature = "n", .types = _CWlSurfaceFrameTypes + 0},
-    { .name = "set_opaque_region", .signature = "?o", .types = _CWlSurfaceSetOpaqueRegionTypes + 0},
-    { .name = "set_input_region", .signature = "?o", .types = _CWlSurfaceSetInputRegionTypes + 0},
-    { .name = "commit", .signature = "", .types = wayland_dummyTypes + 0},
-    { .name = "set_buffer_transform", .signature = "2i", .types = _CWlSurfaceSetBufferTransformTypes + 0},
-    { .name = "set_buffer_scale", .signature = "3i", .types = _CWlSurfaceSetBufferScaleTypes + 0},
-    { .name = "damage_buffer", .signature = "4iiii", .types = _CWlSurfaceDamageBufferTypes + 0},
-    { .name = "offset", .signature = "5ii", .types = _CWlSurfaceOffsetTypes + 0},
+    {.name = "destroy", .signature = "", .types = wayland_dummyTypes + 0},
+    {.name = "attach", .signature = "?oii", .types = _CWlSurfaceAttachTypes + 0},
+    {.name = "damage", .signature = "iiii", .types = _CWlSurfaceDamageTypes + 0},
+    {.name = "frame", .signature = "n", .types = _CWlSurfaceFrameTypes + 0},
+    {.name = "set_opaque_region", .signature = "?o", .types = _CWlSurfaceSetOpaqueRegionTypes + 0},
+    {.name = "set_input_region", .signature = "?o", .types = _CWlSurfaceSetInputRegionTypes + 0},
+    {.name = "commit", .signature = "", .types = wayland_dummyTypes + 0},
+    {.name = "set_buffer_transform", .signature = "2i", .types = _CWlSurfaceSetBufferTransformTypes + 0},
+    {.name = "set_buffer_scale", .signature = "3i", .types = _CWlSurfaceSetBufferScaleTypes + 0},
+    {.name = "damage_buffer", .signature = "4iiii", .types = _CWlSurfaceDamageBufferTypes + 0},
+    {.name = "offset", .signature = "5ii", .types = _CWlSurfaceOffsetTypes + 0},
 };
 
 static const wl_message _CWlSurfaceEvents[] = {
-    { .name = "enter", .signature = "o", .types = _CWlSurfaceEnterTypes + 0},
-    { .name = "leave", .signature = "o", .types = _CWlSurfaceLeaveTypes + 0},
-    { .name = "preferred_buffer_scale", .signature = "6i", .types = _CWlSurfacePreferredBufferScaleTypes + 0},
-    { .name = "preferred_buffer_transform", .signature = "6u", .types = _CWlSurfacePreferredBufferTransformTypes + 0},
+    {.name = "enter", .signature = "o", .types = _CWlSurfaceEnterTypes + 0},
+    {.name = "leave", .signature = "o", .types = _CWlSurfaceLeaveTypes + 0},
+    {.name = "preferred_buffer_scale", .signature = "6i", .types = _CWlSurfacePreferredBufferScaleTypes + 0},
+    {.name = "preferred_buffer_transform", .signature = "6u", .types = _CWlSurfacePreferredBufferTransformTypes + 0},
 };
 
 const wl_interface wl_surface_interface = {
-    .name = "wl_surface", .version = 6,
-    .method_count = 11, .methods = _CWlSurfaceRequests,
-    .event_count = 4, .events = _CWlSurfaceEvents,
+    .name = "wl_surface",
+    .version = 6,
+    .method_count = 11,
+    .methods = _CWlSurfaceRequests,
+    .event_count = 4,
+    .events = _CWlSurfaceEvents,
 };
 
 CCWlSurface::CCWlSurface(wl_proxy* resource) : pResource(resource) {
@@ -1438,13 +1514,9 @@ CCWlSurface::~CCWlSurface() {
         sendDestroy();
 }
 
-void CCWlSurface::setEnter(F<void(CCWlSurface*, wl_proxy*)> handler) {
-    requests.enter = handler;
-}
+void CCWlSurface::setEnter(F<void(CCWlSurface*, wl_proxy*)> handler) { requests.enter = handler; }
 
-void CCWlSurface::setLeave(F<void(CCWlSurface*, wl_proxy*)> handler) {
-    requests.leave = handler;
-}
+void CCWlSurface::setLeave(F<void(CCWlSurface*, wl_proxy*)> handler) { requests.leave = handler; }
 
 void CCWlSurface::setPreferredBufferScale(F<void(CCWlSurface*, int32_t)> handler) {
     requests.preferredBufferScale = handler;
@@ -1475,7 +1547,8 @@ wl_proxy* CCWlSeat::sendGetPointer() {
     if (!pResource)
         return nullptr;
 
-    auto proxy = wl_proxy_marshal_flags(pResource, 0, &wl_pointer_interface, wl_proxy_get_version(pResource), 0, nullptr);
+    auto proxy =
+        wl_proxy_marshal_flags(pResource, 0, &wl_pointer_interface, wl_proxy_get_version(pResource), 0, nullptr);
 
     return proxy;
 }
@@ -1484,7 +1557,8 @@ wl_proxy* CCWlSeat::sendGetKeyboard() {
     if (!pResource)
         return nullptr;
 
-    auto proxy = wl_proxy_marshal_flags(pResource, 1, &wl_keyboard_interface, wl_proxy_get_version(pResource), 0, nullptr);
+    auto proxy =
+        wl_proxy_marshal_flags(pResource, 1, &wl_keyboard_interface, wl_proxy_get_version(pResource), 0, nullptr);
 
     return proxy;
 }
@@ -1523,21 +1597,24 @@ static const wl_interface* _CWlSeatNameTypes[] = {
 };
 
 static const wl_message _CWlSeatRequests[] = {
-    { .name = "get_pointer", .signature = "n", .types = _CWlSeatGetPointerTypes + 0},
-    { .name = "get_keyboard", .signature = "n", .types = _CWlSeatGetKeyboardTypes + 0},
-    { .name = "get_touch", .signature = "n", .types = _CWlSeatGetTouchTypes + 0},
-    { .name = "release", .signature = "5", .types = wayland_dummyTypes + 0},
+    {.name = "get_pointer", .signature = "n", .types = _CWlSeatGetPointerTypes + 0},
+    {.name = "get_keyboard", .signature = "n", .types = _CWlSeatGetKeyboardTypes + 0},
+    {.name = "get_touch", .signature = "n", .types = _CWlSeatGetTouchTypes + 0},
+    {.name = "release", .signature = "5", .types = wayland_dummyTypes + 0},
 };
 
 static const wl_message _CWlSeatEvents[] = {
-    { .name = "capabilities", .signature = "u", .types = _CWlSeatCapabilitiesTypes + 0},
-    { .name = "name", .signature = "2s", .types = _CWlSeatNameTypes + 0},
+    {.name = "capabilities", .signature = "u", .types = _CWlSeatCapabilitiesTypes + 0},
+    {.name = "name", .signature = "2s", .types = _CWlSeatNameTypes + 0},
 };
 
 const wl_interface wl_seat_interface = {
-    .name = "wl_seat", .version = 10,
-    .method_count = 4, .methods = _CWlSeatRequests,
-    .event_count = 2, .events = _CWlSeatEvents,
+    .name = "wl_seat",
+    .version = 10,
+    .method_count = 4,
+    .methods = _CWlSeatRequests,
+    .event_count = 2,
+    .events = _CWlSeatEvents,
 };
 
 CCWlSeat::CCWlSeat(wl_proxy* resource) : pResource(resource) {
@@ -1553,15 +1630,12 @@ CCWlSeat::~CCWlSeat() {
         sendRelease();
 }
 
-void CCWlSeat::setCapabilities(F<void(CCWlSeat*, enum wl_seat_capability)> handler) {
-    requests.capabilities = handler;
-}
+void CCWlSeat::setCapabilities(F<void(CCWlSeat*, enum wl_seat_capability)> handler) { requests.capabilities = handler; }
 
-void CCWlSeat::setName(F<void(CCWlSeat*, const char*)> handler) {
-    requests.name = handler;
-}
+void CCWlSeat::setName(F<void(CCWlSeat*, const char*)> handler) { requests.name = handler; }
 
-static void _CWlPointerEnter(void* data, void* resource, uint32_t serial, wl_proxy* surface, wl_fixed_t surface_x, wl_fixed_t surface_y) {
+static void _CWlPointerEnter(
+    void* data, void* resource, uint32_t serial, wl_proxy* surface, wl_fixed_t surface_x, wl_fixed_t surface_y) {
     const auto PO = (CCWlPointer*)data;
     if (PO && PO->requests.enter)
         PO->requests.enter(PO, serial, surface, surface_x, surface_y);
@@ -1579,7 +1653,8 @@ static void _CWlPointerMotion(void* data, void* resource, uint32_t time, wl_fixe
         PO->requests.motion(PO, time, surface_x, surface_y);
 }
 
-static void _CWlPointerButton(void* data, void* resource, uint32_t serial, uint32_t time, uint32_t button, enum wl_pointer_button_state state) {
+static void _CWlPointerButton(
+    void* data, void* resource, uint32_t serial, uint32_t time, uint32_t button, enum wl_pointer_button_state state) {
     const auto PO = (CCWlPointer*)data;
     if (PO && PO->requests.button)
         PO->requests.button(PO, serial, time, button, state);
@@ -1621,7 +1696,10 @@ static void _CWlPointerAxisValue120(void* data, void* resource, enum wl_pointer_
         PO->requests.axisValue120(PO, axis, value120);
 }
 
-static void _CWlPointerAxisRelativeDirection(void* data, void* resource, enum wl_pointer_axis axis, enum wl_pointer_axis_relative_direction direction) {
+static void _CWlPointerAxisRelativeDirection(void* data,
+                                             void* resource,
+                                             enum wl_pointer_axis axis,
+                                             enum wl_pointer_axis_relative_direction direction) {
     const auto PO = (CCWlPointer*)data;
     if (PO && PO->requests.axisRelativeDirection)
         PO->requests.axisRelativeDirection(PO, axis, direction);
@@ -1645,7 +1723,15 @@ void CCWlPointer::sendSetCursor(uint32_t serial, CCWlSurface* surface, int32_t h
     if (!pResource)
         return;
 
-    auto proxy = wl_proxy_marshal_flags(pResource, 0, nullptr, wl_proxy_get_version(pResource), 0, serial, surface ? surface->pResource : nullptr, hotspot_x, hotspot_y);
+    auto proxy = wl_proxy_marshal_flags(pResource,
+                                        0,
+                                        nullptr,
+                                        wl_proxy_get_version(pResource),
+                                        0,
+                                        serial,
+                                        surface ? surface->pResource : nullptr,
+                                        hotspot_x,
+                                        hotspot_y);
     proxy;
 }
 
@@ -1710,28 +1796,31 @@ static const wl_interface* _CWlPointerAxisRelativeDirectionTypes[] = {
 };
 
 static const wl_message _CWlPointerRequests[] = {
-    { .name = "set_cursor", .signature = "u?oii", .types = _CWlPointerSetCursorTypes + 0},
-    { .name = "release", .signature = "3", .types = wayland_dummyTypes + 0},
+    {.name = "set_cursor", .signature = "u?oii", .types = _CWlPointerSetCursorTypes + 0},
+    {.name = "release", .signature = "3", .types = wayland_dummyTypes + 0},
 };
 
 static const wl_message _CWlPointerEvents[] = {
-    { .name = "enter", .signature = "uoff", .types = _CWlPointerEnterTypes + 0},
-    { .name = "leave", .signature = "uo", .types = _CWlPointerLeaveTypes + 0},
-    { .name = "motion", .signature = "uff", .types = _CWlPointerMotionTypes + 0},
-    { .name = "button", .signature = "uuuu", .types = _CWlPointerButtonTypes + 0},
-    { .name = "axis", .signature = "uuf", .types = _CWlPointerAxisTypes + 0},
-    { .name = "frame", .signature = "5", .types = wayland_dummyTypes + 0},
-    { .name = "axis_source", .signature = "5u", .types = _CWlPointerAxisSourceTypes + 0},
-    { .name = "axis_stop", .signature = "5uu", .types = _CWlPointerAxisStopTypes + 0},
-    { .name = "axis_discrete", .signature = "5ui", .types = _CWlPointerAxisDiscreteTypes + 0},
-    { .name = "axis_value120", .signature = "8ui", .types = _CWlPointerAxisValue120Types + 0},
-    { .name = "axis_relative_direction", .signature = "9uu", .types = _CWlPointerAxisRelativeDirectionTypes + 0},
+    {.name = "enter", .signature = "uoff", .types = _CWlPointerEnterTypes + 0},
+    {.name = "leave", .signature = "uo", .types = _CWlPointerLeaveTypes + 0},
+    {.name = "motion", .signature = "uff", .types = _CWlPointerMotionTypes + 0},
+    {.name = "button", .signature = "uuuu", .types = _CWlPointerButtonTypes + 0},
+    {.name = "axis", .signature = "uuf", .types = _CWlPointerAxisTypes + 0},
+    {.name = "frame", .signature = "5", .types = wayland_dummyTypes + 0},
+    {.name = "axis_source", .signature = "5u", .types = _CWlPointerAxisSourceTypes + 0},
+    {.name = "axis_stop", .signature = "5uu", .types = _CWlPointerAxisStopTypes + 0},
+    {.name = "axis_discrete", .signature = "5ui", .types = _CWlPointerAxisDiscreteTypes + 0},
+    {.name = "axis_value120", .signature = "8ui", .types = _CWlPointerAxisValue120Types + 0},
+    {.name = "axis_relative_direction", .signature = "9uu", .types = _CWlPointerAxisRelativeDirectionTypes + 0},
 };
 
 const wl_interface wl_pointer_interface = {
-    .name = "wl_pointer", .version = 10,
-    .method_count = 2, .methods = _CWlPointerRequests,
-    .event_count = 11, .events = _CWlPointerEvents,
+    .name = "wl_pointer",
+    .version = 10,
+    .method_count = 2,
+    .methods = _CWlPointerRequests,
+    .event_count = 11,
+    .events = _CWlPointerEvents,
 };
 
 CCWlPointer::CCWlPointer(wl_proxy* resource) : pResource(resource) {
@@ -1751,9 +1840,7 @@ void CCWlPointer::setEnter(F<void(CCWlPointer*, uint32_t, wl_proxy*, wl_fixed_t,
     requests.enter = handler;
 }
 
-void CCWlPointer::setLeave(F<void(CCWlPointer*, uint32_t, wl_proxy*)> handler) {
-    requests.leave = handler;
-}
+void CCWlPointer::setLeave(F<void(CCWlPointer*, uint32_t, wl_proxy*)> handler) { requests.leave = handler; }
 
 void CCWlPointer::setMotion(F<void(CCWlPointer*, uint32_t, wl_fixed_t, wl_fixed_t)> handler) {
     requests.motion = handler;
@@ -1767,9 +1854,7 @@ void CCWlPointer::setAxis(F<void(CCWlPointer*, uint32_t, enum wl_pointer_axis, w
     requests.axis = handler;
 }
 
-void CCWlPointer::setFrame(F<void(CCWlPointer*)> handler) {
-    requests.frame = handler;
-}
+void CCWlPointer::setFrame(F<void(CCWlPointer*)> handler) { requests.frame = handler; }
 
 void CCWlPointer::setAxisSource(F<void(CCWlPointer*, enum wl_pointer_axis_source)> handler) {
     requests.axisSource = handler;
@@ -1787,11 +1872,13 @@ void CCWlPointer::setAxisValue120(F<void(CCWlPointer*, enum wl_pointer_axis, int
     requests.axisValue120 = handler;
 }
 
-void CCWlPointer::setAxisRelativeDirection(F<void(CCWlPointer*, enum wl_pointer_axis, enum wl_pointer_axis_relative_direction)> handler) {
+void CCWlPointer::setAxisRelativeDirection(
+    F<void(CCWlPointer*, enum wl_pointer_axis, enum wl_pointer_axis_relative_direction)> handler) {
     requests.axisRelativeDirection = handler;
 }
 
-static void _CWlKeyboardKeymap(void* data, void* resource, enum wl_keyboard_keymap_format format, int32_t fd, uint32_t size) {
+static void
+    _CWlKeyboardKeymap(void* data, void* resource, enum wl_keyboard_keymap_format format, int32_t fd, uint32_t size) {
     const auto PO = (CCWlKeyboard*)data;
     if (PO && PO->requests.keymap)
         PO->requests.keymap(PO, format, fd, size);
@@ -1809,13 +1896,20 @@ static void _CWlKeyboardLeave(void* data, void* resource, uint32_t serial, wl_pr
         PO->requests.leave(PO, serial, surface);
 }
 
-static void _CWlKeyboardKey(void* data, void* resource, uint32_t serial, uint32_t time, uint32_t key, enum wl_keyboard_key_state state) {
+static void _CWlKeyboardKey(
+    void* data, void* resource, uint32_t serial, uint32_t time, uint32_t key, enum wl_keyboard_key_state state) {
     const auto PO = (CCWlKeyboard*)data;
     if (PO && PO->requests.key)
         PO->requests.key(PO, serial, time, key, state);
 }
 
-static void _CWlKeyboardModifiers(void* data, void* resource, uint32_t serial, uint32_t mods_depressed, uint32_t mods_latched, uint32_t mods_locked, uint32_t group) {
+static void _CWlKeyboardModifiers(void* data,
+                                  void* resource,
+                                  uint32_t serial,
+                                  uint32_t mods_depressed,
+                                  uint32_t mods_latched,
+                                  uint32_t mods_locked,
+                                  uint32_t group) {
     const auto PO = (CCWlKeyboard*)data;
     if (PO && PO->requests.modifiers)
         PO->requests.modifiers(PO, serial, mods_depressed, mods_latched, mods_locked, group);
@@ -1877,22 +1971,25 @@ static const wl_interface* _CWlKeyboardRepeatInfoTypes[] = {
 };
 
 static const wl_message _CWlKeyboardRequests[] = {
-    { .name = "release", .signature = "3", .types = wayland_dummyTypes + 0},
+    {.name = "release", .signature = "3", .types = wayland_dummyTypes + 0},
 };
 
 static const wl_message _CWlKeyboardEvents[] = {
-    { .name = "keymap", .signature = "uhu", .types = _CWlKeyboardKeymapTypes + 0},
-    { .name = "enter", .signature = "uoa", .types = _CWlKeyboardEnterTypes + 0},
-    { .name = "leave", .signature = "uo", .types = _CWlKeyboardLeaveTypes + 0},
-    { .name = "key", .signature = "uuuu", .types = _CWlKeyboardKeyTypes + 0},
-    { .name = "modifiers", .signature = "uuuuu", .types = _CWlKeyboardModifiersTypes + 0},
-    { .name = "repeat_info", .signature = "4ii", .types = _CWlKeyboardRepeatInfoTypes + 0},
+    {.name = "keymap", .signature = "uhu", .types = _CWlKeyboardKeymapTypes + 0},
+    {.name = "enter", .signature = "uoa", .types = _CWlKeyboardEnterTypes + 0},
+    {.name = "leave", .signature = "uo", .types = _CWlKeyboardLeaveTypes + 0},
+    {.name = "key", .signature = "uuuu", .types = _CWlKeyboardKeyTypes + 0},
+    {.name = "modifiers", .signature = "uuuuu", .types = _CWlKeyboardModifiersTypes + 0},
+    {.name = "repeat_info", .signature = "4ii", .types = _CWlKeyboardRepeatInfoTypes + 0},
 };
 
 const wl_interface wl_keyboard_interface = {
-    .name = "wl_keyboard", .version = 10,
-    .method_count = 1, .methods = _CWlKeyboardRequests,
-    .event_count = 6, .events = _CWlKeyboardEvents,
+    .name = "wl_keyboard",
+    .version = 10,
+    .method_count = 1,
+    .methods = _CWlKeyboardRequests,
+    .event_count = 6,
+    .events = _CWlKeyboardEvents,
 };
 
 CCWlKeyboard::CCWlKeyboard(wl_proxy* resource) : pResource(resource) {
@@ -1916,9 +2013,7 @@ void CCWlKeyboard::setEnter(F<void(CCWlKeyboard*, uint32_t, wl_proxy*, wl_array*
     requests.enter = handler;
 }
 
-void CCWlKeyboard::setLeave(F<void(CCWlKeyboard*, uint32_t, wl_proxy*)> handler) {
-    requests.leave = handler;
-}
+void CCWlKeyboard::setLeave(F<void(CCWlKeyboard*, uint32_t, wl_proxy*)> handler) { requests.leave = handler; }
 
 void CCWlKeyboard::setKey(F<void(CCWlKeyboard*, uint32_t, uint32_t, uint32_t, enum wl_keyboard_key_state)> handler) {
     requests.key = handler;
@@ -1928,11 +2023,16 @@ void CCWlKeyboard::setModifiers(F<void(CCWlKeyboard*, uint32_t, uint32_t, uint32
     requests.modifiers = handler;
 }
 
-void CCWlKeyboard::setRepeatInfo(F<void(CCWlKeyboard*, int32_t, int32_t)> handler) {
-    requests.repeatInfo = handler;
-}
+void CCWlKeyboard::setRepeatInfo(F<void(CCWlKeyboard*, int32_t, int32_t)> handler) { requests.repeatInfo = handler; }
 
-static void _CWlTouchDown(void* data, void* resource, uint32_t serial, uint32_t time, wl_proxy* surface, int32_t id, wl_fixed_t x, wl_fixed_t y) {
+static void _CWlTouchDown(void* data,
+                          void* resource,
+                          uint32_t serial,
+                          uint32_t time,
+                          wl_proxy* surface,
+                          int32_t id,
+                          wl_fixed_t x,
+                          wl_fixed_t y) {
     const auto PO = (CCWlTouch*)data;
     if (PO && PO->requests.down)
         PO->requests.down(PO, serial, time, surface, id, x, y);
@@ -2022,23 +2122,26 @@ static const wl_interface* _CWlTouchOrientationTypes[] = {
 };
 
 static const wl_message _CWlTouchRequests[] = {
-    { .name = "release", .signature = "3", .types = wayland_dummyTypes + 0},
+    {.name = "release", .signature = "3", .types = wayland_dummyTypes + 0},
 };
 
 static const wl_message _CWlTouchEvents[] = {
-    { .name = "down", .signature = "uuoiff", .types = _CWlTouchDownTypes + 0},
-    { .name = "up", .signature = "uui", .types = _CWlTouchUpTypes + 0},
-    { .name = "motion", .signature = "uiff", .types = _CWlTouchMotionTypes + 0},
-    { .name = "frame", .signature = "", .types = wayland_dummyTypes + 0},
-    { .name = "cancel", .signature = "", .types = wayland_dummyTypes + 0},
-    { .name = "shape", .signature = "6iff", .types = _CWlTouchShapeTypes + 0},
-    { .name = "orientation", .signature = "6if", .types = _CWlTouchOrientationTypes + 0},
+    {.name = "down", .signature = "uuoiff", .types = _CWlTouchDownTypes + 0},
+    {.name = "up", .signature = "uui", .types = _CWlTouchUpTypes + 0},
+    {.name = "motion", .signature = "uiff", .types = _CWlTouchMotionTypes + 0},
+    {.name = "frame", .signature = "", .types = wayland_dummyTypes + 0},
+    {.name = "cancel", .signature = "", .types = wayland_dummyTypes + 0},
+    {.name = "shape", .signature = "6iff", .types = _CWlTouchShapeTypes + 0},
+    {.name = "orientation", .signature = "6if", .types = _CWlTouchOrientationTypes + 0},
 };
 
 const wl_interface wl_touch_interface = {
-    .name = "wl_touch", .version = 10,
-    .method_count = 1, .methods = _CWlTouchRequests,
-    .event_count = 7, .events = _CWlTouchEvents,
+    .name = "wl_touch",
+    .version = 10,
+    .method_count = 1,
+    .methods = _CWlTouchRequests,
+    .event_count = 7,
+    .events = _CWlTouchEvents,
 };
 
 CCWlTouch::CCWlTouch(wl_proxy* resource) : pResource(resource) {
@@ -2058,37 +2161,37 @@ void CCWlTouch::setDown(F<void(CCWlTouch*, uint32_t, uint32_t, wl_proxy*, int32_
     requests.down = handler;
 }
 
-void CCWlTouch::setUp(F<void(CCWlTouch*, uint32_t, uint32_t, int32_t)> handler) {
-    requests.up = handler;
-}
+void CCWlTouch::setUp(F<void(CCWlTouch*, uint32_t, uint32_t, int32_t)> handler) { requests.up = handler; }
 
 void CCWlTouch::setMotion(F<void(CCWlTouch*, uint32_t, int32_t, wl_fixed_t, wl_fixed_t)> handler) {
     requests.motion = handler;
 }
 
-void CCWlTouch::setFrame(F<void(CCWlTouch*)> handler) {
-    requests.frame = handler;
-}
+void CCWlTouch::setFrame(F<void(CCWlTouch*)> handler) { requests.frame = handler; }
 
-void CCWlTouch::setCancel(F<void(CCWlTouch*)> handler) {
-    requests.cancel = handler;
-}
+void CCWlTouch::setCancel(F<void(CCWlTouch*)> handler) { requests.cancel = handler; }
 
-void CCWlTouch::setShape(F<void(CCWlTouch*, int32_t, wl_fixed_t, wl_fixed_t)> handler) {
-    requests.shape = handler;
-}
+void CCWlTouch::setShape(F<void(CCWlTouch*, int32_t, wl_fixed_t, wl_fixed_t)> handler) { requests.shape = handler; }
 
-void CCWlTouch::setOrientation(F<void(CCWlTouch*, int32_t, wl_fixed_t)> handler) {
-    requests.orientation = handler;
-}
+void CCWlTouch::setOrientation(F<void(CCWlTouch*, int32_t, wl_fixed_t)> handler) { requests.orientation = handler; }
 
-static void _CWlOutputGeometry(void* data, void* resource, int32_t x, int32_t y, int32_t physical_width, int32_t physical_height, int32_t subpixel, const char* make, const char* model, int32_t transform) {
+static void _CWlOutputGeometry(void* data,
+                               void* resource,
+                               int32_t x,
+                               int32_t y,
+                               int32_t physical_width,
+                               int32_t physical_height,
+                               int32_t subpixel,
+                               const char* make,
+                               const char* model,
+                               int32_t transform) {
     const auto PO = (CCWlOutput*)data;
     if (PO && PO->requests.geometry)
         PO->requests.geometry(PO, x, y, physical_width, physical_height, subpixel, make, model, transform);
 }
 
-static void _CWlOutputMode(void* data, void* resource, enum wl_output_mode flags, int32_t width, int32_t height, int32_t refresh) {
+static void _CWlOutputMode(
+    void* data, void* resource, enum wl_output_mode flags, int32_t width, int32_t height, int32_t refresh) {
     const auto PO = (CCWlOutput*)data;
     if (PO && PO->requests.mode)
         PO->requests.mode(PO, flags, width, height, refresh);
@@ -2162,22 +2265,25 @@ static const wl_interface* _CWlOutputDescriptionTypes[] = {
 };
 
 static const wl_message _CWlOutputRequests[] = {
-    { .name = "release", .signature = "3", .types = wayland_dummyTypes + 0},
+    {.name = "release", .signature = "3", .types = wayland_dummyTypes + 0},
 };
 
 static const wl_message _CWlOutputEvents[] = {
-    { .name = "geometry", .signature = "iiiiissi", .types = _CWlOutputGeometryTypes + 0},
-    { .name = "mode", .signature = "uiii", .types = _CWlOutputModeTypes + 0},
-    { .name = "done", .signature = "2", .types = wayland_dummyTypes + 0},
-    { .name = "scale", .signature = "2i", .types = _CWlOutputScaleTypes + 0},
-    { .name = "name", .signature = "4s", .types = _CWlOutputNameTypes + 0},
-    { .name = "description", .signature = "4s", .types = _CWlOutputDescriptionTypes + 0},
+    {.name = "geometry", .signature = "iiiiissi", .types = _CWlOutputGeometryTypes + 0},
+    {.name = "mode", .signature = "uiii", .types = _CWlOutputModeTypes + 0},
+    {.name = "done", .signature = "2", .types = wayland_dummyTypes + 0},
+    {.name = "scale", .signature = "2i", .types = _CWlOutputScaleTypes + 0},
+    {.name = "name", .signature = "4s", .types = _CWlOutputNameTypes + 0},
+    {.name = "description", .signature = "4s", .types = _CWlOutputDescriptionTypes + 0},
 };
 
 const wl_interface wl_output_interface = {
-    .name = "wl_output", .version = 4,
-    .method_count = 1, .methods = _CWlOutputRequests,
-    .event_count = 6, .events = _CWlOutputEvents,
+    .name = "wl_output",
+    .version = 4,
+    .method_count = 1,
+    .methods = _CWlOutputRequests,
+    .event_count = 6,
+    .events = _CWlOutputEvents,
 };
 
 CCWlOutput::CCWlOutput(wl_proxy* resource) : pResource(resource) {
@@ -2193,7 +2299,8 @@ CCWlOutput::~CCWlOutput() {
         sendRelease();
 }
 
-void CCWlOutput::setGeometry(F<void(CCWlOutput*, int32_t, int32_t, int32_t, int32_t, int32_t, const char*, const char*, int32_t)> handler) {
+void CCWlOutput::setGeometry(
+    F<void(CCWlOutput*, int32_t, int32_t, int32_t, int32_t, int32_t, const char*, const char*, int32_t)> handler) {
     requests.geometry = handler;
 }
 
@@ -2201,21 +2308,13 @@ void CCWlOutput::setMode(F<void(CCWlOutput*, enum wl_output_mode, int32_t, int32
     requests.mode = handler;
 }
 
-void CCWlOutput::setDone(F<void(CCWlOutput*)> handler) {
-    requests.done = handler;
-}
+void CCWlOutput::setDone(F<void(CCWlOutput*)> handler) { requests.done = handler; }
 
-void CCWlOutput::setScale(F<void(CCWlOutput*, int32_t)> handler) {
-    requests.scale = handler;
-}
+void CCWlOutput::setScale(F<void(CCWlOutput*, int32_t)> handler) { requests.scale = handler; }
 
-void CCWlOutput::setName(F<void(CCWlOutput*, const char*)> handler) {
-    requests.name = handler;
-}
+void CCWlOutput::setName(F<void(CCWlOutput*, const char*)> handler) { requests.name = handler; }
 
-void CCWlOutput::setDescription(F<void(CCWlOutput*, const char*)> handler) {
-    requests.description = handler;
-}
+void CCWlOutput::setDescription(F<void(CCWlOutput*, const char*)> handler) { requests.description = handler; }
 
 static const void* _CCWlRegionVTable[] = {
     nullptr,
@@ -2259,15 +2358,18 @@ static const wl_interface* _CWlRegionSubtractTypes[] = {
 };
 
 static const wl_message _CWlRegionRequests[] = {
-    { .name = "destroy", .signature = "", .types = wayland_dummyTypes + 0},
-    { .name = "add", .signature = "iiii", .types = _CWlRegionAddTypes + 0},
-    { .name = "subtract", .signature = "iiii", .types = _CWlRegionSubtractTypes + 0},
+    {.name = "destroy", .signature = "", .types = wayland_dummyTypes + 0},
+    {.name = "add", .signature = "iiii", .types = _CWlRegionAddTypes + 0},
+    {.name = "subtract", .signature = "iiii", .types = _CWlRegionSubtractTypes + 0},
 };
 
 const wl_interface wl_region_interface = {
-    .name = "wl_region", .version = 1,
-    .method_count = 3, .methods = _CWlRegionRequests,
-    .event_count = 0, .events = nullptr,
+    .name = "wl_region",
+    .version = 1,
+    .method_count = 3,
+    .methods = _CWlRegionRequests,
+    .event_count = 0,
+    .events = nullptr,
 };
 
 CCWlRegion::CCWlRegion(wl_proxy* resource) : pResource(resource) {
@@ -2300,7 +2402,14 @@ wl_proxy* CCWlSubcompositor::sendGetSubsurface(CCWlSurface* surface, CCWlSurface
     if (!pResource)
         return nullptr;
 
-    auto proxy = wl_proxy_marshal_flags(pResource, 1, &wl_subsurface_interface, wl_proxy_get_version(pResource), 0, nullptr, surface ? surface->pResource : nullptr, parent ? parent->pResource : nullptr);
+    auto proxy = wl_proxy_marshal_flags(pResource,
+                                        1,
+                                        &wl_subsurface_interface,
+                                        wl_proxy_get_version(pResource),
+                                        0,
+                                        nullptr,
+                                        surface ? surface->pResource : nullptr,
+                                        parent ? parent->pResource : nullptr);
 
     return proxy;
 }
@@ -2311,14 +2420,17 @@ static const wl_interface* _CWlSubcompositorGetSubsurfaceTypes[] = {
 };
 
 static const wl_message _CWlSubcompositorRequests[] = {
-    { .name = "destroy", .signature = "", .types = wayland_dummyTypes + 0},
-    { .name = "get_subsurface", .signature = "noo", .types = _CWlSubcompositorGetSubsurfaceTypes + 0},
+    {.name = "destroy", .signature = "", .types = wayland_dummyTypes + 0},
+    {.name = "get_subsurface", .signature = "noo", .types = _CWlSubcompositorGetSubsurfaceTypes + 0},
 };
 
 const wl_interface wl_subcompositor_interface = {
-    .name = "wl_subcompositor", .version = 1,
-    .method_count = 2, .methods = _CWlSubcompositorRequests,
-    .event_count = 0, .events = nullptr,
+    .name = "wl_subcompositor",
+    .version = 1,
+    .method_count = 2,
+    .methods = _CWlSubcompositorRequests,
+    .event_count = 0,
+    .events = nullptr,
 };
 
 CCWlSubcompositor::CCWlSubcompositor(wl_proxy* resource) : pResource(resource) {
@@ -2359,7 +2471,8 @@ void CCWlSubsurface::sendPlaceAbove(CCWlSurface* sibling) {
     if (!pResource)
         return;
 
-    auto proxy = wl_proxy_marshal_flags(pResource, 2, nullptr, wl_proxy_get_version(pResource), 0, sibling ? sibling->pResource : nullptr);
+    auto proxy = wl_proxy_marshal_flags(
+        pResource, 2, nullptr, wl_proxy_get_version(pResource), 0, sibling ? sibling->pResource : nullptr);
     proxy;
 }
 
@@ -2367,7 +2480,8 @@ void CCWlSubsurface::sendPlaceBelow(CCWlSurface* sibling) {
     if (!pResource)
         return;
 
-    auto proxy = wl_proxy_marshal_flags(pResource, 3, nullptr, wl_proxy_get_version(pResource), 0, sibling ? sibling->pResource : nullptr);
+    auto proxy = wl_proxy_marshal_flags(
+        pResource, 3, nullptr, wl_proxy_get_version(pResource), 0, sibling ? sibling->pResource : nullptr);
     proxy;
 }
 
@@ -2398,18 +2512,21 @@ static const wl_interface* _CWlSubsurfacePlaceBelowTypes[] = {
 };
 
 static const wl_message _CWlSubsurfaceRequests[] = {
-    { .name = "destroy", .signature = "", .types = wayland_dummyTypes + 0},
-    { .name = "set_position", .signature = "ii", .types = _CWlSubsurfaceSetPositionTypes + 0},
-    { .name = "place_above", .signature = "o", .types = _CWlSubsurfacePlaceAboveTypes + 0},
-    { .name = "place_below", .signature = "o", .types = _CWlSubsurfacePlaceBelowTypes + 0},
-    { .name = "set_sync", .signature = "", .types = wayland_dummyTypes + 0},
-    { .name = "set_desync", .signature = "", .types = wayland_dummyTypes + 0},
+    {.name = "destroy", .signature = "", .types = wayland_dummyTypes + 0},
+    {.name = "set_position", .signature = "ii", .types = _CWlSubsurfaceSetPositionTypes + 0},
+    {.name = "place_above", .signature = "o", .types = _CWlSubsurfacePlaceAboveTypes + 0},
+    {.name = "place_below", .signature = "o", .types = _CWlSubsurfacePlaceBelowTypes + 0},
+    {.name = "set_sync", .signature = "", .types = wayland_dummyTypes + 0},
+    {.name = "set_desync", .signature = "", .types = wayland_dummyTypes + 0},
 };
 
 const wl_interface wl_subsurface_interface = {
-    .name = "wl_subsurface", .version = 1,
-    .method_count = 6, .methods = _CWlSubsurfaceRequests,
-    .event_count = 0, .events = nullptr,
+    .name = "wl_subsurface",
+    .version = 1,
+    .method_count = 6,
+    .methods = _CWlSubsurfaceRequests,
+    .event_count = 0,
+    .events = nullptr,
 };
 
 CCWlSubsurface::CCWlSubsurface(wl_proxy* resource) : pResource(resource) {
@@ -2442,7 +2559,8 @@ void CCWlFixes::sendDestroyRegistry(CCWlRegistry* registry) {
     if (!pResource)
         return;
 
-    auto proxy = wl_proxy_marshal_flags(pResource, 1, nullptr, wl_proxy_get_version(pResource), 0, registry ? registry->pResource : nullptr);
+    auto proxy = wl_proxy_marshal_flags(
+        pResource, 1, nullptr, wl_proxy_get_version(pResource), 0, registry ? registry->pResource : nullptr);
     proxy;
 }
 static const wl_interface* _CWlFixesDestroyRegistryTypes[] = {
@@ -2450,14 +2568,17 @@ static const wl_interface* _CWlFixesDestroyRegistryTypes[] = {
 };
 
 static const wl_message _CWlFixesRequests[] = {
-    { .name = "destroy", .signature = "", .types = wayland_dummyTypes + 0},
-    { .name = "destroy_registry", .signature = "o", .types = _CWlFixesDestroyRegistryTypes + 0},
+    {.name = "destroy", .signature = "", .types = wayland_dummyTypes + 0},
+    {.name = "destroy_registry", .signature = "o", .types = _CWlFixesDestroyRegistryTypes + 0},
 };
 
 const wl_interface wl_fixes_interface = {
-    .name = "wl_fixes", .version = 1,
-    .method_count = 2, .methods = _CWlFixesRequests,
-    .event_count = 0, .events = nullptr,
+    .name = "wl_fixes",
+    .version = 1,
+    .method_count = 2,
+    .methods = _CWlFixesRequests,
+    .event_count = 0,
+    .events = nullptr,
 };
 
 CCWlFixes::CCWlFixes(wl_proxy* resource) : pResource(resource) {

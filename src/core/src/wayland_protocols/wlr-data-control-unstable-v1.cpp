@@ -28,7 +28,7 @@
     AN ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION,
     ARISING OUT OF OR IN CONNECTION WITH THE USE OR PERFORMANCE OF
     THIS SOFTWARE.
-  
+
 */
 
 #define private public
@@ -37,7 +37,7 @@
 #undef private
 #define F std::function
 
-static const wl_interface* wlrDataControlUnstableV1_dummyTypes[] = { nullptr };
+static const wl_interface* wlrDataControlUnstableV1_dummyTypes[] = {nullptr};
 
 // Reference all other interfaces.
 // The reason why this is in snake is to
@@ -57,7 +57,8 @@ wl_proxy* CCZwlrDataControlManagerV1::sendCreateDataSource() {
     if (!pResource)
         return nullptr;
 
-    auto proxy = wl_proxy_marshal_flags(pResource, 0, &zwlr_data_control_source_v1_interface, wl_proxy_get_version(pResource), 0, nullptr);
+    auto proxy = wl_proxy_marshal_flags(
+        pResource, 0, &zwlr_data_control_source_v1_interface, wl_proxy_get_version(pResource), 0, nullptr);
 
     return proxy;
 }
@@ -66,7 +67,8 @@ wl_proxy* CCZwlrDataControlManagerV1::sendGetDataDevice(wl_proxy* seat) {
     if (!pResource)
         return nullptr;
 
-    auto proxy = wl_proxy_marshal_flags(pResource, 1, &zwlr_data_control_device_v1_interface, wl_proxy_get_version(pResource), 0, nullptr, seat);
+    auto proxy = wl_proxy_marshal_flags(
+        pResource, 1, &zwlr_data_control_device_v1_interface, wl_proxy_get_version(pResource), 0, nullptr, seat);
 
     return proxy;
 }
@@ -88,15 +90,18 @@ static const wl_interface* _CZwlrDataControlManagerV1GetDataDeviceTypes[] = {
 };
 
 static const wl_message _CZwlrDataControlManagerV1Requests[] = {
-    { .name = "create_data_source", .signature = "n", .types = _CZwlrDataControlManagerV1CreateDataSourceTypes + 0},
-    { .name = "get_data_device", .signature = "no", .types = _CZwlrDataControlManagerV1GetDataDeviceTypes + 0},
-    { .name = "destroy", .signature = "", .types = wlrDataControlUnstableV1_dummyTypes + 0},
+    {.name = "create_data_source", .signature = "n", .types = _CZwlrDataControlManagerV1CreateDataSourceTypes + 0},
+    {.name = "get_data_device", .signature = "no", .types = _CZwlrDataControlManagerV1GetDataDeviceTypes + 0},
+    {.name = "destroy", .signature = "", .types = wlrDataControlUnstableV1_dummyTypes + 0},
 };
 
 const wl_interface zwlr_data_control_manager_v1_interface = {
-    .name = "zwlr_data_control_manager_v1", .version = 2,
-    .method_count = 3, .methods = _CZwlrDataControlManagerV1Requests,
-    .event_count = 0, .events = nullptr,
+    .name = "zwlr_data_control_manager_v1",
+    .version = 2,
+    .method_count = 3,
+    .methods = _CZwlrDataControlManagerV1Requests,
+    .event_count = 0,
+    .events = nullptr,
 };
 
 CCZwlrDataControlManagerV1::CCZwlrDataControlManagerV1(wl_proxy* resource) : pResource(resource) {
@@ -147,7 +152,8 @@ void CCZwlrDataControlDeviceV1::sendSetSelection(CCZwlrDataControlSourceV1* sour
     if (!pResource)
         return;
 
-    auto proxy = wl_proxy_marshal_flags(pResource, 0, nullptr, wl_proxy_get_version(pResource), 0, source ? source->pResource : nullptr);
+    auto proxy = wl_proxy_marshal_flags(
+        pResource, 0, nullptr, wl_proxy_get_version(pResource), 0, source ? source->pResource : nullptr);
     proxy;
 }
 
@@ -164,7 +170,8 @@ void CCZwlrDataControlDeviceV1::sendSetPrimarySelection(CCZwlrDataControlSourceV
     if (!pResource)
         return;
 
-    auto proxy = wl_proxy_marshal_flags(pResource, 2, nullptr, wl_proxy_get_version(pResource), 0, source ? source->pResource : nullptr);
+    auto proxy = wl_proxy_marshal_flags(
+        pResource, 2, nullptr, wl_proxy_get_version(pResource), 0, source ? source->pResource : nullptr);
     proxy;
 }
 static const wl_interface* _CZwlrDataControlDeviceV1SetSelectionTypes[] = {
@@ -184,22 +191,27 @@ static const wl_interface* _CZwlrDataControlDeviceV1PrimarySelectionTypes[] = {
 };
 
 static const wl_message _CZwlrDataControlDeviceV1Requests[] = {
-    { .name = "set_selection", .signature = "?o", .types = _CZwlrDataControlDeviceV1SetSelectionTypes + 0},
-    { .name = "destroy", .signature = "", .types = wlrDataControlUnstableV1_dummyTypes + 0},
-    { .name = "set_primary_selection", .signature = "2?o", .types = _CZwlrDataControlDeviceV1SetPrimarySelectionTypes + 0},
+    {.name = "set_selection", .signature = "?o", .types = _CZwlrDataControlDeviceV1SetSelectionTypes + 0},
+    {.name = "destroy", .signature = "", .types = wlrDataControlUnstableV1_dummyTypes + 0},
+    {.name = "set_primary_selection",
+     .signature = "2?o",
+     .types = _CZwlrDataControlDeviceV1SetPrimarySelectionTypes + 0},
 };
 
 static const wl_message _CZwlrDataControlDeviceV1Events[] = {
-    { .name = "data_offer", .signature = "n", .types = _CZwlrDataControlDeviceV1DataOfferTypes + 0},
-    { .name = "selection", .signature = "?o", .types = _CZwlrDataControlDeviceV1SelectionTypes + 0},
-    { .name = "finished", .signature = "", .types = wlrDataControlUnstableV1_dummyTypes + 0},
-    { .name = "primary_selection", .signature = "2?o", .types = _CZwlrDataControlDeviceV1PrimarySelectionTypes + 0},
+    {.name = "data_offer", .signature = "n", .types = _CZwlrDataControlDeviceV1DataOfferTypes + 0},
+    {.name = "selection", .signature = "?o", .types = _CZwlrDataControlDeviceV1SelectionTypes + 0},
+    {.name = "finished", .signature = "", .types = wlrDataControlUnstableV1_dummyTypes + 0},
+    {.name = "primary_selection", .signature = "2?o", .types = _CZwlrDataControlDeviceV1PrimarySelectionTypes + 0},
 };
 
 const wl_interface zwlr_data_control_device_v1_interface = {
-    .name = "zwlr_data_control_device_v1", .version = 2,
-    .method_count = 3, .methods = _CZwlrDataControlDeviceV1Requests,
-    .event_count = 4, .events = _CZwlrDataControlDeviceV1Events,
+    .name = "zwlr_data_control_device_v1",
+    .version = 2,
+    .method_count = 3,
+    .methods = _CZwlrDataControlDeviceV1Requests,
+    .event_count = 4,
+    .events = _CZwlrDataControlDeviceV1Events,
 };
 
 CCZwlrDataControlDeviceV1::CCZwlrDataControlDeviceV1(wl_proxy* resource) : pResource(resource) {
@@ -273,19 +285,22 @@ static const wl_interface* _CZwlrDataControlSourceV1SendTypes[] = {
 };
 
 static const wl_message _CZwlrDataControlSourceV1Requests[] = {
-    { .name = "offer", .signature = "s", .types = _CZwlrDataControlSourceV1OfferTypes + 0},
-    { .name = "destroy", .signature = "", .types = wlrDataControlUnstableV1_dummyTypes + 0},
+    {.name = "offer", .signature = "s", .types = _CZwlrDataControlSourceV1OfferTypes + 0},
+    {.name = "destroy", .signature = "", .types = wlrDataControlUnstableV1_dummyTypes + 0},
 };
 
 static const wl_message _CZwlrDataControlSourceV1Events[] = {
-    { .name = "send", .signature = "sh", .types = _CZwlrDataControlSourceV1SendTypes + 0},
-    { .name = "cancelled", .signature = "", .types = wlrDataControlUnstableV1_dummyTypes + 0},
+    {.name = "send", .signature = "sh", .types = _CZwlrDataControlSourceV1SendTypes + 0},
+    {.name = "cancelled", .signature = "", .types = wlrDataControlUnstableV1_dummyTypes + 0},
 };
 
 const wl_interface zwlr_data_control_source_v1_interface = {
-    .name = "zwlr_data_control_source_v1", .version = 1,
-    .method_count = 2, .methods = _CZwlrDataControlSourceV1Requests,
-    .event_count = 2, .events = _CZwlrDataControlSourceV1Events,
+    .name = "zwlr_data_control_source_v1",
+    .version = 1,
+    .method_count = 2,
+    .methods = _CZwlrDataControlSourceV1Requests,
+    .event_count = 2,
+    .events = _CZwlrDataControlSourceV1Events,
 };
 
 CCZwlrDataControlSourceV1::CCZwlrDataControlSourceV1(wl_proxy* resource) : pResource(resource) {
@@ -344,18 +359,21 @@ static const wl_interface* _CZwlrDataControlOfferV1OfferTypes[] = {
 };
 
 static const wl_message _CZwlrDataControlOfferV1Requests[] = {
-    { .name = "receive", .signature = "sh", .types = _CZwlrDataControlOfferV1ReceiveTypes + 0},
-    { .name = "destroy", .signature = "", .types = wlrDataControlUnstableV1_dummyTypes + 0},
+    {.name = "receive", .signature = "sh", .types = _CZwlrDataControlOfferV1ReceiveTypes + 0},
+    {.name = "destroy", .signature = "", .types = wlrDataControlUnstableV1_dummyTypes + 0},
 };
 
 static const wl_message _CZwlrDataControlOfferV1Events[] = {
-    { .name = "offer", .signature = "s", .types = _CZwlrDataControlOfferV1OfferTypes + 0},
+    {.name = "offer", .signature = "s", .types = _CZwlrDataControlOfferV1OfferTypes + 0},
 };
 
 const wl_interface zwlr_data_control_offer_v1_interface = {
-    .name = "zwlr_data_control_offer_v1", .version = 1,
-    .method_count = 2, .methods = _CZwlrDataControlOfferV1Requests,
-    .event_count = 1, .events = _CZwlrDataControlOfferV1Events,
+    .name = "zwlr_data_control_offer_v1",
+    .version = 1,
+    .method_count = 2,
+    .methods = _CZwlrDataControlOfferV1Requests,
+    .event_count = 1,
+    .events = _CZwlrDataControlOfferV1Events,
 };
 
 CCZwlrDataControlOfferV1::CCZwlrDataControlOfferV1(wl_proxy* resource) : pResource(resource) {

@@ -1,12 +1,12 @@
-#include <csignal>
-#include <tether/log.hpp>
-#include <nlohmann/json.hpp>
 #include "notification.hpp"
+#include <csignal>
+#include <nlohmann/json.hpp>
 #include <tether/core.hpp>
 #include <tether/crypto.hpp>
 #include <tether/discovery.hpp>
 #include <tether/event_loop.hpp>
 #include <tether/file_transfer.hpp>
+#include <tether/log.hpp>
 #include <tether/net.hpp>
 #include <tether/wayland.hpp>
 #include <unistd.h>
@@ -65,7 +65,7 @@ int main(int argc, char** argv) {
         if (!discovery.publish(hostname, 5134, my_fp)) {
             debug::log(ERR, "Warning: mDNS advertisement failed (is avahi-daemon running?)");
         }
-        
+
         discovery.start_continuous_browse([](const std::vector<tether::DiscoveredDevice>& devices) {
             nlohmann::json payload;
             payload["command"] = "discovery_result";

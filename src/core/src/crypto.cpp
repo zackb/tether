@@ -3,13 +3,13 @@
 #include <filesystem>
 #include <fstream>
 #include <iomanip>
-#include <tether/log.hpp>
 #include <nlohmann/json.hpp>
 #include <openssl/evp.h>
 #include <openssl/pem.h>
 #include <openssl/rsa.h>
 #include <openssl/x509.h>
 #include <sstream>
+#include <tether/log.hpp>
 
 namespace tether {
 
