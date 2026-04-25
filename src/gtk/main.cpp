@@ -94,7 +94,9 @@ namespace {
     void send_async_daemon_message(const nlohmann::json& j) {
         if (g_app.event_fd >= 0) {
             std::string payload = j.dump() + "\n";
-            ::write(g_app.event_fd, payload.c_str(), payload.size());
+            if (::write(g_app.event_fd, payload.c_str(), payload.size()) < 0) {
+                std::cerr << "daemon write error\n";
+            }
         }
     }
 
@@ -641,7 +643,9 @@ namespace {
                                               on_event_channel,
                                               nullptr);
         static const char kSubscribe[] = "{\"command\":\"subscribe\"}\n";
-        write(fd, kSubscribe, sizeof(kSubscribe) - 1);
+        if (write(fd, kSubscribe, sizeof(kSubscribe) - 1) < 0) {
+            std::cerr << "subscribe write error\n";
+        }
         set_status_main("Daemon Online");
         return G_SOURCE_REMOVE;
     }

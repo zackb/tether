@@ -158,7 +158,9 @@ void ClipboardManager::copy(const std::string& text) {
         // Given that we are primarily fixing the READ data race, we'll keep 
         // the write simple but ensure it doesn't touch any manager state.
         std::thread([text_to_send, fd]() {
-            write(fd, text_to_send.c_str(), text_to_send.size());
+            if (write(fd, text_to_send.c_str(), text_to_send.size()) < 0) {
+                std::cerr << "clipboard write error\n";
+            }
             close(fd);
         }).detach();
     });

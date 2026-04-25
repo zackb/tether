@@ -137,7 +137,9 @@ std::string Client::send_and_wait(const std::string& payload) {
             return std::string(buf);
         }
     } else {
-        write(sock_, payload.c_str(), payload.size());
+        if (write(sock_, payload.c_str(), payload.size()) < 0) {
+            std::cerr << "client write error\n";
+        }
         ssize_t n = read(sock_, buf, sizeof(buf) - 1);
         if (n > 0) {
             buf[n] = '\0';
