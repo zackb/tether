@@ -31,7 +31,7 @@ run-gtk: debug
 .PHONY: fmt
 fmt:
 	@echo "Formatting code with clang-format..."
-	@find ./src -name "*.cpp" -o -name "*.hpp" -print0 | xargs -0 -n 1 clang-format -i
+	@find ./src -not -path "*/build/*" \( -name "*.cpp" -o -name "*.hpp" \) -print0 | xargs -0 -r -n 1 clang-format -i
 	@echo "Done."
 
 clean:
