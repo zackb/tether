@@ -613,9 +613,9 @@ namespace {
                     std::filesystem::path self_path = std::filesystem::read_symlink("/proc/self/exe");
                     std::string daemon_path = (self_path.parent_path() / "tetherd").string();
                     if (fork() == 0) {
-                        freopen("/dev/null", "w", stdout);
-                        freopen("/dev/null", "w", stderr);
-                        freopen("/dev/null", "r", stdin);
+                        if (freopen("/dev/null", "w", stdout) == nullptr) {}
+                        if (freopen("/dev/null", "w", stderr) == nullptr) {}
+                        if (freopen("/dev/null", "r", stdin) == nullptr) {}
                         execl(daemon_path.c_str(), "tetherd", nullptr);
                         execlp("tetherd", "tetherd", nullptr);
                         exit(1);
