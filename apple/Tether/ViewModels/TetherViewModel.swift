@@ -449,6 +449,7 @@ final class TetherViewModel {
     }
 
     private func scheduleAutoReconnectAttempt() {
+        print("TetherViewModel: Scheduling auto-reconnect. shouldAutoReconnect: \(shouldAutoReconnect), autoConnectingFingerprint: \(String(describing: autoConnectingFingerprint))")
         guard shouldAutoReconnect else { return }
         guard autoConnectingFingerprint == nil else { return }
 
@@ -475,6 +476,7 @@ final class TetherViewModel {
     }
 
     private func attemptAutoReconnect() {
+        print("TetherViewModel: Attempting auto-reconnect. Last fingerprint: \(String(describing: certificateManager.lastConnectedFingerprint)), Found hosts: \(discovery.hosts.count)")
         guard shouldAutoReconnect else { return }
         
         // If we have a last connected fingerprint, prioritize it.
@@ -489,8 +491,10 @@ final class TetherViewModel {
             matchingHosts = discovery.hosts.count == 1 ? discovery.hosts : []
         }
         
+        print("TetherViewModel: Found \(matchingHosts.count) matching hosts for auto-reconnect.")
         guard let targetHost = matchingHosts.first else { return }
 
+        print("TetherViewModel: Connecting to target host: \(targetHost.name)")
         autoConnectingFingerprint = targetHost.fingerprint
         connectTo(host: targetHost)
     }
