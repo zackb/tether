@@ -217,6 +217,7 @@ final class TetherViewModel {
         pendingReconnectTask?.cancel()
         pendingReconnectTask = nil
         autoConnectingFingerprint = nil
+        certificateManager.lastConnectedFingerprint = nil // Also clear last connection
         connection.disconnect()
         appState = .disconnected
         connectedDeviceName = nil
@@ -372,6 +373,7 @@ final class TetherViewModel {
                 self.pendingReconnectTask?.cancel()
                 self.pendingReconnectTask = nil
                 self.autoConnectingFingerprint = nil
+                self.certificateManager.lastConnectedFingerprint = self.connection.serverFingerprint
                 self.handleConnected() // TODO: isInbound
             case .disconnected:
                 self.autoConnectingFingerprint = nil
@@ -474,24 +476,22 @@ final class TetherViewModel {
 
     private func attemptAutoReconnect() {
         guard shouldAutoReconnect else { return }
-        guard certificateManager.knownHosts.count == 1,
-              let fingerprint = certificateManager.knownHosts.keys.first else { return }
-
-        let matchingHosts = discovery.hosts.filter { $0.fingerprint == fingerprint }
-        let targetHost: DiscoveredHost?
-
-        if matchingHosts.count == 1 {
-            targetHost = matchingHosts[0]
-        } else if discovery.hosts.count == 1 {
-            let soleHost = discovery.hosts[0]
-            targetHost = soleHost.fingerprint.isEmpty || soleHost.fingerprint == fingerprint ? soleHost : nil
+        
+        // If we have a last connected fingerprint, prioritize it.
+        let targetFingerprint = certificateManager.lastConnectedFingerprint
+        
+        let matchingHosts: [DiscoveredHost]
+        if let targetFingerprint {
+            matchingHosts = discovery.hosts.filter { $0.fingerprint == targetFingerprint }
         } else {
-            targetHost = nil
+            // Fallback to any host if we don't have a record,
+            // but ONLY if there's exactly one host found.
+            matchingHosts = discovery.hosts.count == 1 ? discovery.hosts : []
         }
+        
+        guard let targetHost = matchingHosts.first else { return }
 
-        guard let targetHost else { return }
-
-        autoConnectingFingerprint = fingerprint
+        autoConnectingFingerprint = targetHost.fingerprint
         connectTo(host: targetHost)
     }
 

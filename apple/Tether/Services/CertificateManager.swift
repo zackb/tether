@@ -19,12 +19,20 @@ final class CertificateManager {
     private static let certLabel = "net.jeedup.Tether.cert"
     private static let knownHostsKey = "TetherKnownHosts"
     private static let localDeviceNameKey = "TetherLocalDeviceName"
+    private static let lastConnectedFingerprintKey = "TetherLastConnectedFingerprint"
 
     // SHA-256 fingerprint of our own certificate (lowercase hex, no separators).
     private(set) var myFingerprint: String = ""
 
     // Map of known host fingerprints → device name.
     private(set) var knownHosts: [String: String] = [:]
+
+    // The fingerprint of the host we most recently connected to.
+    var lastConnectedFingerprint: String? {
+        didSet {
+            UserDefaults.standard.set(lastConnectedFingerprint, forKey: Self.lastConnectedFingerprintKey)
+        }
+    }
 
     // Name of this device as presented to others.
     var localDeviceName: String = "" {
@@ -42,6 +50,7 @@ final class CertificateManager {
     func initialize() {
         loadKnownHosts()
         loadLocalDeviceName()
+        lastConnectedFingerprint = UserDefaults.standard.string(forKey: Self.lastConnectedFingerprintKey)
 
         if let existing = loadIdentityFromKeychain() {
             identity = existing
