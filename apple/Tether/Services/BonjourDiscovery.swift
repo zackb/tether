@@ -99,6 +99,7 @@ final class BonjourDiscovery {
             }
 
             let fingerprint = extractFingerprint(from: result.metadata)
+            print("BonjourDiscovery: Discovered host: \(name), fingerprint: '\(fingerprint)'")
             
             if let local = self.localFingerprint, !local.isEmpty, fingerprint == local {
                 return nil
