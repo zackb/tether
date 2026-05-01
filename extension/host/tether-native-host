@@ -2,4 +2,4 @@
 # Wrapper script to run tether in native messaging proxy mode
 # The browser will execute this script via the com.tether.extension.json manifest.
 
-exec /usr/local/bin/tether --native-host
+exec tether --native-host

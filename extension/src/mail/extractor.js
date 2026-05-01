@@ -4,6 +4,8 @@
 // This example assumes Manifest V2/V3 background script using the WebExtension Mail APIs
 // (messenger.messages, messenger.mailTabs)
 
+import { sendToNativeHost } from '../shared/native.js';
+
 if (typeof messenger !== 'undefined') {
   console.log("Tether Mail Extractor loaded in Thunderbird/Betterbird");
 
@@ -35,9 +37,9 @@ if (typeof messenger !== 'undefined') {
       const otp = matches[0]; // Simplistic approach: take the first one
       console.log("Found OTP in email:", otp);
       
-      // Send it to the background script, which forwards it to the native daemon
-      browser.runtime.sendMessage({
-        action: "found_otp_in_email",
+      // Send it directly to the native daemon
+      sendToNativeHost({
+        command: "new_otp",
         otp: otp,
         source: message.subject
       });
