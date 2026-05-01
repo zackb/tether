@@ -1,0 +1,10 @@
+{
+  "name": "com.tether.extension",
+  "description": "Tether Native Messaging Host",
+  "path": "/usr/local/bin/tetherd",
+  "type": "stdio",
+  "allowed_origins": [
+    "chrome-extension://<EXTENSION-ID-HERE>/",
+    "moz-extension://<EXTENSION-ID-HERE>/"
+  ]
+}

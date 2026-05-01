@@ -1,0 +1,45 @@
+// Mail script for Thunderbird/Betterbird
+// This script extracts OTP codes from emails
+
+// This example assumes Manifest V2/V3 background script using the WebExtension Mail APIs
+// (messenger.messages, messenger.mailTabs)
+
+if (typeof messenger !== 'undefined') {
+  console.log("Tether Mail Extractor loaded in Thunderbird/Betterbird");
+
+  // Listen for new messages being displayed
+  messenger.messageDisplay.onMessageDisplayed.addListener(async (tabId, message) => {
+    // Get the full message body
+    const full = await messenger.messages.getFull(message.id);
+    const bodyText = extractTextFromParts(full.parts);
+    
+    // Simple regex to find 6-8 digit OTP codes
+    const otpRegex = /\b\d{6,8}\b/g;
+    const matches = bodyText.match(otpRegex);
+    
+    if (matches && matches.length > 0) {
+      const otp = matches[0]; // Simplistic approach: take the first one
+      console.log("Found OTP in email:", otp);
+      
+      // Send it to the background script, which forwards it to the native daemon
+      browser.runtime.sendMessage({
+        action: "found_otp_in_email",
+        otp: otp,
+        source: message.subject
+      });
+    }
+  });
+
+  function extractTextFromParts(parts) {
+    let text = "";
+    if (!parts) return text;
+    for (const part of parts) {
+      if (part.contentType === "text/plain" && part.body) {
+        text += part.body + "\n";
+      } else if (part.parts) {
+        text += extractTextFromParts(part.parts);
+      }
+    }
+    return text;
+  }
+}

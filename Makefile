@@ -34,6 +34,10 @@ fmt:
 	@find ./src -not -path "*/build/*" \( -name "*.cpp" -o -name "*.hpp" \) -print0 | xargs -0 -r -n 1 clang-format -i
 	@echo "Done."
 
+.PHONY: extension
+extension:
+	@./extension/build.sh
+
 clean:
 	rm -rf build
 	rm -f compile_commands.json
