@@ -53,6 +53,7 @@ namespace tether {
     static std::vector<ReceivedFileInfo> recent_received_files;
     static constexpr size_t kMaxRecentReceivedFiles = 16;
     static std::map<int, ConnectedClientSnapshot> connected_remote_clients;
+    static std::string g_current_otp;
 
     void register_client_fd(int fd) { active_sessions[fd] = {fd, nullptr}; }
 
@@ -411,6 +412,22 @@ namespace tether {
                             }
                             continue;
                         }
+                    } else if (j.contains("command") && j["command"] == "new_otp" && j.contains("otp")) {
+                        g_current_otp = j["otp"];
+                        std::string payload = "{\"status\":\"ok\"}\n";
+                        if (write(client_fd, payload.c_str(), payload.size()) < 0) {
+                            debug::log(ERR, "net write error\n");
+                        }
+                        continue;
+                    } else if (j.contains("command") && j["command"] == "request_otp") {
+                        nlohmann::json resp;
+                        resp["command"] = "otp_available";
+                        resp["otp"] = g_current_otp;
+                        std::string payload = resp.dump() + "\n";
+                        if (write(client_fd, payload.c_str(), payload.size()) < 0) {
+                            debug::log(ERR, "net write error\n");
+                        }
+                        continue;
                     } else if (j.contains("command") && j["command"] == "file_start") {
                         if (broadcast_tcp_message(msg) == 0) {
                             nlohmann::json resp;

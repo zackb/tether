@@ -14,7 +14,7 @@ if (typeof chrome !== 'undefined' && chrome.runtime) {
       console.log("Found OTP in email, sending to Tether daemon:", request.otp);
       // Send the extracted OTP to the C++ daemon
       sendToNativeHost({
-        type: "new_otp",
+        command: "new_otp",
         otp: request.otp,
         source: request.source
       });
@@ -25,7 +25,7 @@ if (typeof chrome !== 'undefined' && chrome.runtime) {
       console.log("Content script requesting OTP for:", request.url);
       // Query the C++ daemon for an OTP
       sendToNativeHost({
-        type: "request_otp",
+        command: "request_otp",
         url: request.url
       });
       sendResponse({ status: "requested" });

@@ -36,7 +36,7 @@ export function sendToNativeHost(message) {
 
 function handleNativeMessage(message) {
   // Dispatch native messages to other parts of the extension
-  if (message.type === "otp_available") {
+  if (message.command === "otp_available") {
     // Notify content scripts or popup
     if (typeof chrome !== 'undefined' && chrome.tabs) {
       chrome.tabs.query({active: true, currentWindow: true}, function(tabs) {
