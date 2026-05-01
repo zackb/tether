@@ -177,3 +177,38 @@ Trusts a pending pair request by moving the target fingerprint into the daemon's
 Offloads an entire file transfer to the daemon. The daemon spawns a thread to read the local filesystem and pushes the chunks sequence securely.
 **Payload**: `{"command": "send_file", "path": "/absolute/path/to/my_video.mp4"}`
 **Response**: `{"command": "file_send_complete", "success": true, "message": "Sent my_video.mp4"}`
+
+---
+
+## 5. OTP Vault (Extension Integration)
+
+Tether uses the local UNIX socket to coordinate OTP syncing between mail clients (Thunderbird/Betterbird) and web browsers (Firefox/Chrome). The daemon acts as an ephemeral secure vault for these codes.
+
+### `new_otp` (Mail Extension -> Daemon)
+**Description**: Sent by the mail extension via native messaging when an OTP code is scraped from a new email.
+**Payload**:
+```json
+{
+  "command": "new_otp",
+  "otp": "123456",
+  "source": "Your Login Code"
+}
+```
+**Response**: `{"status": "ok"}`
+
+### `request_otp` (Browser Extension -> Daemon)
+**Description**: Sent by the browser extension via native messaging when a 2FA/OTP input field is detected natively in the DOM.
+**Payload**:
+```json
+{
+  "command": "request_otp",
+  "url": "example.com"
+}
+```
+**Response**: 
+```json
+{
+  "command": "otp_available",
+  "otp": "123456"
+}
+```
