@@ -1,7 +1,7 @@
 {
   "name": "com.tether.extension",
   "description": "Tether Native Messaging Host",
-  "path": "/usr/local/bin/tetherd",
+  "path": "@CMAKE_INSTALL_FULL_BINDIR@/tether-native-host",
   "type": "stdio",
   "allowed_origins": [
     "chrome-extension://<EXTENSION-ID-HERE>/",

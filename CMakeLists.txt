@@ -46,3 +46,15 @@ if(NOT TARGET uninstall)
     add_custom_target(uninstall
         COMMAND ${CMAKE_COMMAND} -P ${CMAKE_CURRENT_BINARY_DIR}/cmake_uninstall.cmake)
 endif()
+
+# Browser Extension Host manifest generation
+include(GNUInstallDirs)
+configure_file(
+    "${CMAKE_CURRENT_SOURCE_DIR}/extension/host/com.tether.extension.json.in"
+    "${CMAKE_CURRENT_BINARY_DIR}/com.tether.extension.json"
+    @ONLY
+)
+
+install(PROGRAMS "${CMAKE_CURRENT_SOURCE_DIR}/extension/host/tether-native-host"
+        DESTINATION ${CMAKE_INSTALL_BINDIR})
+
