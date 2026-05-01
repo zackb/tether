@@ -50,8 +50,13 @@ endif()
 # Browser Extension Host manifest generation
 include(GNUInstallDirs)
 configure_file(
-    "${CMAKE_CURRENT_SOURCE_DIR}/extension/host/com.tether.extension.json.in"
-    "${CMAKE_CURRENT_BINARY_DIR}/com.tether.extension.json"
+    "${CMAKE_CURRENT_SOURCE_DIR}/extension/host/com.tether.extension.chrome.json.in"
+    "${CMAKE_CURRENT_BINARY_DIR}/com.tether.extension.chrome.json"
+    @ONLY
+)
+configure_file(
+    "${CMAKE_CURRENT_SOURCE_DIR}/extension/host/com.tether.extension.mozilla.json.in"
+    "${CMAKE_CURRENT_BINARY_DIR}/com.tether.extension.mozilla.json"
     @ONLY
 )
 

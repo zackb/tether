@@ -7,6 +7,7 @@
 #include <vector>
 
 void run_native_messaging_host(tether::Client& client) {
+    debug::log(INFO, "Starting Native Messaging Host loop...\n");
     while (true) {
         uint32_t length = 0;
         if (!std::cin.read(reinterpret_cast<char*>(&length), sizeof(length))) {

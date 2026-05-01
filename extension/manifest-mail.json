@@ -1,33 +1,36 @@
 {
-  "manifest_version": 2,
-  "name": "Tether Mail Extension",
-  "version": "1.0.0",
-  "description": "Extracts OTPs from emails for Tether daemon",
-  "browser_specific_settings": {
-    "gecko": {
-      "id": "tether@yourdomain.com",
-      "strict_min_version": "115.0"
+    "manifest_version": 2,
+    "name": "Tether Mail Extension",
+    "version": "1.0.0",
+    "description": "Extracts OTPs from emails for Tether daemon",
+    "browser_specific_settings": {
+        "gecko": {
+            "id": "tether@tether.com",
+            "strict_min_version": "115.0"
+        }
+    },
+    "permissions": [
+        "nativeMessaging",
+        "messagesRead",
+        "storage"
+    ],
+    "background": {
+        "scripts": [
+            "src/background/background.js",
+            "src/mail/extractor.js"
+        ]
+    },
+    "browser_action": {
+        "default_popup": "popup/index.html",
+        "default_icon": {
+            "16": "icons/icon16.png",
+            "48": "icons/icon48.png",
+            "128": "icons/icon128.png"
+        }
+    },
+    "icons": {
+        "16": "icons/icon16.png",
+        "48": "icons/icon48.png",
+        "128": "icons/icon128.png"
     }
-  },
-  "permissions": [
-    "nativeMessaging",
-    "messagesRead",
-    "storage"
-  ],
-  "background": {
-    "scripts": ["src/background/background.js", "src/mail/extractor.js"]
-  },
-  "browser_action": {
-    "default_popup": "popup/index.html",
-    "default_icon": {
-      "16": "icons/icon16.png",
-      "48": "icons/icon48.png",
-      "128": "icons/icon128.png"
-    }
-  },
-  "icons": {
-    "16": "icons/icon16.png",
-    "48": "icons/icon48.png",
-    "128": "icons/icon128.png"
-  }
 }

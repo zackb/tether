@@ -4,7 +4,9 @@
 // This example assumes Manifest V2/V3 background script using the WebExtension Mail APIs
 // (messenger.messages, messenger.mailTabs)
 
-import { sendToNativeHost } from '../shared/native.js';
+import { connectToNativeHost, sendToNativeHost } from '../shared/native.js';
+
+connectToNativeHost();
 
 if (typeof messenger !== 'undefined') {
   console.log("Tether Mail Extractor loaded in Thunderbird/Betterbird");

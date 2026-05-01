@@ -17,10 +17,17 @@ export function connectToNativeHost() {
     handleNativeMessage(message);
   });
 
-  port.onDisconnect.addListener(() => {
-    console.log("Disconnected from Tether daemon");
+  port.onDisconnect.addListener((p) => {
+    let errorMsg = "unknown reason";
+    if (p.error) {
+        errorMsg = p.error.message;
+    } else if (typeof browser !== 'undefined' && browser.runtime.lastError) {
+      errorMsg = browser.runtime.lastError.message;
+    } else if (typeof chrome !== 'undefined' && chrome.runtime.lastError) {
+      errorMsg = chrome.runtime.lastError.message;
+    }
+    console.log("Disconnected from Tether daemon. Reason:", errorMsg);
     port = null;
-    // Implement reconnection logic if needed
   });
 
   return port;

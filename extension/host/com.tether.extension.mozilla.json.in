@@ -3,8 +3,8 @@
   "description": "Tether Native Messaging Host",
   "path": "@CMAKE_INSTALL_FULL_BINDIR@/tether-native-host",
   "type": "stdio",
-  "allowed_origins": [
-    "chrome-extension://<EXTENSION-ID-HERE>/",
-    "moz-extension://<EXTENSION-ID-HERE>/"
+  "allowed_extensions": [
+    "tether-browser@yourdomain.com",
+    "tether@yourdomain.com"
   ]
 }
