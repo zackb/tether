@@ -4,6 +4,41 @@
 #include <tether/discovery.hpp>
 #include <tether/log.hpp>
 #include <unistd.h>
+#include <vector>
+
+void run_native_messaging_host(tether::Client& client) {
+    while (true) {
+        uint32_t length = 0;
+        if (!std::cin.read(reinterpret_cast<char*>(&length), sizeof(length))) {
+            break;
+        }
+
+        if (length == 0 || length > 10 * 1024 * 1024) {
+            break;
+        }
+
+        std::vector<char> buffer(length);
+        if (!std::cin.read(buffer.data(), length)) {
+            break;
+        }
+
+        std::string payload(buffer.begin(), buffer.end());
+        if (payload.empty() || payload.back() != '\n') {
+            payload += "\n";
+        }
+
+        std::string response = client.send_and_wait(payload);
+
+        if (!response.empty() && response.back() == '\n') {
+            response.pop_back();
+        }
+
+        uint32_t out_length = response.length();
+        std::cout.write(reinterpret_cast<const char*>(&out_length), sizeof(out_length));
+        std::cout.write(response.data(), out_length);
+        std::cout.flush();
+    }
+}
 
 void print_help() {
     std::cout << "tether - Wayland companion CLI\n\n"
@@ -12,6 +47,7 @@ void print_help() {
               << "  -g, --get-clipboard      Retrieve the current Wayland clipboard text.\n"
               << "  -s, --set-clipboard      Take string input and copy it to the local Wayland clipboard.\n"
               << "  -f, --send-file          Send a file through tether.\n"
+              << "  -n, --native-host        Start the browser Native Messaging Host proxy loop.\n"
               << "  -d, --discover           Scan the local network for tetherd instances via mDNS.\n"
               << "  --host <ip>              Connect over TCP to daemon ip instead of UNIX Socket.\n"
               << "  --port <num>             Connect over TCP port (default 5134).\n"
@@ -69,6 +105,8 @@ int main(int argc, char* argv[]) {
             action = "file";
             if (i + 1 < argc && argv[i + 1][0] != '-')
                 arg_val = argv[++i];
+        } else if (arg == "-n" || arg == "--native-host") {
+            action = "native";
         } else if (arg == "-s" || arg == "--set-clipboard") {
             action = "set";
             if (i + 1 < argc && argv[i + 1][0] != '-')
@@ -164,6 +202,8 @@ int main(int argc, char* argv[]) {
             return 1;
         }
         debug::log(INFO, "File transfer delivered.\n");
+    } else if (action == "native") {
+        run_native_messaging_host(client);
     }
 
     return 0;
