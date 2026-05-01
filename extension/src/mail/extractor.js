@@ -7,8 +7,22 @@
 if (typeof messenger !== 'undefined') {
   console.log("Tether Mail Extractor loaded in Thunderbird/Betterbird");
 
-  // Listen for new messages being displayed
+  // Listen for new messages arriving in the background completely silently
+  if (messenger.messages.onNewMailReceived) {
+    messenger.messages.onNewMailReceived.addListener(async (folder, messages) => {
+      // messages is a MessageList, we need to iterate its messages array
+      for (const message of messages.messages) {
+        processMessage(message);
+      }
+    });
+  }
+
+  // Also process manually opened messages just in case it missed it
   messenger.messageDisplay.onMessageDisplayed.addListener(async (tabId, message) => {
+    processMessage(message);
+  });
+
+  async function processMessage(message) {
     // Get the full message body
     const full = await messenger.messages.getFull(message.id);
     const bodyText = extractTextFromParts(full.parts);
@@ -28,7 +42,7 @@ if (typeof messenger !== 'undefined') {
         source: message.subject
       });
     }
-  });
+  }
 
   function extractTextFromParts(parts) {
     let text = "";
