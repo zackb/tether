@@ -27,7 +27,7 @@ const POLL_INTERVAL_MS = 15000;    // 15 seconds between polls
 const OTP_TTL_MS = 10 * 60 * 1000; // only look at emails from the last 10 minutes
 
 // Use a Map instead of Set so we can prune by timestamp
-const seenMessages = new Map(); // message.id → timestamp
+const seenMessages = new Map(); // message.id -> timestamp
 
 function markSeen(id) {
   seenMessages.set(id, Date.now());
@@ -82,6 +82,12 @@ function isFalsePositive(num, context) {
   return false;
 }
 
+// ---------------------------------------------------------------------------
+// FALLBACK text extraction: manually walk getFull() parts.
+// Used when listInlineTextParts() is unavailable (older Thunderbird builds).
+// For HTML parts we use DOMParser to tag prominent elements for the scorer,
+// then grab the full body plain text.
+// ---------------------------------------------------------------------------
 function extractTextFromParts(parts) {
   let text = "";
   if (!parts) return text;
@@ -107,9 +113,7 @@ function extractTextFromParts(parts) {
           if (t) prominentParts.push('PROMINENT:' + t);
         });
 
-        // Full plain text of the cleaned body (no duplicate tag-stripped HTML)
         const bodyPlain = doc.body?.textContent || '';
-
         text += prominentParts.join('\n') + '\n' + bodyPlain + '\n';
       } catch (e) {
         console.error("DOMParser error", e);
@@ -123,13 +127,78 @@ function extractTextFromParts(parts) {
   return text;
 }
 
+// ---------------------------------------------------------------------------
+// PRIMARY text extraction: uses newer Thunderbird APIs (TB 102+).
+//
+//   messenger.messages.listInlineTextParts(id)
+//     - gives us clean content without manually walking the MIME tree
+//
+//   messenger.messengerUtilities.convertToPlainText(html)
+//     - Thunderbird's own HTML-to-plaintext converter; handles tables,
+//       encoded entities, and nested elements far better than a hand-rolled
+//       DOMParser tag-strip. Borrowed from thunderbird-vericode's approach.
+//
+// We still run the DOMParser tagging pass on the raw HTML before
+// converting, so the scorer's +25 bonus is preserved on this code path too.
+//
+// Falls back to extractTextFromParts() for older Thunderbird/Betterbird builds.
+// ---------------------------------------------------------------------------
+async function getEmailText(messageId) {
+  try {
+    const parts = await messenger.messages.listInlineTextParts(messageId);
+    let text = '';
+
+    for (const part of parts) {
+      if (part.contentType === 'text/plain') {
+        text += part.content + '\n';
+
+      } else if (part.contentType === 'text/html') {
+        // tagging pass on the raw HTML first, before conversion
+        // strips all tags. This preserves our scoring bonus.
+        try {
+          const parser = new DOMParser();
+          const doc = parser.parseFromString(part.content, 'text/html');
+          doc.querySelectorAll('style, script, footer, nav').forEach(el => el.remove());
+
+          const prominentParts = [];
+          doc.querySelectorAll(
+            'strong, b, h1, h2, h3, td, th, .otp, .code, [class*="otp"], [class*="code"], [class*="verif"]'
+          ).forEach(el => {
+            const t = el.textContent.trim();
+            if (t) prominentParts.push('PROMINENT:' + t);
+          });
+
+          if (prominentParts.length > 0) {
+            text += prominentParts.join('\n') + '\n';
+          }
+        } catch (e) {
+          // tagging failed, continue without the bonus
+        }
+
+        // Use Thunderbird's built-in converter for the full body plain text.
+        // This handles encoded entities, table layouts, and nested elements
+        // far better than a manual tag-strip.
+        const plain = await messenger.messengerUtilities.convertToPlainText(part.content);
+        text += plain + '\n';
+      }
+    }
+
+    return text;
+  } catch (e) {
+    // listInlineTextParts or convertToPlainText not available
+    // fall back to the manual DOMParser path.
+    console.log("listInlineTextParts unavailable, falling back to getFull():", e.message);
+    const full = await messenger.messages.getFull(messageId);
+    return extractTextFromParts(full.parts);
+  }
+}
+
 async function processMessage(message) {
   console.log("Processing message:", message.subject);
 
-  const full = await messenger.messages.getFull(message.id);
-  const bodyText = extractTextFromParts(full.parts);
+  const bodyText = await getEmailText(message.id);
 
-  // Subject is a strong prior. If it matches, we trust body extractions more
+  // Subject is a strong prior — if it matches, we trust body extractions more
   const subjectMatches = OTP_SUBJECT_PATTERNS.some(p => p.test(message.subject));
 
   const candidates = [];
@@ -192,10 +261,9 @@ if (typeof messenger !== 'undefined') {
         for (const message of page.messages) {
           if (hasSeen(message.id)) continue;
           markSeen(message.id);
-          console.log("New message:", message.subject);
 
           // Pre-filter by subject or sender before fetching the full body,
-          // so we don't pay the getFull() cost on every single email.
+          // so we don't pay the getEmailText() cost on every single email.
           const subjectMatches = OTP_SUBJECT_PATTERNS.some(p => p.test(message.subject));
           const fromMatches = /noreply|no-reply|security|verify|auth|account/i.test(message.author);
 
