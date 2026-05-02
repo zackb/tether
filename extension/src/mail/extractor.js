@@ -1,9 +1,6 @@
 // Mail script for Thunderbird/Betterbird
 // This script extracts OTP codes from emails
 
-// This example assumes Manifest V2/V3 background script using the WebExtension Mail APIs
-// (messenger.messages, messenger.mailTabs)
-
 import { connectToNativeHost, sendToNativeHost } from '../shared/native.js';
 
 connectToNativeHost();
@@ -26,17 +23,40 @@ const OTP_SUBJECT_PATTERNS = [
   /\bOTP\b/i, /security code/i, /\d{4,8} is your/i
 ];
 
+const POLL_INTERVAL_MS = 15000;    // 15 seconds between polls
+const OTP_TTL_MS = 10 * 60 * 1000; // only look at emails from the last 10 minutes
+
+// Use a Map instead of Set so we can prune by timestamp
+const seenMessages = new Map(); // message.id → timestamp
+
+function markSeen(id) {
+  seenMessages.set(id, Date.now());
+}
+
+function hasSeen(id) {
+  return seenMessages.has(id);
+}
+
+function pruneOldSeen() {
+  const cutoff = Date.now() - OTP_TTL_MS;
+  for (const [id, ts] of seenMessages) {
+    if (ts < cutoff) seenMessages.delete(id);
+  }
+}
+
+// Run pruning every minute so the Map doesn't grow forever
+setInterval(pruneOldSeen, 60_000);
+
 function scoreCandidate(num, surroundingText) {
   let score = 0;
   const lower = surroundingText.toLowerCase();
-
   const numIndex = lower.indexOf(num.toLowerCase());
 
   for (const kw of OTP_CONTEXT_KEYWORDS) {
     if (lower.includes(kw)) {
       score += 10;
 
-      // Proximity bonus: keyword within 20 chars of the number
+      // Proximity bonus: keyword within 30 chars of the number
       if (numIndex !== -1) {
         const kwIndex = lower.indexOf(kw);
         if (Math.abs(numIndex - kwIndex) <= 30) {
@@ -45,6 +65,10 @@ function scoreCandidate(num, surroundingText) {
       }
     }
   }
+
+  // Bonus if the match was found inside a visually prominent element
+  if (surroundingText.includes('PROMINENT:')) score += 25;
+
   return score;
 }
 
@@ -58,142 +82,180 @@ function isFalsePositive(num, context) {
   return false;
 }
 
-if (typeof messenger !== 'undefined') {
-  console.log("Tether Mail Extractor loaded in Thunderbird/Betterbird");
+function extractTextFromParts(parts) {
+  let text = "";
+  if (!parts) return text;
 
-  // Track message IDs we've already processed to avoid duplicates
-  const seenMessageIds = new Set();
+  for (const part of parts) {
+    if (part.contentType === "text/plain" && part.body) {
+      text += part.body + "\n";
 
-  async function processNewMessagesInFolder(folder) {
-    try {
-      const page = await messenger.messages.list(folder);
-      for (const message of page.messages) {
-        if (!seenMessageIds.has(message.id)) {
-          seenMessageIds.add(message.id);
-          processMessage(message);
-        }
-      }
-    } catch (e) {
-      // Folder may not support listing (e.g. virtual folders)
-    }
-  }
+    } else if (part.contentType === "text/html" && part.body) {
+      try {
+        const parser = new DOMParser();
+        const doc = parser.parseFromString(part.body, 'text/html');
 
-  // Tier 1: onNewMailReceived — works for POP3 / local delivery / filters
-  if (messenger.messages.onNewMailReceived) {
-    messenger.messages.onNewMailReceived.addListener(async (folder, messages) => {
-      for (const message of messages.messages) {
-        if (!seenMessageIds.has(message.id)) {
-          seenMessageIds.add(message.id);
-          processMessage(message);
-        }
-      }
-    });
-  }
+        // Remove noise nodes before any extraction
+        doc.querySelectorAll('style, script, footer, nav').forEach(el => el.remove());
 
-  // Tier 2: onFolderInfoChanged — catches IMAP synced mail that onNewMailReceived misses
-  // Fires when folder unread/total counts change, i.e. new messages landed via IMAP
-  if (messenger.folders?.onFolderInfoChanged) {
-    messenger.folders.onFolderInfoChanged.addListener(async (folder, folderInfo) => {
-      // Only scan inbox-type folders where new mail typically lands
-      if (folder.type === 'inbox' || folder.type === 'other') {
-        await processNewMessagesInFolder(folder);
-      }
-    });
-  }
-
-  // Tier 3: onMessageDisplayed — final fallback when opening an email manually
-  messenger.messageDisplay.onMessageDisplayed.addListener(async (tabId, message) => {
-    if (!seenMessageIds.has(message.id)) {
-      seenMessageIds.add(message.id);
-      processMessage(message);
-    }
-  });
-
-
-  async function processMessage(message) {
-    const full = await messenger.messages.getFull(message.id);
-    const bodyText = extractTextFromParts(full.parts);
-    
-    // Email Subject Line as a Strong Prior
-    let subjectMatches = false;
-    for (const pattern of OTP_SUBJECT_PATTERNS) {
-      if (pattern.test(message.subject)) {
-        subjectMatches = true;
-        break;
-      }
-    }
-
-    let candidates = [];
-    
-    for (const pattern of OTP_PATTERNS) {
-      let match;
-      const regex = new RegExp(pattern.source, pattern.flags);
-
-      while ((match = regex.exec(bodyText)) !== null) {
-        const num = match[1] || match[0];
-
-        // Skip purely alphabetical matches
-        if (/^[A-Za-z]+$/.test(num)) continue;
-
-        const startIndex = Math.max(0, match.index - 50);
-        const endIndex = Math.min(bodyText.length, match.index + match[0].length + 50);
-        const context = bodyText.substring(startIndex, endIndex);
-
-        if (isFalsePositive(num, context)) continue;
-
-        let score = scoreCandidate(num, context);
-        if (subjectMatches) score += 30;
-
-        candidates.push({ num, score });
-      }
-    }
-
-    if (candidates.length > 0) {
-      // Sort by score descending
-      candidates.sort((a, b) => b.score - a.score);
-      const best = candidates[0];
-
-      if (best.score > 0) {
-        console.log("Found OTP candidate in email:", best.num, "with score:", best.score);
-        sendToNativeHost({
-          command: "new_otp",
-          otp: best.num.replace(/[-\s]/g, ''),
-          source: message.subject
+        // Tag visually prominent elements so the scorer can give them a bonus
+        const prominentParts = [];
+        doc.querySelectorAll(
+          'strong, b, h1, h2, h3, td, th, .otp, .code, [class*="otp"], [class*="code"], [class*="verif"]'
+        ).forEach(el => {
+          const t = el.textContent.trim();
+          if (t) prominentParts.push('PROMINENT:' + t);
         });
+
+        // Full plain text of the cleaned body (no duplicate tag-stripped HTML)
+        const bodyPlain = doc.body?.textContent || '';
+
+        text += prominentParts.join('\n') + '\n' + bodyPlain + '\n';
+      } catch (e) {
+        console.error("DOMParser error", e);
       }
+
+    } else if (part.parts) {
+      text += extractTextFromParts(part.parts);
     }
   }
 
-  function extractTextFromParts(parts) {
-    let text = "";
-    if (!parts) return text;
-    for (const part of parts) {
-      if (part.contentType === "text/plain" && part.body) {
-        text += part.body + "\n";
-      } else if (part.contentType === "text/html" && part.body) {
-        let htmlText = "";
-        try {
-          const parser = new DOMParser();
-          const doc = parser.parseFromString(part.body, 'text/html');
-          const candidates = doc.querySelectorAll('strong, b, h1, h2, td, .otp, .code');
-          for (const el of candidates) {
-            htmlText += el.textContent + " \n ";
-          }
-        } catch (e) {
-          console.error("DOMParser error", e);
-        }
+  return text;
+}
 
-        let htmlBody = part.body;
-        htmlBody = htmlBody.replace(/<style[^>]*>[\s\S]*?<\/style>/gi, ' ');
-        htmlBody = htmlBody.replace(/<script[^>]*>[\s\S]*?<\/script>/gi, ' ');
-        htmlBody = htmlBody.replace(/<[^>]+>/g, ' ');
+async function processMessage(message) {
+  console.log("Processing message:", message.subject);
 
-        text += htmlText + "\n" + htmlBody + "\n";
-      } else if (part.parts) {
-        text += extractTextFromParts(part.parts);
-      }
+  const full = await messenger.messages.getFull(message.id);
+  const bodyText = extractTextFromParts(full.parts);
+
+  // Subject is a strong prior. If it matches, we trust body extractions more
+  const subjectMatches = OTP_SUBJECT_PATTERNS.some(p => p.test(message.subject));
+
+  const candidates = [];
+
+  for (const pattern of OTP_PATTERNS) {
+    const regex = new RegExp(pattern.source, pattern.flags);
+    let match;
+
+    while ((match = regex.exec(bodyText)) !== null) {
+      const num = match[1] || match[0];
+
+      // Skip purely alphabetical matches
+      if (/^[A-Za-z]+$/.test(num)) continue;
+
+      const startIndex = Math.max(0, match.index - 50);
+      const endIndex = Math.min(bodyText.length, match.index + match[0].length + 50);
+      const context = bodyText.substring(startIndex, endIndex);
+
+      if (isFalsePositive(num, context)) continue;
+
+      let score = scoreCandidate(num, context);
+      if (subjectMatches) score += 30;
+
+      candidates.push({ num, score });
     }
-    return text;
+  }
+
+  if (candidates.length > 0) {
+    candidates.sort((a, b) => b.score - a.score);
+    const best = candidates[0];
+
+    if (best.score > 0) {
+      console.log("Found OTP candidate in email:", best.num, "with score:", best.score);
+      sendToNativeHost({
+        command: "new_otp",
+        otp: best.num.replace(/[-\s]/g, ''),
+        source: message.subject
+      });
+    }
   }
 }
 
+if (typeof messenger !== 'undefined') {
+  console.log("Tether Mail Extractor loaded in Thunderbird/Betterbird");
+
+  // ---------------------------------------------------------------------------
+  // PRIMARY: Poll via messages.query() — the only reliable method for IMAP.
+  //
+  // onNewMailReceived only fires for POP3/local delivery, never for IMAP.
+  // onFolderInfoChanged fires for metadata changes and is unreliable for timing.
+  // Polling with a fromDate filter is what production Thunderbird extensions use.
+  // ---------------------------------------------------------------------------
+  async function pollForNewOtpEmails() {
+    const since = new Date(Date.now() - OTP_TTL_MS);
+
+    try {
+      let page = await messenger.messages.query({ fromDate: since });
+
+      while (page) {
+        for (const message of page.messages) {
+          if (hasSeen(message.id)) continue;
+          markSeen(message.id);
+          console.log("New message:", message.subject);
+
+          // Pre-filter by subject or sender before fetching the full body,
+          // so we don't pay the getFull() cost on every single email.
+          const subjectMatches = OTP_SUBJECT_PATTERNS.some(p => p.test(message.subject));
+          const fromMatches = /noreply|no-reply|security|verify|auth|account/i.test(message.author);
+
+          if (subjectMatches || fromMatches) {
+            processMessage(message);
+          }
+        }
+
+        // messages.query() returns paginated results — walk all pages
+        page = page.id ? await messenger.messages.continueList(page.id) : null;
+      }
+    } catch (e) {
+      console.error("pollForNewOtpEmails error:", e);
+    }
+  }
+
+  // Run immediately on load, then on a regular interval
+  pollForNewOtpEmails();
+  setInterval(pollForNewOtpEmails, POLL_INTERVAL_MS);
+
+  // ---------------------------------------------------------------------------
+  // SECONDARY: onNewMailReceived — fires instantly for POP3 and local delivery.
+  // Messages are handed to us directly here so we process them inline rather
+  // than re-querying. hasSeen() prevents the poller from double-processing them.
+  // ---------------------------------------------------------------------------
+  if (messenger.messages?.onNewMailReceived) {
+    messenger.messages.onNewMailReceived.addListener(async (folder, messages) => {
+      console.log("onNewMailReceived fired for folder:", folder.name);
+      for (const message of messages.messages) {
+        if (hasSeen(message.id)) continue;
+        markSeen(message.id);
+        const subjectMatches = OTP_SUBJECT_PATTERNS.some(p => p.test(message.subject));
+        const fromMatches = /noreply|no-reply|security|verify|auth|account/i.test(message.author);
+        if (subjectMatches || fromMatches) processMessage(message);
+      }
+    });
+  }
+
+  // ---------------------------------------------------------------------------
+  // TERTIARY: onFolderInfoChanged — used only as a hint to poll early for IMAP.
+  // This event doesn't give us the messages directly, so we just trigger a poll
+  // immediately rather than waiting for the next interval. hasSeen() ensures
+  // nothing gets processed twice.
+  // ---------------------------------------------------------------------------
+  if (messenger.folders?.onFolderInfoChanged) {
+    messenger.folders.onFolderInfoChanged.addListener((folder, folderInfo) => {
+      if (folder.type === 'inbox' || folder.type === 'other') {
+        console.log("onFolderInfoChanged hint — polling now for folder:", folder.name);
+        pollForNewOtpEmails();
+      }
+    });
+  }
+
+  // ---------------------------------------------------------------------------
+  // QUATERNARY: onMessageDisplayed — fires instantly when the user opens an
+  // email manually. Zero-latency fallback that works for all account types.
+  // ---------------------------------------------------------------------------
+  messenger.messageDisplay.onMessageDisplayed.addListener(async (tabId, message) => {
+    if (hasSeen(message.id)) return;
+    markSeen(message.id);
+    processMessage(message);
+  });
+}
