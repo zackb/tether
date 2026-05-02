@@ -8,13 +8,62 @@ import { connectToNativeHost, sendToNativeHost } from '../shared/native.js';
 
 connectToNativeHost();
 
+const OTP_CONTEXT_KEYWORDS = [
+  'code', 'otp', 'one-time', 'verification', 'confirm', 'passcode',
+  'authenticate', 'login', 'sign in', '2fa', 'token', 'pin',
+  'expires', 'valid for', 'do not share', 'use this'
+];
+
+const OTP_PATTERNS = [
+  /\b(\d{4,8})\b/g,                         // plain digits 4–8 long
+  /\b([A-Z0-9]{6,10})\b/g,                  // alphanumeric (some services)
+  /\b(\d{3}[-\s]\d{3})\b/g,                 // formatted: 123 456 or 123-456
+];
+
+const OTP_SUBJECT_PATTERNS = [
+  /verification/i, /your .{0,15} code/i, /one.time/i,
+  /confirm.{0,10}(email|account)/i, /sign.in code/i, /login code/i,
+  /\bOTP\b/i, /security code/i, /\d{4,8} is your/i
+];
+
+function scoreCandidate(num, surroundingText) {
+  let score = 0;
+  const lower = surroundingText.toLowerCase();
+
+  const numIndex = lower.indexOf(num.toLowerCase());
+
+  for (const kw of OTP_CONTEXT_KEYWORDS) {
+    if (lower.includes(kw)) {
+      score += 10;
+
+      // Proximity bonus: keyword within 20 chars of the number
+      if (numIndex !== -1) {
+        const kwIndex = lower.indexOf(kw);
+        if (Math.abs(numIndex - kwIndex) <= 30) {
+          score += 20;
+        }
+      }
+    }
+  }
+  return score;
+}
+
+function isFalsePositive(num, context) {
+  if (/^(19|20)\d{2}$/.test(num)) return true;  // year
+  if (num.startsWith('0') && num.length > 6) return true;  // phone-like
+  if (context.includes('$') || context.includes('USD')) return true;  // price
+
+  const lower = context.toLowerCase();
+  if (lower.includes('order') || lower.includes('tracking')) return true;
+  return false;
+}
+
 if (typeof messenger !== 'undefined') {
   console.log("Tether Mail Extractor loaded in Thunderbird/Betterbird");
 
   // Listen for new messages arriving in the background completely silently
   if (messenger.messages.onNewMailReceived) {
     messenger.messages.onNewMailReceived.addListener(async (folder, messages) => {
-      // messages is a MessageList, we need to iterate its messages array
       for (const message of messages.messages) {
         processMessage(message);
       }
@@ -27,24 +76,56 @@ if (typeof messenger !== 'undefined') {
   });
 
   async function processMessage(message) {
-    // Get the full message body
     const full = await messenger.messages.getFull(message.id);
     const bodyText = extractTextFromParts(full.parts);
     
-    // Simple regex to find 6-8 digit OTP codes
-    const otpRegex = /\b\d{6,8}\b/g;
-    const matches = bodyText.match(otpRegex);
+    // Email Subject Line as a Strong Prior
+    let subjectMatches = false;
+    for (const pattern of OTP_SUBJECT_PATTERNS) {
+      if (pattern.test(message.subject)) {
+        subjectMatches = true;
+        break;
+      }
+    }
+
+    let candidates = [];
     
-    if (matches && matches.length > 0) {
-      const otp = matches[0]; // Simplistic approach: take the first one
-      console.log("Found OTP in email:", otp);
-      
-      // Send it directly to the native daemon
-      sendToNativeHost({
-        command: "new_otp",
-        otp: otp,
-        source: message.subject
-      });
+    for (const pattern of OTP_PATTERNS) {
+      let match;
+      const regex = new RegExp(pattern.source, pattern.flags);
+
+      while ((match = regex.exec(bodyText)) !== null) {
+        const num = match[1] || match[0];
+
+        // Skip purely alphabetical matches
+        if (/^[A-Za-z]+$/.test(num)) continue;
+
+        const startIndex = Math.max(0, match.index - 50);
+        const endIndex = Math.min(bodyText.length, match.index + match[0].length + 50);
+        const context = bodyText.substring(startIndex, endIndex);
+
+        if (isFalsePositive(num, context)) continue;
+
+        let score = scoreCandidate(num, context);
+        if (subjectMatches) score += 30;
+
+        candidates.push({ num, score });
+      }
+    }
+
+    if (candidates.length > 0) {
+      // Sort by score descending
+      candidates.sort((a, b) => b.score - a.score);
+      const best = candidates[0];
+
+      if (best.score > 0) {
+        console.log("Found OTP candidate in email:", best.num, "with score:", best.score);
+        sendToNativeHost({
+          command: "new_otp",
+          otp: best.num.replace(/[-\s]/g, ''),
+          source: message.subject
+        });
+      }
     }
   }
 
@@ -54,6 +135,25 @@ if (typeof messenger !== 'undefined') {
     for (const part of parts) {
       if (part.contentType === "text/plain" && part.body) {
         text += part.body + "\n";
+      } else if (part.contentType === "text/html" && part.body) {
+        let htmlText = "";
+        try {
+          const parser = new DOMParser();
+          const doc = parser.parseFromString(part.body, 'text/html');
+          const candidates = doc.querySelectorAll('strong, b, h1, h2, td, .otp, .code');
+          for (const el of candidates) {
+            htmlText += el.textContent + " \n ";
+          }
+        } catch (e) {
+          console.error("DOMParser error", e);
+        }
+
+        let htmlBody = part.body;
+        htmlBody = htmlBody.replace(/<style[^>]*>[\s\S]*?<\/style>/gi, ' ');
+        htmlBody = htmlBody.replace(/<script[^>]*>[\s\S]*?<\/script>/gi, ' ');
+        htmlBody = htmlBody.replace(/<[^>]+>/g, ' ');
+
+        text += htmlText + "\n" + htmlBody + "\n";
       } else if (part.parts) {
         text += extractTextFromParts(part.parts);
       }
@@ -61,3 +161,4 @@ if (typeof messenger !== 'undefined') {
     return text;
   }
 }
+
