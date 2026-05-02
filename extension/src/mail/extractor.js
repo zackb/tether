@@ -61,19 +61,54 @@ function isFalsePositive(num, context) {
 if (typeof messenger !== 'undefined') {
   console.log("Tether Mail Extractor loaded in Thunderbird/Betterbird");
 
-  // Listen for new messages arriving in the background completely silently
+  // Track message IDs we've already processed to avoid duplicates
+  const seenMessageIds = new Set();
+
+  async function processNewMessagesInFolder(folder) {
+    try {
+      const page = await messenger.messages.list(folder);
+      for (const message of page.messages) {
+        if (!seenMessageIds.has(message.id)) {
+          seenMessageIds.add(message.id);
+          processMessage(message);
+        }
+      }
+    } catch (e) {
+      // Folder may not support listing (e.g. virtual folders)
+    }
+  }
+
+  // Tier 1: onNewMailReceived — works for POP3 / local delivery / filters
   if (messenger.messages.onNewMailReceived) {
     messenger.messages.onNewMailReceived.addListener(async (folder, messages) => {
       for (const message of messages.messages) {
-        processMessage(message);
+        if (!seenMessageIds.has(message.id)) {
+          seenMessageIds.add(message.id);
+          processMessage(message);
+        }
       }
     });
   }
 
-  // Also process manually opened messages just in case it missed it
+  // Tier 2: onFolderInfoChanged — catches IMAP synced mail that onNewMailReceived misses
+  // Fires when folder unread/total counts change, i.e. new messages landed via IMAP
+  if (messenger.folders?.onFolderInfoChanged) {
+    messenger.folders.onFolderInfoChanged.addListener(async (folder, folderInfo) => {
+      // Only scan inbox-type folders where new mail typically lands
+      if (folder.type === 'inbox' || folder.type === 'other') {
+        await processNewMessagesInFolder(folder);
+      }
+    });
+  }
+
+  // Tier 3: onMessageDisplayed — final fallback when opening an email manually
   messenger.messageDisplay.onMessageDisplayed.addListener(async (tabId, message) => {
-    processMessage(message);
+    if (!seenMessageIds.has(message.id)) {
+      seenMessageIds.add(message.id);
+      processMessage(message);
+    }
   });
+
 
   async function processMessage(message) {
     const full = await messenger.messages.getFull(message.id);
