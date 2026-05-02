@@ -10,6 +10,7 @@ import Foundation
 import SwiftUI
 import UniformTypeIdentifiers
 import UIKit
+import TetherFramework
 
 // High-level app state.
 enum AppConnectionState: Equatable {
@@ -195,6 +196,8 @@ final class TetherViewModel {
         manualDisconnect = false
         appState = .connecting
         connectedDeviceName = host.name
+        // Persist the service name so the Share Extension can connect without discovery.
+        ShareSender.persistLastServiceName(host.name)
         connection.connect(to: host.endpoint, identity: identity)
     }
 
@@ -255,6 +258,12 @@ final class TetherViewModel {
     // Request the current clipboard from the daemon.
     func requestClipboard() {
         connection.send(.clipboardGet())
+    }
+
+    // Send an OTP code to the tetherd vault (`new_otp`).
+    // The daemon stores it so the browser extension can retrieve it via `request_otp`.
+    func sendNewOtp(_ code: String, source: String = "iPhone") {
+        connection.send(.newOtp(code, source: source))
     }
 
     // Copy a clipboard entry to the iOS pasteboard.

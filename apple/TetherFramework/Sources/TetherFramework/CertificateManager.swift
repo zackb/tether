@@ -1,56 +1,80 @@
 //
 //  CertificateManager.swift
-//  Tether
+//  TetherFramework
 //
 //  Self-signed X.509 certificate generation, Keychain identity management,
 //  and SHA-256 fingerprint computation — all in pure Swift (no OpenSSL).
+//
+//  Shared between the main app and the Share Extension via a common
+//  App Group (group.net.jeedup.Tether) and Keychain access group.
 //
 
 import Foundation
 import Security
 import CryptoKit
+
+#if canImport(UIKit)
 import UIKit
+#endif
 
 // Manages the app's TLS identity (self-signed RSA cert + private key)
 // and the set of known remote host fingerprints.
+//
+// All Keychain items are stored in the shared access group so both the
+// main app and the Share Extension can read them.
+// All UserDefaults are stored in the shared App Group suite.
 @Observable
-final class CertificateManager {
+public final class CertificateManager {
+    // Shared App Group identifier — must match both targets' entitlements.
+    public static let appGroupID = "group.net.jeedup.Tether"
+
+    // Shared Keychain access group — must match both targets' entitlements.
+    // The prefix is omitted here; we set kSecAttrAccessGroup directly.
+    private static let keychainAccessGroup = "group.net.jeedup.Tether"
+
     private static let keyTag = "net.jeedup.Tether.key"
     private static let certLabel = "net.jeedup.Tether.cert"
     private static let knownHostsKey = "TetherKnownHosts"
     private static let localDeviceNameKey = "TetherLocalDeviceName"
     private static let lastConnectedFingerprintKey = "TetherLastConnectedFingerprint"
 
+    // Shared UserDefaults suite backed by the App Group container.
+    private static var sharedDefaults: UserDefaults {
+        UserDefaults(suiteName: appGroupID) ?? .standard
+    }
+
     // SHA-256 fingerprint of our own certificate (lowercase hex, no separators).
-    private(set) var myFingerprint: String = ""
+    public private(set) var myFingerprint: String = ""
 
     // Map of known host fingerprints → device name.
-    private(set) var knownHosts: [String: String] = [:]
+    public private(set) var knownHosts: [String: String] = [:]
 
     // The fingerprint of the host we most recently connected to.
-    var lastConnectedFingerprint: String? {
+    public var lastConnectedFingerprint: String? {
         didSet {
-            UserDefaults.standard.set(lastConnectedFingerprint, forKey: Self.lastConnectedFingerprintKey)
+            Self.sharedDefaults.set(lastConnectedFingerprint, forKey: Self.lastConnectedFingerprintKey)
         }
     }
 
     // Name of this device as presented to others.
-    var localDeviceName: String = "" {
+    public var localDeviceName: String = "" {
         didSet {
-            UserDefaults.standard.set(localDeviceName, forKey: Self.localDeviceNameKey)
+            Self.sharedDefaults.set(localDeviceName, forKey: Self.localDeviceNameKey)
         }
     }
 
     // The `SecIdentity` used for mTLS client authentication.
     private var identity: SecIdentity?
 
+    public init() {}
+
     // MARK: - Initialization
 
     // Load or create the TLS identity and populate known hosts.
-    func initialize() {
+    public func initialize() {
         loadKnownHosts()
         loadLocalDeviceName()
-        lastConnectedFingerprint = UserDefaults.standard.string(forKey: Self.lastConnectedFingerprintKey)
+        lastConnectedFingerprint = Self.sharedDefaults.string(forKey: Self.lastConnectedFingerprintKey)
 
         if let existing = loadIdentityFromKeychain() {
             identity = existing
@@ -68,22 +92,22 @@ final class CertificateManager {
     }
 
     // Returns the `SecIdentity` for use with `Network.framework` TLS options.
-    func getIdentity() -> SecIdentity? {
+    public func getIdentity() -> SecIdentity? {
         identity
     }
 
     // MARK: - Known Hosts
 
-    func isHostKnown(_ fingerprint: String) -> Bool {
+    public func isHostKnown(_ fingerprint: String) -> Bool {
         knownHosts[fingerprint] != nil
     }
 
-    func addKnownHost(fingerprint: String, name: String) {
+    public func addKnownHost(fingerprint: String, name: String) {
         knownHosts[fingerprint] = name
         saveKnownHosts()
     }
 
-    func removeKnownHost(fingerprint: String) {
+    public func removeKnownHost(fingerprint: String) {
         knownHosts.removeValue(forKey: fingerprint)
         saveKnownHosts()
     }
@@ -92,7 +116,7 @@ final class CertificateManager {
 
     // Compute the SHA-256 fingerprint of a DER-encoded certificate.
     // Output matches the daemon's `generate_fingerprint`: lowercase hex, no separators.
-    static func fingerprint(ofCertificate cert: SecCertificate) -> String {
+    public static func fingerprint(ofCertificate cert: SecCertificate) -> String {
         let der = SecCertificateCopyData(cert) as Data
         let hash = SHA256.hash(data: der)
         return hash.map { String(format: "%02x", $0) }.joined()
@@ -101,11 +125,12 @@ final class CertificateManager {
     // MARK: - Private — Keychain
 
     private func loadIdentityFromKeychain() -> SecIdentity? {
-        // First check if the private key exists
+        // First check if the private key exists in the shared access group
         let keyQuery: [String: Any] = [
             kSecClass as String: kSecClassKey,
             kSecAttrApplicationTag as String: Self.keyTag.data(using: .utf8)!,
             kSecAttrKeyType as String: kSecAttrKeyTypeRSA,
+            kSecAttrAccessGroup as String: Self.keychainAccessGroup,
             kSecReturnRef as String: true,
         ]
         var keyResult: CFTypeRef?
@@ -113,10 +138,11 @@ final class CertificateManager {
             return nil
         }
 
-        // Now look for the identity (cert + key pair)
+        // Now look for the identity (cert + key pair) in the shared access group
         let identityQuery: [String: Any] = [
             kSecClass as String: kSecClassIdentity,
             kSecAttrApplicationTag as String: Self.keyTag.data(using: .utf8)!,
+            kSecAttrAccessGroup as String: Self.keychainAccessGroup,
             kSecReturnRef as String: true,
         ]
         var identityResult: CFTypeRef?
@@ -135,7 +161,7 @@ final class CertificateManager {
     }
 
     private func loadKnownHosts() {
-        if let data = UserDefaults.standard.data(forKey: Self.knownHostsKey),
+        if let data = Self.sharedDefaults.data(forKey: Self.knownHostsKey),
            let hosts = try? JSONDecoder().decode([String: String].self, from: data)
         {
             knownHosts = hosts
@@ -144,12 +170,12 @@ final class CertificateManager {
 
     private func saveKnownHosts() {
         if let data = try? JSONEncoder().encode(knownHosts) {
-            UserDefaults.standard.set(data, forKey: Self.knownHostsKey)
+            Self.sharedDefaults.set(data, forKey: Self.knownHostsKey)
         }
     }
 
     private func loadLocalDeviceName() {
-        if let name = UserDefaults.standard.string(forKey: Self.localDeviceNameKey) {
+        if let name = Self.sharedDefaults.string(forKey: Self.localDeviceNameKey) {
             localDeviceName = name
         } else {
             // Default name
@@ -164,15 +190,16 @@ final class CertificateManager {
     // MARK: - Private — Certificate Generation
 
     // Generate a 2048-bit RSA keypair + self-signed X.509v3 certificate and
-    // store both in the Keychain as a `SecIdentity`.
+    // store both in the Keychain in the shared access group as a `SecIdentity`.
     private func generateAndStoreIdentity() -> SecIdentity? {
-        // 1. Generate RSA 2048 keypair in Keychain
+        // 1. Generate RSA 2048 keypair in Keychain (shared access group)
         let keyAttrs: [String: Any] = [
             kSecAttrKeyType as String: kSecAttrKeyTypeRSA,
             kSecAttrKeySizeInBits as String: 2048,
             kSecPrivateKeyAttrs as String: [
                 kSecAttrIsPermanent as String: true,
                 kSecAttrApplicationTag as String: Self.keyTag.data(using: .utf8)!,
+                kSecAttrAccessGroup as String: Self.keychainAccessGroup,
                 kSecAttrAccessible as String: kSecAttrAccessibleAfterFirstUnlock,
             ] as [String: Any],
         ]
@@ -204,7 +231,7 @@ final class CertificateManager {
             return nil
         }
 
-        // 4. Import certificate into Keychain
+        // 4. Import certificate into Keychain (shared access group)
         guard let certificate = SecCertificateCreateWithData(nil, certDER as CFData) else {
             print("CertificateManager: Failed to create SecCertificate from DER")
             return nil
@@ -214,6 +241,7 @@ final class CertificateManager {
             kSecClass as String: kSecClassCertificate,
             kSecValueRef as String: certificate,
             kSecAttrLabel as String: Self.certLabel,
+            kSecAttrAccessGroup as String: Self.keychainAccessGroup,
             kSecAttrAccessible as String: kSecAttrAccessibleAfterFirstUnlock,
         ]
         let addStatus = SecItemAdd(addCertQuery as CFDictionary, nil)

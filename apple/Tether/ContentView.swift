@@ -6,6 +6,7 @@
 //
 
 import SwiftUI
+import TetherFramework
 
 struct ContentView: View {
     @Environment(TetherViewModel.self) private var viewModel

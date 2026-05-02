@@ -1,6 +1,6 @@
 //
 //  BonjourDiscovery.swift
-//  Tether
+//  TetherFramework
 //
 //  NetServiceBrowser-based mDNS/Bonjour discovery for `_tether._tcp` services.
 //  Using NetService to correctly parse TXT records which NWBrowser ignores.
@@ -10,41 +10,51 @@ import Foundation
 import Network
 
 // A single discovered `tetherd` instance on the local network.
-struct DiscoveredHost: Identifiable, Sendable {
-    let id = UUID()
-    let name: String
-    let endpoint: NWEndpoint
-    let fingerprint: String
+public struct DiscoveredHost: Identifiable, Sendable {
+    public let id = UUID()
+    public let name: String
+    public let endpoint: NWEndpoint
+    public let fingerprint: String
+
+    public init(name: String, endpoint: NWEndpoint, fingerprint: String) {
+        self.name = name
+        self.endpoint = endpoint
+        self.fingerprint = fingerprint
+    }
 }
 
 // Scans the local network for `tetherd` daemons advertising `_tether._tcp`
 // via Bonjour/mDNS and exposes the results as an observable list.
 @Observable
-final class BonjourDiscovery: NSObject, NetServiceBrowserDelegate, NetServiceDelegate {
+public final class BonjourDiscovery: NSObject, NetServiceBrowserDelegate, NetServiceDelegate {
     private static let serviceType = "_tether._tcp"
     private static let serviceDomain = "local."
 
     // Our own fingerprint, to filter ourselves out of the results.
-    var localFingerprint: String?
+    public var localFingerprint: String?
 
     // Our own device name, as a fallback filter if the TXT record hasn't arrived.
-    var localDeviceName: String?
+    public var localDeviceName: String?
 
     // Currently discovered hosts (updated live as services appear/disappear).
-    private(set) var hosts: [DiscoveredHost] = []
+    public private(set) var hosts: [DiscoveredHost] = []
 
     // Whether the browser is actively scanning.
-    private(set) var isScanning = false
+    public private(set) var isScanning = false
 
     private var browser: NetServiceBrowser?
     private var activeServices: Set<NetService> = []
 
-    @ObservationIgnored var onHostsChanged: (([DiscoveredHost]) -> Void)?
+    @ObservationIgnored public var onHostsChanged: (([DiscoveredHost]) -> Void)?
+
+    public override init() {
+        super.init()
+    }
 
     // MARK: - Public
 
     // Start scanning for `_tether._tcp` services.
-    func startScanning(forceRestart: Bool = false) {
+    public func startScanning(forceRestart: Bool = false) {
         if forceRestart {
             stopScanning(clearHosts: true)
         }
@@ -60,7 +70,7 @@ final class BonjourDiscovery: NSObject, NetServiceBrowserDelegate, NetServiceDel
     }
 
     // Stop scanning.
-    func stopScanning(clearHosts: Bool = false) {
+    public func stopScanning(clearHosts: Bool = false) {
         browser?.stop()
         browser = nil
         isScanning = false
@@ -75,32 +85,32 @@ final class BonjourDiscovery: NSObject, NetServiceBrowserDelegate, NetServiceDel
 
     // MARK: - NetServiceBrowserDelegate
 
-    func netServiceBrowser(_ browser: NetServiceBrowser, didFind service: NetService, moreComing: Bool) {
+    public func netServiceBrowser(_ browser: NetServiceBrowser, didFind service: NetService, moreComing: Bool) {
         activeServices.insert(service)
         service.delegate = self
         service.resolve(withTimeout: 5.0)
     }
 
-    func netServiceBrowser(_ browser: NetServiceBrowser, didRemove service: NetService, moreComing: Bool) {
+    public func netServiceBrowser(_ browser: NetServiceBrowser, didRemove service: NetService, moreComing: Bool) {
         activeServices.remove(service)
 
         hosts.removeAll { $0.name == service.name }
         onHostsChanged?(hosts)
     }
 
-    func netServiceBrowser(_ browser: NetServiceBrowser, didNotSearch errorDict: [String : NSNumber]) {
+    public func netServiceBrowser(_ browser: NetServiceBrowser, didNotSearch errorDict: [String: NSNumber]) {
         print("BonjourDiscovery: Browser failed to search: \(errorDict)")
         isScanning = false
         self.browser = nil
     }
 
-    func netServiceBrowserDidStopSearch(_ browser: NetServiceBrowser) {
+    public func netServiceBrowserDidStopSearch(_ browser: NetServiceBrowser) {
         isScanning = false
     }
 
     // MARK: - NetServiceDelegate
 
-    func netServiceDidResolveAddress(_ sender: NetService) {
+    public func netServiceDidResolveAddress(_ sender: NetService) {
         let name = sender.name
         let endpoint = NWEndpoint.service(name: name, type: Self.serviceType, domain: Self.serviceDomain, interface: nil)
         var fingerprint = ""
@@ -131,7 +141,7 @@ final class BonjourDiscovery: NSObject, NetServiceBrowserDelegate, NetServiceDel
         onHostsChanged?(hosts)
     }
 
-    func netService(_ sender: NetService, didUpdateTXTRecord data: Data) {
+    public func netService(_ sender: NetService, didUpdateTXTRecord data: Data) {
         netServiceDidResolveAddress(sender)
     }
 }

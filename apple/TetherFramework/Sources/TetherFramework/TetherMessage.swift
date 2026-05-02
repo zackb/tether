@@ -1,6 +1,6 @@
 //
 //  TetherMessage.swift
-//  Tether
+//  TetherFramework
 //
 //  Codable models matching the tetherd newline-delimited JSON protocol.
 //
@@ -10,7 +10,7 @@ import Foundation
 // MARK: - Command Enum
 
 // All known command types in the Tether protocol.
-enum TetherCommand: String, Codable, Sendable {
+public enum TetherCommand: String, Codable, Sendable {
     // Client → Daemon
     case clipboardSet = "clipboard_set"
     case clipboardGet = "clipboard_get"
@@ -18,6 +18,7 @@ enum TetherCommand: String, Codable, Sendable {
     case fileChunk = "file_chunk"
     case fileEnd = "file_end"
     case pairRequest = "pair_request"
+    case newOtp = "new_otp"
 
     // Daemon → Client
     case clipboardUpdated = "clipboard_updated"
@@ -35,33 +36,66 @@ enum TetherCommand: String, Codable, Sendable {
 // Uses a flat structure with optional fields — the daemon's JSON payloads
 // share a unified shape where only the relevant fields are present
 // for each command type.
-struct TetherMessage: Codable, Sendable {
-    let command: String
+public struct TetherMessage: Codable, Sendable {
+    public let command: String
 
     // Clipboard
-    var content: String?
+    public var content: String?
 
     // File transfer
-    var filename: String?
-    var size: Int64?
-    var transferId: String?
-    var chunkIndex: Int?
-    var data: String? // Base64 encoded chunk
+    public var filename: String?
+    public var size: Int64?
+    public var transferId: String?
+    public var chunkIndex: Int?
+    public var data: String? // Base64 encoded chunk
 
     // Pairing
-    var deviceName: String?
+    public var deviceName: String?
+
+    // OTP (new_otp command uses "otp" and optional "source" keys)
+    public var otp: String?
+    public var source: String?
 
     // Status / Error
-    var status: String?
-    var message: String?
+    public var status: String?
+    public var message: String?
 
-    enum CodingKeys: String, CodingKey {
+    public enum CodingKeys: String, CodingKey {
         case command, content, filename, size
         case transferId = "transfer_id"
         case chunkIndex = "chunk_index"
         case data
         case deviceName = "device_name"
+        case otp, source
         case status, message
+    }
+
+    public init(
+        command: String,
+        content: String? = nil,
+        filename: String? = nil,
+        size: Int64? = nil,
+        transferId: String? = nil,
+        chunkIndex: Int? = nil,
+        data: String? = nil,
+        deviceName: String? = nil,
+        otp: String? = nil,
+        source: String? = nil,
+        status: String? = nil,
+        message: String? = nil
+    ) {
+        self.command = command
+        self.content = content
+        self.filename = filename
+        self.size = size
+        self.transferId = transferId
+        self.chunkIndex = chunkIndex
+        self.data = data
+        self.deviceName = deviceName
+        self.otp = otp
+        self.source = source
+        self.status = status
+        self.message = message
     }
 }
 
@@ -69,27 +103,33 @@ struct TetherMessage: Codable, Sendable {
 
 extension TetherMessage {
     // Create a `clipboard_set` message.
-    static func clipboardSet(_ text: String) -> TetherMessage {
+    public static func clipboardSet(_ text: String) -> TetherMessage {
         TetherMessage(command: TetherCommand.clipboardSet.rawValue, content: text)
     }
 
     // Create a `clipboard_get` request.
-    static func clipboardGet() -> TetherMessage {
+    public static func clipboardGet() -> TetherMessage {
         TetherMessage(command: TetherCommand.clipboardGet.rawValue)
     }
 
+    // Create a `new_otp` message.
+    // Uses the `otp` key to match the daemon's Unix socket handler and TCP handler.
+    public static func newOtp(_ code: String, source: String = "iPhone Share") -> TetherMessage {
+        TetherMessage(command: TetherCommand.newOtp.rawValue, otp: code, source: source)
+    }
+
     // Create a `pair_request` message.
-    static func pairRequest(deviceName: String) -> TetherMessage {
+    public static func pairRequest(deviceName: String) -> TetherMessage {
         TetherMessage(command: TetherCommand.pairRequest.rawValue, deviceName: deviceName)
     }
 
     // Create a `pair_accepted` message (replying to a request).
-    static var pairAccepted: TetherMessage {
+    public static var pairAccepted: TetherMessage {
         TetherMessage(command: TetherCommand.pairAccepted.rawValue)
     }
 
     // Create a `file_start` message.
-    static func fileStart(filename: String, size: Int64, transferId: String) -> TetherMessage {
+    public static func fileStart(filename: String, size: Int64, transferId: String) -> TetherMessage {
         TetherMessage(
             command: TetherCommand.fileStart.rawValue,
             filename: filename,
@@ -99,7 +139,7 @@ extension TetherMessage {
     }
 
     // Create a `file_chunk` message.
-    static func fileChunk(transferId: String, chunkIndex: Int, data: String) -> TetherMessage {
+    public static func fileChunk(transferId: String, chunkIndex: Int, data: String) -> TetherMessage {
         TetherMessage(
             command: TetherCommand.fileChunk.rawValue,
             transferId: transferId,
@@ -109,12 +149,12 @@ extension TetherMessage {
     }
 
     // Create a `file_end` message.
-    static func fileEnd(transferId: String) -> TetherMessage {
+    public static func fileEnd(transferId: String) -> TetherMessage {
         TetherMessage(command: TetherCommand.fileEnd.rawValue, transferId: transferId)
     }
 
     // The parsed command enum, if recognized.
-    var parsedCommand: TetherCommand? {
+    public var parsedCommand: TetherCommand? {
         TetherCommand(rawValue: command)
     }
 }
