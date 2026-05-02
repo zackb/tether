@@ -1,7 +1,7 @@
 // Content script for browsers (Chrome/Firefox)
 // This runs in the context of webpages and looks for OTP input fields
 
-function findOtpInputs(doc) {
+export function findOtpInputs(doc) {
   const inputs = [...doc.querySelectorAll('input')];
 
   return inputs.filter(input => {
@@ -15,7 +15,7 @@ function findOtpInputs(doc) {
     // Tier 3: attribute keyword matching
     const attrs = [input.id, input.name, input.placeholder, input.className]
       .join(' ').toLowerCase();
-    if (/otp|passcode|verif|code|token|pin|2fa/.test(attrs)) return true;
+    if (/\b(otp|passcode|verif|token|pin|2fa)\b/.test(attrs)) return true;
 
     // Tier 4: maxlength in OTP range (4–8)
     const ml = parseInt(input.maxLength);
@@ -25,7 +25,7 @@ function findOtpInputs(doc) {
   });
 }
 
-function scoreInput(input) {
+export function scoreInput(input) {
   let score = 0;
   // Look at nearby label text
   const label = input.labels?.[0]?.textContent
@@ -39,7 +39,7 @@ function scoreInput(input) {
   return score;
 }
 
-function detectSplitOtp(doc) {
+export function detectSplitOtp(doc) {
   const singles = [...doc.querySelectorAll('input[maxlength="1"]')]
     .filter(i => i.type === 'text' || i.type === 'tel' || i.type === 'number' || !i.type);
 
@@ -50,6 +50,12 @@ function detectSplitOtp(doc) {
   return null;
 }
 
+// ---------------------------------------------------------------------------
+// Browser-only code - only runs when loaded in actual browser context
+// ---------------------------------------------------------------------------
+if (typeof document === 'undefined') {
+  // Test environment: skip browser-only code
+} else {
 let otpInterval = null;
 
 function requestOtp() {
@@ -118,3 +124,4 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
     }
   }
 });
+}
