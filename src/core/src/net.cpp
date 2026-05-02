@@ -34,6 +34,7 @@ namespace tether {
 
     // Global list of active connected sessions
     static std::map<int, ClientSession> active_sessions;
+    static std::mutex g_sessions_mutex;
     static std::set<int> local_subscribers;
     static std::mutex g_subscribers_mutex;
 
@@ -87,7 +88,8 @@ namespace tether {
             if (n <= 0) {
                 int err = SSL_get_error(ssl, n);
                 if (err == SSL_ERROR_WANT_WRITE || err == SSL_ERROR_WANT_READ) {
-                    continue; // Busy-wait retry for simplicity in this daemon
+                    usleep(1000); // Yield to avoid busy-wait
+                    continue;
                 }
                 return n; // Fatal error
             }
@@ -98,9 +100,10 @@ namespace tether {
 
     void broadcast_message(const std::string& msg, int exclude_fd) {
         std::string packet = msg;
-        if (packet.back() != '\n')
+        if (!packet.empty() && packet.back() != '\n')
             packet += '\n';
 
+        std::lock_guard<std::mutex> lock(g_subscribers_mutex);
         for (auto const& [fd, session] : active_sessions) {
             if (fd == exclude_fd)
                 continue;
@@ -234,10 +237,11 @@ namespace tether {
 
     size_t broadcast_tcp_message(const std::string& msg, int exclude_fd) {
         std::string packet = msg;
-        if (packet.back() != '\n')
+        if (!packet.empty() && packet.back() != '\n')
             packet += '\n';
 
         size_t recipients = 0;
+        std::lock_guard<std::mutex> lock(g_subscribers_mutex);
         for (auto const& [fd, session] : active_sessions) {
             if (fd == exclude_fd || !session.ssl)
                 continue;
@@ -861,13 +865,14 @@ namespace tether {
             }
 
             debug::log(INFO, "TcpServer: Client disconnected (fd: {})", client_fd);
-            if (connected_remote_clients.count(client_fd)) {
+            auto it = connected_remote_clients.find(client_fd);
+            if (it != connected_remote_clients.end()) {
                 nlohmann::json event;
                 event["command"] = "client_disconnected";
-                event["address"] = connected_remote_clients[client_fd].address;
-                event["fingerprint"] = connected_remote_clients[client_fd].fingerprint;
-                event["device_name"] = connected_remote_clients[client_fd].device_name;
-                event["paired"] = connected_remote_clients[client_fd].paired;
+                event["address"] = it->second.address;
+                event["fingerprint"] = it->second.fingerprint;
+                event["device_name"] = it->second.device_name;
+                event["paired"] = it->second.paired;
                 broadcast_local_event(event.dump());
             }
             SSL_free(ssl);
@@ -986,33 +991,35 @@ namespace tether {
             int exit_code = WIFEXITED(status) ? WEXITSTATUS(status) : 3;
 
             if (exit_code == 0) {
-                // User accepted — trust the device
                 Crypto::instance().add_known_host(info.device_name, info.fingerprint);
                 debug::log(INFO, "[Pairing Accepted] {} ({})", info.device_name, info.fingerprint);
 
-                // Mark as paired if still connected
-                if (client_paired_.count(info.client_fd)) {
+                auto remote_it = connected_remote_clients.find(info.client_fd);
+                auto ssl_it = active_ssl_.find(info.client_fd);
+
+                if (client_paired_.find(info.client_fd) != client_paired_.end()) {
                     client_paired_[info.client_fd] = true;
                 }
-                if (client_info_.count(info.client_fd)) {
-                    client_info_[info.client_fd].paired = true;
-                    client_info_[info.client_fd].device_name = info.device_name;
+                auto info_it = client_info_.find(info.client_fd);
+                if (info_it != client_info_.end()) {
+                    info_it->second.paired = true;
+                    info_it->second.device_name = info.device_name;
                 }
-                if (connected_remote_clients.count(info.client_fd)) {
-                    connected_remote_clients[info.client_fd].paired = true;
-                    connected_remote_clients[info.client_fd].device_name = info.device_name;
+                if (remote_it != connected_remote_clients.end()) {
+                    remote_it->second.paired = true;
+                    remote_it->second.device_name = info.device_name;
                 }
 
-                if (active_ssl_.count(info.client_fd)) {
-                    register_client_ssl(info.client_fd, active_ssl_[info.client_fd]);
+                if (ssl_it != active_ssl_.end()) {
+                    register_client_ssl(info.client_fd, ssl_it->second);
                 }
 
                 nlohmann::json event;
                 event["command"] = "pair_accepted";
                 event["fingerprint"] = info.fingerprint;
                 event["device_name"] = info.device_name;
-                if (connected_remote_clients.count(info.client_fd)) {
-                    event["address"] = connected_remote_clients[info.client_fd].address;
+                if (remote_it != connected_remote_clients.end()) {
+                    event["address"] = remote_it->second.address;
                 }
                 broadcast_local_event(event.dump());
 
@@ -1021,20 +1028,18 @@ namespace tether {
                 connected_event["fingerprint"] = info.fingerprint;
                 connected_event["device_name"] = info.device_name;
                 connected_event["paired"] = true;
-                if (connected_remote_clients.count(info.client_fd)) {
-                    connected_event["address"] = connected_remote_clients[info.client_fd].address;
+                if (remote_it != connected_remote_clients.end()) {
+                    connected_event["address"] = remote_it->second.address;
                 }
                 broadcast_local_event(connected_event.dump());
 
-                // Notify the remote client
-                if (active_ssl_.count(info.client_fd)) {
+                if (ssl_it != active_ssl_.end()) {
                     nlohmann::json resp;
                     resp["command"] = "pair_accepted";
                     std::string payload = resp.dump() + "\n";
-                    robust_ssl_write(active_ssl_[info.client_fd], payload.c_str(), payload.size());
+                    robust_ssl_write(ssl_it->second, payload.c_str(), payload.size());
                 }
 
-                // Clean up pending_pairs.json
                 std::string pending_path = get_runtime_dir() + "/pending_pairs.json";
                 nlohmann::json pending;
                 std::ifstream ifs(pending_path);
@@ -1053,21 +1058,23 @@ namespace tether {
             } else {
                 debug::log(INFO, "[Pairing Rejected] {} (exit code {})", info.device_name, exit_code);
 
+                auto remote_it = connected_remote_clients.find(info.client_fd);
+                auto ssl_it = active_ssl_.find(info.client_fd);
+
                 nlohmann::json event;
                 event["command"] = "pair_rejected";
                 event["fingerprint"] = info.fingerprint;
                 event["device_name"] = info.device_name;
-                if (connected_remote_clients.count(info.client_fd)) {
-                    event["address"] = connected_remote_clients[info.client_fd].address;
+                if (remote_it != connected_remote_clients.end()) {
+                    event["address"] = remote_it->second.address;
                 }
                 broadcast_local_event(event.dump());
 
-                // Notify the remote client
-                if (active_ssl_.count(info.client_fd)) {
+                if (ssl_it != active_ssl_.end()) {
                     nlohmann::json resp;
                     resp["command"] = "pair_rejected";
                     std::string payload = resp.dump() + "\n";
-                    robust_ssl_write(active_ssl_[info.client_fd], payload.c_str(), payload.size());
+                    robust_ssl_write(ssl_it->second, payload.c_str(), payload.size());
                 }
             }
 
