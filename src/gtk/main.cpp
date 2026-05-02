@@ -47,6 +47,7 @@ namespace {
 
         GtkWidget* lbl_action_name = nullptr;
         GtkWidget* lbl_action_status = nullptr;
+        GtkWidget* btn_grid = nullptr;
 
         GtkWidget* lbl_unpaired_name = nullptr;
         GtkWidget* lbl_unpaired_ip = nullptr;
@@ -291,6 +292,9 @@ namespace {
             bool online = std::find(g_app.connected_fps.begin(), g_app.connected_fps.end(), g_app.selected_device_fp) !=
                           g_app.connected_fps.end();
             set_status_action(online ? "Connected and ready." : "Device is offline. Pair again or wait for network.");
+            if (g_app.btn_grid) {
+                gtk_widget_set_visible(g_app.btn_grid, online);
+            }
         } else {
             gtk_stack_set_visible_child_name(GTK_STACK(g_app.right_pane_stack), "pair");
             set_markup(g_app.lbl_unpaired_name, ("<b>" + escape_markup(g_app.selected_device_name) + "</b>"));
@@ -739,6 +743,7 @@ namespace {
 
         GtkWidget* btn_grid = gtk_box_new(GTK_ORIENTATION_VERTICAL, 12);
         gtk_widget_set_halign(btn_grid, GTK_ALIGN_CENTER);
+        g_app.btn_grid = btn_grid;
 
         GtkWidget* btn_send_file = gtk_button_new_with_label("Send File");
         gtk_style_context_add_class(gtk_widget_get_style_context(btn_send_file), "suggested-action");
