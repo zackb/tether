@@ -1,0 +1,10 @@
+Subject: MyBank One Time Password
+From: MyBank <memberservice@mybank.com>
+To: user@example.com
+Content-Type: text/html; charset=UTF-8
+
+<html>
+<body>
+<p>PREVENT FRAUD: DO NOT SHARE THIS CODE. MyBank will never contact you asking for it. Only use verification code: 171792 in Online Banking or the MyBank App.</p>
+</body>
+</html>

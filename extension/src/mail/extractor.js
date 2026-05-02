@@ -11,7 +11,7 @@ const OTP_CONTEXT_KEYWORDS = [
   'expires', 'valid for', 'do not share', 'use this'
 ];
 
-const OTP_PATTERNS = [
+export const OTP_PATTERNS = [
   /\b(\d{4,8})\b/g,                         // plain digits 4–8 long
   /\b([A-Z0-9]{6,10})\b/g,                  // alphanumeric (some services)
   /\b(\d{3}[-\s]\d{3})\b/g,                 // formatted: 123 456 or 123-456
@@ -47,7 +47,7 @@ function pruneOldSeen() {
 // Run pruning every minute so the Map doesn't grow forever
 setInterval(pruneOldSeen, 60_000);
 
-function scoreCandidate(num, surroundingText) {
+export function scoreCandidate(num, surroundingText) {
   let score = 0;
   const lower = surroundingText.toLowerCase();
   const numIndex = lower.indexOf(num.toLowerCase());
@@ -72,7 +72,7 @@ function scoreCandidate(num, surroundingText) {
   return score;
 }
 
-function isFalsePositive(num, context) {
+export function isFalsePositive(num, context) {
   if (/^(19|20)\d{2}$/.test(num)) return true;  // year
   if (num.startsWith('0') && num.length > 6) return true;  // phone-like
   if (context.includes('$') || context.includes('USD')) return true;  // price
@@ -193,7 +193,7 @@ async function getEmailText(messageId) {
   }
 }
 
-async function processMessage(message) {
+export async function processMessage(message) {
   console.log("Processing message:", message.subject);
 
   const bodyText = await getEmailText(message.id);

@@ -1,0 +1,469 @@
+Delivered-To: username@user.com
+Received: by 2002:a05:7412:4e22:b0:1cd:e701:7427 with SMTP id zb34csp422204rdb;
+        Fri, 1 May 2026 17:42:50 -0700 (PDT)
+X-Forwarded-Encrypted: i=3; AFNElJ9N0zUF6gip7LLA8LsipEXlyaVKSSfsdhigopsdhgisoghdsiopI0SkLjqVNAxQ1uN@user.com
+X-Received: by 2001:b05:622a:1e8d:b0:5f:bea3:9490 with SMTP id fhsdpgfndsigds-5104bfcdac8mr22159491cf.60.7682569931;
+        Fri, 01 May 2026 17:42:49 -0700 (PDT)
+ARC-Seal: i=2; a=rsa-sha256; t=1777682569; cv=pass;
+        d=google.com; s=arc-20240605;
+        b=NFIDSPONGIOPSDGNIDPGFNipghsipghsdoghnsdkgdsgklgnjdslk
+         NU15RgBGZUL9HW25GzeQv7lUkdyFvPK9+e2wlms+fYAZzA25zW6Kh0eWm4t/GDomOf4v
+         QNSkIRcK/3NSkFKVb/r7iDmC0LwDi86uInPiyViub4xn09GqaYGsSuae28jed7gqiXxH
+         wxSesRTa+bRyOZE98eSaDy0UIyL3TTL96kURwBEwBdHUYnidQBE7su6Slt/mCljOB3yj
+         ODdkoZJLCjnJvsG6mVEP+pzdNpiSeOf8N3kRiFVUo5yGjE5g/6hZ3v7vQH+uHreN5qTA
+         HVLA==
+ARC-Message-Signature: i=2; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
+        h=content-transfer-encoding:message-id:subject:date:reply-to:to:from
+         :mime-version:dkim-signature:bimi-location:bimi-indicator;
+        bh=+iS+QKs/q6S7IQzKFVLoWmnaqz+5k+35Gh5AB1cTDJI=;
+        fh=cfULjWwZ9gqHugmGvqxTzWCJjsUa8J4xA9op/JEZHgg=;
+        b=TMNj7/NIFHNIDPGFNHDOIGFNHDOIGHNDOSGNDISOGNDSOI
+         ntJc7sqYaXmWADEZ0YNxR99E7UcKcW6QLxz3Be/FNIDOKNFDISOGFNDOIGNDSIO+gprAizwa
+         TVFO4RO4UeRcCmIMLWpL059t84GfNubN9Tfo78eVuQK3Xg9pmd/FmdRtZaF476f2zaeq
+         MNFIODSGNIDOSGNOIGNIODNHGDOISG
+         pghYiVsxNQ/RRto2XsunrYD1SnsglFcu2gNEHoB+LWOy+NxLBk7H3sIwLL/QQq9lCdVP
+         POjw==;
+        dara=google.com
+ARC-Authentication-Results: i=2; mx.google.com;
+       dkim=pass header.i=@user.com header.s=mime3elnnjmoaM header.b=nffFjn4Jg;
+       arc=pass (i=1 dkim=pass dkdomain=user.com dmarc=pass fromdomain=user.com);
+       spf=pass (google.com: domain of srs0=s+u0=c7=user.com=memberservice@srs.messagingengine.com designates 202.12.124.196 as permitted sender) smtp.mailfrom="SRS0=S+U0=C7=user.com=memberservice@srs.messagingengine.com";
+       dmarc=pass (p=QUARANTINE sp=QUARANTINE dis=NONE) header.from=user.com
+Return-Path: <SRS0=S+U0=C7=user.com=memberservice@srs.messagingengine.com>
+Received: from fforwardh-b1-smtp.messagingengine.com (fforwardh-b1-smtp.messagingengine.com. [202.12.124.196])
+        by mx.google.com with ESMTPS id 6a1803df08f44-8b53bcfe464si59276786d6.276.2026.05.01.17.42.49
+        for <user@gmail.com>
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 01 May 2026 17:42:49 -0700 (PDT)
+Received-SPF: pass (google.com: domain of srs0=s+u0=c7=user.com=memberservice@srs.messagingengine.com designates 202.12.124.196 as permitted sender) client-ip=202.12.124.196;
+Authentication-Results: mx.google.com;
+       dkim=pass header.i=@user.com header.s=mime3elx2jmoaM header.b=urFjn4Jg;
+       arc=pass (i=1 dkim=pass dkdomain=user.com dmarc=pass fromdomain=user.com);
+       spf=pass (google.com: domain of srs0=s+u0=c7=user.com=memberservice@srs.messagingengine.com designates 202.12.124.196 as permitted sender) smtp.mailfrom="SRS0=S+U0=C7=user.com=memberservice@srs.messagingengine.com";
+       dmarc=pass (p=QUARANTINE sp=QUARANTINE dis=NONE) header.from=user.com
+Received: from stl-compute-04.internal (stl-compute-04.internal [10.204.2.64])
+	by mailfforwardh.stl.internal (Postfix) with ESMTP id 84A758400B5
+	for <user@gmail.com>; Fri,  1 May 2026 20:42:49 -0400 (EDT)
+Received: from stl-outbound-01 ([10.204.2.202])
+  by stl-compute-04.internal (MEProxy); Fri, 01 May 2026 20:42:49 -0400
+X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeefhedrtddtgdeludeijecutefuodetggdotefrod
+    ftvfcurfhrohhfihhlvgemucfhrghsthforghilhdpuffrtefokffrpgfnqfghnecuuegr
+    ihhlohhuthemuceftddtnecundettggtohhunhhtucdlvddtmdenucfjughrpegghffvrh
+    ffuffktgfgsehhqhdttdertdejnecuhfhrohhmpefhihhrshhtucfvvggthhcuhfgvuggv
+    rhgrlhcuvehrvgguihhtucgfnhhiohhnuceomhgvmhgsvghrshgvrhhvihgtvgesfhhirh
+    hsthhtvggthhhfvggurdgtohhmqeenucggtffrrghtthgvrhhnpeeuffeufffhkeevteeg
+    ffelleffgffgtdeiudeiueehjefhteetveeihffffffgvdenucffohhmrghinhepfhhirh
+    hsthhtvggthhhfvggurdgtohhmnecukfhppedvtdelrdduiedvrddvtddvrdeivdenucev
+    lhhushhtvghrufhiiigvpedtnecurfgrrhgrmhepmhgrihhlfhhrohhmpehmvghmsggvrh
+    hsvghrvhhitggvsehfihhrshhtthgvtghhfhgvugdrtghomhdpnhgspghrtghpthhtohep
+    uddpmhhouggvpehsmhhtphhouhhtpdhrtghpthhtohepshhrshdggdiirggtkhgsrghrth
+    gvlhesghhmrghilhdrtghomh
+X-ME-Proxy: <xmx:iUj1aWUyP25XoZyxd-oyRwrcj5LYw6E7Um8_gpNeCQz0UvOgg1-5eg>
+    <xmx:iUj1aYfE6DWSJyRgTbd67wWHJ8IGcwDH5j8GkSQyt_0qvc77hl-VMw>
+    <xmx:iUj1aVfE0VvcNbj4ELi_E0dn2A98YVG1-6b77LpEUoBU_Zd-sWjKEK9hu6-D>
+    <xmx:iUj1aULHU9U9tFNavydsd8B0MasnLYAkPPKXCsxE2s9SO5pfNmNMu1DorqMf4oTXH0WXAwbuChVXr5l1Lmp5IlnHYMOE2Z7UxoUIys2KHQ>
+    <xmx:iUj1aQK-Nu13qu7Q0iDTUKYgKbjZn5_iXjO7C3PDztp00d-FvbWHDzk5>
+Received: from phl-compute-02.internal (phl-compute-02.internal [10.202.2.42])
+	by mailfforwardh.stl.internal (Postfix) with ESMTP id E9A6F8400D8
+	for <srs##user@gmail.com>; Fri,  1 May 2026 20:42:48 -0400 (EDT)
+Received: from phl-imap-08 ([10.202.2.84])
+  by phl-compute-02.internal (MEProxy); Fri, 01 May 2026 20:42:48 -0400
+X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeefhedrtddtgdeludeijecutefuodetggdotefrod
+    ftvfcurfhrohhfihhlvgemucfhrghsthforghilhdpuffrtefokffrpgfnqfghnecuuegr
+    ihhlohhuthemuceftddtnecundettggtohhunhhtucdlvddtmdenucfjughrpegghffvrh
+    ffuffktgfgsehhqhdttdertdejnecuhfhrohhmpefhihhrshhtucfvvggthhcuhfgvuggv
+    rhgrlhcuvehrvgguihhtucgfnhhiohhnuceomhgvmhgsvghrshgvrhhvihgtvgesfhhirh
+    hsthhtvggthhhfvggurdgtohhmqeenucggtffrrghtthgvrhhnpeeuffeufffhkeevteeg
+    ffelleffgffgtdeiudeiueehjefhteetveeihffffffgvdenucffohhmrghinhepfhhirh
+    hsthhtvggthhhfvggurdgtohhmnecukfhppedvtdelrdduiedvrddvtddvrdeivdenucev
+    lhhushhtvghrufhiiigvpedtnecurfgrrhgrmhepmhgrihhlfhhrohhmpehmvghmsggvrh
+    hsvghrvhhitggvsehfihhrshhtthgvtghhfhgvugdrtghomhdpnhgspghrtghpthhtohep
+    uddpmhhouggvpehsmhhtphhouhhtpdhrtghpthhtohepshhrshdggdiirggtkhgsrghrth
+    gvlhesghhmrghilhdrtghomh
+X-ME-Proxy: <xmx:iEj1aVaWRrI0z-LVWYWaVgRI1z7RiwmfqTnbROI1LhDqnV9Qc1J8FA>
+    <xmx:iEj1aSTYBPF7-THS5jfE0SIRaUp07tu7EF-bXI-ZWT8SydRad9hh0g>
+    <xmx:iEj1aTAsIXtSvqz_BR2xZ7ya_SvUjqNUecttNeWvPZ6lPStct3pK3LJTfAid>
+    <xmx:iEj1aUPZU0yjliZ2q6GDkEbldq-VBhi81lAXe4jSkLZLyIStoCqpcg2skPodkMGQsEhPTTQr584m9Gkoa1ajKWPPFyH_edVHP_GkHUYVrg>
+    <xmx:iEj1aXR-Jn7nuDgnVVyKY9aVqzIWip3jjQ2Y2oXm55zj6YhZmR_7bgV_>
+Received: by mailredirect.phl.internal (Postfix, from userid 501)
+	id E75192CE0072; Fri,  1 May 2026 20:42:47 -0400 (EDT)
+X-Mailer: MessagingEngine.com Webmail Interface
+X-Sieve-Action: redirect
+Received: from phl-compute-05.internal (phl-compute-05.internal [10.202.2.45])
+	 by slotpi08m46 (Cyrus 3.13.1-511-g56aded35b-fm-20260420.002-g56aded35) with LMTPA;
+	 Fri, 01 May 2026 20:42:47 -0400
+X-Cyrus-Session-Id: slotpi08m46-1777682567-1140336-2-7304484388722139925
+X-Sieve: CMU Sieve 3.0
+X-Spam-known-sender: no
+X-Spam-sender-reputation: 500 (none)
+X-Spam-score: 0.0
+X-Spam-hits: DCC_CHECK 1.1, DCC_REPUT_13_19 -0.1, HTML_MESSAGE 0.001, ME_419_ALERT2 -2,
+  ME_SENDERREP_NEUTRAL 0.001, MIME_HTML_ONLY 0.1,
+  RCVD_IN_DNSWL_NONE -0.0001, SPF_PASS -0.001, T_SPF_HELO_TEMPERROR 0.01,
+  LANGUAGES en, BAYES_USED none, SA_VERSION 4.0.1
+X-Spam-source: IP='2.2.2.2', Host='us-smtp-delivery-67.mimcast.com',
+  Country='US', FromHeader='com', MailFrom='com'
+X-Spam-charsets: html='UTF-8'
+X-Resolved-to: user@user.com
+X-Delivered-to: user@user.com
+X-Mail-from: memberservice@user.com
+Received: from phl-mx-01 ([10.202.2.200])
+  by phl-compute-05.internal (LMTPProxy); Fri, 01 May 2026 20:42:47 -0400
+Received: from phl-mx-01.messagingengine.com (localhost [127.0.0.1])
+	by mailmx.phl.internal (Postfix) with ESMTP id 0F23011200D4
+	for <user@user.com>; Fri,  1 May 2026 20:42:44 -0400 (EDT)
+Received: from mailmx.phl.internal (localhost [127.0.0.1])
+    by phl-mx-01.messagingengine.com (Authentication Milter) with ESMTP
+    id 3240E8CB6B8.C866911200B8;
+    Fri, 1 May 2026 20:42:44 -0400
+ARC-Seal: i=1; a=rsa-sha256; cv=none; d=messagingengine.com; s=fm3; t=
+    1777682564; b=CwzlpuHHedvEY4aiDui+ZIT/gaQUGBEJiOJwYYa1C2rnK0gn5m
+    afg9VktWOhOlivsdCDNNC7w0oVmmZgw635HYu7+Sni0qhz4+v8A1c71i9JfVcxd4
+    fMz8j6UeZ5lQDukod5hG0ehEvZO52J8EMi4Cowlcvq/hn/1nIGItiXzbIppJWeSQ
+    uf4Y3XaC8yzM3oywRNw69Tyj+BjK/pNmLzvv29GJE9SKOU0U1HnoSpFYN33eJZSy
+    JQGDxSSlDKgk4gCoeZJBQW55pnytoqSGLpOFDBwzSeIAC0l/K2s96Yi4F87kbv6S
+    1dIoyNUX1hAb+cwe9bqTNn1nHqzwX3VcTY4g==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=
+    messagingengine.com; h=mime-version:from:to:reply-to:date
+    :subject:message-id:content-type:content-transfer-encoding; s=
+    fm3; t=1777682564; bh=+iS+QKs/q6S7IQzKFVLoWmnaqz+5k+35Gh5AB1cTDJ
+    I=; b=StMW+rCfLXV/9JlxZ7D2QnbC4BMXGfDT8adQD5eecG4r4dZg6XiipVYAPu
+    6wMDBKlXKsXinWOkMwnP2US/gezQZsatvS54jBzMPaz+V0Em7L3l7s3onJH8X/1D
+    EqKgc6U6PZqLw23JEsHa7OBMTr1lf+KOtdggYvn1nUdFbGNCPte42++CziHj7rY3
+    Ebs2lTeVh6jbm7H+nFNF0LjJ8sLQ+yyVbkOpLY7sk+GG16v3JkgaWs1maZI3aTOw
+    433a0W51QIcVRuUxE+hmHCaZ1WR2ele1XrRSNRszus8uciWwhX5Ej1kOKxjxyAiu
+    6gZl84cLXLAvOw3PI66kdywC+2bg==
+ARC-Authentication-Results: i=1; phl-mx-01.messagingengine.com;
+    x-csa=none;
+    x-me-sender=none;
+    x-ptr=pass smtp.helo=us-smtp-delivery-131.mimecast.com
+    policy.ptr=us-smtp-delivery-131.mimecast.com;
+    bimi=pass header.d=user.com header.selector=default
+    policy.authority=pass policy.mark-type="Registered Mark"
+    policy.authority-uri=
+    https://www.user.com/Assets/woppy.pem
+    arc=none (no signatures found);
+    dkim=pass (2048-bit rsa key sha256) header.d=user.com
+    header.i=@user.com header.b=urFjn4Jg header.a=rsa-sha256
+    header.s=mime3elx2jmoaM;
+    dmarc=pass policy.published-domain-policy=quarantine
+    policy.published-subdomain-policy=quarantine
+    policy.applied-disposition=none policy.evaluated-disposition=none
+    (p=quarantine,sp=quarantine,d=none,d.eval=none) policy.policy-from=p
+    header.from=user.com;
+    iprev=pass smtp.remote-ip=170.10.133.131
+    (us-smtp-delivery-131.mimecast.com);
+    spf=fail smtp.mailfrom=memberservice@user.com
+    smtp.helo=us-smtp-delivery-131.mimecast.com
+    (spf pass downgraded due to suspicious path)
+X-ME-Authentication-Results: phl-mx-01.messagingengine.com;
+    x-tls=pass smtp.version=TLSv1.3 smtp.cipher=TLS_AES_256_GCM_SHA384
+      smtp.bits=256/256;
+    x-vs=transactional:account score=20 state=14
+Authentication-Results: phl-mx-01.messagingengine.com;
+    x-csa=none;
+    x-me-sender=none;
+    x-ptr=pass smtp.helo=us-smtp-delivery-131.mimecast.com
+      policy.ptr=us-smtp-delivery-131.mimecast.com
+Authentication-Results: phl-mx-01.messagingengine.com;
+    bimi=pass header.d=user.com header.selector=default
+      policy.authority=pass policy.mark-type="Registered Mark"
+      policy.authority-uri=
+      https://www.user.com/woppy.pem
+Authentication-Results: phl-mx-01.messagingengine.com;
+    arc=none (no signatures found)
+Authentication-Results: phl-mx-01.messagingengine.com;
+    dkim=pass (2048-bit rsa key sha256) header.d=user.com
+      header.i=@user.com header.b=urFjn4Jg header.a=rsa-sha256
+      header.s=mime3elx2jmoaM;
+    dmarc=pass policy.published-domain-policy=quarantine
+      policy.published-subdomain-policy=quarantine
+      policy.applied-disposition=none policy.evaluated-disposition=none
+      (p=quarantine,sp=quarantine,d=none,d.eval=none) policy.policy-from=p
+      header.from=user.com;
+    iprev=pass smtp.remote-ip=170.10.133.131
+      (us-smtp-delivery-131.mimecast.com);
+    spf=fail smtp.mailfrom=memberservice@user.com
+      smtp.helo=us-smtp-delivery-131.mimecast.com
+      (spf pass downgraded due to suspicious path)
+BIMI-Indicator: PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0idXRmLTgiPz4KPCEtLSBHZW5lcmF0b3
+    I6IEFkb2JlIElsbHVzdHJhdG9yIDI3LjIuMCwgU1ZHIEV4cG9ydCBQbHVnLUluIC4gU1ZH
+    IFZlcnNpb246IDYuMDAgQnVpbGQgMCkgIC0tPgo8c3ZnIHZlcnNpb249IjEuMiIgYmFzZV
+    Byb2ZpbGU9InRpbnktcHMiCglpZD0iTGF5ZXJfMSIgeG1sbnM9Imh0dHA6Ly93d3cudzMu
+    b3JnLzIwMDAvc3ZnIiB4bWxuczp4bGluaz0iaHR0cDovL3d3dy53My5vcmcvMTk5OS94bG
+    luayIKCXZpZXdCb3g9IjAgMCA0MCA0MCIgeG1sOnNwYWNlPSJwcmVzZXJ2ZSI+Cjx0aXRs
+    ZT5GaXJzdCBUZWNoIEZlZGVyYWwgQ3JlZGl0IFVuaW9uPC90aXRsZT4KPGcgaWQ9IkJ1Zy
+    1CbGFja18wMDAwMDA5ODE4NzE2MTg0OTEzOTk3ODg1MDAwMDAwMjM1MTU5ODkzNjg4NDI2
+    ODQzOF8iPgoJPGc+CgkJPHBhdGggZmlsbD0iIzAwMDEwNCIgZD0iTTIzLjY0LDIuODl2NS
+    4wOUwxMy4yOCwxOC4xOGMwLDAsMS4wNCwwLDIuMTQsMGMxLjA5LDAsMi4wMywwLjEyLDIu
+    NjksMC45NAoJCQljMC44OSwxLjExLDAuODIsMi4zNSwwLjgyLDMuNTNjMCwxLjE4LDAuMD
+    EsMTYuNDMsMC4wMSwxNi40M0w0LjIyLDI0LjM3YzAsMC0xLjMtMS40My0xLjMtMy4wNWMw
+    LTEuNjIsMS4yOC0zLjAzLDEuMjgtMy4wMwoJCQlMMTkuNTksMi45MWMwLDAsMS43NC0xLj
+    k5LDIuNzktMS45OUMyMy43MSwwLjkxLDIzLjY0LDIuODksMjMuNjQsMi44OSIvPgoJCTxw
+    YXRoIGZpbGw9IiMwMDAxMDQiIGQ9Ik0yMy42NSwzMi4yNmMwLDAtMC4wMywyLjI1LDAuOT
+    UsMi4yNWMwLjMsMCwwLjgyLTAuNDYsMC44Mi0wLjQ2TDM2LjEsMjMuMzhjMCwwLDAuOTgt
+    MC44NCwwLjk4LTIuMQoJCQljMC0xLjI2LTAuOTgtMi4xLTAuOTgtMi4xTDI1LjM5LDguND
+    djMCwwLTAuMzktMC40MS0wLjc4LTAuNDFjLTEuMDksMC0wLjk2LDIuMjUtMC45NiwyLjI1
+    VjMyLjI2eiIvPgoJPC9nPgo8L2c+Cjwvc3ZnPgo=
+X-ME-VSCause: gggruggvucftvghtrhhoucdtuddrgeefhedrtddtgdeludeijecutefuodetggdotefrod
+    ftvfcurfhrohhfihhlvgemucfhrghsthforghilhdpuffrtefokffrpgfnqfghnecuuegr
+    ihhlohhuthemuceftddtnecundettggtohhunhhtucdlvddtmdenucfjughrpegghffvrh
+    ffuffktgfgsehhqhdttddttdejnecuhfhrohhmpefhihhrshhtucfvvggthhcuhfgvuggv
+    rhgrlhcuvehrvgguihhtucgfnhhiohhnuceomhgvmhgsvghrshgvrhhvihgtvgesfhhirh
+    hsthhtvggthhhfvggurdgtohhmqeenucggtffrrghtthgvrhhnpeeutdfhffejgfevfeef
+    hfeijeefgfefheeuteefgfefgffhjedthfdvueeigeekvdenucffohhmrghinhepfhhirh
+    hsthhtvggthhhfvggurdgtohhmnecukfhppedujedtrddutddrudeffedrudefuddpvddt
+    ledrudeivddrvddtvddriedvnecuvehluhhsthgvrhfuihiivgeptdenucfrrghrrghmpe
+    hinhgvthepudejtddruddtrddufeefrddufedupdhhvghlohepuhhsqdhsmhhtphdquggv
+    lhhivhgvrhihqddufedurdhmihhmvggtrghsthdrtghomhdpmhgrihhlfhhrohhmpeeomh
+    gvmhgsvghrshgvrhhvihgtvgesfhhirhhsthhtvggthhhfvggurdgtohhmqedpnhgspghr
+    tghpthhtohepuddprhgtphhtthhopeeoiigrtghksegsrghrthgvlhdrtghomheq
+X-ME-VSScore: 20
+X-ME-VSCategory: transactional:account
+X-ME-CSA: none
+X-ME-Received: <xmx:g0j1aeUF5OQFQGo1Voh6kcYCxZ_Ui96ky1iTW9laIeYTc9jmhwUsZA>
+X-ME-Received: <xmx:g0j1aespddwFLLM1n05LRj1SfM1h-6-2sSvVN94mXaW5V9mX5mPLZQ>
+Received-SPF: pass
+    (user.com ... 46kbx7jj._spf._d.mim.ec: 170.10.133.131 is authorized to use 'memberservice@user.com' in 'mfrom' identity (mechanism 'ip4:170.10.133.0/24' matched))
+    receiver=phl-mx-01.messagingengine.com;
+    identity=mailfrom;
+    envelope-from="memberservice@user.com";
+    helo=us-smtp-delivery-131.mimecast.com;
+    client-ip=170.10.133.131
+Received: from us-smtp-delivery-131.mimecast.com (us-smtp-delivery-131.mimecast.com [170.10.133.131])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by phl-mx-01.messagingengine.com (Postfix) with ESMTPS id C866911200B8
+	for <user@user.com>; Fri,  1 May 2026 20:42:42 -0400 (EDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=user.com;
+	s=mime3elx2jmoaM; t=1777682561;
+	h=from:from:reply-to:reply-to:subject:subject:date:date:
+	 message-id:message-id:to:to:cc:mime-version:mime-version:
+	 content-type:content-type:  content-transfer-encoding:content-transfer-encoding;
+	bh=+iS+QKs/q6S7IQzKFVLoWmnaqz+5k+35Gh5AB1cTDJI=;
+	b=urFjn4Jgez+Nf2g9ZVV8eDC4qbUGBAk28olc5hDPb+WLeVi3gC8BoRRdFbnAgg0TpLWZSE
+	jCDYZMXOsDdQm4GNj80wA7xT8JI3m2GZDloCDf7mE6TnaStffoazovW/L/s2lhv8xlq5bW
+	cJxSueGbZo43g4mUMx/Tr+QPhwJa3lEmFHWHFs14mBlByA0MIeXNxXbFlqgCl5nNwcMTyw
+	8y/q/qN2Azy7gsUy3TgGCmfw+1MpWIRUN4TzJ6/sPuCqNihMWrpC4NVOp0iH13oOrzDbRX
+	XSKisWAA1P24LndpC2U+P2xfo6A8BHlcis5eLhJPlDkTjvB+kjzcn5lWQeO1rQ==
+Received: from relay.goskope.com (relay.goskope.com [163.116.131.203]) by
+ relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-226-bmq49XBGOfqlEZuKLODSGw-1; Fri,
+ 01 May 2026 20:42:39 -0400
+X-MC-Unique: bmq49XBGOfqlEZuKLODSGw-1
+X-Mimecast-MFC-AGG-ID: bmq49XBGOfqlEZuKLODSGw_1777682559
+Received: from BN9PR03CA0394.namprd03.prod.outlook.com (2603:10b6:408:111::9)
+ by BL3PR12MB9050.namprd12.prod.outlook.com (2603:10b6:208:3b9::13) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9870.23; Sat, 2 May
+ 2026 00:42:33 +0000
+Received: from BN3PEPF0000B371.namprd21.prod.outlook.com
+ (2603:10b6:408:111:cafe::c) by BN9PR03CA0394.outlook.office365.com
+ (2603:10b6:408:111::9) with Microsoft SMTP Server (version=TLS1_3,
+ cipher=TLS_AES_256_GCM_SHA384) id 15.20.9870.22 via Frontend Transport; Sat,
+ 2 May 2026 00:42:33 +0000
+X-MS-Exchange-Authentication-Results: spf=fail (sender IP is 4.4.4.4)
+ smtp.mailfrom=user.com; dkim=none (message not signed)
+ header.d=none;dmarc=fail action=quarantine header.from=user.com
+Received: from mail.user.com (4.4.4.4) by
+ BN3PEPF0000B371.mail.protection.outlook.com (10.167.243.168) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.21.25.1 via Frontend Transport; Sat, 2 May 2026 00:42:32 +0000
+Received: from sfefsd.user.corp (4.4.4.4) by Wfsdfsd.user.corp
+ (10.8.110.155) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 3.4.2562.37; Fri, 1 May
+ 2026 17:42:24 -0700
+Received: from app167267 (10.8.110.67) by sfefsd.user.corp
+ (10.8.110.155) with Microsoft SMTP Server id 5.2.2562.37 via Frontend
+ Transport; Fri, 1 May 2026 17:42:24 -0700
+X-BID: c55ede7a-29e1-43b6-abc2-aeca0993e5af
+X-HN: app167267
+X-UID: 5330f593-bf1a-43e8-8c01-b708d7c766c1
+X-UCID: 1374852
+MIME-Version: 1.0
+From: MyBank <memberservice@user.com>
+To: <USER@USER.COM>
+Reply-To: MyBank Member Support <notifications@user.com>
+Date: Sat, 2 May 2026 00:42:24 +0000
+Subject: MyBank One Time Password
+Message-ID: <47fd72dd-0f3b-4dff-9afa-7c886c5431d0@Wdddsfefsd.useuser.corp>
+X-EOPAttributedMessage: 0
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: BN3PEPF0000B371:EE_|BL3PR12MB9050:EE_
+X-MS-Office365-Filtering-Correlation-Id: 3a9f702a-78d2-40b2-bf60-08dea7e3b2a7
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;ARA:13230040|36860700016|7149299003|69100299015|3109299003|376014|1800799024|82310400026|56012099003|18002099003|8096899003|4076899003
+X-Microsoft-Antispam-Message-Info: aYwzuq7L6Ks7cHmvWCadKJJuMBGW6n23+lr+oTi7rQOMb0HjcD9eqlEcX7fLOTSvX7+somDgvr0Pllel4EqTNI9ycaHf+i75mpEMaghMW10GHnd8/+fobu6OhI84AkHN+ck2ICPqQ9Vxvao2qjZUXPF5sA1JFjLhdVj7Y4jx9qArzq7zD9aoGiy/HrA3BdyHwguena0fk+xTl82cE7abMN8ZeoGnXBvhK1gb7A2x85cTS/RzUdlHcoMBSRJkRRrDkBc8OdAhe8oHx3vDHbbsHkFeg6XuRGGDXVoxW3D27Gpv8m5yKJIn74B0+z9bWb1oJVJVb2ORG4YGikXxHpyA/DaBYye33Wac4O1YwOpuJ5zfv6ASLoqfH96gWt6dN4lehT+vLl2SAk7nDKaoiIcqAONDk7x1gTMJnOJUCf/FVSU2oU75s53SNEcwJFcJUMswdYTSXB48WWPj98g7Ua7G5oa9WCId+Vn38Ns2W2ghRdkb9PvdS8QBHR2sxU70yxP1n0kzyQSd5rXfXcABJburOwdI8hgC28iAE+guz7u0/IPgUkOzbRpvHcUPc9KfEixePpd/wFTjbyje9mr0c/Jubrpugo2Mqd5H2dpavpy5FrYnd1bM2jBRX2h9/dUBSLRRHGZTzFAotbafkdS02qsEo9xhs4giwp7e4Mp1fFB+AGZdo9tYGd3ZrufktGytXSxO
+X-Forefront-Antispam-Report: CIP:4.4.4.4;CTRY:US;LANG:en;SCL:1;SRV:;IPV:CAL;SFV:NSPM;H:mail.user.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230040)(36860700016)(7149299003)(69100299015)(3109299003)(376014)(1800799024)(82310400026)(56012099003)(18002099003)(8096899003)(4076899003);DIR:OUT;SFP:1102
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: 3MUFNQYsWvL0Zli+ihwbzjPqIhULPH5jDzG5BvU7WcKy8hIU27s1hPLbgLwwGWQCU2IfrmSQTeuMLqjKmyU6ClrFtNyLCb4tvjJUz0sUr6Duj5lYKBqdxnbmKG5wiBWLzG7YYRSlG8WCPZQ1VsmjYvRO3yD04VbGZZft4cvBzttsMUuXe0fdaGp88mzReE73A6NZxTjnKmb1kCOoqG2RbSzF/5Z0n0sN5ivPXcCcIhjmYD/9R1VMvT+UExiBxrHoEzyhJuWAaJptVvMApKRTZwqa+S73si0WlUMn7fALFzI5I084W7EyCuVaJ33nqaRElqSaFmTz4qSOsiTsAZ7y9U7xV7dxk1ZtvQ1BO1zfmzg8e7ur0XKPry5LSXkA1/FLTY76i4tKcAILTO8XAd2lqKmLzbGBkuWOXsbrXgTyyjPjQsgsF3qHqPn9ZMzmH6ri
+X-Exchange-RoutingPolicyChecked: vsw9sXPyZv1cE+njBjbkdnoLwYxw+CVjbZJRg20ErEdDK2WdTOC7OPmAl0hU2iJz6w3j9a7onKHlfHvyiI8EP6pdPf0khjJea+ALn2LNJjMqHp6q2OtkTdt8Q3d5qN2bjowtGdlqyxu+4XIg8i16J/CoqB23DEeBkmjXD35KgHJZrjANU6WL3NUJvMsSJ//Mo3t5Z26XnAGdyUIGkSaUGMswGKRZlv0937y8CKURuAnjFDPEFYOUFidWxGP3FgqG4hR+7vy88To7NN/XUrYGkIcAZrwG06tZPCOYqhhYNirsfxJTJw/iWg773yOfOUefAKDm4yzN1tpygWvV3fC46w==
+X-OriginatorOrg: user.com
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 02 May 2026 00:42:32.8319
+ (UTC)
+X-MS-Exchange-CrossTenant-Network-Message-Id: 3a9f702a-78d2-40b2-bf60-08dea7e3b2a7
+X-MS-Exchange-CrossTenant-Id: 10d721f3-e32b-4719-840d-7e82379ea09f
+X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=10d721f3-e32b-4719-840d-7e82379ea09f;Ip=[209.162.202.62];Helo=[mail.user.com]
+X-MS-Exchange-CrossTenant-AuthSource: BN3PEPF0000B371.namprd21.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Anonymous
+X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: BL3PR12MB9050
+x-netskope-inspected: true
+X-Mimecast-Spam-Score: 0
+X-Mimecast-MFC-PROC-ID: i3HNMqO78ywc40lbRorjiAPWlDEKP7TvZqazOeFu9os_1777682559
+X-Mimecast-Originator: user.com
+Content-Type: text/html; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+
+<html><head>
+    <meta http-equiv=3D"Content-Type" content=3D"text/html; charset=3DUTF-8=
+" />
+        <style type=3D"text/css">
+                /**********************************
+            ********** Mobile Only ***********
+            **********************************/
+                @media only screen and (max-width: 480px), only screen and =
+(max-device-width: 480px) {
+                    table[id=3Dcontainer], table#container {
+                        padding: 10px !important;
+                        width: 100% !important;
+                    }
+                    h1 {
+                        font-size: 20px !important;
+                    }
+                    span.header {
+                        -webkit-text-size-adjust: none;
+                    }
+                }
+        </style>
+    </head><body style=3D"color: #595959; font-family: Helvetica Neue, Helv=
+etica, Arial, sans-serif; font-size: 13px; line-height: 150%; margin-top: 0=
+; margin-right: 0; margin-left: 0; margin-bottom: 0; padding-top: 0; paddin=
+g-right: 0; padding-bottom: 0; padding-left: 0;">
+   =20
+    <br>
+    <br>
+   =20
+        <table id=3D"container" align=3D"center" style=3D"color: #595959; f=
+ont-family: Helvetica Neue, Helvetica, Arial, sans-serif; font-size: 13px; =
+line-height: 150%; width: 90%; margin-top: 0; margin-right: auto; margin-bo=
+ttom: 0; margin-left: auto; padding-top: 20px; padding-right: 20px; padding=
+-bottom: 20px; padding-left: 20px;">
+            <tr style=3D"color: #595959; font-family: Helvetica Neue, Helve=
+tica, Arial, sans-serif; font-size: 13px; line-height: 150%; margin-top: 0;=
+ margin-right: 0; margin-left: 0; margin-bottom: 0; padding-top: 0; padding=
+-right: 0; padding-bottom: 0; padding-left: 0;">
+                <td style=3D"color: #595959; font-family: Helvetica Neue, H=
+elvetica, Arial, sans-serif; font-size: 13px; line-height: 150%; margin-top=
+: 0; margin-right: 0; margin-left: 0; margin-bottom: 0; padding-top: 0; pad=
+ding-right: 0; padding-bottom: 0; padding-left: 0;">
+                    <!-- HEADER -->
+                    <img src=3D'https://banking.user.com/Image/Logo=
+' title=3D'MyBank' alt=3D'MyBank =
+foo' style=3D"max-width:150px;"/>
+                    <br />
+                    <br />
+                    <hr style=3D"height: 1px; margin-top: 0; margin-right: =
+0; margin-bottom: 10px; margin-left: 0; padding-top: 0; padding-right: 0; p=
+adding-bottom: 0; padding-left: 0; border-top-style: none; border-right-sty=
+le: none; border-bottom-style: none; border-left-style: none; border-top-wi=
+dth: 0; border-right-width: 0; border-bottom-width: 0; border-left-width: 0=
+; background-color: #D9DBDC;" />
+                    <h1 id=3D"title" style=3D"color: #595959; font-family: =
+Helvetica Neue, Helvetica, Arial, sans-serif; font-size: 25px; line-height:=
+ 150%; font-weight: normal; margin-top: 0; margin-right: 0; margin-bottom: =
+0; margin-left: 0; padding-top: 0; padding-right: 0; padding-bottom: 0; pad=
+ding-left: 0;">
+                       =20
+                    </h1>
+                    <h6 id=3D"date" style=3D"color: #999999 !important; fon=
+t-family: Helvetica Neue, Helvetica, Arial, sans-serif; font-size: 13px; li=
+ne-height: 150%; font-weight: normal; text-transform: uppercase; margin-top=
+: 0; margin-right: 0; margin-bottom: 15px; margin-left: 0; padding-top: 0; =
+padding-right: 0; padding-bottom: 0; padding-left: 0;">
+                       =20
+                    </h6>
+                    <!-- END HEADER -->
+                    <!-- MAIN CONTENT SETUP IN TEMPLATES FOR THE ALERT -->
+                    <!-- WARNING DO NOT CHANGE THIS FORMAT AS IT IS USED TO=
+ REPLACE WITH THE ALERT TEMPLATE -->
+                     <p></p>
+<p>PREVENT FRAUD: DO NOT SHARE THIS CODE. MyBank will never contact you=
+ asking for it. Only use verification code: 171793 in Online Banking or the=
+ MyBank App.</p>
+                    <br style=3D"color: #595959; font-family: Helvetica Neu=
+e, Helvetica, Arial, sans-serif; font-size: 13px; line-height: 150%; margin=
+-top: 0; margin-right: 0; margin-left: 0; margin-bottom: 0; padding-top: 0;=
+ padding-right: 0; padding-bottom: 0; padding-left: 0;" />
+                    <!-- FOOTER -->
+                    <table id=3D"footer" style=3D"color: #595959; font-fami=
+ly: Helvetica Neue, Helvetica, Arial, sans-serif; font-size: 13px; line-hei=
+ght: 150%; margin-top: 0; margin-right: 0; margin-left: 0; margin-bottom: 0=
+; padding-top: 0; padding-right: 0; padding-bottom: 0; padding-left: 0; wid=
+th: 100%;">
+                        <tr style=3D"color: #999999; font-family: Helvetica=
+ Neue, Helvetica, Arial, sans-serif; font-size: 12px; line-height: 150%; ma=
+rgin-top: 0; margin-right: 0; margin-bottom: 0; margin-left: 0; padding-top=
+: 0; padding-right: 0; padding-bottom: 0; padding-left: 0;">
+                            <td style=3D"color: #999999; font-family: Helve=
+tica Neue, Helvetica, Arial, sans-serif; font-size: 12px; line-height: 150%=
+; margin-top: 0; margin-right: 0; margin-bottom: 0; margin-left: 0; padding=
+-top: 0; padding-right: 0; padding-bottom: 0; padding-left: 0;">
+                                <hr style=3D"height: 1px; margin-top: 0; ma=
+rgin-right: 0; margin-bottom: 10px; margin-left: 0; padding-top: 0; padding=
+-right: 0; padding-bottom: 0; padding-left: 0; border-top-style: none; bord=
+er-right-style: none; border-bottom-style: none; border-left-style: none; b=
+order-top-width: 0; border-right-width: 0; border-bottom-width: 0; border-l=
+eft-width: 0; background-color: #D9DBDC;" />
+                               =20
+                                            <p>
+                                                You are receiving this mess=
+age because you signed up for this alert.
+                                                Please log in to your
+                                                MyBank=
+ online banking account to manage your alert sett=
+ings.
+                                            </p>
+                              =20
+                                <p>
+                                    MyBank<br>PO B=
+ox 31, Notreal, ZA 12121 
+                                </p>
+                            </td>
+                        </tr>
+                    </table>
+                    <!-- END FOOTER -->
+                </td>
+            </tr>
+        </table>
+   =20
+
+
+    <br>
+    <br>
+<p>
+</p><hr>
+The information contained in this e-mail message is confidential and may be=
+ legally privileged and is intended only for the use of the individual or e=
+ntity  named above.  If you are not an intended recipient or if you have re=
+ceived this message in error, you are hereby  notified that any disseminati=
+on, distribution or copy of this e-mail is strictly prohibited.  If you hav=
+e received  this e-mail in error, please immediately notify us by  return e=
+-mail or telephone if the sender's phone number  is listed above, then prom=
+ptly and permanently delete  this message.  Thank you for your cooperation =
+and  consideration.
+ <br>
+    <br>
+PRIVACY NOTICE AT COLLECTION OF PERSONAL INFORMATION: Your privacy is impor=
+tant to us.  To find out more about how we collect, use, and share your per=
+sonal information, please read our Notice at Collection of Personal Informa=
+tion available online at user.com/NoticeAtCollectionConsumer and ou=
+r California Privacy Policy available at user.com/pooey=
+policy.
+<hr>
+<p></p>
+ =20
+</body></html>
+

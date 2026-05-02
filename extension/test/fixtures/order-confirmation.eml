@@ -1,0 +1,11 @@
+Subject: Your Amazon order confirmation
+From: Amazon <order-update@amazon.com>
+To: user@example.com
+Content-Type: text/plain
+
+Thank you for your order!
+
+Order number: 123456789
+Total: $99.99
+
+Your package will arrive in 2-3 business days.

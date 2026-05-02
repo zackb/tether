@@ -1,0 +1,13 @@
+Subject: Verify your identity
+From: Chase Bank <noreply@chase.com>
+To: user@example.com
+Content-Type: text/html; charset=UTF-8
+
+<html>
+<body>
+<h2>Your verification code</h2>
+<p><strong>987654</strong></p>
+<p>This code will expire in 5 minutes.</p>
+<p>Do not share this code with anyone.</p>
+</body>
+</html>

@@ -1,0 +1,11 @@
+Subject: Microsoft account security code
+From: Microsoft <account-security-noreply@account.microsoft.com>
+To: user@example.com
+Content-Type: text/html; charset=UTF-8
+
+<html>
+<body>
+<p>Your security code is: <strong>A1B2C3D4</strong></p>
+<p>Use this code to sign in to your Microsoft account.</p>
+</body>
+</html>
