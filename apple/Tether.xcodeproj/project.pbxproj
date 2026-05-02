@@ -6,12 +6,13 @@
 	objectVersion = 77;
 	objects = {
 
-/* Begin PBXContainerItemProxy section */
 /* Begin PBXBuildFile section */
+		14961D8C2FA6BAAF00A3C8B3 /* TetherFramework in Frameworks */ = {isa = PBXBuildFile; productRef = AA03AA03AA03AA03AA03AA03 /* TetherFramework */; };
+		14961D8D2FA6BAAF00A3C8B3 /* TetherFramework in Frameworks */ = {isa = PBXBuildFile; productRef = AA02AA02AA02AA02AA02AA02 /* TetherFramework */; };
 		AA10AA10AA10AA10AA10AA10 /* TetherShareExtension.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = AA04AA04AA04AA04AA04AA04 /* TetherShareExtension.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
 /* End PBXBuildFile section */
 
-
+/* Begin PBXContainerItemProxy section */
 		144ECAE52F8C2A8900786838 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = 144ECACF2F8C2A8800786838 /* Project object */;
@@ -26,7 +27,6 @@
 			remoteGlobalIDString = 144ECAD62F8C2A8800786838;
 			remoteInfo = Tether;
 		};
-/* End PBXContainerItemProxy section */
 		AA07AA07AA07AA07AA07AA07 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = 144ECACF2F8C2A8800786838 /* Project object */;
@@ -34,9 +34,8 @@
 			remoteGlobalIDString = AA06AA06AA06AA06AA06AA06;
 			remoteInfo = TetherShareExtension;
 		};
+/* End PBXContainerItemProxy section */
 
-
-/* Begin PBXFileReference section */
 /* Begin PBXCopyFilesBuildPhase section */
 		AA09AA09AA09AA09AA09AA09 /* Embed Foundation Extensions */ = {
 			isa = PBXCopyFilesBuildPhase;
@@ -51,13 +50,22 @@
 		};
 /* End PBXCopyFilesBuildPhase section */
 
-
+/* Begin PBXFileReference section */
 		144ECAD72F8C2A8800786838 /* Tether.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Tether.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		144ECAE42F8C2A8900786838 /* TetherTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = TetherTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		144ECAEE2F8C2A8900786838 /* TetherUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = TetherUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		AA04AA04AA04AA04AA04AA04 /* TetherShareExtension.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = TetherShareExtension.appex; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
-		AA04AA04AA04AA04AA04AA04 /* TetherShareExtension.appex */ = {isa = PBXFileReference; explicitFileType = wrapper.app-extension; includeInIndex = 0; path = TetherShareExtension.appex; sourceTree = BUILT_PRODUCTS_DIR; };
 
+/* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
+		AA11AA11AA11AA11AA11AA11 /* Exceptions for "TetherShareExtension" folder in "TetherShareExtension" target */ = {
+			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
+			membershipExceptions = (
+				Info.plist,
+			);
+			target = AA06AA06AA06AA06AA06AA06 /* TetherShareExtension */;
+		};
+/* End PBXFileSystemSynchronizedBuildFileExceptionSet section */
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
 		144ECAD92F8C2A8800786838 /* Tether */ = {
@@ -75,30 +83,22 @@
 			path = TetherUITests;
 			sourceTree = "<group>";
 		};
-/* End PBXFileSystemSynchronizedRootGroup section */
 		AA05AA05AA05AA05AA05AA05 /* TetherShareExtension */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
 			exceptions = (
-				AA11AA11AA11AA11AA11AA11 /* PBXFileSystemSynchronizedBuildFileExceptionSet */,
+				AA11AA11AA11AA11AA11AA11 /* Exceptions for "TetherShareExtension" folder in "TetherShareExtension" target */,
 			);
 			path = TetherShareExtension;
 			sourceTree = "<group>";
 		};
-		AA11AA11AA11AA11AA11AA11 /* PBXFileSystemSynchronizedBuildFileExceptionSet */ = {
-			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
-			membershipExceptions = (
-				Info.plist,
-				TetherShareExtension.entitlements,
-			);
-			target = AA06AA06AA06AA06AA06AA06 /* TetherShareExtension */;
-		};
-
+/* End PBXFileSystemSynchronizedRootGroup section */
 
 /* Begin PBXFrameworksBuildPhase section */
 		144ECAD42F8C2A8800786838 /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				14961D8D2FA6BAAF00A3C8B3 /* TetherFramework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -116,15 +116,15 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
-/* End PBXFrameworksBuildPhase section */
 		AA0AAA0AAA0AAA0AAA0AAA0A /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				14961D8C2FA6BAAF00A3C8B3 /* TetherFramework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
-
+/* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
 		144ECACE2F8C2A8800786838 = {
@@ -223,7 +223,6 @@
 			productReference = 144ECAEE2F8C2A8900786838 /* TetherUITests.xctest */;
 			productType = "com.apple.product-type.bundle.ui-testing";
 		};
-/* End PBXNativeTarget section */
 		AA06AA06AA06AA06AA06AA06 /* TetherShareExtension */ = {
 			isa = PBXNativeTarget;
 			buildConfigurationList = AA0FAA0FAA0FAA0FAA0FAA0F /* Build configuration list for PBXNativeTarget "TetherShareExtension" */;
@@ -247,7 +246,7 @@
 			productReference = AA04AA04AA04AA04AA04AA04 /* TetherShareExtension.appex */;
 			productType = "com.apple.product-type.app-extension";
 		};
-
+/* End PBXNativeTarget section */
 
 /* Begin PBXProject section */
 		144ECACF2F8C2A8800786838 /* Project object */ = {
@@ -282,11 +281,11 @@
 			);
 			mainGroup = 144ECACE2F8C2A8800786838;
 			minimizedProjectReferenceProxies = 1;
-			preferredProjectObjectVersion = 77;
-			productRefGroup = 144ECAD82F8C2A8800786838 /* Products */;
 			packageReferences = (
 				AA01AA01AA01AA01AA01AA01 /* XCLocalSwiftPackageReference "TetherFramework" */,
 			);
+			preferredProjectObjectVersion = 77;
+			productRefGroup = 144ECAD82F8C2A8800786838 /* Products */;
 			projectDirPath = "";
 			projectRoot = "";
 			targets = (
@@ -297,27 +296,6 @@
 			);
 		};
 /* End PBXProject section */
-
-
-/* Begin PBXResourcesBuildPhase section */
-		AA0BAA0BAA0BAA0BAA0BAA0B /* Resources */ = {
-			isa = PBXResourcesBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
-/* End PBXResourcesBuildPhase section */
-
-/* Begin PBXSourcesBuildPhase section */
-		AA0CAA0CAA0CAA0CAA0CAA0C /* Sources */ = {
-			isa = PBXSourcesBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
-/* End PBXSourcesBuildPhase section */
 
 /* Begin PBXResourcesBuildPhase section */
 		144ECAD52F8C2A8800786838 /* Resources */ = {
@@ -335,6 +313,13 @@
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 		144ECAEC2F8C2A8900786838 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		AA0BAA0BAA0BAA0BAA0BAA0B /* Resources */ = {
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -365,6 +350,13 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		AA0CAA0CAA0CAA0CAA0CAA0C /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 /* End PBXSourcesBuildPhase section */
 
 /* Begin PBXTargetDependency section */
@@ -378,13 +370,12 @@
 			target = 144ECAD62F8C2A8800786838 /* Tether */;
 			targetProxy = 144ECAEF2F8C2A8900786838 /* PBXContainerItemProxy */;
 		};
-/* End PBXTargetDependency section */
 		AA08AA08AA08AA08AA08AA08 /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
 			target = AA06AA06AA06AA06AA06AA06 /* TetherShareExtension */;
 			targetProxy = AA07AA07AA07AA07AA07AA07 /* PBXContainerItemProxy */;
 		};
-
+/* End PBXTargetDependency section */
 
 /* Begin XCBuildConfiguration section */
 		144ECAF62F8C2A8A00786838 /* Debug */ = {
@@ -511,7 +502,7 @@
 				AUTOMATION_APPLE_EVENTS = NO;
 				CODE_SIGN_ENTITLEMENTS = Tether/Tether.entitlements;
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 3;
+				CURRENT_PROJECT_VERSION = 5;
 				DEVELOPMENT_TEAM = BN376Y4X83;
 				ENABLE_APP_SANDBOX = YES;
 				ENABLE_FILE_ACCESS_DOWNLOADS_FOLDER = readwrite;
@@ -547,7 +538,7 @@
 				LD_RUNPATH_SEARCH_PATHS = "@executable_path/Frameworks";
 				"LD_RUNPATH_SEARCH_PATHS[sdk=macosx*]" = "@executable_path/../Frameworks";
 				MACOSX_DEPLOYMENT_TARGET = 26.3;
-				MARKETING_VERSION = 1.0;
+				MARKETING_VERSION = 1.1;
 				PRODUCT_BUNDLE_IDENTIFIER = net.jeedup.Tether;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				REGISTER_APP_GROUPS = YES;
@@ -578,7 +569,7 @@
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				AUTOMATION_APPLE_EVENTS = NO;
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 3;
+				CURRENT_PROJECT_VERSION = 5;
 				DEVELOPMENT_TEAM = BN376Y4X83;
 				ENABLE_APP_SANDBOX = YES;
 				ENABLE_FILE_ACCESS_DOWNLOADS_FOLDER = readwrite;
@@ -614,7 +605,7 @@
 				LD_RUNPATH_SEARCH_PATHS = "@executable_path/Frameworks";
 				"LD_RUNPATH_SEARCH_PATHS[sdk=macosx*]" = "@executable_path/../Frameworks";
 				MACOSX_DEPLOYMENT_TARGET = 26.3;
-				MARKETING_VERSION = 1.0;
+				MARKETING_VERSION = 1.1;
 				PRODUCT_BUNDLE_IDENTIFIER = net.jeedup.Tether;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				REGISTER_APP_GROUPS = YES;
@@ -740,19 +731,18 @@
 			};
 			name = Release;
 		};
-/* End XCBuildConfiguration section */
 		AA0DAA0DAA0DAA0DAA0DAA0D /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				CODE_SIGN_ENTITLEMENTS = TetherShareExtension/TetherShareExtension.entitlements;
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 1;
+				CURRENT_PROJECT_VERSION = 5;
 				DEVELOPMENT_TEAM = BN376Y4X83;
 				GENERATE_INFOPLIST_FILE = NO;
 				INFOPLIST_FILE = TetherShareExtension/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
 				LD_RUNPATH_SEARCH_PATHS = "@executable_path/../../Frameworks";
-				MARKETING_VERSION = 1.0;
+				MARKETING_VERSION = 1.1;
 				PRODUCT_BUNDLE_IDENTIFIER = net.jeedup.Tether.ShareExtension;
 				PRODUCT_NAME = TetherShareExtension;
 				SDKROOT = iphoneos;
@@ -771,27 +761,27 @@
 			buildSettings = {
 				CODE_SIGN_ENTITLEMENTS = TetherShareExtension/TetherShareExtension.entitlements;
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 1;
+				CURRENT_PROJECT_VERSION = 5;
 				DEVELOPMENT_TEAM = BN376Y4X83;
 				GENERATE_INFOPLIST_FILE = NO;
 				INFOPLIST_FILE = TetherShareExtension/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
 				LD_RUNPATH_SEARCH_PATHS = "@executable_path/../../Frameworks";
-				MARKETING_VERSION = 1.0;
+				MARKETING_VERSION = 1.1;
 				PRODUCT_BUNDLE_IDENTIFIER = net.jeedup.Tether.ShareExtension;
 				PRODUCT_NAME = TetherShareExtension;
 				SDKROOT = iphoneos;
 				SKIP_INSTALL = YES;
 				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
 				SWIFT_APPROACHABLE_CONCURRENCY = YES;
-				SWIFT_DEFAULT_ACTOR_ISOLATION = MainActor;
 				SWIFT_COMPILATION_MODE = wholemodule;
+				SWIFT_DEFAULT_ACTOR_ISOLATION = MainActor;
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = 1;
 			};
 			name = Release;
 		};
-
+/* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
 		144ECAD22F8C2A8800786838 /* Build configuration list for PBXProject "Tether" */ = {
@@ -830,7 +820,6 @@
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
-/* End XCConfigurationList section */
 		AA0FAA0FAA0FAA0FAA0FAA0F /* Build configuration list for PBXNativeTarget "TetherShareExtension" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
@@ -840,7 +829,7 @@
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
-
+/* End XCConfigurationList section */
 
 /* Begin XCLocalSwiftPackageReference section */
 		AA01AA01AA01AA01AA01AA01 /* XCLocalSwiftPackageReference "TetherFramework" */ = {
@@ -861,7 +850,6 @@
 			productName = TetherFramework;
 		};
 /* End XCSwiftPackageProductDependency section */
-
 	};
 	rootObject = 144ECACF2F8C2A8800786838 /* Project object */;
 }

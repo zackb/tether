@@ -28,10 +28,6 @@ public final class CertificateManager {
     // Shared App Group identifier — must match both targets' entitlements.
     public static let appGroupID = "group.net.jeedup.Tether"
 
-    // Shared Keychain access group — must match both targets' entitlements.
-    // The prefix is omitted here; we set kSecAttrAccessGroup directly.
-    private static let keychainAccessGroup = "group.net.jeedup.Tether"
-
     private static let keyTag = "net.jeedup.Tether.key"
     private static let certLabel = "net.jeedup.Tether.cert"
     private static let knownHostsKey = "TetherKnownHosts"
@@ -130,7 +126,6 @@ public final class CertificateManager {
             kSecClass as String: kSecClassKey,
             kSecAttrApplicationTag as String: Self.keyTag.data(using: .utf8)!,
             kSecAttrKeyType as String: kSecAttrKeyTypeRSA,
-            kSecAttrAccessGroup as String: Self.keychainAccessGroup,
             kSecReturnRef as String: true,
         ]
         var keyResult: CFTypeRef?
@@ -142,7 +137,6 @@ public final class CertificateManager {
         let identityQuery: [String: Any] = [
             kSecClass as String: kSecClassIdentity,
             kSecAttrApplicationTag as String: Self.keyTag.data(using: .utf8)!,
-            kSecAttrAccessGroup as String: Self.keychainAccessGroup,
             kSecReturnRef as String: true,
         ]
         var identityResult: CFTypeRef?
@@ -199,7 +193,6 @@ public final class CertificateManager {
             kSecPrivateKeyAttrs as String: [
                 kSecAttrIsPermanent as String: true,
                 kSecAttrApplicationTag as String: Self.keyTag.data(using: .utf8)!,
-                kSecAttrAccessGroup as String: Self.keychainAccessGroup,
                 kSecAttrAccessible as String: kSecAttrAccessibleAfterFirstUnlock,
             ] as [String: Any],
         ]
@@ -241,7 +234,6 @@ public final class CertificateManager {
             kSecClass as String: kSecClassCertificate,
             kSecValueRef as String: certificate,
             kSecAttrLabel as String: Self.certLabel,
-            kSecAttrAccessGroup as String: Self.keychainAccessGroup,
             kSecAttrAccessible as String: kSecAttrAccessibleAfterFirstUnlock,
         ]
         let addStatus = SecItemAdd(addCertQuery as CFDictionary, nil)
