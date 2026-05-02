@@ -8,8 +8,11 @@
 A self-hosted alternative to Apple's Continuity and Universal Clipboard.
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
-[![Platform: Linux](https://img.shields.io/badge/Platform-Linux Wayland-blue.svg)](https://wayland.freedesktop.org/)
+
+[![Platform: Linux](https://img.shields.io/badge/Platform-Linux%20Wayland-blue.svg)](https://wayland.freedesktop.org/)
+
 [![iOS: 16+](https://img.shields.io/badge/iOS-16%2B-purple.svg)](https://apps.apple.com/us/app/tether-linux-companion/id6762097135)
+
 [![Download on the App Store](https://developer.apple.com/assets/elements/badges/download-on-the-app-store.svg)](https://apps.apple.com/us/app/tether-linux-companion/id6762097135)
 
 ## Features
