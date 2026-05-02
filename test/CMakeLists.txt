@@ -1,6 +1,7 @@
 add_executable(tether_test
     test_base64.cpp
     test_crypto.cpp
+    test_discovery.cpp
     test_file_transfer.cpp
 )
 
