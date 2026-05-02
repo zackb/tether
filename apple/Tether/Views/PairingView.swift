@@ -6,6 +6,7 @@
 //
 
 import SwiftUI
+import TetherFramework
 
 struct PairingView: View {
     @Environment(TetherViewModel.self) private var viewModel

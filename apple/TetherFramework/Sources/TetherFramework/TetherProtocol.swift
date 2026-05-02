@@ -1,6 +1,6 @@
 //
 //  TetherProtocol.swift
-//  Tether
+//  TetherFramework
 //
 //  Newline-delimited JSON framing over raw byte streams.
 //
@@ -9,7 +9,7 @@ import Foundation
 
 // Handles encoding and decoding of `TetherMessage` values using the
 // newline-delimited JSON wire format spoken by `tetherd`.
-enum TetherProtocol {
+public enum TetherProtocol {
     private static let encoder: JSONEncoder = {
         let e = JSONEncoder()
         e.keyEncodingStrategy = .useDefaultKeys
@@ -27,7 +27,7 @@ enum TetherProtocol {
     // MARK: - Encoding
 
     // Encode a message to its wire representation (JSON + trailing newline).
-    static func encode(_ message: TetherMessage) throws -> Data {
+    public static func encode(_ message: TetherMessage) throws -> Data {
         var data = try encoder.encode(message)
         data.append(newline)
         return data
@@ -42,7 +42,7 @@ enum TetherProtocol {
     //
     // Lines that fail JSON parsing (e.g. the daemon's bare `OK\n` response)
     // are silently skipped.
-    static func decode(buffer: inout Data) -> [TetherMessage] {
+    public static func decode(buffer: inout Data) -> [TetherMessage] {
         var messages: [TetherMessage] = []
 
         while let newlineIndex = buffer.firstIndex(of: newline) {

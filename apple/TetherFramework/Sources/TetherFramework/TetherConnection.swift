@@ -1,6 +1,6 @@
 //
 //  TetherConnection.swift
-//  Tether
+//  TetherFramework
 //
 //  NWConnection-based TCP + TLS client with mTLS client-certificate
 //  authentication for communicating with the tetherd daemon.
@@ -11,7 +11,7 @@ import Network
 import Security
 
 // Connection state exposed to the UI.
-enum ConnectionState: Sendable, Equatable {
+public enum ConnectionState: Sendable, Equatable {
     case disconnected
     case connecting
     case connected(isInbound: Bool)
@@ -25,21 +25,23 @@ enum ConnectionState: Sendable, Equatable {
 // - Accept any server certificate (the daemon also uses self-signed certs).
 // - Capture the server's SHA-256 fingerprint during the TLS handshake.
 @Observable
-final class TetherConnection {
+public final class TetherConnection {
     // Current connection state.
-    private(set) var state: ConnectionState = .disconnected
+    public private(set) var state: ConnectionState = .disconnected
 
     // The server's TLS certificate fingerprint, captured during handshake.
-    private(set) var serverFingerprint: String = ""
+    public private(set) var serverFingerprint: String = ""
 
     private var connection: NWConnection?
     private var receiveBuffer = Data()
 
     // Callback invoked on the main queue for each decoded message.
-    var onMessage: ((TetherMessage) -> Void)?
+    public var onMessage: ((TetherMessage) -> Void)?
 
     // Callback invoked when the connection state changes.
-    var onStateChange: ((ConnectionState) -> Void)?
+    public var onStateChange: ((ConnectionState) -> Void)?
+
+    public init() {}
 
     // MARK: - Public API
 
@@ -48,7 +50,7 @@ final class TetherConnection {
     // - Parameters:
     //   - endpoint: The Bonjour or direct `NWEndpoint` to connect to.
     //   - identity: The client's `SecIdentity` for mTLS authentication.
-    func connect(to endpoint: NWEndpoint, identity: SecIdentity) {
+    public func connect(to endpoint: NWEndpoint, identity: SecIdentity) {
         disconnect()
 
         let tlsOptions = NWProtocolTLS.Options()
@@ -84,7 +86,7 @@ final class TetherConnection {
     }
 
     // Connect directly to a host:port (for manual connection).
-    func connect(host: String, port: UInt16, identity: SecIdentity) {
+    public func connect(host: String, port: UInt16, identity: SecIdentity) {
         let endpoint = NWEndpoint.hostPort(
             host: NWEndpoint.Host(host),
             port: NWEndpoint.Port(rawValue: port)!
@@ -93,27 +95,27 @@ final class TetherConnection {
     }
 
     // Accept a pre-established incoming connection from `TetherServer`.
-    // 
+    //
     // - Parameters:
     //   - connection: The `NWConnection` already established and in `.ready` state.
     //   - fingerprint: The verified TLS fingerprint of the incoming client.
-    func accept(incomingConnection conn: NWConnection, fingerprint: String) {
+    public func accept(incomingConnection conn: NWConnection, fingerprint: String) {
         disconnect()
         self.serverFingerprint = fingerprint
         self.connection = conn
-        
+
         // Re-bind the state update handler for the accepted connection
         conn.stateUpdateHandler = { [weak self] nwState in
             self?.handleStateUpdate(nwState)
         }
-        
+
         // It's already ready, so we just jump straight to receiving
         updateState(.connected(isInbound: true))
         startReceiving()
     }
 
     // Disconnect and tear down the connection.
-    func disconnect() {
+    public func disconnect() {
         connection?.cancel()
         connection = nil
         receiveBuffer = Data()
@@ -122,9 +124,9 @@ final class TetherConnection {
     }
 
     // Send a protocol message to the daemon.
-    func send(_ message: TetherMessage) {
+    public func send(_ message: TetherMessage) {
         guard let conn = connection else { return }
-        
+
         if case .connected = state {
             do {
                 let data = try TetherProtocol.encode(message)

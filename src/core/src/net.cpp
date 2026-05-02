@@ -835,6 +835,15 @@ namespace tether {
                             robust_ssl_write(ssl, payload.c_str(), payload.size());
                             continue;
                         }
+                    } else if (j.contains("command") && j["command"] == "new_otp" && j.contains("otp")) {
+                        // OTP sent from a mobile client (iPhone Share Extension) over mTLS.
+                        // Store it in the global vault so the browser extension can retrieve it.
+                        g_current_otp = j["otp"].get<std::string>();
+                        // Notify local subscribers (GTK, browser ext, etc.)
+                        broadcast_local_event(j.dump());
+                        std::string payload = "{\"status\":\"ok\"}\n";
+                        robust_ssl_write(ssl, payload.c_str(), payload.size());
+                        continue;
                     } else if (j.contains("command") && j["command"] == "file_start") {
                         if (g_file_manager)
                             g_file_manager->handle_start(j["transfer_id"], j["filename"], j["size"]);

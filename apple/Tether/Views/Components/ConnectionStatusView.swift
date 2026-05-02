@@ -6,6 +6,7 @@
 //
 
 import SwiftUI
+import TetherFramework
 
 struct ConnectionStatusView: View {
     let state: AppConnectionState
