@@ -22,7 +22,7 @@ namespace tether {
         bool send_file(const std::string& path, std::string& err_out);
 
         std::string get_peer_fingerprint() const;
-        int get_socket() const;
+        ssize_t read(char* buf, size_t count);
 
         // High Level Features
         std::string get_clipboard(std::string& err_out);

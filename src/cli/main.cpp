@@ -20,10 +20,8 @@ void run_native_messaging_host(tether::Client& client) {
     std::thread reader_thread([&]() {
         std::string buffer;
         char buf[8192];
-        int daemon_sock = client.get_socket();
-
         while (running) {
-            ssize_t n = read(daemon_sock, buf, sizeof(buf));
+            ssize_t n = client.read(buf, sizeof(buf));
             if (n <= 0) {
                 running = false;
                 break;

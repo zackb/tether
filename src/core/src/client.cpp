@@ -143,7 +143,7 @@ namespace tether {
             if (write(sock_, payload.c_str(), payload.size()) < 0) {
                 debug::log(ERR, "client write error\n");
             }
-            ssize_t n = read(sock_, buf, sizeof(buf) - 1);
+            ssize_t n = ::read(sock_, buf, sizeof(buf) - 1);
             if (n > 0) {
                 buf[n] = '\0';
                 return std::string(buf);
@@ -161,7 +161,13 @@ namespace tether {
         }
     }
 
-    int Client::get_socket() const { return sock_; }
+    ssize_t Client::read(char* buf, size_t count) {
+        if (ssl_) {
+            return SSL_read(ssl_, buf, count);
+        } else {
+            return ::read(sock_, buf, count);
+        }
+    }
 
     std::string Client::get_clipboard(std::string& err_out) {
         nlohmann::json j;
