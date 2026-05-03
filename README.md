@@ -37,7 +37,13 @@ Drag and drop files from Linux directly into the iPhone app, or receive files au
 ### Device Pairing
 Securely pair devices using **Mutually Authenticated TLS (mTLS)**, restricting TCP traffic securely using X.509 RSA certificates.
 
-### Browser & Mail Extensions (WIP)
+### OTP Handling
+Streamline two-factor authentication across your devices:
+- iOS Share Extension: Send OTP codes from your iPhone to your Linux clipboard.
+- Thunderbird Addon: Automatically parse OTP codes from incoming email messages.
+- Browser Extension: Autofill OTP codes into login forms from the iOS app or the mail extension.
+
+### Browser & Mail Extensions
 A unified WebExtension that works across Thunderbird/Betterbird and Firefox/Chromium browsers:
 
 - **Thunderbird/Betterbird:** Detects OTP codes in incoming emails (verification codes, 2FA messages) and copies them to the clipboard or sends them to the Tether daemon for vault storage
