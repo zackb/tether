@@ -63,3 +63,19 @@ configure_file(
 install(PROGRAMS "${CMAKE_CURRENT_SOURCE_DIR}/extension/host/tether-native-host"
         DESTINATION ${CMAKE_INSTALL_BINDIR})
 
+# native messaging manifests
+install(FILES "${CMAKE_CURRENT_BINARY_DIR}/com.tether.extension.chrome.json"
+        DESTINATION "/etc/chromium/native-messaging-hosts"
+        RENAME "com.tether.extension.json")
+
+install(FILES "${CMAKE_CURRENT_BINARY_DIR}/com.tether.extension.chrome.json"
+        DESTINATION "/etc/opt/chrome/native-messaging-hosts"
+        RENAME "com.tether.extension.json")
+
+install(FILES "${CMAKE_CURRENT_BINARY_DIR}/com.tether.extension.mozilla.json"
+        DESTINATION "/usr/lib/mozilla/native-messaging-hosts"
+        RENAME "com.tether.extension.json")
+
+install(FILES "${CMAKE_CURRENT_BINARY_DIR}/com.tether.extension.mozilla.json"
+        DESTINATION "/usr/lib/thunderbird/native-messaging-hosts"
+        RENAME "com.tether.extension.json")
