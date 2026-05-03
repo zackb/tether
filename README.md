@@ -4,8 +4,7 @@
 
 > Bridge your iPhone to the Linux Wayland desktop
 
-**Tether** is an open-source companion device integration suite that bridges iOS (iPhone/iPad) and the Linux Wayland desktop. If you've migrated away from macOS but still carry an iPhone, Tether provides the missing ecosystem integration.
-A self-hosted alternative to Apple's Continuity and Universal Clipboard.
+**Tether** aims to support all of the [Apple Continuity](https://www.apple.com/macos/continuity/) features on Linux that are technically possible. If you've migrated away from macOS but still carry an iPhone, Tether provides the missing ecosystem integration.
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 
