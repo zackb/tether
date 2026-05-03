@@ -51,6 +51,8 @@ public enum ShareSenderError: LocalizedError {
 public actor ShareSender {
     // Keys for the last-known Bonjour service name, stored in shared UserDefaults.
     private static let lastServiceNameKey = "TetherLastServiceName"
+    private static let lastHostKey = "TetherLastHost"
+    private static let lastPortKey = "TetherLastPort"
     private static let serviceType = "_tether._tcp"
     private static let serviceDomain = "local."
 
@@ -79,19 +81,24 @@ public actor ShareSender {
             return .failure(ShareSenderError.noKnownHost)
         }
 
-        // 3. Resolve endpoint — use the last-known service name stored by the main app
+        // 3. Resolve endpoint — prefer direct IP/Port bypass to avoid Local Network Privacy limits in the extension
         let sharedDefaults = UserDefaults(suiteName: CertificateManager.appGroupID) ?? .standard
-        guard let serviceName = sharedDefaults.string(forKey: lastServiceNameKey),
-              !serviceName.isEmpty else {
+        let endpoint: NWEndpoint
+
+        if let hostStr = sharedDefaults.string(forKey: lastHostKey), !hostStr.isEmpty,
+           let portInt = sharedDefaults.object(forKey: lastPortKey) as? Int, portInt > 0,
+           let port = NWEndpoint.Port(rawValue: UInt16(portInt)) {
+            endpoint = NWEndpoint.hostPort(host: .init(hostStr), port: port)
+        } else if let serviceName = sharedDefaults.string(forKey: lastServiceNameKey), !serviceName.isEmpty {
+            endpoint = NWEndpoint.service(
+                name: serviceName,
+                type: serviceType,
+                domain: serviceDomain,
+                interface: nil
+            )
+        } else {
             return .failure(ShareSenderError.noKnownHost)
         }
-
-        let endpoint = NWEndpoint.service(
-            name: serviceName,
-            type: serviceType,
-            domain: serviceDomain,
-            interface: nil
-        )
 
         // 4. Connect
         let connection = TetherConnection()
@@ -224,5 +231,13 @@ extension ShareSender {
     public static func persistLastServiceName(_ name: String) {
         let sharedDefaults = UserDefaults(suiteName: CertificateManager.appGroupID) ?? .standard
         sharedDefaults.set(name, forKey: lastServiceNameKey)
+    }
+
+    /// Called by the main app once the connection is established to cache the
+    /// direct IP and Port, allowing the Share Extension to bypass Bonjour entirely.
+    public static func persistLastEndpoint(host: String, port: UInt16) {
+        let sharedDefaults = UserDefaults(suiteName: CertificateManager.appGroupID) ?? .standard
+        sharedDefaults.set(host, forKey: lastHostKey)
+        sharedDefaults.set(Int(port), forKey: lastPortKey)
     }
 }

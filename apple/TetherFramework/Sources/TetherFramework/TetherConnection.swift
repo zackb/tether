@@ -32,6 +32,15 @@ public final class TetherConnection {
     // The server's TLS certificate fingerprint, captured during handshake.
     public private(set) var serverFingerprint: String = ""
 
+    // The actual resolved IP and Port of the active connection, if available.
+    public var resolvedEndpoint: (host: String, port: UInt16)? {
+        guard let endpoint = connection?.currentPath?.remoteEndpoint else { return nil }
+        if case .hostPort(let host, let port) = endpoint {
+            return ("\(host)", port.rawValue)
+        }
+        return nil
+    }
+
     private var connection: NWConnection?
     private var receiveBuffer = Data()
 

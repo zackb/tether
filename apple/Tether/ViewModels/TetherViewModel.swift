@@ -383,6 +383,9 @@ final class TetherViewModel {
                 self.pendingReconnectTask = nil
                 self.autoConnectingFingerprint = nil
                 self.certificateManager.lastConnectedFingerprint = self.connection.serverFingerprint
+                if let endpoint = self.connection.resolvedEndpoint {
+                    ShareSender.persistLastEndpoint(host: endpoint.host, port: endpoint.port)
+                }
                 self.handleConnected() // TODO: isInbound
             case .disconnected:
                 self.autoConnectingFingerprint = nil
