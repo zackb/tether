@@ -28,6 +28,38 @@ public final class CertificateManager {
     // Shared App Group identifier — must match both targets' entitlements.
     public static let appGroupID = "group.net.jeedup.Tether"
 
+    // The Keychain access group entitlement uses $(AppIdentifierPrefix), which
+    // the OS expands to your Team ID at runtime (e.g. "ABCDE12345.net.jeedup.Tether").
+    // We resolve it dynamically so the correct string is used in both development
+    // and TestFlight/App Store builds. Hardcoding would break distribution builds.
+    private static let keychainAccessGroup: String = {
+        let query: [String: Any] = [
+            kSecClass as String: kSecClassGenericPassword,
+            kSecAttrService as String: "net.jeedup.Tether.__groupProbe",
+            kSecReturnAttributes as String: true,
+        ]
+        var item: CFTypeRef?
+        if SecItemCopyMatching(query as CFDictionary, &item) == errSecSuccess,
+           let attrs = item as? [String: Any],
+           let group = attrs[kSecAttrAccessGroup as String] as? String {
+            return group
+        }
+        let addQuery: [String: Any] = [
+            kSecClass as String: kSecClassGenericPassword,
+            kSecAttrService as String: "net.jeedup.Tether.__groupProbe",
+            kSecAttrAccount as String: "probe",
+            kSecValueData as String: Data([0]),
+            kSecReturnAttributes as String: true,
+        ]
+        var addResult: CFTypeRef?
+        SecItemAdd(addQuery as CFDictionary, &addResult)
+        if let attrs = addResult as? [String: Any],
+           let group = attrs[kSecAttrAccessGroup as String] as? String {
+            return group
+        }
+        return "net.jeedup.Tether"
+    }()
+
     private static let keyTag = "net.jeedup.Tether.key"
     private static let certLabel = "net.jeedup.Tether.cert"
     private static let knownHostsKey = "TetherKnownHosts"
@@ -126,6 +158,7 @@ public final class CertificateManager {
             kSecClass as String: kSecClassKey,
             kSecAttrApplicationTag as String: Self.keyTag.data(using: .utf8)!,
             kSecAttrKeyType as String: kSecAttrKeyTypeRSA,
+            kSecAttrAccessGroup as String: Self.keychainAccessGroup,
             kSecReturnRef as String: true,
         ]
         var keyResult: CFTypeRef?
@@ -137,6 +170,7 @@ public final class CertificateManager {
         let identityQuery: [String: Any] = [
             kSecClass as String: kSecClassIdentity,
             kSecAttrApplicationTag as String: Self.keyTag.data(using: .utf8)!,
+            kSecAttrAccessGroup as String: Self.keychainAccessGroup,
             kSecReturnRef as String: true,
         ]
         var identityResult: CFTypeRef?
@@ -193,6 +227,7 @@ public final class CertificateManager {
             kSecPrivateKeyAttrs as String: [
                 kSecAttrIsPermanent as String: true,
                 kSecAttrApplicationTag as String: Self.keyTag.data(using: .utf8)!,
+                kSecAttrAccessGroup as String: Self.keychainAccessGroup,
                 kSecAttrAccessible as String: kSecAttrAccessibleAfterFirstUnlock,
             ] as [String: Any],
         ]
@@ -234,6 +269,7 @@ public final class CertificateManager {
             kSecClass as String: kSecClassCertificate,
             kSecValueRef as String: certificate,
             kSecAttrLabel as String: Self.certLabel,
+            kSecAttrAccessGroup as String: Self.keychainAccessGroup,
             kSecAttrAccessible as String: kSecAttrAccessibleAfterFirstUnlock,
         ]
         let addStatus = SecItemAdd(addCertQuery as CFDictionary, nil)
