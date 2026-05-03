@@ -11,9 +11,9 @@ A self-hosted alternative to Apple's Continuity and Universal Clipboard.
 
 [![Platform: Linux](https://img.shields.io/badge/Platform-Linux%20Wayland-blue.svg)](https://wayland.freedesktop.org/)
 
-[![iOS: 16+](https://img.shields.io/badge/iOS-16%2B-purple.svg)](https://apps.apple.com/us/app/tether-linux-companion/id6762097135)
-
 [![Get the Firefox Add-on](https://img.shields.io/badge/Firefox-Add--on-orange.svg)](https://addons.mozilla.org/en-US/firefox/addon/tether-browser-extension/)
+
+[![iOS: 16+](https://img.shields.io/badge/iOS-16%2B-purple.svg)](https://apps.apple.com/us/app/tether-linux-companion/id6762097135)
 
 [![Download on the App Store](https://developer.apple.com/assets/elements/badges/download-on-the-app-store.svg)](https://apps.apple.com/us/app/tether-linux-companion/id6762097135)
 
