@@ -92,6 +92,12 @@ Tether uses a multi-component architecture:
 
 ## Installation
 
+### Arch Linux
+
+```bash
+yay -S tether
+```
+
 ### Build from Source
 
 ```bash
