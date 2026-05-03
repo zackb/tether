@@ -13,6 +13,8 @@ A self-hosted alternative to Apple's Continuity and Universal Clipboard.
 
 [![Get the Firefox Add-on](https://img.shields.io/badge/Firefox-Add--on-orange.svg)](https://addons.mozilla.org/en-US/firefox/addon/tether-browser-extension/)
 
+[![Get the Thunderbird / Betterbird Add-on](https://img.shields.io/badge/Thunderbird-Add--on-orange.svg)](https://addons.thunderbird.net/en-US/thunderbird/addon/tether-mail-extension/)
+
 [![iOS: 16+](https://img.shields.io/badge/iOS-16%2B-purple.svg)](https://apps.apple.com/us/app/tether-linux-companion/id6762097135)
 
 [![Download on the App Store](https://developer.apple.com/assets/elements/badges/download-on-the-app-store.svg)](https://apps.apple.com/us/app/tether-linux-companion/id6762097135)
@@ -63,7 +65,7 @@ Tether uses a multi-component architecture:
 
 4. **iPhone App** — Native SwiftUI iOS 16+ app that discovers the daemon via Bonjour/mDNS, utilizing Apple's `Network.framework` for secure TLS negotiation.
 
-5. **Browser/Mail Extension (WIP)** — WebExtension that interfaces with the daemon via native messaging. Use with Thunderbird/Betterbird and Firefox or Chromium-based browsers.
+5. **Browser/Mail Extension** — WebExtension that interfaces with the daemon via native messaging. Use with Thunderbird/Betterbird and Firefox or Chromium-based browsers.
 
 ## Requirements
 
@@ -135,8 +137,8 @@ The daemon uses an advisory lock (`$XDG_RUNTIME_DIR/tether/tetherd.lock`) ensuri
 - [x] Complete iOS app development
 - [x] Add end-to-end encryption for file transfers
 - [x] Release browser extension for Firefox
+- [x] Release mail extension for Thunderbird
 - [ ] Implement TOTP/OTP vault with Safari autofill
-- [ ] Release mail extension for Thunderbird
 - [ ] Explore macOS support
 
 ## Contributing
