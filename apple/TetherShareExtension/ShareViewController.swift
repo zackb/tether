@@ -58,39 +58,16 @@ final class ShareViewController: UIViewController {
 
         let provider = attachments[0]
 
-        // Check for plain text first
-        if provider.hasItemConformingToTypeIdentifier(UTType.plainText.identifier) {
-            provider.loadItem(forTypeIdentifier: UTType.plainText.identifier, options: nil) { item, _ in
-                DispatchQueue.main.async {
-                    let text = (item as? String) ?? (item as? URL)?.absoluteString ?? ""
-                    completion(.text(text))
-                }
-            }
-            return
-        }
-
-        // Check for URL (treat as text)
-        if provider.hasItemConformingToTypeIdentifier(UTType.url.identifier) {
-            provider.loadItem(forTypeIdentifier: UTType.url.identifier, options: nil) { item, _ in
-                DispatchQueue.main.async {
-                    let text = (item as? URL)?.absoluteString ?? ""
-                    completion(.text(text))
-                }
-            }
-            return
-        }
-
-        // Check for image
-        if provider.hasItemConformingToTypeIdentifier(UTType.image.identifier) {
-            provider.loadItem(forTypeIdentifier: UTType.image.identifier, options: nil) { item, _ in
+        // 1. Explicit File URL (Files app, high-quality Photo Library shares)
+        if provider.hasItemConformingToTypeIdentifier(UTType.fileURL.identifier) {
+            provider.loadItem(forTypeIdentifier: UTType.fileURL.identifier, options: nil) { item, _ in
                 DispatchQueue.main.async {
                     if let url = item as? URL {
+                        let isSecured = url.startAccessingSecurityScopedResource()
+                        defer { if isSecured { url.stopAccessingSecurityScopedResource() } }
                         let filename = url.lastPathComponent
                         let data = (try? Data(contentsOf: url)) ?? Data()
                         completion(.file(data, filename: filename))
-                    } else if let image = item as? UIImage,
-                              let data = image.jpegData(compressionQuality: 0.9) {
-                        completion(.file(data, filename: "image.jpg"))
                     } else {
                         completion(.unsupported)
                     }
@@ -99,14 +76,68 @@ final class ShareViewController: UIViewController {
             return
         }
 
-        // Generic file
+        // 2. General URL (Could be web link or disguised file URL)
+        if provider.hasItemConformingToTypeIdentifier(UTType.url.identifier) {
+            provider.loadItem(forTypeIdentifier: UTType.url.identifier, options: nil) { item, _ in
+                DispatchQueue.main.async {
+                    if let url = item as? URL, url.isFileURL {
+                        let isSecured = url.startAccessingSecurityScopedResource()
+                        defer { if isSecured { url.stopAccessingSecurityScopedResource() } }
+                        let filename = url.lastPathComponent
+                        let data = (try? Data(contentsOf: url)) ?? Data()
+                        completion(.file(data, filename: filename))
+                    } else {
+                        let text = (item as? URL)?.absoluteString ?? (item as? String) ?? ""
+                        completion(.text(text))
+                    }
+                }
+            }
+            return
+        }
+
+        // 3. Plain Text (Must be checked after URLs so we don't accidentally treat links as raw strings too early, though order here is flexible)
+        if provider.hasItemConformingToTypeIdentifier(UTType.plainText.identifier) {
+            provider.loadItem(forTypeIdentifier: UTType.plainText.identifier, options: nil) { item, _ in
+                DispatchQueue.main.async {
+                    let text = (item as? String) ?? ""
+                    completion(.text(text))
+                }
+            }
+            return
+        }
+
+        // 4. Image fallback (If it didn't conform to fileURL, like in-memory UIImages)
+        if provider.hasItemConformingToTypeIdentifier(UTType.image.identifier) {
+            provider.loadItem(forTypeIdentifier: UTType.image.identifier, options: nil) { item, _ in
+                DispatchQueue.main.async {
+                    if let image = item as? UIImage, let data = image.jpegData(compressionQuality: 0.9) {
+                        completion(.file(data, filename: "image.jpg"))
+                    } else if let url = item as? URL {
+                        let isSecured = url.startAccessingSecurityScopedResource()
+                        defer { if isSecured { url.stopAccessingSecurityScopedResource() } }
+                        let filename = url.lastPathComponent
+                        let data = (try? Data(contentsOf: url)) ?? Data()
+                        completion(.file(data, filename: filename))
+                    } else {
+                        completion(.unsupported)
+                    }
+                }
+            }
+            return
+        }
+
+        // 5. Generic Data (Other file representations)
         if provider.hasItemConformingToTypeIdentifier(UTType.data.identifier) {
             provider.loadItem(forTypeIdentifier: UTType.data.identifier, options: nil) { item, _ in
                 DispatchQueue.main.async {
                     if let url = item as? URL {
+                        let isSecured = url.startAccessingSecurityScopedResource()
+                        defer { if isSecured { url.stopAccessingSecurityScopedResource() } }
                         let filename = url.lastPathComponent
                         let data = (try? Data(contentsOf: url)) ?? Data()
                         completion(.file(data, filename: filename))
+                    } else if let data = item as? Data {
+                        completion(.file(data, filename: "shared_file.bin"))
                     } else {
                         completion(.unsupported)
                     }
