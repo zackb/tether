@@ -15,6 +15,8 @@ A self-hosted alternative to Apple's Continuity and Universal Clipboard.
 
 [![Download on the App Store](https://developer.apple.com/assets/elements/badges/download-on-the-app-store.svg)](https://apps.apple.com/us/app/tether-linux-companion/id6762097135)
 
+[![Get the Firefox Add-on](https://img.shields.io/badge/Firefox-Add--on-orange.svg)](https://addons.mozilla.org/en-US/firefox/addon/tether-browser-extension/)
+
 ## Features
 
 | Feature | Status |
@@ -22,7 +24,7 @@ A self-hosted alternative to Apple's Continuity and Universal Clipboard.
 | **Clipboard Sync** | ✅ Stable |
 | **File Transfer** | ✅ Stable |
 | **iOS App** | ✅ Stable |
-| **Browser Extension** | 🔄 In Progress |
+| **Browser Extension** | ✅ Stable |
 | **Mail Extension** | 🔄 In Progress |
 | **TOTP/OTP Vault** | 🗓️ Planning |
 
@@ -77,6 +79,9 @@ Tether uses a multi-component architecture:
 - iOS 16+
 - Get the app: [Tether - Linux Companion](https://apps.apple.com/us/app/tether-linux-companion/id6762097135)
 
+### Browser Extension
+- Firefox: [Tether Browser Extension](https://addons.mozilla.org/en-US/firefox/addon/tether-browser-extension/)
+
 ## Installation
 
 ### Build from Source
@@ -123,8 +128,9 @@ The daemon uses an advisory lock (`$XDG_RUNTIME_DIR/tether/tetherd.lock`) ensuri
 
 - [x] Complete iOS app development
 - [x] Add end-to-end encryption for file transfers
+- [x] Release browser extension for Firefox
 - [ ] Implement TOTP/OTP vault with Safari autofill
-- [ ] Release browser/mail extension for Thunderbird and Firefox
+- [ ] Release mail extension for Thunderbird
 - [ ] Explore macOS support
 
 ## Contributing
