@@ -17,8 +17,12 @@ namespace tether {
         bool is_connected() const;
 
         // Base Level payload loop
+        bool send(const std::string& payload);
         std::string send_and_wait(const std::string& payload);
+        bool send_file(const std::string& path, std::string& err_out);
+
         std::string get_peer_fingerprint() const;
+        int get_socket() const;
 
         // High Level Features
         std::string get_clipboard(std::string& err_out);
@@ -27,8 +31,6 @@ namespace tether {
         std::string list_devices();
         bool accept_device(const std::string& fingerprint, const std::string& name = "Paired Device");
         std::string pair(const std::string& device_name, std::string& err_out);
-
-        bool send_file(const std::string& path, std::string& err_out);
 
     private:
         int connect_unix(bool retry);

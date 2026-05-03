@@ -1,25 +1,67 @@
+#include <atomic>
 #include <string>
 #include <tether/client.hpp>
 #include <tether/crypto.hpp>
 #include <tether/discovery.hpp>
 #include <tether/log.hpp>
+#include <thread>
 #include <unistd.h>
 #include <vector>
 
 void run_native_messaging_host(tether::Client& client) {
     debug::log(INFO, "Starting Native Messaging Host loop...\n");
-    while (true) {
+
+    // Subscribe to daemon broadcast events
+    client.send("{\"command\":\"subscribe\"}\n");
+
+    std::atomic<bool> running{true};
+
+    // read asynchronous events/responses from tetherd and send to browser
+    std::thread reader_thread([&]() {
+        std::string buffer;
+        char buf[8192];
+        int daemon_sock = client.get_socket();
+
+        while (running) {
+            ssize_t n = read(daemon_sock, buf, sizeof(buf));
+            if (n <= 0) {
+                running = false;
+                break;
+            }
+            buffer.append(buf, n);
+
+            size_t pos;
+            while ((pos = buffer.find('\n')) != std::string::npos) {
+                std::string msg = buffer.substr(0, pos);
+                buffer.erase(0, pos + 1);
+
+                if (msg.empty())
+                    continue;
+
+                uint32_t out_length = msg.length();
+                std::cout.write(reinterpret_cast<const char*>(&out_length), sizeof(out_length));
+                std::cout.write(msg.data(), out_length);
+                std::cout.flush();
+            }
+        }
+    });
+
+    // main thread reads commands from browser and forwards to tetherd
+    while (running) {
         uint32_t length = 0;
         if (!std::cin.read(reinterpret_cast<char*>(&length), sizeof(length))) {
+            running = false;
             break;
         }
 
         if (length == 0 || length > 10 * 1024 * 1024) {
+            running = false;
             break;
         }
 
         std::vector<char> buffer(length);
         if (!std::cin.read(buffer.data(), length)) {
+            running = false;
             break;
         }
 
@@ -28,16 +70,15 @@ void run_native_messaging_host(tether::Client& client) {
             payload += "\n";
         }
 
-        std::string response = client.send_and_wait(payload);
-
-        if (!response.empty() && response.back() == '\n') {
-            response.pop_back();
+        if (!client.send(payload)) {
+            running = false;
+            break;
         }
+    }
 
-        uint32_t out_length = response.length();
-        std::cout.write(reinterpret_cast<const char*>(&out_length), sizeof(out_length));
-        std::cout.write(response.data(), out_length);
-        std::cout.flush();
+    client.disconnect(); // unblock reader thread
+    if (reader_thread.joinable()) {
+        reader_thread.join();
     }
 }
 

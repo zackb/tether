@@ -152,6 +152,17 @@ namespace tether {
         return "";
     }
 
+    bool Client::send(const std::string& payload) {
+        if (ssl_) {
+            int w = SSL_write(ssl_, payload.c_str(), payload.size());
+            return w > 0;
+        } else {
+            return write(sock_, payload.c_str(), payload.size()) > 0;
+        }
+    }
+
+    int Client::get_socket() const { return sock_; }
+
     std::string Client::get_clipboard(std::string& err_out) {
         nlohmann::json j;
         j["command"] = "clipboard_get";
