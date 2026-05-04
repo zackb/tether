@@ -1,0 +1,67 @@
+.TH TETHER 1 "May 2026" "Tether 0.1.0" "User Commands"
+.SH NAME
+tether \- Wayland companion CLI for iPhone integration
+.SH SYNOPSIS
+.B tether
+[\fIOPTIONS\fR]
+.SH DESCRIPTION
+.B tether
+is a command-line interface for communicating with the Tether daemon (\fBtetherd\fR).
+It allows for clipboard synchronization, file transfers, and device management between
+a Linux Wayland desktop and an iOS device.
+.SH OPTIONS
+.TP
+\fB\-h, \-\-help\fR
+Show help message and exit.
+.TP
+\fB\-g, \-\-get-clipboard\fR
+Retrieve the current Wayland clipboard text from the daemon.
+.TP
+\fB\-s, \-\-set-clipboard\fR [\fISTRING\fR]
+Copy the provided string (or stdin if omitted) to the local Wayland clipboard.
+.TP
+\fB\-f, \-\-send-file\fR \fIFILE\fR
+Send a file to the currently connected device.
+.TP
+\fB\-n, \-\-native-host\fR
+Start the browser Native Messaging Host proxy loop (used by browser extensions).
+.TP
+\fB\-d, \-\-discover\fR
+Scan the local network for tetherd instances via mDNS.
+.TP
+\fB\-\-host\fR \fIIP\fR
+Connect over TCP to the daemon at the specified IP address instead of using the local UNIX socket.
+.TP
+\fB\-\-port\fR \fINUM\fR
+Connect over TCP port (default: 5134).
+.TP
+\fB\-\-timeout\fR \fIMS\fR
+Discovery scan duration in milliseconds (default: 3000).
+.TP
+\fB\-\-list-devices\fR
+List all paired connection devices and their fingerprints.
+.TP
+\fB\-\-accept\fR \fIFINGERPRINT\fR
+Accept a pending pairing request locally for the specified device fingerprint.
+.TP
+\fB\-\-pair\fR
+Send a pairing request over TCP to the daemon.
+.SH EXAMPLES
+Retrieve clipboard:
+.IP
+tether \-g
+.PP
+Copy text to clipboard:
+.IP
+echo "Hello from Linux" | tether \-s
+.PP
+Discover other Tether instances:
+.IP
+tether \-\-discover
+.PP
+Send a file:
+.IP
+tether \-f document.pdf
+.SH SEE ALSO
+.BR tetherd (8),
+.BR tether-gtk (1)

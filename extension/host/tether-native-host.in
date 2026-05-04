@@ -1,0 +1,5 @@
+#!/bin/bash
+# Wrapper script to run tether in native messaging proxy mode
+# The browser will execute this script via the com.tether.extension.json manifest.
+
+exec "@CMAKE_INSTALL_FULL_BINDIR@/tether" --native-host 2>> /tmp/tether-native.log

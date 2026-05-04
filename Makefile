@@ -16,6 +16,12 @@ test: debug
 install: release
 	cmake --install build/release
 
+package: release
+	cd build/release && cpack
+
+arch-package:
+	makepkg -sf
+
 uninstall:
 	cmake --build build/release --target uninstall
 

@@ -3,7 +3,8 @@
 set -e
 echo "Building Tether Extensions..."
 
-BUILD_DIR="build/extension"
+# Allow overriding build directory from environment
+BUILD_DIR="${BUILD_DIR:-build/extension}"
 BROWSER_DIR="$BUILD_DIR/browser"
 MAIL_DIR="$BUILD_DIR/mail"
 CHROME_DIR="$BUILD_DIR/chromium"

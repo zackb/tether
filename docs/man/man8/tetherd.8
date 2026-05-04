@@ -1,0 +1,28 @@
+.TH TETHERD 8 "May 2026" "Tether 0.1.0" "System Administration"
+.SH NAME
+tetherd \- Tether background daemon for iOS/Wayland integration
+.SH SYNOPSIS
+.B tetherd
+.SH DESCRIPTION
+.B tetherd
+ is a background daemon that manages the connection between a Linux Wayland
+compositor and an iOS device running the Tether app. It handles clipboard
+synchronization, file transfers, and secure device pairing using mTLS.
+
+The daemon advertises its presence on the local network using mDNS (Bonjour)
+and listens for incoming connections on TCP port 5134 by default. It also
+provides a UNIX domain socket at \fB$XDG_RUNTIME_DIR/tether/tetherd.sock\fR
+for local communication with the \fBtether\fR(1) CLI and \fBtether-gtk\fR(1) GUI.
+.SH FILES
+.TP
+\fB$XDG_RUNTIME_DIR/tether/tetherd.sock\fR
+The UNIX domain socket used for local communication.
+.TP
+\fB$XDG_RUNTIME_DIR/tether/tetherd.lock\fR
+Advisory lock file to ensure only one instance of the daemon is running.
+.TP
+\fB$XDG_CONFIG_HOME/tether/certs/\fR
+Directory containing the mTLS certificates and keys.
+.SH SEE ALSO
+.BR tether (1),
+.BR tether-gtk (1)
