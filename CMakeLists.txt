@@ -121,6 +121,7 @@ endif()
 
 # CPack Configuration
 set(CPACK_SET_DESTDIR ON)
+set(CPACK_PACKAGE_RELOCATABLE FALSE)
 set(CPACK_PACKAGE_NAME "tether")
 set(CPACK_PACKAGE_VENDOR "zackb")
 set(CPACK_PACKAGE_DESCRIPTION_SUMMARY "A Wayland-native local file transfer and clipboard sync tool over mDNS")
@@ -139,7 +140,7 @@ set(CPACK_DEBIAN_PACKAGE_HOMEPAGE "https://github.com/zackb/tether")
 # RPM
 set(CPACK_RPM_PACKAGE_REQUIRES "gtk3, libnotify, openssl, wayland-client, avahi-client")
 set(CPACK_RPM_PACKAGE_LICENSE "MIT")
-set(CPACK_RPM_PACKAGE_RELOCATABLE OFF)
+set(CPACK_RPM_PACKAGE_RELOCATABLE FALSE)
 
 # Generators
 set(CPACK_GENERATOR "TGZ;DEB;RPM")
