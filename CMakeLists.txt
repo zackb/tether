@@ -133,11 +133,14 @@ if(TETHER_BUILD_EXTENSIONS AND NPM_EXECUTABLE)
         VERBATIM
     )
 
-    # Install extensions into the package
-    install(DIRECTORY "${EXTENSION_BUILD_DIR}/"
+    # Install only the finalized extension bundles into the package
+    install(FILES
+            "${EXTENSION_BUILD_DIR}/tether-browser-extension.zip"
+            "${EXTENSION_BUILD_DIR}/tether-mail-extension.xpi"
+            "${EXTENSION_BUILD_DIR}/tether-chromium-extension.zip"
             DESTINATION "${CMAKE_INSTALL_DATADIR}/tether/extensions"
-            OPTIONAL
-            FILES_MATCHING PATTERN "*.zip" PATTERN "*.xpi")
+            COMPONENT extensions
+            OPTIONAL)
 endif()
 
 # CPack Configuration
