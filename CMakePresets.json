@@ -24,6 +24,7 @@
       "binaryDir": "${sourceDir}/build/release",
       "cacheVariables": {
         "CMAKE_BUILD_TYPE": "Release",
+        "CMAKE_INSTALL_PREFIX": "/usr",
         "CMAKE_EXPORT_COMPILE_COMMANDS": "ON"
       }
     }
