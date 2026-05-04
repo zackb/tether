@@ -1,4 +1,4 @@
-.TH TETHERD 8 "May 2026" "Tether 0.1.0" "System Administration"
+.TH TETHERD 8 "@BUILD_DATE@" "Tether @TETHER_VERSION@" "System Administration"
 .SH NAME
 tetherd \- Tether background daemon for iOS/Wayland integration
 .SH SYNOPSIS

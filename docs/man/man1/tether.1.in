@@ -1,4 +1,4 @@
-.TH TETHER 1 "May 2026" "Tether 0.1.0" "User Commands"
+.TH TETHER 1 "@BUILD_DATE@" "Tether @TETHER_VERSION@" "User Commands"
 .SH NAME
 tether \- Wayland companion CLI for iPhone integration
 .SH SYNOPSIS

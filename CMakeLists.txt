@@ -113,11 +113,18 @@ install(FILES "${CMAKE_CURRENT_BINARY_DIR}/com.tether.extension.mozilla.json"
         DESTINATION "${THUNDERBIRD_MESSAGING_DIR}"
         RENAME "com.tether.extension.json")
 
+string(TIMESTAMP BUILD_DATE "%B %Y")
+
+configure_file(docs/man/man1/tether.1.in "${CMAKE_CURRENT_BINARY_DIR}/man/tether.1" @ONLY)
+configure_file(docs/man/man1/tether-gtk.1.in "${CMAKE_CURRENT_BINARY_DIR}/man/tether-gtk.1" @ONLY)
+configure_file(docs/man/man8/tetherd.8.in "${CMAKE_CURRENT_BINARY_DIR}/man/tetherd.8" @ONLY)
+
 # install man pages
-install(FILES docs/man/man1/tether.1 docs/man/man1/tether-gtk.1
+install(FILES "${CMAKE_CURRENT_BINARY_DIR}/man/tether.1" "${CMAKE_CURRENT_BINARY_DIR}/man/tether-gtk.1"
         DESTINATION ${CMAKE_INSTALL_MANDIR}/man1)
-install(FILES docs/man/man8/tetherd.8
+install(FILES "${CMAKE_CURRENT_BINARY_DIR}/man/tetherd.8"
         DESTINATION ${CMAKE_INSTALL_MANDIR}/man8)
+
 
 # Extension Building only if npm is available
 option(TETHER_BUILD_EXTENSIONS "Build browser and mail extensions automatically" ON)
