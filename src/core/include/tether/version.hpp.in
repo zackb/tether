@@ -1,0 +1,3 @@
+#pragma once
+
+#define TETHER_VERSION "@TETHER_VERSION@"

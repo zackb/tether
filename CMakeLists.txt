@@ -1,8 +1,29 @@
 cmake_minimum_required(VERSION 3.19)
-project(tether VERSION 0.1.0 LANGUAGES CXX C)
+project(tether VERSION 0.0.0 LANGUAGES CXX C)
 
 set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
+
+# version from git
+execute_process(
+    COMMAND git describe --tags --always --dirty
+    WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}
+    OUTPUT_VARIABLE GIT_VERSION
+    OUTPUT_STRIP_TRAILING_WHITESPACE
+    ERROR_QUIET
+)
+
+if(GIT_VERSION)
+    string(REGEX REPLACE "^v" "" TETHER_VERSION "${GIT_VERSION}")
+else()
+    set(TETHER_VERSION "${PROJECT_VERSION}-unknown")
+endif()
+
+configure_file(
+    "${CMAKE_CURRENT_SOURCE_DIR}/src/core/include/tether/version.hpp.in"
+    "${CMAKE_CURRENT_BINARY_DIR}/generated/tether/version.hpp"
+    @ONLY
+)
 
 include(GNUInstallDirs)
 find_package(PkgConfig REQUIRED)
@@ -125,7 +146,8 @@ set(CPACK_PACKAGE_RELOCATABLE FALSE)
 set(CPACK_PACKAGE_NAME "tether")
 set(CPACK_PACKAGE_VENDOR "zackb")
 set(CPACK_PACKAGE_DESCRIPTION_SUMMARY "A Wayland-native local file transfer and clipboard sync tool over mDNS")
-set(CPACK_PACKAGE_VERSION "${PROJECT_VERSION}")
+set(CPACK_PACKAGE_VERSION "${TETHER_VERSION}")
+
 set(CPACK_PACKAGE_CONTACT "zack@bartel.com")
 set(CPACK_PACKAGE_INSTALL_DIRECTORY "tether")
 set(CPACK_RESOURCE_FILE_LICENSE "${CMAKE_CURRENT_SOURCE_DIR}/LICENSE")
