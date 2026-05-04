@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.19)
-project(tether VERSION 0.0.0 LANGUAGES CXX C)
+project(tether VERSION 0.1.2 LANGUAGES CXX C)
 
 set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
