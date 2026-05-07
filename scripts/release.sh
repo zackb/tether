@@ -29,6 +29,12 @@ if ! git diff-index --quiet HEAD --; then
     exit 1
 fi
 
+CURRENT_BRANCH=$(git branch --show-current)
+if [ "$CURRENT_BRANCH" != "main" ]; then
+    echo "Error: You are on branch '$CURRENT_BRANCH'. Releases must be performed from 'main'."
+    exit 1
+fi
+
 echo "🚀 Starting release process for $TAG..."
 
 # 2. Update CMakeLists.txt version (optional but recommended)

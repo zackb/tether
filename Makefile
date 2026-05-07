@@ -47,3 +47,4 @@ extension:
 clean:
 	rm -rf build
 	rm -f compile_commands.json
+	rm -rf extension/build
