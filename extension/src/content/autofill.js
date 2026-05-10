@@ -40,13 +40,39 @@ export function scoreInput(input) {
 }
 
 export function detectSplitOtp(doc) {
-  const singles = [...doc.querySelectorAll('input[maxlength="1"]')]
+  const inputs = [...doc.querySelectorAll('input')]
     .filter(i => i.type === 'text' || i.type === 'tel' || i.type === 'number' || !i.type);
 
-  // Check if they're siblings/adjacent — likely a split OTP
+  // Strategy 1: exact maxlength=1 (standard split OTP)
+  const singles = inputs.filter(i => i.maxLength === 1);
   if (singles.length >= 4 && singles.length <= 8) {
-    return singles; // fill character by character
+    return singles;
   }
+
+  // Strategy 2: Clustered inputs under same parent with OTP keywords (e.g. Walmart)
+  const parentMap = new Map();
+  inputs.forEach(input => {
+    const p = input.parentElement;
+    if (p) {
+      if (!parentMap.has(p)) parentMap.set(p, []);
+      parentMap.get(p).push(input);
+    }
+  });
+
+  for (const group of parentMap.values()) {
+    if (group.length >= 4 && group.length <= 8) {
+      const otpScore = group.reduce((acc, input) => {
+        const attrs = [input.id, input.name, input.className, input.getAttribute('aria-label')]
+          .join(' ').toLowerCase();
+        if (/\botp\b|\bcode\b|verif|digit/.test(attrs)) return acc + 1;
+        return acc;
+      }, 0);
+
+      // If at least half the inputs in the group look like OTP inputs
+      if (otpScore >= group.length / 2) return group;
+    }
+  }
+
   return null;
 }
 
