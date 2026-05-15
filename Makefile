@@ -12,6 +12,7 @@ release:
 
 test: debug
 	ctest --test-dir build/debug --output-on-failure
+	cd extension && npm test
 
 install: release
 	cmake --install build/release
