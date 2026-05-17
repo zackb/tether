@@ -58,6 +58,12 @@ describe('OTP input detection', () => {
       const inputs = detectSplitOtp(doc);
       expect(inputs).toHaveLength(6);
     });
+
+    it('detects roku generic input based on nearby label score', () => {
+      const doc = loadFixture('roku.html');
+      const inputs = findOtpInputs(doc);
+      expect(inputs.length).toBe(1);
+    });
   });
 
   describe('scoreInput', () => {

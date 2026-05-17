@@ -5,6 +5,12 @@ export function findOtpInputs(doc) {
   const inputs = [...doc.querySelectorAll('input')];
 
   return inputs.filter(input => {
+    const attrs = [input.id, input.name, input.placeholder, input.className, input.type]
+      .join(' ').toLowerCase();
+
+    // Reject obvious non-OTP fields immediately
+    if (/\b(zip|search|password|email|phone)\b/.test(attrs)) return false;
+
     // Tier 1: explicit standard attribute
     if (input.autocomplete === 'one-time-code') return true;
 
@@ -13,13 +19,16 @@ export function findOtpInputs(doc) {
     if (input.type === 'tel' || input.type === 'number') return scoreInput(input) > 5;
 
     // Tier 3: attribute keyword matching
-    const attrs = [input.id, input.name, input.placeholder, input.className]
-      .join(' ').toLowerCase();
     if (/\b(otp|passcode|verif|token|pin|2fa)\b/.test(attrs)) return true;
 
     // Tier 4: maxlength in OTP range (4–8)
     const ml = parseInt(input.maxLength);
-    if (ml >= 4 && ml <= 8 && input.type !== 'password') return scoreInput(input) > 3;
+    if (ml >= 4 && ml <= 8) return scoreInput(input) > 3;
+
+    // Tier 5: fallback for generic text inputs based on label/context
+    if (input.type === 'text' || !input.type) {
+      if (scoreInput(input) >= 10) return true;
+    }
 
     return false;
   });
@@ -27,10 +36,19 @@ export function findOtpInputs(doc) {
 
 export function scoreInput(input) {
   let score = 0;
-  // Look at nearby label text
-  const label = input.labels?.[0]?.textContent
-    || input.closest('form')?.querySelector('label')?.textContent || '';
-  if (/code|otp|verify|token|pin/i.test(label)) score += 10;
+  let labelText = input.labels?.[0]?.textContent || '';
+  if (!labelText && input.id) {
+    try {
+      const doc = input.ownerDocument || document;
+      const labelEl = doc.querySelector(`label[for="${input.id}"]`);
+      if (labelEl) labelText = labelEl.textContent;
+    } catch (e) {}
+  }
+  if (!labelText) {
+    labelText = input.closest('form')?.querySelector('label')?.textContent || '';
+  }
+
+  if (/code|otp|verify|token|pin/i.test(labelText)) score += 10;
 
   // Surrounding text in parent
   const parentText = input.parentElement?.textContent?.toLowerCase() || '';
