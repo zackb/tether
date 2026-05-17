@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html>
+<body>
+    <form id="verify-phone-otp-form" novalidate="">
+        <div class="mt3 tl" data-testid="verifyotpform-description">
+            <span class="dark-gray" data-qm-mask="true">
+                <span>Please enter the 6-digit verification code we sent to</span>
+                <strong>zack@bartel.com </strong>
+            </span>
+        </div>
+        <fieldset class="bw0 pl4 pr4 mt3 pv0" name="verificationCodeSection" aria-label="Please enter the 6-digit verification code">
+            <div class="flex justify-between w-100" style="column-gap: 10px;">
+                <input id="input-verificationCode" name="verificationCode-0" type="text" inputmode="numeric" pattern="[0-9]*" autocomplete="off" aria-label="digit 1 . On entering code in the input fields, focus will automatically move on to the next input fields." maxlength="6" class="otp-input w-100 br3 pa0 tc f2 b lh-solid ba" style="height: 52px; border-color: rgb(144, 145, 150);" value="">
+                <input id="input-verificationCode-1" name="verificationCode-1" type="text" inputmode="numeric" pattern="[0-9]*" autocomplete="off" aria-label="digit 2 " maxlength="6" class="otp-input w-100 br3 pa0 tc f2 b lh-solid ba" style="height: 52px; border-color: rgb(144, 145, 150);" value="">
+                <input id="input-verificationCode-2" name="verificationCode-2" type="text" inputmode="numeric" pattern="[0-9]*" autocomplete="off" aria-label="digit 3 " maxlength="6" class="otp-input w-100 br3 pa0 tc f2 b lh-solid ba" style="height: 52px; border-color: rgb(144, 145, 150);" value="">
+                <input id="input-verificationCode-3" name="verificationCode-3" type="text" inputmode="numeric" pattern="[0-9]*" autocomplete="off" aria-label="digit 4 " maxlength="6" class="otp-input w-100 br3 pa0 tc f2 b lh-solid ba" style="height: 52px; border-color: rgb(144, 145, 150);" value="">
+                <input id="input-verificationCode-4" name="verificationCode-4" type="text" inputmode="numeric" pattern="[0-9]*" autocomplete="off" aria-label="digit 5 " maxlength="6" class="otp-input w-100 br3 pa0 tc f2 b lh-solid ba" style="height: 52px; border-color: rgb(144, 145, 150);" value="">
+                <input id="input-verificationCode-5" name="verificationCode-5" type="text" inputmode="numeric" pattern="[0-9]*" autocomplete="off" aria-label="digit 6 " maxlength="6" class="otp-input w-100 br3 pa0 tc f2 b lh-solid ba" style="height: 52px; border-color: rgb(144, 145, 150);" value="">
+            </div>
+            <div class="f5 flex mt2 mb3 items-center justify-center ">
+                <span class="dark-gray f6 tc">Didn't receive it?</span>
+                <a link-identifier="getAnotherCode" class="dark-gray f6 pl2 underline" id="resend-button" aria-label="Didn't receive it? Get another code" role="button" href="#">Get another code</a>
+            </div>
+        </fieldset>
+        <div class="pb3 pl4">
+            <label class="ld_AK ld_AL" for="keep-signed-in">
+                <input id="keep-signed-in" type="checkbox" checked="">
+                <span>Keep me signed in</span>
+            </label>
+        </div>
+        <button class="Button_button__s6lnv Button_primary___r9Bd Button_isFullWidth__8bg_i Button_medium__QLNmo pa4" type="submit" form="verify-phone-otp-form">Sign in</button>
+    </form>
+</body>
+</html>

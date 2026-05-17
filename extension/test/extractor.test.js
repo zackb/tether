@@ -104,6 +104,11 @@ describe('isFalsePositive (from extractor.js)', () => {
     expect(isFalsePositive('171792', 'your verification code is 171792')).toBe(false);
     expect(isFalsePositive('123456', 'confirm code 123456 expires in 5 min')).toBe(false);
   });
+
+  it('rejects zip codes as false positives', () => {
+    expect(isFalsePositive('95110', 'Adobe, 345 Park Avenue, San Jose, CA 95110 USA')).toBe(true);
+    expect(isFalsePositive('10001', 'NY 10001')).toBe(true);
+  });
 });
 
 describe('OTP pattern matching', () => {
@@ -177,5 +182,23 @@ This code can be used to confirm your identity.`;
     const candidates = extractOtpCandidates(text);
 
     expect(candidates.length).toBe(0);
+  });
+
+  it('extracts correct OTP from complex HTML email (Adobe)', () => {
+    const fs = require('fs');
+    const path = require('path');
+
+    // naive plain text conversion here
+    const emlPath = path.join(__dirname, 'fixtures/adobe.eml');
+    const emailText = fs.readFileSync(emlPath, 'utf-8');
+
+    const candidates = extractOtpCandidates(emailText);
+
+    // Zip code 95110 should be rejected by isFalsePositive
+    const zipCodeCandidate = candidates.find(c => c.num === '95110');
+    expect(zipCodeCandidate).toBeUndefined();
+    
+    expect(candidates.length).toBeGreaterThan(0);
+    expect(candidates[0].num).toBe('861017');
   });
 });

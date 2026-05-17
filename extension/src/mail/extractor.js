@@ -49,7 +49,9 @@ setInterval(pruneOldSeen, 60_000);
 
 export function scoreCandidate(num, surroundingText) {
   let score = 0;
-  const lower = surroundingText.toLowerCase();
+  // Squash whitespace for accurate proximity and keyword matching
+  const cleanText = surroundingText.replace(/\s+/g, ' ').toLowerCase();
+  const lower = cleanText;
   const numIndex = lower.indexOf(num.toLowerCase());
 
   for (const kw of OTP_CONTEXT_KEYWORDS) {
@@ -76,6 +78,9 @@ export function isFalsePositive(num, context) {
   if (/^(19|20)\d{2}$/.test(num)) return true;  // year
   if (num.startsWith('0') && num.length > 6) return true;  // phone-like
   if (context.includes('$') || context.includes('USD')) return true;  // price
+
+  // Zip codes (State + 5 digits)
+  if (new RegExp('\\b[A-Z]{2}\\s+' + num + '\\b').test(context)) return true;
 
   const lower = context.toLowerCase();
   if (lower.includes('order') || lower.includes('tracking')) return true;
@@ -107,14 +112,26 @@ function extractTextFromParts(parts) {
         // Tag visually prominent elements so the scorer can give them a bonus
         const prominentParts = [];
         doc.querySelectorAll(
-          'strong, b, h1, h2, h3, td, th, .otp, .code, [class*="otp"], [class*="code"], [class*="verif"]'
+          'strong, b, h1, h2, h3, .otp, .code, [class*="otp"], [class*="code"], [class*="verif"]'
         ).forEach(el => {
           const t = el.textContent.trim();
           if (t) prominentParts.push('PROMINENT:' + t);
         });
 
+        // Also tag elements that likely contain only the code
+        doc.querySelectorAll('td, th, span, div, p, font').forEach(el => {
+          const t = el.textContent.trim();
+          if (/^\d{4,8}$/.test(t) || /^[A-Z0-9]{6,10}$/.test(t)) {
+            prominentParts.push('PROMINENT:' + t);
+          }
+        });
+
         const bodyPlain = doc.body?.textContent || '';
-        text += prominentParts.join('\n') + '\n' + bodyPlain + '\n';
+        if (prominentParts.length > 0) {
+          // Pad prominent parts to avoid false proximity
+          text += prominentParts.join('\n' + ' '.repeat(50) + '\n') + '\n' + ' '.repeat(50) + '\n';
+        }
+        text += bodyPlain + '\n';
       } catch (e) {
         console.error("DOMParser error", e);
       }
@@ -162,14 +179,23 @@ async function getEmailText(messageId) {
 
           const prominentParts = [];
           doc.querySelectorAll(
-            'strong, b, h1, h2, h3, td, th, .otp, .code, [class*="otp"], [class*="code"], [class*="verif"]'
+            'strong, b, h1, h2, h3, .otp, .code, [class*="otp"], [class*="code"], [class*="verif"]'
           ).forEach(el => {
             const t = el.textContent.trim();
             if (t) prominentParts.push('PROMINENT:' + t);
           });
 
+          // Also tag elements that likely contain only the code
+          doc.querySelectorAll('td, th, span, div, p, font').forEach(el => {
+            const t = el.textContent.trim();
+            if (/^\d{4,8}$/.test(t) || /^[A-Z0-9]{6,10}$/.test(t)) {
+              prominentParts.push('PROMINENT:' + t);
+            }
+          });
+
           if (prominentParts.length > 0) {
-            text += prominentParts.join('\n') + '\n';
+            // Pad prominent parts to avoid false proximity
+            text += prominentParts.join('\n' + ' '.repeat(50) + '\n') + '\n' + ' '.repeat(50) + '\n';
           }
         } catch (e) {
           // tagging failed, continue without the bonus

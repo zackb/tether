@@ -52,6 +52,18 @@ describe('OTP input detection', () => {
       const inputs = findOtpInputs(doc);
       expect(inputs.length).toBe(1);
     });
+
+    it('detects walmart split-style inputs with maxlength=6', () => {
+      const doc = loadFixture('walmart.html');
+      const inputs = detectSplitOtp(doc);
+      expect(inputs).toHaveLength(6);
+    });
+
+    it('detects roku generic input based on nearby label score', () => {
+      const doc = loadFixture('roku.html');
+      const inputs = findOtpInputs(doc);
+      expect(inputs.length).toBe(1);
+    });
   });
 
   describe('scoreInput', () => {
@@ -95,6 +107,22 @@ describe('OTP autofill insertion', () => {
       expect(inputs[0].value).toBe('1');
       expect(inputs[1].value).toBe('2');
       expect(inputs[5].value).toBe('6');
+    });
+
+    it('fills walmart split-style inputs character by character', () => {
+      const doc = loadFixture('walmart.html');
+      const inputs = detectSplitOtp(doc);
+
+      const otp = '654321';
+      for (let i = 0; i < otp.length; i++) {
+        inputs[i].value = otp[i];
+        inputs[i].dispatchEvent(new doc.defaultView.Event('input', { bubbles: true }));
+        inputs[i].dispatchEvent(new doc.defaultView.Event('change', { bubbles: true }));
+      }
+
+      expect(inputs[0].value).toBe('6');
+      expect(inputs[1].value).toBe('5');
+      expect(inputs[5].value).toBe('1');
     });
   });
 
