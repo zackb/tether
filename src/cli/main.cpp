@@ -185,15 +185,15 @@ int main(int argc, char* argv[]) {
                 if (!dev.fingerprint.empty() && tether::Crypto::instance().is_host_known(dev.fingerprint)) {
                     status = "[known]";
                 }
-                debug::log(INFO, "  %-20s  %s\n", dev.name.c_str(), status.c_str());
+                fprintf(stdout, "  %-20s  %s\n", dev.name.c_str(), status.c_str());
                 for (const auto& addr : dev.addresses) {
-                    debug::log(INFO, "    %s:%d\n", addr.address.c_str(), addr.port);
+                    fprintf(stdout, "    %s:%d\n", addr.address.c_str(), addr.port);
                 }
-                debug::log(INFO, "\n");
+                fprintf(stdout, "\n");
             }
         }
 
-        debug::log(INFO, "Found %zu device(s) in %.1fs\n", devices.size(), timeout_ms / 1000.0);
+        fprintf(stdout, "Found %zu device(s) in %.1fs\n", devices.size(), timeout_ms / 1000.0);
         return 0;
     }
 
