@@ -26,7 +26,7 @@
 | **File Transfer** | ✅ Stable |
 | **iOS App** | ✅ Stable |
 | **Browser Extension** | ✅ Stable |
-| **Mail Extension** | 🔄 In Progress |
+| **Mail Extension** | ✅ Stable |
 | **TOTP/OTP Vault** | 🗓️ Planning |
 
 ### Clipboard Sync
