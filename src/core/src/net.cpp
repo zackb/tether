@@ -418,6 +418,12 @@ namespace tether {
                         }
                     } else if (j.contains("command") && j["command"] == "new_otp" && j.contains("otp")) {
                         g_current_otp = j["otp"];
+                        // Push the code to local subscribers (browser extension, GTK, etc.)
+                        // so the browser fills it without depending on its polling timing.
+                        nlohmann::json event;
+                        event["command"] = "otp_available";
+                        event["otp"] = g_current_otp;
+                        broadcast_local_event(event.dump(), client_fd);
                         std::string payload = "{\"status\":\"ok\"}\n";
                         if (write(client_fd, payload.c_str(), payload.size()) < 0) {
                             debug::log(ERR, "net write error\n");
@@ -839,8 +845,12 @@ namespace tether {
                         // OTP sent from a mobile client (iPhone Share Extension) over mTLS.
                         // Store it in the global vault so the browser extension can retrieve it.
                         g_current_otp = j["otp"].get<std::string>();
-                        // Notify local subscribers (GTK, browser ext, etc.)
-                        broadcast_local_event(j.dump());
+                        // Notify local subscribers (GTK, browser ext, etc.) using the
+                        // otp_available shape the browser extension listens for.
+                        nlohmann::json event;
+                        event["command"] = "otp_available";
+                        event["otp"] = g_current_otp;
+                        broadcast_local_event(event.dump());
                         std::string payload = "{\"status\":\"ok\"}\n";
                         robust_ssl_write(ssl, payload.c_str(), payload.size());
                         continue;

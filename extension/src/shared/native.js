@@ -34,6 +34,11 @@ export function connectToNativeHost() {
 }
 
 export function sendToNativeHost(message) {
+  // Under MV3 the service worker (and its native host) can be torn down between
+  // sends; lazily re-establish the port so messages and the subscription survive.
+  if (!port) {
+    connectToNativeHost();
+  }
   if (port) {
     port.postMessage(message);
   } else {
@@ -43,12 +48,16 @@ export function sendToNativeHost(message) {
 
 function handleNativeMessage(message) {
   // Dispatch native messages to other parts of the extension
-  if (message.command === "otp_available") {
-    // Notify content scripts or popup
+  if (message.command === "otp_available" && message.otp) {
+    // Deliver to every tab; the content script only fills when the page actually
+    // has OTP fields, so we don't depend on which tab happens to be focused.
     if (typeof chrome !== 'undefined' && chrome.tabs) {
-      chrome.tabs.query({active: true, currentWindow: true}, function(tabs) {
-        if (tabs[0]) {
-          chrome.tabs.sendMessage(tabs[0].id, { action: "fill_otp", otp: message.otp });
+      chrome.tabs.query({}, function(tabs) {
+        for (const tab of tabs) {
+          chrome.tabs.sendMessage(tab.id, { action: "fill_otp", otp: message.otp }, () => {
+            // Ignore tabs without a content script listening.
+            void chrome.runtime.lastError;
+          });
         }
       });
     }

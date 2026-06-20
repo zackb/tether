@@ -154,7 +154,9 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
       if (otpInterval) clearInterval(otpInterval);
     } else {
       const regularFields = findOtpInputs(document);
-      if (regularFields.length > 0 && regularFields[0].value === "") {
+      // Fill when empty, or overwrite a stale/partial value — but skip if the code
+      // is already present to avoid redundant re-fills and event storms.
+      if (regularFields.length > 0 && regularFields[0].value !== otp) {
         console.log("Autofilling OTP:", otp);
         regularFields[0].value = otp;
 
