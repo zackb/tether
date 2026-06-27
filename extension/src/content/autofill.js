@@ -133,7 +133,6 @@ let otpFlowStarted = false;
 function startOtpFlow() {
   if (otpFlowStarted) return;
   otpFlowStarted = true;
-  console.log("Found potential OTP fields on page, requesting OTP from Tether");
   requestOtp();
 
   let attempts = 0;
@@ -154,7 +153,6 @@ function startOtpFlow() {
 }
 
 const otpPresentAtLoad = hasOtpFields();
-console.log("Tether: content script loaded on", window.location.href, "— OTP fields present at load:", otpPresentAtLoad);
 if (otpPresentAtLoad) {
   startOtpFlow();
 } else {
@@ -162,7 +160,6 @@ if (otpPresentAtLoad) {
   // their email/phone). Watch for it instead of only checking once at load.
   const observer = new MutationObserver(() => {
     if (hasOtpFields()) {
-      console.log("Tether: OTP fields appeared after load");
       observer.disconnect();
       startOtpFlow();
     }
