@@ -1,7 +1,7 @@
 {
     "manifest_version": 2,
     "name": "Tether Mail Extension",
-    "version": "1.0.2",
+    "version": "1.0.3",
     "description": "Extracts OTPs from emails for Tether daemon",
     "browser_specific_settings": {
         "gecko": {
