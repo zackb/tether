@@ -103,10 +103,15 @@ if (typeof document === 'undefined') {
 let otpInterval = null;
 
 function requestOtp() {
-  chrome.runtime.sendMessage({ 
-    action: "request_otp_for_site", 
-    url: window.location.hostname 
+  chrome.runtime.sendMessage({
+    action: "request_otp_for_site",
+    url: window.location.hostname
   });
+}
+
+// Tell the daemon the code was used so it isn't re-served to the next page.
+function consumeOtp() {
+  chrome.runtime.sendMessage({ action: "consume_otp" });
 }
 
 function hasOtpFields() {
@@ -115,7 +120,10 @@ function hasOtpFields() {
 }
 
 // Check every 2 seconds for up to 2 minutes
-if (hasOtpFields()) {
+let otpFlowStarted = false;
+function startOtpFlow() {
+  if (otpFlowStarted) return;
+  otpFlowStarted = true;
   console.log("Found potential OTP fields on page, requesting OTP from Tether");
   requestOtp();
 
@@ -126,14 +134,30 @@ if (hasOtpFields()) {
     const regular = findOtpInputs(document);
 
     // Stop trying after 2 minutes or if the user manually filled the field
-    if (attempts > 60 || 
-        (splits && splits[0].value !== "") || 
+    if (attempts > 60 ||
+        (splits && splits[0].value !== "") ||
         (regular.length > 0 && regular[0].value.length > 3)) {
       clearInterval(otpInterval);
       return;
     }
     requestOtp();
   }, 2000);
+}
+
+if (hasOtpFields()) {
+  startOtpFlow();
+} else {
+  // The OTP field often renders after load (SPA route, or after the user enters
+  // their email/phone). Watch for it instead of only checking once at load.
+  const observer = new MutationObserver(() => {
+    if (hasOtpFields()) {
+      observer.disconnect();
+      startOtpFlow();
+    }
+  });
+  observer.observe(document.documentElement, { childList: true, subtree: true });
+  // ponytail: bound the watcher so it doesn't run forever on non-OTP pages
+  setTimeout(() => observer.disconnect(), 120000);
 }
 
 // Listen for OTPs sent from the daemon
@@ -152,6 +176,7 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
         splitFields[i].dispatchEvent(new Event('change', { bubbles: true }));
       }
       if (otpInterval) clearInterval(otpInterval);
+      consumeOtp();
     } else {
       const regularFields = findOtpInputs(document);
       // Fill when empty, or overwrite a stale/partial value — but skip if the code
@@ -166,6 +191,7 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
 
         // Clean up the interval
         if (otpInterval) clearInterval(otpInterval);
+        consumeOtp();
       }
     }
   }
