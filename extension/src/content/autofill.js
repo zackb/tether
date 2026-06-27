@@ -114,6 +114,15 @@ function consumeOtp() {
   chrome.runtime.sendMessage({ action: "consume_otp" });
 }
 
+// React/Vue track input values via the prototype's value setter, so a plain
+// `el.value = x` is ignored and reverted on re-render. Go through the native
+// setter so controlled inputs actually register the change.
+function setNativeValue(el, value) {
+  const setter = Object.getOwnPropertyDescriptor(Object.getPrototypeOf(el), 'value')?.set;
+  if (setter) setter.call(el, value);
+  else el.value = value;
+}
+
 function hasOtpFields() {
   if (detectSplitOtp(document)) return true;
   return findOtpInputs(document).length > 0;
@@ -144,13 +153,16 @@ function startOtpFlow() {
   }, 2000);
 }
 
-if (hasOtpFields()) {
+const otpPresentAtLoad = hasOtpFields();
+console.log("Tether: content script loaded on", window.location.href, "— OTP fields present at load:", otpPresentAtLoad);
+if (otpPresentAtLoad) {
   startOtpFlow();
 } else {
   // The OTP field often renders after load (SPA route, or after the user enters
   // their email/phone). Watch for it instead of only checking once at load.
   const observer = new MutationObserver(() => {
     if (hasOtpFields()) {
+      console.log("Tether: OTP fields appeared after load");
       observer.disconnect();
       startOtpFlow();
     }
@@ -169,7 +181,7 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
     if (splitFields) {
       console.log("Autofilling split OTP:", otp);
       for (let i = 0; i < Math.min(otp.length, splitFields.length); i++) {
-        splitFields[i].value = otp[i];
+        setNativeValue(splitFields[i], otp[i]);
 
         // Dispatch events so React/Vue/Angular pick up the change
         splitFields[i].dispatchEvent(new Event('input', { bubbles: true }));
@@ -183,7 +195,7 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
       // is already present to avoid redundant re-fills and event storms.
       if (regularFields.length > 0 && regularFields[0].value !== otp) {
         console.log("Autofilling OTP:", otp);
-        regularFields[0].value = otp;
+        setNativeValue(regularFields[0], otp);
 
         // Dispatch events so React/Vue/Angular pick up the change
         regularFields[0].dispatchEvent(new Event('input', { bubbles: true }));
