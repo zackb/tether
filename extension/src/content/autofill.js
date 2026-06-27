@@ -103,10 +103,24 @@ if (typeof document === 'undefined') {
 let otpInterval = null;
 
 function requestOtp() {
-  chrome.runtime.sendMessage({ 
-    action: "request_otp_for_site", 
-    url: window.location.hostname 
+  chrome.runtime.sendMessage({
+    action: "request_otp_for_site",
+    url: window.location.hostname
   });
+}
+
+// Tell the daemon the code was used so it isn't re-served to the next page.
+function consumeOtp() {
+  chrome.runtime.sendMessage({ action: "consume_otp" });
+}
+
+// React/Vue track input values via the prototype's value setter, so a plain
+// `el.value = x` is ignored and reverted on re-render. Go through the native
+// setter so controlled inputs actually register the change.
+function setNativeValue(el, value) {
+  const setter = Object.getOwnPropertyDescriptor(Object.getPrototypeOf(el), 'value')?.set;
+  if (setter) setter.call(el, value);
+  else el.value = value;
 }
 
 function hasOtpFields() {
@@ -115,8 +129,10 @@ function hasOtpFields() {
 }
 
 // Check every 2 seconds for up to 2 minutes
-if (hasOtpFields()) {
-  console.log("Found potential OTP fields on page, requesting OTP from Tether");
+let otpFlowStarted = false;
+function startOtpFlow() {
+  if (otpFlowStarted) return;
+  otpFlowStarted = true;
   requestOtp();
 
   let attempts = 0;
@@ -126,14 +142,31 @@ if (hasOtpFields()) {
     const regular = findOtpInputs(document);
 
     // Stop trying after 2 minutes or if the user manually filled the field
-    if (attempts > 60 || 
-        (splits && splits[0].value !== "") || 
+    if (attempts > 60 ||
+        (splits && splits[0].value !== "") ||
         (regular.length > 0 && regular[0].value.length > 3)) {
       clearInterval(otpInterval);
       return;
     }
     requestOtp();
   }, 2000);
+}
+
+const otpPresentAtLoad = hasOtpFields();
+if (otpPresentAtLoad) {
+  startOtpFlow();
+} else {
+  // The OTP field often renders after load (SPA route, or after the user enters
+  // their email/phone). Watch for it instead of only checking once at load.
+  const observer = new MutationObserver(() => {
+    if (hasOtpFields()) {
+      observer.disconnect();
+      startOtpFlow();
+    }
+  });
+  observer.observe(document.documentElement, { childList: true, subtree: true });
+  // ponytail: bound the watcher so it doesn't run forever on non-OTP pages
+  setTimeout(() => observer.disconnect(), 120000);
 }
 
 // Listen for OTPs sent from the daemon
@@ -145,20 +178,21 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
     if (splitFields) {
       console.log("Autofilling split OTP:", otp);
       for (let i = 0; i < Math.min(otp.length, splitFields.length); i++) {
-        splitFields[i].value = otp[i];
+        setNativeValue(splitFields[i], otp[i]);
 
         // Dispatch events so React/Vue/Angular pick up the change
         splitFields[i].dispatchEvent(new Event('input', { bubbles: true }));
         splitFields[i].dispatchEvent(new Event('change', { bubbles: true }));
       }
       if (otpInterval) clearInterval(otpInterval);
+      consumeOtp();
     } else {
       const regularFields = findOtpInputs(document);
       // Fill when empty, or overwrite a stale/partial value — but skip if the code
       // is already present to avoid redundant re-fills and event storms.
       if (regularFields.length > 0 && regularFields[0].value !== otp) {
         console.log("Autofilling OTP:", otp);
-        regularFields[0].value = otp;
+        setNativeValue(regularFields[0], otp);
 
         // Dispatch events so React/Vue/Angular pick up the change
         regularFields[0].dispatchEvent(new Event('input', { bubbles: true }));
@@ -166,6 +200,7 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
 
         // Clean up the interval
         if (otpInterval) clearInterval(otpInterval);
+        consumeOtp();
       }
     }
   }

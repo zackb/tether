@@ -30,6 +30,11 @@ if (typeof chrome !== 'undefined' && chrome.runtime) {
       });
       sendResponse({ status: "requested" });
     }
+
+    if (request.action === "consume_otp") {
+      sendToNativeHost({ command: "consume_otp" });
+      sendResponse({ status: "consumed" });
+    }
     return true;
   });
 }

@@ -1,4 +1,6 @@
 #include <atomic>
+#include <csignal>
+#include <iostream>
 #include <string>
 #include <tether/client.hpp>
 #include <tether/crypto.hpp>
@@ -10,6 +12,10 @@
 
 void run_native_messaging_host(tether::Client& client) {
     debug::log(INFO, "Starting Native Messaging Host loop...\n");
+
+    // When the browser tears down the port, stdout becomes a closed pipe. Ignore
+    // SIGPIPE so a write to it fails gracefully.
+    signal(SIGPIPE, SIG_IGN);
 
     // Subscribe to daemon broadcast events
     client.send("{\"command\":\"subscribe\"}\n");
@@ -40,6 +46,11 @@ void run_native_messaging_host(tether::Client& client) {
                 std::cout.write(reinterpret_cast<const char*>(&out_length), sizeof(out_length));
                 std::cout.write(msg.data(), out_length);
                 std::cout.flush();
+                // Browser pipe closed: stop cleanly instead of spinning on a dead fd.
+                if (!std::cout) {
+                    running = false;
+                    break;
+                }
             }
         }
     });
