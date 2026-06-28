@@ -79,13 +79,9 @@ namespace tether {
                     break;
             }
 
-            // Catch-all fallback: if none of our preferred types are found,
-            // try the first thing the compositor offered.
-            if (!found && !current_mimes.empty()) {
-                best_mime = current_mimes[0];
-                found = true;
-            }
-
+            // text-only sync. No text mime => skip it. Reading the
+            // first offered mime (image/png) feeds binary into the JSON
+            // string field and aborts the daemon on invalid UTF-8.
             if (!found)
                 return;
 

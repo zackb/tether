@@ -94,7 +94,9 @@ int main(int argc, char** argv) {
             nlohmann::json j;
             j["command"] = "clipboard_updated";
             j["content"] = text;
-            tether::broadcast_message(j.dump());
+            // replace bad UTF-8 instead of throwing; a clipboard
+            // app can still mislabel binary as text/plain. Don't abort the daemon.
+            tether::broadcast_message(j.dump(-1, ' ', false, nlohmann::json::error_handler_t::replace));
         });
     }
 
