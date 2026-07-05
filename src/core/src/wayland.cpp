@@ -88,8 +88,13 @@ namespace tether {
         int fd = wl_display_get_fd(raw_display_);
         loop_.addFd(fd, [this](int) {
             if (wl_display_dispatch(raw_display_) < 0) {
-                debug::log(ERR, "WaylandContext: Display disconnected.");
+                // Display connection is dead (compositor stopped).
+                // We choose to exit here rather than attempt to reconnect.
+                debug::log(ERR, "WaylandContext: Display connection lost; shutting down for on-demand restart.");
+                loop_.stop();
+                return;
             }
+            wl_display_flush(raw_display_); // flush requests queued during dispatch (offer/source destroys)
         });
 
         // Flush any pending requests
