@@ -3,6 +3,7 @@
 #include "wayland_protocols/wlr-data-control-unstable-v1.hpp"
 
 #include <cstring>
+#include <poll.h>
 #include <tether/log.hpp>
 #include <wayland-client.h>
 
@@ -86,7 +87,17 @@ namespace tether {
 
         // Attach to event loop!
         int fd = wl_display_get_fd(raw_display_);
-        loop_.addFd(fd, [this](int) {
+        loop_.addFd(fd, [this](int wfd) {
+            // Compositor gone: the wl socket peer closes and epoll is level-triggered,
+            // so this callback fires nonstop. wl_display_dispatch keeps returning >=0
+            // (never surfaces the hangup), so the old dispatch<0 guard never triggers
+            // and we peg a core. POLLHUP/POLLERR is the kernel's ground-truth signal.
+            struct pollfd pfd{wfd, 0, 0};
+            if (poll(&pfd, 1, 0) == 1 && (pfd.revents & (POLLHUP | POLLERR))) {
+                debug::log(ERR, "WaylandContext: compositor hung up; exiting for on-demand restart.");
+                loop_.stop();
+                return;
+            }
             if (wl_display_dispatch(raw_display_) < 0) {
                 // Display connection is dead (compositor stopped).
                 // We choose to exit here rather than attempt to reconnect.
