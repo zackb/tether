@@ -212,3 +212,150 @@ Tether uses the local UNIX socket to coordinate OTP syncing between mail clients
   "otp": "123456"
 }
 ```
+
+---
+
+## 6. Bluetooth: iPhone Messages and Notifications
+
+These commands ride the same UNIX socket and the same newline-delimited JSON. They are
+local-only: nothing here is reachable over TCP, because everything here is personal data.
+
+Two transports sit behind them, and they fail independently: MAP and PBAP are OBEX
+sessions over BR/EDR, while ANCS is a GATT client over BLE. See [BLUETOOTH.md](BLUETOOTH.md) for how they are set up.
+
+Some commands answer on the requesting socket, and some broadcast to every local
+subscriber. Anything a second client would want to see is broadcast.
+
+### Adapter and pairing
+
+#### `bt_status` (Client -> Daemon, answered directly)
+Reports adapter capability and the resolved delivery mode.
+**Payload**: `{"command": "bt_status"}`
+**Response**: `available`, `capability` (`mode` is `full` or `compatibility`, plus
+`bearer_api`, `powered`, `le_central`, `le_peripheral`, `advertising`, `class_ok`, and a
+`reasons` array naming anything missing), and an `adapters` array.
+
+#### `bt_list_devices` (Client -> Daemon, answered directly)
+**Payload**: `{"command": "bt_list_devices"}`
+**Response**: `{"command": "bt_devices", "devices": [...]}`, each entry carrying address,
+name, `paired`, `bonded`, `connected`, `le_bearer`, and whether the device advertises
+`map`, `pbap`, and `ancs`.
+
+#### `bt_pair` / `bt_unpair` (Client -> Daemon, broadcast)
+**Payload**: `{"command": "bt_pair", "address": "AA:BB:CC:DD:EE:FF"}`
+Runs asynchronously and reports through `bt_pair_progress` events, then one
+`bt_pair_result` (or `bt_unpair_result`). Only one pairing transaction runs at a time; a
+second returns `{"status": "busy"}`. A successful pair selects the device and starts
+supervision.
+
+#### `bt_set_device` (Client -> Daemon)
+**Payload**: `{"command": "bt_set_device", "address": "AA:BB:CC:DD:EE:FF"}`
+Points supervision at an already-bonded phone.
+
+#### `bt_pair_progress` / `bt_pair_result` (Daemon -> Clients)
+`bt_pair_progress` carries `step` and `detail` for display during the transaction.
+`bt_pair_result` carries `success`, `status`, `message`, and `dual_bond` — the last being
+whether the bond covers LE as well as BR/EDR, which is what decides if ANCS is reachable.
+
+### Connection state
+
+#### `bt_connection` (Client -> Daemon, answered directly)
+**Payload**: `{"command": "bt_connection"}`
+Returns the same object the daemon broadcasts as `bt_connection_changed`.
+
+#### `bt_connection_changed` (Daemon -> Clients)
+Broadcast when the published state actually changes, not on a timer.
+
+```json
+{
+  "command": "bt_connection_changed",
+  "device_present": true,
+  "device_paired": true,
+  "classic_connected": true,
+  "le_available": true,
+  "le_connected": false,
+  "map_open": true,
+  "pbap_open": true,
+  "map_error": "none",
+  "pbap_error": "none",
+  "ancs_ready": false,
+  "link_reason": "Connected. Bringing up the LE link for notifications...",
+  "profile_reason": "Messages and contacts are connected."
+}
+```
+
+The two `*_reason` strings are written for display (permission is off or a transport that is busy). 
+`map_error` and `pbap_error` name the classification: `forbidden` means the toggle on the phone is off,
+`busy` means another computer holds the phone's single MAP session.
+
+### Messages
+
+#### `bt_list_threads` (Client -> Daemon, answered directly)
+**Payload**: `{"command": "bt_list_threads"}`
+**Response**: `{"command": "bt_threads", "threads": [...]}`. Each thread carries `thread`
+(the key), `name`, `address`, `preview`, `timestamp`, `unread`, `count`, `group`, and
+`repliable`. Group threads add `reply_status` and, when they cannot be replied to, a
+`reply_reason` written for display.
+
+Thread keys are derived from the normalized peer address — `tel:+15035550101` for a phone
+number, the lowercased address for an Apple ID — because MAP provides no conversation
+identifier. Group keys are `group:name:<slug>` or `group:members:<slugs>`.
+
+#### `bt_list_messages` (Client -> Daemon, answered directly)
+**Payload**: `{"command": "bt_list_messages", "thread": "tel:+15035550101"}`
+**Response**: `{"command": "bt_messages", "thread": ..., "messages": [...]}` with `handle`,
+`body`, `timestamp`, `outgoing`, `read`, and `folder` per message.
+
+#### `bt_mark_read` (Client -> Daemon, broadcast)
+**Payload**: `{"command": "bt_mark_read", "handle": "...", "read": true}`
+Writes through to the phone over OBEX, so it answers asynchronously with a
+`bt_message_read` event carrying `success` and, on failure, `message`.
+
+#### `bt_send_message` (Client -> Daemon, broadcast)
+**Payload**: `{"command": "bt_send_message", "thread": "tel:+15035550101", "body": "on my way"}`
+Builds a bMessage and pushes it to the phone's outbox. Answers asynchronously with
+`bt_send_result` (`success`, and `message` when it failed).
+
+Recipients are validated before they are interpolated into the bMessage: an address
+containing CR, LF, or a vCard delimiter is rejected rather than escaped, because such an
+address could otherwise add a recipient and deliver the message to someone else. Body lines
+beginning with a bMessage structural token are byte-stuffed.
+
+A successful send also broadcasts a `bt_message` event. That is the only record the send
+happened — the iPhone's MAP sent folder stays empty and no outgoing notification arrives.
+
+#### `bt_message` (Daemon -> Clients)
+Broadcast once per newly observed message, incoming or locally sent.
+
+### Notifications
+
+#### `bt_list_notifications` (Client -> Daemon, answered directly)
+**Payload**: `{"command": "bt_list_notifications"}`
+**Response**: `{"command": "bt_notifications", "notifications": [...]}` with `uid`,
+`app_id`, `app_name`, `title`, `subtitle`, `body`, `category`, `timestamp`, and which
+actions the notification offers.
+
+Bodies are present only when notification content mirroring is enabled; by default the
+daemon requests the owning app and nothing more. Messages notifications
+(`com.apple.MobileSMS`) are retained but never raise a desktop popup, since MAP already
+delivers those with working read state.
+
+#### `bt_notification_action` (Client -> Daemon, broadcast)
+**Payload**: `{"command": "bt_notification_action", "uid": 42, "action": "positive"}`
+ANCS offers positive and negative actions only — there is no free-text reply on a mirrored
+notification. Answers with `bt_notification_action_result`.
+
+### Diagnostics
+
+#### `bt_diagnostics` (Client -> Daemon, answered directly)
+**Payload**: `{"command": "bt_diagnostics"}`
+Returns a report intended to be pasted into a bug report: version, auth strategy, the
+Bluetooth settings in effect, the current capability and connection state, and an ordered
+timeline of recent link and pairing transitions stamped in milliseconds.
+
+The daemon redacts before answering. Bluetooth addresses, phone numbers, email addresses,
+and home and runtime directories become numbered placeholders — `<address-1>` recurs for
+one device, so a reader can still follow which device a line refers to without learning
+which device it is. Message bodies, contact names, and notification content are dropped
+outright rather than redacted, and message and notification events never enter the timeline
+in the first place.

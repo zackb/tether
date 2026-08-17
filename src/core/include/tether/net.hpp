@@ -3,6 +3,7 @@
 #include "tether/event_loop.hpp"
 #include <filesystem>
 #include <map>
+#include <nlohmann/json.hpp>
 #include <openssl/ssl.h>
 #include <string>
 #include <sys/types.h>
@@ -26,6 +27,10 @@ namespace tether {
     void broadcast_local_event(const std::string& msg, int exclude_fd = -1);
     void record_received_file(const std::filesystem::path& path, size_t bytes_written);
     size_t broadcast_tcp_message(const std::string& msg, int exclude_fd = -1);
+
+    // Bluetooth state, read from the BluezMonitor snapshot.
+    nlohmann::json build_bt_status();
+    nlohmann::json build_bt_devices();
 
     class UnixServer {
     public:

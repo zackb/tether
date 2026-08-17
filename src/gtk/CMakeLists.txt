@@ -3,6 +3,11 @@ pkg_check_modules(GTK3 REQUIRED gtk+-3.0)
 
 add_executable(tether-gtk
     main.cpp
+    ui_util.cpp
+    daemon_client.cpp
+    devices_view.cpp
+    messages_view.cpp
+    notifications_view.cpp
 )
 
 target_include_directories(tether-gtk PRIVATE ${GTK3_INCLUDE_DIRS})

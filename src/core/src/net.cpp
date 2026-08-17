@@ -10,12 +10,19 @@
 #include <sys/wait.h>
 #include <unistd.h>
 
+#include "tether/bluetooth/config.hpp"
+#include "tether/bluetooth/connection.hpp"
+#include "tether/bluetooth/contacts.hpp"
+#include "tether/bluetooth/diagnostics.hpp"
+#include "tether/bluetooth/monitor.hpp"
+#include "tether/bluetooth/pairing.hpp"
 #include "tether/client.hpp"
 #include "tether/crypto.hpp"
 #include "tether/discovery.hpp"
 #include "tether/file_transfer.hpp"
 #include "tether/otp.hpp"
 #include "tether/wayland.hpp"
+#include <atomic>
 #include <cstring>
 #include <filesystem>
 #include <fstream>
@@ -158,6 +165,14 @@ namespace tether {
         if (packet.empty() || packet.back() != '\n')
             packet += '\n';
 
+        // Bluetooth state events feed the diagnostic timeline.
+        if (packet.find("\"bt_") != std::string::npos) {
+            try {
+                bluetooth::record_diagnostic_event(nlohmann::json::parse(packet));
+            } catch (...) {
+            }
+        }
+
         std::lock_guard<std::mutex> lock(g_subscribers_mutex);
         for (int fd : local_subscribers) {
             if (fd == exclude_fd)
@@ -194,6 +209,152 @@ namespace tether {
         }
 
         return "";
+    }
+
+    nlohmann::json build_bt_status() {
+        nlohmann::json status;
+        status["command"] = "bt_status";
+        status["available"] = bluetooth::g_bluez != nullptr && bluetooth::g_bluez->running();
+        if (!bluetooth::g_bluez) {
+            status["capability"] = nullptr;
+            status["adapters"] = nlohmann::json::array();
+            return status;
+        }
+
+        status["capability"] = bluetooth::to_json(bluetooth::g_bluez->capability());
+        nlohmann::json adapters = nlohmann::json::array();
+        for (const auto& adapter : bluetooth::g_bluez->snapshot().adapters)
+            adapters.push_back(bluetooth::to_json(adapter));
+        status["adapters"] = adapters;
+        return status;
+    }
+
+    // Guards against two pairing transactions racing for the same agent and
+    // advertisement object paths.
+    static std::atomic<bool> g_bt_pair_busy{false};
+
+    static void run_bt_pair(const std::string& address) {
+        if (!bluetooth::g_bluez) {
+            nlohmann::json event;
+            event["command"] = "bt_pair_result";
+            event["success"] = false;
+            event["status"] = "error";
+            event["message"] = "Bluetooth is unavailable.";
+            broadcast_local_event(event.dump());
+            return;
+        }
+
+        if (g_bt_pair_busy.exchange(true)) {
+            nlohmann::json event;
+            event["command"] = "bt_pair_result";
+            event["success"] = false;
+            event["status"] = "busy";
+            event["message"] = "Another pairing attempt is already in progress.";
+            broadcast_local_event(event.dump());
+            return;
+        }
+
+        auto config = bluetooth::load_config();
+        auto result = bluetooth::pair_device(
+            *bluetooth::g_bluez,
+            address,
+            config.auth_strategy,
+            [](const std::string& step, const std::string& detail) {
+                nlohmann::json event;
+                event["command"] = "bt_pair_progress";
+                event["step"] = step;
+                event["detail"] = detail;
+                broadcast_local_event(event.dump());
+            },
+            nullptr);
+
+        if (result.success) {
+            config.device_address = result.device_address;
+            // A BR/EDR-only bond can never have ANCS. Remember so later runs do not keep trying to bring up an LE
+            // bearer the phone will not answer.
+            config.ancs_enabled = result.dual_bond;
+            bluetooth::save_config(config);
+            // Point supervision at the device we just bonded with.
+            if (bluetooth::g_bt_connections)
+                bluetooth::g_bt_connections->set_device(config.device_address, config.ancs_enabled);
+        }
+
+        g_bt_pair_busy = false;
+        broadcast_local_event(bluetooth::to_json(result).dump());
+        broadcast_local_event(build_bt_status().dump());
+    }
+
+    static void run_bt_unpair(const std::string& address) {
+        if (!bluetooth::g_bluez)
+            return;
+        auto result = bluetooth::unpair_device(*bluetooth::g_bluez, address);
+        nlohmann::json event = bluetooth::to_json(result);
+        event["command"] = "bt_unpair_result";
+        broadcast_local_event(event.dump());
+        broadcast_local_event(build_bt_status().dump());
+    }
+
+    nlohmann::json build_bt_threads() {
+        nlohmann::json result;
+        result["command"] = "bt_threads";
+        nlohmann::json threads = nlohmann::json::array();
+        {
+            std::lock_guard<std::mutex> lock(bluetooth::message_store_mutex());
+            for (const auto& thread : bluetooth::message_store().threads()) {
+                auto entry = bluetooth::to_json(thread);
+                // Contact names are applied for display only. Key on addresses, so a renamed or ambiguous contact can
+                // never change which conversation a message belongs to.
+                if (auto name = bluetooth::contact_store().name_for(thread.key); !name.empty())
+                    entry["name"] = name;
+
+                if (thread.key.rfind("group:", 0) == 0) {
+                    entry["group"] = true;
+                    std::string reason;
+                    const auto eligibility = bluetooth::group_reply_status(thread.key, reason);
+                    entry["repliable"] = eligibility == bluetooth::ReplyEligibility::Allowed;
+                    entry["reply_status"] = bluetooth::to_string(eligibility);
+                    if (!reason.empty())
+                        entry["reply_reason"] = reason;
+                } else {
+                    entry["group"] = false;
+                    entry["repliable"] = true;
+                }
+                threads.push_back(std::move(entry));
+            }
+        }
+        result["threads"] = threads;
+        return result;
+    }
+
+    nlohmann::json build_bt_messages(const std::string& thread_key) {
+        nlohmann::json result;
+        result["command"] = "bt_messages";
+        result["thread"] = thread_key;
+        nlohmann::json messages = nlohmann::json::array();
+        {
+            std::lock_guard<std::mutex> lock(bluetooth::message_store_mutex());
+            const std::string name = bluetooth::contact_store().name_for(thread_key);
+            for (const auto& message : bluetooth::message_store().messages(thread_key)) {
+                auto entry = bluetooth::to_json(message);
+                if (!name.empty() && !message.outgoing)
+                    entry["name"] = name;
+                messages.push_back(std::move(entry));
+            }
+        }
+        result["messages"] = messages;
+        return result;
+    }
+
+    nlohmann::json build_bt_devices() {
+        nlohmann::json result;
+        result["command"] = "bt_devices";
+        nlohmann::json devices = nlohmann::json::array();
+        if (bluetooth::g_bluez) {
+            for (const auto& device : bluetooth::g_bluez->snapshot().devices)
+                devices.push_back(bluetooth::to_json(device));
+        }
+        result["devices"] = devices;
+        return result;
     }
 
     static nlohmann::json build_local_state_snapshot() {
@@ -452,6 +613,131 @@ namespace tether {
                     } else if (j.contains("command") && j["command"] == "state_snapshot") {
                         std::string payload = build_local_state_snapshot().dump() + "\n";
                         if (write(client_fd, payload.c_str(), payload.size()) < 0) {
+                            debug::log(ERR, "net write error\n");
+                        }
+                        continue;
+                    } else if (j.contains("command") && j["command"] == "bt_status") {
+                        std::string payload = build_bt_status().dump() + "\n";
+                        if (write(client_fd, payload.c_str(), payload.size()) < 0) {
+                            debug::log(ERR, "net write error\n");
+                        }
+                        continue;
+                    } else if (j.contains("command") && j["command"] == "bt_list_devices") {
+                        std::string payload = build_bt_devices().dump() + "\n";
+                        if (write(client_fd, payload.c_str(), payload.size()) < 0) {
+                            debug::log(ERR, "net write error\n");
+                        }
+                        continue;
+                    } else if (j.contains("command") && j["command"] == "bt_pair" && j.contains("address")) {
+                        // Pairing waits on the user and the phone, so it runs on
+                        // its own thread; progress and the result arrive as events.
+                        std::string address = j["address"];
+                        std::thread([address]() { run_bt_pair(address); }).detach();
+                    } else if (j.contains("command") && j["command"] == "bt_unpair" && j.contains("address")) {
+                        std::string address = j["address"];
+                        std::thread([address]() { run_bt_unpair(address); }).detach();
+                    } else if (j.contains("command") && j["command"] == "bt_set_device" && j.contains("address")) {
+                        auto config = bluetooth::load_config();
+                        config.device_address = j["address"];
+                        bluetooth::save_config(config);
+                        if (bluetooth::g_bt_connections)
+                            bluetooth::g_bt_connections->set_device(config.device_address, config.ancs_enabled);
+                        broadcast_local_event(build_bt_status().dump());
+                    } else if (j.contains("command") && j["command"] == "bt_list_threads") {
+                        std::string payload = build_bt_threads().dump() + "\n";
+                        if (write(client_fd, payload.c_str(), payload.size()) < 0) {
+                            debug::log(ERR, "net write error\n");
+                        }
+                        continue;
+                    } else if (j.contains("command") && j["command"] == "bt_list_messages" && j.contains("thread")) {
+                        std::string payload = build_bt_messages(j["thread"]).dump() + "\n";
+                        if (write(client_fd, payload.c_str(), payload.size()) < 0) {
+                            debug::log(ERR, "net write error\n");
+                        }
+                        continue;
+                    } else if (j.contains("command") && j["command"] == "bt_mark_read" && j.contains("handle")) {
+                        std::string handle = j["handle"];
+                        bool read = j.value("read", true);
+                        // Writing through to the phone is a blocking OBEX call.
+                        std::thread([handle, read]() {
+                            std::string err;
+                            nlohmann::json event;
+                            event["command"] = "bt_message_read";
+                            event["handle"] = handle;
+                            event["read"] = read;
+                            event["success"] = bluetooth::mark_message_read(handle, read, err);
+                            if (!err.empty())
+                                event["message"] = err;
+                            broadcast_local_event(event.dump());
+                        }).detach();
+                    } else if (j.contains("command") && j["command"] == "bt_send_message" && j.contains("thread") &&
+                               j.contains("body")) {
+                        std::string thread = j["thread"];
+                        std::string body = j["body"];
+                        // PushMessage is a blocking OBEX transfer, so it cannot
+                        // run on the loop that has to keep serving the UI.
+                        std::thread([thread, body]() {
+                            std::string err;
+                            bluetooth::Message sent;
+                            nlohmann::json event;
+                            event["command"] = "bt_send_result";
+                            event["thread"] = thread;
+                            event["success"] = bluetooth::send_message(thread, body, sent, err);
+                            if (event["success"]) {
+                                // The phone reports nothing about a sent message,
+                                // so the local record is announced the same way an
+                                // incoming one would be.
+                                nlohmann::json message = bluetooth::to_json(sent);
+                                message["command"] = "bt_message";
+                                broadcast_local_event(message.dump());
+                            } else {
+                                event["message"] = err;
+                            }
+                            broadcast_local_event(event.dump());
+                        }).detach();
+                    } else if (j.contains("command") && j["command"] == "bt_list_notifications") {
+                        nlohmann::json payload;
+                        payload["command"] = "bt_notifications";
+                        payload["notifications"] = bluetooth::g_bt_connections
+                                                       ? bluetooth::g_bt_connections->notifications()
+                                                       : nlohmann::json::array();
+                        std::string out = payload.dump(-1, ' ', false, nlohmann::json::error_handler_t::replace) + "\n";
+                        if (write(client_fd, out.c_str(), out.size()) < 0) {
+                            debug::log(ERR, "net write error\n");
+                        }
+                        continue;
+                    } else if (j.contains("command") && j["command"] == "bt_notification_action" && j.contains("uid")) {
+                        // ANCS offers positive and negative only; there is no
+                        // free-text reply to expose here.
+                        const bool positive = j.value("action", "positive") == "positive";
+                        nlohmann::json payload;
+                        payload["command"] = "bt_notification_action_result";
+                        payload["uid"] = j["uid"];
+                        payload["success"] =
+                            bluetooth::g_bt_connections &&
+                            bluetooth::g_bt_connections->perform_notification_action(
+                                j["uid"].get<uint32_t>(),
+                                positive ? bluetooth::ancs::ActionId::Positive : bluetooth::ancs::ActionId::Negative);
+                        broadcast_local_event(payload.dump());
+                    } else if (j.contains("command") && j["command"] == "bt_connection") {
+                        nlohmann::json payload = bluetooth::g_bt_connections
+                                                     ? bluetooth::g_bt_connections->status()
+                                                     : nlohmann::json{{"command", "bt_connection_changed"},
+                                                                      {"device_present", false},
+                                                                      {"link_reason", "Bluetooth is unavailable."},
+                                                                      {"profile_reason", ""}};
+                        std::string out = payload.dump() + "\n";
+                        if (write(client_fd, out.c_str(), out.size()) < 0) {
+                            debug::log(ERR, "net write error\n");
+                        }
+                        continue;
+                    } else if (j.contains("command") && j["command"] == "bt_diagnostics") {
+                        nlohmann::json connection =
+                            bluetooth::g_bt_connections
+                                ? bluetooth::g_bt_connections->status()
+                                : nlohmann::json{{"command", "bt_connection_changed"}, {"device_present", false}};
+                        std::string out = bluetooth::build_diagnostics(build_bt_status(), connection).dump() + "\n";
+                        if (write(client_fd, out.c_str(), out.size()) < 0) {
                             debug::log(ERR, "net write error\n");
                         }
                         continue;
