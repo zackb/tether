@@ -1,11 +1,6 @@
 #include "notification.hpp"
 #include <csignal>
-#include <ctime>
 #include <nlohmann/json.hpp>
-#include <tether/bluetooth/config.hpp>
-#include <tether/bluetooth/connection.hpp>
-#include <tether/bluetooth/contacts.hpp>
-#include <tether/bluetooth/monitor.hpp>
 #include <tether/core.hpp>
 #include <tether/crypto.hpp>
 #include <tether/discovery.hpp>
@@ -106,7 +101,7 @@ int main(int argc, char** argv) {
     }
 
     tether::FileReceiveManager file_mgr;
-    tether::DesktopNotifier notifier;
+    tether::FileArrivalNotifier notifier;
     if (!notifier.init()) {
         debug::log(ERR, "Warning: desktop notifications unavailable");
     } else {
@@ -117,86 +112,6 @@ int main(int argc, char** argv) {
     }
     tether::g_file_manager = &file_mgr;
 
-    // BlueZ runs on its own GLib thread and wakes the loop through an eventfd
-    // whenever the adapter or device set changes.
-    tether::bluetooth::BluezMonitor bluez;
-    tether::bluetooth::ConnectionManager connections(
-        bluez,
-        [](const nlohmann::json& status) { tether::broadcast_local_event(status.dump()); },
-        [&notifier](const tether::bluetooth::Message& message, bool backfill) {
-            nlohmann::json event = tether::bluetooth::to_json(message);
-            event["command"] = "bt_message";
-            tether::broadcast_local_event(event.dump(-1, ' ', false, nlohmann::json::error_handler_t::replace));
-
-            // ANCS deliberately shows no popup for Messages, because MAP is the
-            // copy whose read state stays in sync with the phone. This is that popup.
-            if (backfill || message.outgoing || message.read)
-                return;
-
-            std::string who = tether::bluetooth::contact_store().name_for(message.thread_key);
-            if (who.empty())
-                who = message.peer_name.empty() ? message.peer_address : message.peer_name;
-            notifier.notify(who.empty() ? "iPhone" : who, message.body);
-        });
-    if (bluez.start()) {
-        tether::bluetooth::g_bluez = &bluez;
-        loop.addFd(bluez.event_fd(), [&bluez](int) {
-            bluez.drain();
-            tether::broadcast_local_event(tether::build_bt_status().dump());
-        });
-        auto cap = bluez.capability();
-        debug::log(INFO, "Bluetooth: {} mode", tether::bluetooth::to_string(cap.mode));
-        for (const auto& reason : cap.reasons)
-            debug::log(INFO, "Bluetooth: {}", reason);
-
-        // Supervise the selected iPhone's bearers and OBEX sessions. ANCS is only
-        // attempted when the controller can carry it and pairing produced a bond
-        // that covers LE.
-        auto bt_config = tether::bluetooth::load_config();
-        const bool ancs = bt_config.ancs_enabled && cap.mode == tether::bluetooth::DeliveryMode::Full;
-        tether::bluetooth::g_bt_connections = &connections;
-
-        tether::bluetooth::set_group_replies_enabled(bt_config.group_messages_enabled &&
-                                                     bt_config.ancs_content_enabled);
-        tether::bluetooth::reload_group_rosters();
-
-        if (ancs) {
-            connections.set_notification_handlers(
-                [&notifier](const tether::bluetooth::ancs::Notification& notification) {
-                    // Messages notifications are the only side channel that says
-                    // which conversation a MAP message belongs to.
-                    if (notification.app_id == tether::bluetooth::ancs::APP_ID_MESSAGES) {
-                        tether::bluetooth::observe_message_notification(notification.title,
-                                                                        notification.subtitle,
-                                                                        notification.body,
-                                                                        static_cast<int64_t>(std::time(nullptr)));
-                    }
-
-                    nlohmann::json event = tether::bluetooth::ancs::to_json(notification);
-                    event["command"] = "bt_notification";
-                    tether::broadcast_local_event(event.dump(-1, ' ', false, nlohmann::json::error_handler_t::replace));
-
-                    // Messages already arrive over MAP with read state that stays
-                    // in sync, so a popup here would be the second copy.
-                    if (!tether::bluetooth::ancs::should_show_desktop_popup(notification))
-                        return;
-
-                    const std::string title = notification.title.empty() ? notification.app_name : notification.title;
-                    notifier.notify(title.empty() ? "iPhone" : title, notification.body);
-                },
-                [](uint32_t uid) {
-                    nlohmann::json event;
-                    event["command"] = "bt_notification_removed";
-                    event["uid"] = uid;
-                    tether::broadcast_local_event(event.dump());
-                });
-        }
-
-        connections.start(bt_config.device_address, ancs);
-    } else {
-        debug::log(INFO, "Bluetooth unavailable; messages and notifications are disabled");
-    }
-
     debug::log(INFO, "tetherd is running. Press Ctrl-C to stop.");
     loop.run();
 
@@ -204,10 +119,6 @@ int main(int argc, char** argv) {
     debug::log(INFO, "tetherd shutdown complete.");
 
     // explicitly null globals to be safe during final stack unwinding
-    tether::bluetooth::g_bt_connections = nullptr;
-    connections.stop();
-    tether::bluetooth::g_bluez = nullptr;
-    bluez.stop();
     tether::g_wayland = nullptr;
     tether::g_file_manager = nullptr;
     g_loop = nullptr;

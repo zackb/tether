@@ -1,11 +1,11 @@
 pkgname=tether-git
 pkgver=r1.1234
 pkgrel=1
-pkgdesc="Bridge an iPhone to the Linux desktop: clipboard, files, messages, and notifications"
+pkgdesc="A Wayland-native local file transfer and clipboard sync tool over mDNS"
 arch=('x86_64')
 url="https://github.com/zackb/tether"
 license=('MIT')
-depends=('gtk3' 'libnotify' 'openssl' 'wayland' 'avahi' 'glib2' 'bluez' 'bluez-utils' 'bluez-obex')
+depends=('gtk3' 'libnotify' 'openssl' 'wayland' 'avahi')
 makedepends=('cmake' 'ninja' 'git')
 provides=('tether' 'tether-bin')
 conflicts=('tether' 'tether-bin')

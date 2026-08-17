@@ -27,8 +27,6 @@
 | **iOS App** | ✅ Stable |
 | **Browser Extension** | ✅ Stable |
 | **Mail Extension** | ✅ Stable |
-| **Messages (SMS/iMessage)** | 🧪 Beta |
-| **Notification Mirroring** | 🧪 Beta Bluetooth |
 | **TOTP/OTP Vault** | 🗓️ Planning |
 
 ### Clipboard Sync
@@ -36,12 +34,6 @@ Seamlessly share your Wayland compositor (`wlr-data-control`) clipboard over the
 
 ### File Transfer
 Drag and drop files from Linux directly into the iPhone app, or receive files automatically deposited to your `$XDG_DOWNLOAD_DIR`.
-
-### Messages and Notifications
-
-Read and reply to SMS and iMessage conversations, and see notifications from any app on the phone, on the Linux desktop.
-
-iOS permits no app to touch messages or other apps' notifications. A Bluetooth accessory can, however, receive messages and notifications from the phone.
 
 ### Device Pairing
 Securely pair devices using **Mutually Authenticated TLS (mTLS)**, restricting TCP traffic securely using X.509 RSA certificates.
@@ -68,7 +60,7 @@ Tether uses a multi-component architecture:
 
 2. **`tether` (CLI)** — A lightweight C++ CLI program to communicate with the daemon. This also allows the WebExtension to interface with the daemon via native messaging.
 
-3. **`tether-gtk` (GTK App)** — A native GTK3 application for Linux that provides a graphical interface to manage devices, send files, trigger clipboard sync, read and reply to iPhone messages, see mirrored notifications, and monitor connection status.
+3. **`tether-gtk` (GTK App)** — A native GTK4 application for Linux that provides a graphical interface to manage devices, send files, trigger clipboard sync, and monitor connection status.
 
 4. **iPhone App** — Native SwiftUI iOS 16+ app that discovers the daemon via Bonjour/mDNS, utilizing Apple's `Network.framework` for secure TLS negotiation.
 
@@ -86,16 +78,9 @@ Tether uses a multi-component architecture:
 - `openssl`
 - `pkg-config`
 - `ninja`
-- `gtk3` (for `tether-gtk`)
+- `gtk4` (for `tether-gtk`)
 - `nlohmann-json`
 - `glib2`
-- `avahi`
-- `bluez`, `bluez-utils`, and `bluez-obex` (for messages and notifications)
-
-### Bluetooth (for Messages and Notifications)
-- BlueZ 5.86+ running with experimental bearer API, for notification mirroring.
-- A controller with BR/EDR, LE, and advertising support.
-- Notification mirroring does not work on iOS 18 and earlier.
 
 ### iOS
 - iOS 16+
@@ -152,16 +137,12 @@ The daemon uses an advisory lock (`$XDG_RUNTIME_DIR/tether/tetherd.lock`) ensuri
 
 5. **Start syncing** clipboard and transferring files
 
-6. **For messages and notifications**, (TODO: Bluetooth pairing instructions)
-
 ## Roadmap
 
 - [x] Complete iOS app development
 - [x] Add end-to-end encryption for file transfers
 - [x] Release browser extension for Firefox
 - [x] Release mail extension for Thunderbird
-- [x] Read and reply to iPhone messages over Bluetooth
-- [x] Mirror iPhone notifications over Bluetooth
 - [ ] Implement TOTP/OTP vault with Safari autofill
 - [ ] Explore macOS support
 

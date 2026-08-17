@@ -103,16 +103,16 @@ namespace tether {
 
     } // namespace
 
-    struct DesktopNotifier::Impl {
+    struct FileArrivalNotifier::Impl {
         GMainContext* context = nullptr;
         GMainLoop* loop = nullptr;
         std::thread thread;
         bool initialized = false;
     };
 
-    DesktopNotifier::DesktopNotifier() : impl_(std::make_unique<Impl>()) {}
+    FileArrivalNotifier::FileArrivalNotifier() : impl_(std::make_unique<Impl>()) {}
 
-    DesktopNotifier::~DesktopNotifier() {
+    FileArrivalNotifier::~FileArrivalNotifier() {
         if (!impl_->initialized) {
             return;
         }
@@ -135,7 +135,7 @@ namespace tether {
         notify_uninit();
     }
 
-    bool DesktopNotifier::init() {
+    bool FileArrivalNotifier::init() {
         if (impl_->initialized) {
             return true;
         }
@@ -156,26 +156,7 @@ namespace tether {
         return true;
     }
 
-    void DesktopNotifier::notify(const std::string& summary, const std::string& body) {
-        if (!impl_ || !impl_->initialized) {
-            return;
-        }
-
-        NotifyNotification* notification =
-            notify_notification_new(summary.c_str(), body.empty() ? nullptr : body.c_str(), "phone-symbolic");
-        if (!notification) {
-            return;
-        }
-
-        GError* error = nullptr;
-        if (!notify_notification_show(notification, &error)) {
-            debug::log(ERR, "Failed to show notification: {}", error ? error->message : "unknown");
-            g_clear_error(&error);
-        }
-        g_object_unref(notification);
-    }
-
-    void DesktopNotifier::notify_file_arrived(const std::filesystem::path& path) {
+    void FileArrivalNotifier::notify_file_arrived(const std::filesystem::path& path) {
         if (!impl_->initialized) {
             return;
         }

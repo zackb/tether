@@ -2,23 +2,19 @@
 
 #include <filesystem>
 #include <memory>
-#include <string>
 
 namespace tether {
 
-    class DesktopNotifier {
+    class FileArrivalNotifier {
     public:
-        DesktopNotifier();
-        ~DesktopNotifier();
+        FileArrivalNotifier();
+        ~FileArrivalNotifier();
 
-        DesktopNotifier(const DesktopNotifier&) = delete;
-        DesktopNotifier& operator=(const DesktopNotifier&) = delete;
+        FileArrivalNotifier(const FileArrivalNotifier&) = delete;
+        FileArrivalNotifier& operator=(const FileArrivalNotifier&) = delete;
 
         bool init();
         void notify_file_arrived(const std::filesystem::path& path);
-
-        // A plain notification with no actions.
-        void notify(const std::string& summary, const std::string& body);
 
     private:
         struct Impl;
