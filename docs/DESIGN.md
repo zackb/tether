@@ -157,7 +157,7 @@ The vault is encrypted with a user passphrase. Sync between the iPhone app and t
 | Name | Tether |
 | Daemon binary | `tetherd` |
 | CLI | `tether` |
-| Config | `~/.config/tether/tether.toml` |
+| Config | `$XDG_CONFIG_HOME/tether` (`~/.config/tether` by default) |
 | Primary packaging | AUR (Arch), daemon works on any Wayland Linux |
 | iOS distribution | App Store (required for `ASCredentialProviderExtension`) |
 

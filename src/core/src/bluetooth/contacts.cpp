@@ -1,6 +1,7 @@
 #include "tether/bluetooth/contacts.hpp"
 #include "tether/bluetooth/bmessage.hpp"
 #include "tether/log.hpp"
+#include "tether/paths.hpp"
 #include "tether/secret_store.hpp"
 
 #include <algorithm>
@@ -10,22 +11,9 @@
 #include <filesystem>
 #include <fstream>
 #include <glib.h>
-#include <pwd.h>
 #include <unistd.h>
 
 namespace tether::bluetooth {
-
-    namespace {
-
-        std::string home_dir() {
-            if (const char* home = getenv("HOME"); home && *home)
-                return home;
-            if (const passwd* pw = getpwuid(getuid()); pw && pw->pw_dir)
-                return pw->pw_dir;
-            return {};
-        }
-
-    } // namespace
 
     void ContactStore::set(std::vector<VCard> contacts) {
         contacts_ = std::move(contacts);
@@ -134,10 +122,9 @@ namespace tether::bluetooth {
     }
 
     std::string contacts_path(Retention mode) {
-        std::string home = home_dir();
-        if (home.empty() || mode == Retention::None)
+        const std::filesystem::path dir = paths::data_dir();
+        if (dir.empty() || mode == Retention::None)
             return {};
-        const std::filesystem::path dir = std::filesystem::path(home) / ".local" / "share" / "tether";
         return (dir / (mode == Retention::Encrypted ? "contacts.json.enc" : "contacts.json")).string();
     }
 

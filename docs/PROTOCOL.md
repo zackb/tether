@@ -410,14 +410,14 @@ a `tetherd` left running across a package upgrade.
 #### `bt_set_ancs_content` (Client -> Daemon, broadcast)
 **Payload**: `{"command": "bt_set_ancs_content", "enabled": true}`
 Turns notification content mirroring on or off. Persists to
-`ancs_content_enabled` in `~/.config/tether/bluetooth.json`, applies to the running ANCS
+`ancs_content_enabled` in `$XDG_CONFIG_HOME/tether/bluetooth.json`, applies to the running ANCS
 client without a restart, and answers with a fresh `bt_status`. `bt_status` carries
 `ancs_enabled` and `ancs_content_enabled` so a client can render the current state.
 
 #### `bt_set_retention` (Client -> Daemon, broadcast)
 **Payload**: `{"command": "bt_set_retention", "retention": "encrypted"}`
 One of `encrypted` (the default), `plaintext`, or `none`. Persists to `retention` in
-`~/.config/tether/bluetooth.json` and answers with a fresh `bt_status`.
+`$XDG_CONFIG_HOME/tether/bluetooth.json` and answers with a fresh `bt_status`.
 
 Changing the mode moves what is already stored to the path the new mode uses; `none`
 deletes the message journal and the contact cache outright. `bt_status` carries

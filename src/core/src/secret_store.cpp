@@ -1,6 +1,7 @@
 #include "tether/secret_store.hpp"
 #include "tether/base64.hpp"
 #include "tether/log.hpp"
+#include "tether/paths.hpp"
 
 #include <chrono>
 #include <cstdlib>
@@ -10,7 +11,6 @@
 #include <mutex>
 #include <openssl/evp.h>
 #include <openssl/rand.h>
-#include <pwd.h>
 #include <unistd.h>
 
 namespace tether {
@@ -63,19 +63,11 @@ namespace tether {
                 return &schema;
             }
 
-            std::string home_dir() {
-                if (const char* home = getenv("HOME"); home && *home)
-                    return home;
-                if (const passwd* pw = getpwuid(getuid()); pw && pw->pw_dir)
-                    return pw->pw_dir;
-                return {};
-            }
-
             std::string keyfile_path() {
-                std::string home = home_dir();
-                if (home.empty())
+                const std::filesystem::path dir = paths::config_dir();
+                if (dir.empty())
                     return {};
-                return (std::filesystem::path(home) / ".config" / "tether" / "store.key").string();
+                return (dir / "store.key").string();
             }
 
             int64_t now_seconds() {

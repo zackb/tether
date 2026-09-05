@@ -13,6 +13,13 @@ namespace {
     const bool sandboxed = [] {
         setenv("DBUS_SESSION_BUS_ADDRESS", "unix:path=/nonexistent/tether-test", 1);
 
+        // Store paths follow the XDG variables before $HOME, so a developer who
+        // sets them would otherwise have the suite writing into their real
+        // config and data directories.
+        unsetenv("XDG_CONFIG_HOME");
+        unsetenv("XDG_DATA_HOME");
+        unsetenv("XDG_STATE_HOME");
+
         const auto home = std::filesystem::temp_directory_path() / ("tether-test-home-" + std::to_string(::getpid()));
         std::error_code ec;
         std::filesystem::create_directories(home, ec);

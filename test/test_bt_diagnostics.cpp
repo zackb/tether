@@ -77,8 +77,14 @@ TEST(BtDiagnostics, RedactsHomeAndRuntimeDirectories) {
     tether::testing::ScopedEnv runtime("XDG_RUNTIME_DIR", std::string("/run/user/1000"));
     Redactor r;
     EXPECT_EQ(r.text("staged /run/user/1000/tether/out.bmsg"), "staged <runtime>/tether/out.bmsg");
-    EXPECT_EQ(r.text("wrote /home/someone/.config/tether/bluetooth.json"),
-              "wrote <home>/.config/tether/bluetooth.json");
+    EXPECT_EQ(r.text("wrote /home/someone/.config/tether/bluetooth.json"), "wrote <config>/bluetooth.json");
+}
+
+TEST(BtDiagnostics, RedactsAConfigDirectoryOutsideTheHome) {
+    tether::testing::ScopedEnv home("HOME", std::string("/home/someone"));
+    tether::testing::ScopedEnv config("XDG_CONFIG_HOME", std::string("/elsewhere/config"));
+    Redactor r;
+    EXPECT_EQ(r.text("wrote /elsewhere/config/tether/bluetooth.json"), "wrote <config>/bluetooth.json");
 }
 
 TEST(BtDiagnostics, RedactsRuntimeDirectoryWithoutTheEnvironmentVariable) {

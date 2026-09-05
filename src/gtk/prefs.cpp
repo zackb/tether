@@ -4,16 +4,17 @@
 #include <fstream>
 #include <glib.h>
 #include <tether/log.hpp>
+#include <tether/paths.hpp>
 
 namespace tether::ui {
 
     namespace {
 
         std::string prefs_path() {
-            const char* home = g_get_home_dir();
-            if (!home || !*home)
+            const std::filesystem::path dir = tether::paths::config_dir();
+            if (dir.empty())
                 return {};
-            return (std::filesystem::path(home) / ".config" / "tether" / "gtk.json").string();
+            return (dir / "gtk.json").string();
         }
 
     } // namespace

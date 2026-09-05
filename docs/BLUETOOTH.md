@@ -96,7 +96,8 @@ that can never connect and a bond that never looks dual.
 
 ## Pairing strategies
 
-Two ways to make the bond, recorded in `auth_strategy` in `~/.config/tether/bluetooth.json`.
+Two ways to make the bond, recorded in `auth_strategy` in `$XDG_CONFIG_HOME/tether/bluetooth.json`
+(`~/.config/tether` by default).
 
 **Connect-first** (`connect-first`, the default) calls `Device1.Connect()` on the unpaired
 device. That is a *profile* connect, not an authentication request: it brings the ACL up, the
@@ -664,7 +665,7 @@ replayed backlog arrived stamped all alike -- see issue #48.
 
 ### Group messages
 
-Off by default, `group_messages_enabled` in `~/.config/tether/bluetooth.json`. It also
+Off by default, `group_messages_enabled` in `$XDG_CONFIG_HOME/tether/bluetooth.json`. It also
 needs `ancs_content_enabled` (on by default, `tether --bt-ancs-content off` to disable),
 so group support cannot work without content mirroring.
 
@@ -676,7 +677,7 @@ the group's name. Neither form contains a member list...
 - Correlation is bounded to a 30-second window, and two notifications with the same
   text are refused instead of guessing, the wrong choice would put a message in the wrong conversation and send a reply at the wrong people.
 - An unnamed group is repliable only when **every** participant name resolves to exactly one contact address. A name matching several contacts is refused.
-- A named group stays read-only until we figure out the member list in `~/.config/tether/groups.json`.
+- A named group stays read-only until we figure out the member list in `$XDG_CONFIG_HOME/tether/groups.json`.
     That list affects Tether's reply routing only and never modifies the group on the phone.
 - iOS reports nothing when a member is added or removed, so an unknown sender is the only available signal that a member list has gone stale.
 - Because iOS supplies a name but no conversation identifier, distinct named groups
@@ -1100,7 +1101,7 @@ The key is 32 bytes from `RAND_bytes`, kept in the desktop secret service
 `secret_service_search_sync` **without** `SECRET_SEARCH_UNLOCK`:
 `secret_password_lookup_sync` would raise an unlock prompt, which is wrong for a
 user unit that can start before the graphical session. On a host with no secret
-service on the bus at all the key falls back to `~/.config/tether/store.key`,
+service on the bus at all the key falls back to `$XDG_CONFIG_HOME/tether/store.key`,
 mode 0600 — that stops a backup or a synced home, not another process running as
 you, and it is never written when a wallet is merely locked.
 
