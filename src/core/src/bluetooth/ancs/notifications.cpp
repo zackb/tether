@@ -178,6 +178,32 @@ namespace tether::bluetooth::ancs {
         return out;
     }
 
+    LaunchTarget launch_target(const std::string& app_id) {
+        static const std::map<std::string, LaunchTarget> by_app_id{
+            {"com.apple.mobilemail", {"mailto", {}}},
+            {"com.facebook.Messenger", {"", {"caprine", "com.sindresorhus.Caprine"}}},
+            {"com.google.Gmail", {"mailto", {}}},
+            {"com.hammerandchisel.discord", {"discord", {"discord", "com.discordapp.Discord"}}},
+            {"com.microsoft.Office.Outlook", {"mailto", {}}},
+            {"com.spotify.client", {"spotify", {"spotify", "com.spotify.Client"}}},
+            {"com.tinyspeck.chatlyio", {"slack", {"slack", "com.slack.Slack"}}},
+            {"net.whatsapp.WhatsApp",
+             {"whatsapp",
+              {"com.rtosta.zapzap",
+               "io.github.mimbrero.WhatsAppDesktop",
+               "com.github.eneshecan.WhatsAppForLinux",
+               "whatsapp-for-linux"}}},
+            {"org.telegram.messenger", {"tg", {"org.telegram.desktop", "telegramdesktop", "telegram-desktop"}}},
+            {"org.whispersystems.signal", {"sgnl", {"signal-desktop", "signal", "org.signal.Signal"}}},
+            {"ph.telegra.Telegraph", {"tg", {"org.telegram.desktop", "telegramdesktop", "telegram-desktop"}}},
+            {"us.zoom.videomeetings", {"zoommtg", {"Zoom", "us.zoom.Zoom"}}},
+        };
+
+        if (auto found = by_app_id.find(app_id); found != by_app_id.end())
+            return found->second;
+        return {};
+    }
+
     nlohmann::json to_json(const Notification& notification) {
         return {
             {"uid", notification.uid},

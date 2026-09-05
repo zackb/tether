@@ -299,7 +299,8 @@ int main(int argc, char** argv) {
                                      tether::bluetooth::ancs::icon_candidates(notification),
                                      notification.silent,
                                      "",
-                                     otp});
+                                     otp,
+                                     notification.app_id});
                 },
                 [](uint32_t uid) {
                     nlohmann::json event;

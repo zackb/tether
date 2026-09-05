@@ -42,5 +42,5 @@ esac
 command -v msgfmt >/dev/null || { echo "ci-deps: msgfmt missing; translations would be skipped" >&2; exit 1; }
 
 pkg-config --print-errors --exists \
-    "wayland-client avahi-client openssl glib-2.0 gio-2.0 libsecret-1 gtk+-3.0 gtk-layer-shell-0 libnotify"
+    "wayland-client avahi-client openssl glib-2.0 gio-2.0 gio-unix-2.0 libsecret-1 gtk+-3.0 gtk-layer-shell-0 libnotify"
 echo "==> ready: gtk $(pkg-config --modversion gtk+-3.0), openssl $(pkg-config --modversion openssl)"

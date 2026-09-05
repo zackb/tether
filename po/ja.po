@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: tether\n"
 "Report-Msgid-Bugs-To: zack@bartel.com\n"
-"POT-Creation-Date: 2026-09-05 11:01-0700\n"
+"POT-Creation-Date: 2026-09-05 13:35-0700\n"
 "PO-Revision-Date: 2026-08-23\n"
 "Last-Translator: Tether project\n"
 "Language-Team: Japanese\n"
@@ -199,7 +199,11 @@ msgid ""
 "Write the tether-btclass@.service unit, which sets the Bluetooth adapter "
 "class iOS requires. Needs root, and never enables it. Needed only for "
 "portable builds; the distro packages install it."
-msgstr "iOS が要求する Bluetooth アダプターのクラスを設定する tether-btclass@.service ユニットを書き出します。root が必要で、有効化は行いません。ポータブルビルドでのみ必要です。ディストリビューションのパッケージは自分でインストールします。"
+msgstr ""
+"iOS が要求する Bluetooth アダプターのクラスを設定する tether-"
+"btclass@.service ユニットを書き出します。root が必要で、有効化は行いません。"
+"ポータブルビルドでのみ必要です。ディストリビューションのパッケージは自分でイ"
+"ンストールします。"
 
 #: src/cli/main.cpp
 msgid "Accept a pending pairing request locally."
@@ -265,7 +269,10 @@ msgid ""
 "\n"
 "It is not enabled. Run 'systemctl daemon-reload', then 'systemctl enable --"
 "now tether-btclass@hci0' to apply it.\n"
-msgstr "\n有効にはなっていません。適用するには 'systemctl daemon-reload' を実行し、続けて 'systemctl enable --now tether-btclass@hci0' を実行してください。\n"
+msgstr ""
+"\n"
+"有効にはなっていません。適用するには 'systemctl daemon-reload' を実行し、続け"
+"て 'systemctl enable --now tether-btclass@hci0' を実行してください。\n"
 
 #: src/cli/main.cpp
 msgid "Could not read Bluetooth status from the daemon.\n"
@@ -1220,6 +1227,11 @@ msgstr "返信"
 #: src/daemon/notification.cpp
 msgid "Copy Code"
 msgstr "コードをコピー"
+
+#: src/daemon/notification.cpp
+#, c++-format
+msgid "Open in {}"
+msgstr "{} で開く"
 
 #: src/gtk/calls_view.cpp
 msgid "Incoming"

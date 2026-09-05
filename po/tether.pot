@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: tether 0.2.25\n"
 "Report-Msgid-Bugs-To: zack@bartel.com\n"
-"POT-Creation-Date: 2026-09-05 11:01-0700\n"
+"POT-Creation-Date: 2026-09-05 13:35-0700\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -1113,6 +1113,11 @@ msgstr ""
 
 #: src/daemon/notification.cpp
 msgid "Copy Code"
+msgstr ""
+
+#: src/daemon/notification.cpp
+#, c++-format
+msgid "Open in {}"
 msgstr ""
 
 #: src/gtk/calls_view.cpp

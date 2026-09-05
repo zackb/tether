@@ -81,6 +81,18 @@ namespace tether::bluetooth::ancs {
     // own logo, then something generic for its category.
     std::vector<std::string> icon_candidates(const Notification& notification);
 
+    // How to find the Linux counterpart of an iPhone app.
+    struct LaunchTarget {
+        // No "://".
+        std::string uri_scheme;
+        // No ".desktop" suffix.
+        std::vector<std::string> desktop_ids;
+
+        bool empty() const { return uri_scheme.empty() && desktop_ids.empty(); }
+    };
+
+    LaunchTarget launch_target(const std::string& app_id);
+
     nlohmann::json to_json(const Notification& notification);
 
 } // namespace tether::bluetooth::ancs

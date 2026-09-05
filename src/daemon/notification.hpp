@@ -20,6 +20,8 @@ namespace tether {
         std::string reply_thread;
         // OTP found in this notification, or empty. Non-empty adds a copy action.
         std::string otp_code;
+        // Originating iPhone bundle id.
+        std::string app_id;
     };
 
     class DesktopNotifier {
