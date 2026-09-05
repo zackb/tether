@@ -2,6 +2,7 @@
 
 #include <tether/i18n.hpp>
 
+#include <gio/gdesktopappinfo.h>
 #include <gio/gio.h>
 #include <glib.h>
 #include <libnotify/notify.h>
@@ -9,6 +10,7 @@
 #include <functional>
 #include <mutex>
 #include <string>
+#include <tether/bluetooth/ancs/notifications.hpp>
 #include <tether/log.hpp>
 #include <tether/net.hpp>
 #include <thread>
@@ -155,6 +157,71 @@ namespace tether {
                 open_gui_thread(action->payload);
         }
 
+        // Whether this process can see the host's installed applications. A flatpak sandbox cannot.
+        bool sandboxed() {
+            static const bool yes = std::filesystem::exists("/.flatpak-info");
+            return yes;
+        }
+
+        // How to open the Linux counterpart of an iPhone app.
+        struct AppLauncher {
+            // "scheme://" URI, a "<id>.desktop" entry, or empty when
+            std::string payload;
+            std::string name;
+        };
+
+        AppLauncher resolve_launcher(const std::string& app_id) {
+            const auto target = bluetooth::ancs::launch_target(app_id);
+
+            if (!target.uri_scheme.empty()) {
+                if (GAppInfo* info = g_app_info_get_default_for_uri_scheme(target.uri_scheme.c_str())) {
+                    // Launch the handler itself rather than a bare "scheme://" the app
+                    // would have to make sense of.
+                    const char* id = g_app_info_get_id(info);
+                    const char* name = g_app_info_get_display_name(info);
+                    AppLauncher launcher{id ? id : target.uri_scheme + "://", name ? name : ""};
+                    g_object_unref(info);
+                    return launcher;
+                }
+                if (sandboxed())
+                    return {target.uri_scheme + "://", ""};
+            }
+
+            for (const auto& id : target.desktop_ids) {
+                const std::string entry = id + ".desktop";
+                if (GDesktopAppInfo* info = g_desktop_app_info_new(entry.c_str())) {
+                    const char* name = g_app_info_get_display_name(G_APP_INFO(info));
+                    AppLauncher launcher{entry, name ? name : ""};
+                    g_object_unref(info);
+                    return launcher;
+                }
+            }
+            return {};
+        }
+
+        void on_open_app_action(NotifyNotification*, char*, gpointer user_data) {
+            auto* action = static_cast<NotificationActionData*>(user_data);
+            if (!action)
+                return;
+
+            if (!action->payload.ends_with(".desktop")) {
+                launch_uri(action->payload);
+                return;
+            }
+
+            GDesktopAppInfo* info = g_desktop_app_info_new(action->payload.c_str());
+            if (!info) {
+                debug::log(ERR, "No desktop entry '{}' to open", action->payload);
+                return;
+            }
+            GError* error = nullptr;
+            if (!g_app_info_launch(G_APP_INFO(info), nullptr, nullptr, &error)) {
+                debug::log(ERR, "Failed to launch {}: {}", action->payload, error ? error->message : "unknown");
+                g_clear_error(&error);
+            }
+            g_object_unref(info);
+        }
+
         void on_notification_action(NotifyNotification*, char*, gpointer user_data) {
             auto* action = static_cast<NotificationActionData*>(user_data);
             if (!action) {
@@ -230,7 +297,9 @@ namespace tether {
             set_identity(notification, spec->app_name);
             notify_notification_set_urgency(notification, spec->quiet ? NOTIFY_URGENCY_LOW : NOTIFY_URGENCY_NORMAL);
 
-            const bool has_actions = !spec->reply_thread.empty() || !spec->otp_code.empty();
+            const AppLauncher launcher = spec->app_id.empty() ? AppLauncher{} : resolve_launcher(spec->app_id);
+            const bool has_actions =
+                !spec->reply_thread.empty() || !spec->otp_code.empty() || !launcher.payload.empty();
             if (has_actions)
                 g_signal_connect(notification, "closed", G_CALLBACK(on_notification_closed), nullptr);
 
@@ -255,6 +324,17 @@ namespace tether {
                                                _("Copy Code"),
                                                on_copy_code_action,
                                                new NotificationActionData{spec->otp_code},
+                                               free_action_data);
+            }
+
+            if (!launcher.payload.empty()) {
+                const std::string label =
+                    tr_format(_("Open in {}"), launcher.name.empty() ? spec->app_name : launcher.name);
+                notify_notification_add_action(notification,
+                                               "open-app",
+                                               label.c_str(),
+                                               on_open_app_action,
+                                               new NotificationActionData{launcher.payload},
                                                free_action_data);
             }
 

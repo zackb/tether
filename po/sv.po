@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: tether\n"
 "Report-Msgid-Bugs-To: zack@bartel.com\n"
-"POT-Creation-Date: 2026-09-05 11:01-0700\n"
+"POT-Creation-Date: 2026-09-05 13:35-0700\n"
 "PO-Revision-Date: 2026-08-23\n"
 "Last-Translator: Tether project\n"
 "Language-Team: Swedish\n"
@@ -200,7 +200,10 @@ msgid ""
 "Write the tether-btclass@.service unit, which sets the Bluetooth adapter "
 "class iOS requires. Needs root, and never enables it. Needed only for "
 "portable builds; the distro packages install it."
-msgstr "Skriver enheten tether-btclass@.service, som sätter den Bluetooth-adapterklass som iOS kräver. Kräver root och aktiverar den aldrig. Behövs bara för portabla byggen; distributionspaketen installerar den själva."
+msgstr ""
+"Skriver enheten tether-btclass@.service, som sätter den Bluetooth-"
+"adapterklass som iOS kräver. Kräver root och aktiverar den aldrig. Behövs "
+"bara för portabla byggen; distributionspaketen installerar den själva."
 
 #: src/cli/main.cpp
 msgid "Accept a pending pairing request locally."
@@ -266,7 +269,10 @@ msgid ""
 "\n"
 "It is not enabled. Run 'systemctl daemon-reload', then 'systemctl enable --"
 "now tether-btclass@hci0' to apply it.\n"
-msgstr "\nDen är inte aktiverad. Kör 'systemctl daemon-reload' och sedan 'systemctl enable --now tether-btclass@hci0' för att tillämpa den.\n"
+msgstr ""
+"\n"
+"Den är inte aktiverad. Kör 'systemctl daemon-reload' och sedan 'systemctl "
+"enable --now tether-btclass@hci0' för att tillämpa den.\n"
 
 #: src/cli/main.cpp
 msgid "Could not read Bluetooth status from the daemon.\n"
@@ -1228,6 +1234,11 @@ msgstr "Svara"
 #: src/daemon/notification.cpp
 msgid "Copy Code"
 msgstr "Kopiera kod"
+
+#: src/daemon/notification.cpp
+#, c++-format
+msgid "Open in {}"
+msgstr "Öppna i {}"
 
 #: src/gtk/calls_view.cpp
 msgid "Incoming"

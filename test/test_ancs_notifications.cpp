@@ -52,6 +52,25 @@ TEST(AncsIcons, AlwaysEndsWithAnIconThatShipsWithTether) {
     }
 }
 
+TEST(AncsLaunchTarget, OffersAWayToReachTheLinuxApp) {
+    const auto whatsapp = launch_target("net.whatsapp.WhatsApp");
+    EXPECT_EQ(whatsapp.uri_scheme, "whatsapp");
+    EXPECT_FALSE(whatsapp.desktop_ids.empty());
+
+    const auto telegram = launch_target("ph.telegra.Telegraph");
+    EXPECT_EQ(telegram.uri_scheme, launch_target("org.telegram.messenger").uri_scheme)
+        << "both Telegram bundle ids reach the same client";
+
+    EXPECT_FALSE(launch_target("org.whispersystems.signal").empty());
+}
+
+TEST(AncsLaunchTarget, IsEmptyWithoutALinuxCounterpart) {
+    EXPECT_TRUE(launch_target("com.example.unheardof").empty());
+    EXPECT_TRUE(launch_target("").empty());
+    // Messages notifications reply through tether-gtk instead.
+    EXPECT_TRUE(launch_target(APP_ID_MESSAGES).empty());
+}
+
 TEST(AncsRegistry, RenameAppTouchesOnlyThatApp) {
     NotificationRegistry registry;
     registry.store(make(1, "com.burbn.instagram"));
