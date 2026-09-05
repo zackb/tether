@@ -1,26 +1,14 @@
 #include "tether/bluetooth/config.hpp"
 #include "tether/log.hpp"
+#include "tether/paths.hpp"
 
 #include <cstdlib>
 #include <filesystem>
 #include <fstream>
 #include <nlohmann/json.hpp>
-#include <pwd.h>
 #include <unistd.h>
 
 namespace tether::bluetooth {
-
-    namespace {
-
-        std::string home_dir() {
-            if (const char* home = getenv("HOME"); home && *home)
-                return home;
-            if (const passwd* pw = getpwuid(getuid()); pw && pw->pw_dir)
-                return pw->pw_dir;
-            return {};
-        }
-
-    } // namespace
 
     namespace {
         // 2 since 0.2.24 how to tell "never had a retention setting" from "lost one".
@@ -36,10 +24,10 @@ namespace tether::bluetooth {
     }
 
     std::string config_path() {
-        std::string home = home_dir();
-        if (home.empty())
+        const std::filesystem::path dir = paths::config_dir();
+        if (dir.empty())
             return {};
-        return (std::filesystem::path(home) / ".config" / "tether" / "bluetooth.json").string();
+        return (dir / "bluetooth.json").string();
     }
 
     std::string serialize_config(const Config& config) {

@@ -4,6 +4,7 @@
 #include "tether/bluetooth/config.hpp"
 #include "tether/bluetooth/monitor.hpp"
 #include "tether/bluetooth/pairing.hpp"
+#include "tether/paths.hpp"
 #include "tether/version.hpp"
 
 #include <algorithm>
@@ -169,6 +170,11 @@ namespace tether::bluetooth {
         if (const char* runtime = std::getenv("XDG_RUNTIME_DIR"); runtime && *runtime)
             out = replace_literal(out, runtime, "<runtime>");
         out = replace_all(out, kRuntimeDir, [](const std::string&) { return "<runtime>"; });
+        // Before $HOME, so an XDG directory outside the home is still covered.
+        if (const std::string config = paths::config_dir().string(); !config.empty())
+            out = replace_literal(out, config, "<config>");
+        if (const std::string data = paths::data_dir().string(); !data.empty())
+            out = replace_literal(out, data, "<data>");
         if (const char* home = std::getenv("HOME"); home && *home)
             out = replace_literal(out, home, "<home>");
 

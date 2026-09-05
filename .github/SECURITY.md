@@ -55,7 +55,8 @@ Check what you are running with `tether --version` and compare against the
 The parts of Tether where a bug is a security bug:
 
 - **Pairing and TLS.** Certificate and key handling
-  (`~/.config/tether/cert.pem`, `key.pem`, `known_hosts.json`), the pairing
+  (`cert.pem`, `key.pem`, `known_hosts.json` under `$XDG_CONFIG_HOME/tether`,
+  `~/.config/tether` by default), the pairing
   approval flow, and anything that lets an unpaired peer be trusted, or a
   paired peer be impersonated.
 - **Bluetooth.** ANCS notification and MAP message handling, and the parsers

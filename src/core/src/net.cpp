@@ -26,6 +26,7 @@
 #include "tether/discovery.hpp"
 #include "tether/file_transfer.hpp"
 #include "tether/otp.hpp"
+#include "tether/paths.hpp"
 #include "tether/wayland.hpp"
 #include <algorithm>
 #include <atomic>
@@ -774,17 +775,9 @@ namespace tether {
     }
 
     std::string get_state_dir() {
-        const char* xdg_state = std::getenv("XDG_STATE_HOME");
-        const char* home = std::getenv("HOME");
-        std::filesystem::path base;
-        if (xdg_state && *xdg_state)
-            base = xdg_state;
-        else if (home && *home)
-            base = std::filesystem::path(home) / ".local" / "state";
-        else
-            base = "/tmp";
-
-        std::filesystem::path tether_dir = base / "tether";
+        std::filesystem::path tether_dir = paths::state_dir();
+        if (tether_dir.empty())
+            tether_dir = "/tmp/tether";
         std::filesystem::create_directories(tether_dir);
         return tether_dir.string();
     }

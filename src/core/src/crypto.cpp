@@ -8,9 +8,9 @@
 #include <openssl/pem.h>
 #include <openssl/rsa.h>
 #include <openssl/x509.h>
-#include <pwd.h>
 #include <sstream>
 #include <tether/log.hpp>
+#include <tether/paths.hpp>
 #include <unistd.h>
 
 namespace tether {
@@ -30,21 +30,13 @@ namespace tether {
     SSL_CTX* Crypto::get_server_context() { return server_ctx_; }
     SSL_CTX* Crypto::get_client_context() { return client_ctx_; }
 
-    static std::string home_dir() {
-        if (const char* home = getenv("HOME"); home && *home) {
-            return home;
-        }
-        if (const passwd* pw = getpwuid(getuid()); pw && pw->pw_dir) {
-            return pw->pw_dir;
-        }
-        throw std::runtime_error("Cannot determine home directory (HOME unset and no passwd entry)");
-    }
-
     bool Crypto::init() {
         if (server_ctx_ && client_ctx_)
             return true;
 
-        std::filesystem::path config_dir = std::filesystem::path(home_dir()) / ".config" / "tether";
+        const std::filesystem::path config_dir = paths::config_dir();
+        if (config_dir.empty())
+            throw std::runtime_error("Cannot determine home directory (HOME unset and no passwd entry)");
         std::filesystem::create_directories(config_dir);
         cert_path_ = (config_dir / "cert.pem").string();
         key_path_ = (config_dir / "key.pem").string();

@@ -6,9 +6,8 @@
 #                          and the key the encrypted store was written with
 #   tether-reset.sh all    both, plus the daemon log
 #
-# Paths are spelled out rather than derived from XDG_CONFIG_HOME/XDG_DATA_HOME
-# because the daemon itself builds them from $HOME; following the spec here
-# would delete files nothing ever wrote.
+# Paths follow the same XDG variables the daemon resolves, so a custom
+# XDG_CONFIG_HOME or XDG_DATA_HOME is cleaned rather than skipped.
 
 set -uo pipefail
 
@@ -31,8 +30,8 @@ esac
 red=$'\e[31m'; grn=$'\e[32m'; ylw=$'\e[33m'; dim=$'\e[2m'; rst=$'\e[0m'
 [[ -t 1 ]] || { red=; grn=; ylw=; dim=; rst=; }
 
-config="$HOME/.config/tether"
-share="$HOME/.local/share/tether"
+config="${XDG_CONFIG_HOME:-$HOME/.config}/tether"
+share="${XDG_DATA_HOME:-$HOME/.local/share}/tether"
 state="${XDG_STATE_HOME:-$HOME/.local/state}/tether"
 runtime="${XDG_RUNTIME_DIR:-/run/user/$(id -u)}/tether"
 

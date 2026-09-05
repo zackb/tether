@@ -1,5 +1,6 @@
 #include "tether/bluetooth/groups.hpp"
 #include <tether/i18n.hpp>
+#include <tether/paths.hpp>
 
 #include <algorithm>
 #include <cctype>
@@ -7,20 +8,11 @@
 #include <filesystem>
 #include <fstream>
 #include <nlohmann/json.hpp>
-#include <pwd.h>
 #include <unistd.h>
 
 namespace tether::bluetooth {
 
     namespace {
-
-        std::string home_dir() {
-            if (const char* home = getenv("HOME"); home && *home)
-                return home;
-            if (const passwd* pw = getpwuid(getuid()); pw && pw->pw_dir)
-                return pw->pw_dir;
-            return {};
-        }
 
         std::string trim(const std::string& text) {
             size_t begin = text.find_first_not_of(" \t\r\n");
@@ -220,10 +212,10 @@ namespace tether::bluetooth {
     }
 
     std::string roster_path() {
-        std::string home = home_dir();
-        if (home.empty())
+        const std::filesystem::path dir = paths::config_dir();
+        if (dir.empty())
             return {};
-        return (std::filesystem::path(home) / ".config" / "tether" / "groups.json").string();
+        return (dir / "groups.json").string();
     }
 
     GroupRoster load_rosters() {

@@ -25,6 +25,7 @@ add_executable(tether_test
     test_log.cpp
     test_net.cpp
     test_otp.cpp
+    test_paths.cpp
     test_message_format.cpp
     ../src/gtk/message_format.cpp
 )
