@@ -92,7 +92,81 @@ namespace tether::ui {
     background-color: alpha(@theme_selected_bg_color, 0.12);
 }
 )CSS";
+        // xdg-desktop-portal Settings: 0 = no preference, 1 = dark, 2 = light.
+        void apply_color_scheme(guint32 scheme) {
+            GtkSettings* settings = gtk_settings_get_default();
+            if (!settings)
+                return;
+            if (scheme == 1 || scheme == 2)
+                g_object_set(settings, "gtk-application-prefer-dark-theme", scheme == 1 ? TRUE : FALSE, nullptr);
+        }
+
+        void read_color_scheme(GDBusProxy* proxy) {
+            GError* error = nullptr;
+            GVariant* result =
+                g_dbus_proxy_call_sync(proxy,
+                                       "Read",
+                                       g_variant_new("(ss)", "org.freedesktop.appearance", "color-scheme"),
+                                       G_DBUS_CALL_FLAGS_NONE,
+                                       -1,
+                                       nullptr,
+                                       &error);
+            if (!result) {
+                g_clear_error(&error);
+                return;
+            }
+            // Read returns the value boxed twice: (v) holding a v holding the uint32.
+            GVariant* outer = nullptr;
+            g_variant_get(result, "(v)", &outer);
+            GVariant* inner = g_variant_get_variant(outer);
+            if (g_variant_is_of_type(inner, G_VARIANT_TYPE_UINT32))
+                apply_color_scheme(g_variant_get_uint32(inner));
+            g_variant_unref(inner);
+            g_variant_unref(outer);
+            g_variant_unref(result);
+        }
+
+        void on_setting_changed(GDBusProxy*, const gchar*, const gchar* signal_name, GVariant* params, gpointer) {
+            if (g_strcmp0(signal_name, "SettingChanged") != 0)
+                return;
+            const gchar* nspace = nullptr;
+            const gchar* key = nullptr;
+            GVariant* value = nullptr;
+            g_variant_get(params, "(&s&sv)", &nspace, &key, &value);
+            if (g_strcmp0(nspace, "org.freedesktop.appearance") == 0 && g_strcmp0(key, "color-scheme") == 0 &&
+                g_variant_is_of_type(value, G_VARIANT_TYPE_UINT32))
+                apply_color_scheme(g_variant_get_uint32(value));
+            g_variant_unref(value);
+        }
     } // namespace
+
+    void follow_system_color_scheme() {
+        // An explicit GTK_THEME overrides.
+        if (g_getenv("GTK_THEME"))
+            return;
+
+        static GDBusProxy* proxy = nullptr;
+        if (proxy)
+            return;
+
+        GError* error = nullptr;
+        proxy = g_dbus_proxy_new_for_bus_sync(G_BUS_TYPE_SESSION,
+                                              G_DBUS_PROXY_FLAGS_DO_NOT_LOAD_PROPERTIES,
+                                              nullptr,
+                                              "org.freedesktop.portal.Desktop",
+                                              "/org/freedesktop/portal/desktop",
+                                              "org.freedesktop.portal.Settings",
+                                              nullptr,
+                                              &error);
+        if (!proxy) {
+            // no portal
+            g_clear_error(&error);
+            return;
+        }
+
+        g_signal_connect(proxy, "g-signal", G_CALLBACK(on_setting_changed), nullptr);
+        read_color_scheme(proxy);
+    }
 
     void install_style() {
         GdkScreen* screen = gdk_screen_get_default();

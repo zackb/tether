@@ -8,6 +8,11 @@ namespace tether::ui {
     // Loads the application stylesheet.
     void install_style();
 
+    // Respects the desktop's light/dark preference from the settings portal.
+    // GTK3 has no built-in listener for it, so GNOME's "Dark" style would
+    // otherwise render light Adwaita.
+    void follow_system_color_scheme();
+
     std::string escape_markup(const std::string& text);
 
     // Normalized case- and accent-insensitive form of a string.
