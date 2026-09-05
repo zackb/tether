@@ -191,6 +191,7 @@ namespace {
 
         tether::Crypto::instance().init();
         install_style();
+        follow_system_color_scheme();
 
         GtkWidget* window = gtk_application_window_new(app);
         gtk_window_set_title(GTK_WINDOW(window), _("Tether"));
