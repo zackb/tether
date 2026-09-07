@@ -23,29 +23,34 @@
 
 ## Features
 
-| Feature | Status |
-|---------|--------|
-| **Clipboard Sync** | ✅ Stable |
-| **File Transfer** | ✅ Stable |
-| **iOS App** | ✅ Stable |
-| **Browser Extension** | ✅ Stable |
-| **Mail Extension** | ✅ Stable |
-| **Messages (SMS/iMessage)** | 🧪 Beta |
-| **Notification Mirroring** | 🧪 Beta |
-| **Phone Calls** | 🧪 Alpha |
-| **TOTP/OTP Vault** | 🗓️ Planning |
+| Feature                     | Status      |
+| --------------------------- | ----------- |
+| **Clipboard Sync**          | ✅ Stable   |
+| **File Transfer**           | ✅ Stable   |
+| **iOS App**                 | ✅ Stable   |
+| **Browser Extension**       | ✅ Stable   |
+| **Mail Extension**          | ✅ Stable   |
+| **Messages (SMS/iMessage)** | 🧪 Beta     |
+| **Notification Mirroring**  | 🧪 Beta     |
+| **Phone Calls**             | 🧪 Alpha    |
+| **TOTP/OTP Vault**          | 🗓️ Planning |
 
 ### Clipboard Sync
+
 Text copied on your Linux desktop appears instantly on your iPhone, and vice versa.
 
 ### File Transfer
+
 Drag and drop files from Linux directly into the iPhone app, or receive files automatically to your `$XDG_DOWNLOAD_DIR` (~/Downloads).
 
 ### Messages and Notifications
+
 Read and reply to SMS and iMessage conversations, and see notifications from any app on the phone, on the Linux desktop.
 
 ### Device Pairing
+
 There are two ways tether communicates with the iPhone:
+
 - WiFi: for clipboard sync, file transfer, and OTP handling
 - Bluetooth: for Messages, Notifications, and Calls
 
@@ -54,33 +59,40 @@ You can use either or both, depending on your needs.
 Connections run over TLS 1.2 and both sides present a self-signed X.509 certificate.
 
 ### Phone Calls
-Place, answer and end calls on the iPhone from the desktop, complete with caller ID and the phone's carrier and signal. 
+
+Place, answer and end calls on the iPhone from the desktop, complete with caller ID and the phone's carrier and signal.
 The call audio stays on the iPhone. If you've used Linux long enough you know why (it sounds like "FalsePotty-o"). PulsAlsaWire is too hard to support across all deployment targets.
 
 ### OTP Handling
+
 Streamline two-factor authentication across your devices:
+
 - iOS Share Extension: Send OTP codes from your iPhone to your Linux clipboard.
 - Thunderbird Addon: Automatically parse OTP codes from incoming email messages.
 - Browser Extension: Autofill OTP codes into login forms from the iOS app or the mail extension.
 - SMS / iMessage: Detects OTP codes in incoming messages and notifications and offers them to the browser extension for autofill.
 
 ### Browser & Mail Extensions
+
 A unified WebExtension that works in Thunderbird/Betterbird and Firefox/Chromium browsers:
 
 - **Thunderbird/Betterbird:** Detects OTP codes in incoming emails (verification codes, 2FA messages) and copies them to the clipboard or sends them to the Tether daemon for vault storage
 - **Firefox/Chromium:** Autofills OTP codes into login forms by retrieving secrets from the Tether vault, with one-click verification for sites using TOTP-based 2FA
 
-The extension communicates with `tetherd` via native messaging. This allows users to autofill OTP codes into websites when the email arrives. 
+The extension communicates with `tetherd` via native messaging. This allows users to autofill OTP codes into websites when the email arrives.
 
 ## Installation
 
 ### iOS App
+
 - Get the app: [Tether - Linux Companion](https://apps.apple.com/us/app/tether-linux-companion/id6762097135)
 
 ### Browser Extension
+
 - Firefox: [Tether Browser Extension](https://addons.mozilla.org/en-US/firefox/addon/tether-browser-extension/)
 
 ### Mail Extension
+
 - Thunderbird: [Tether Mail Extension](https://addons.thunderbird.net/en-US/thunderbird/addon/tether-mail-extension/)
 
 ### Arch Linux
@@ -197,28 +209,13 @@ adapter or multiple adapters, change `bluetooth.adapters` accordingly.
 
 ### Build from Source
 
-On Debian/Ubuntu:
-
-```bash
-sudo apt install build-essential cmake ninja-build pkg-config git \
-    libwayland-dev libavahi-client-dev libssl-dev \
-    libglib2.0-dev libgtk-3-dev libgtk-layer-shell-dev libnotify-dev \
-    npm zip
-```
-
-On Fedora:
-
-```bash
-sudo dnf install gcc-c++ cmake ninja-build pkgconf-pkg-config git \
-    wayland-devel avahi-devel openssl-devel \
-    glib2-devel gtk3-devel gtk-layer-shell-devel libnotify-devel \
-    npm zip
-```
-
 ```bash
 # Clone the repository
 git clone https://github.com/zackb/tether.git
 cd tether
+
+# Install build dependencies (Arch, Fedora, Debian, or Ubuntu)
+sudo ./scripts/ci-deps.sh
 
 # Build and test
 make release
@@ -228,6 +225,7 @@ make install
 ```
 
 ## Quick Start
+
 1. On Linux, launch the GTK app (tether-gtk) or run the CLI to pair your iPhone.
 
 2. WiFi pair via the GUI or CLI:
@@ -253,7 +251,7 @@ make install
    Bluetooth outside of Tether, so running them is your call. The same steps
    appear in the GTK app's Devices page, with a "Copy commands" button.
 
-   *If* you have more than one Bluetooth controller, pick the one to use. Default is the first powered one.
+   _If_ you have more than one Bluetooth controller, pick the one to use. Default is the first powered one.
 
    ```bash
    tether --bt-adapter hci1     # or the controller's address, or "auto"
@@ -276,7 +274,6 @@ make install
    take a few minutes to appear; "Show iPhone Permissions" in the GTK app
    re-advertises so they show up again.
 
-
 ## Components
 
 1. **`tetherd`**: A background process running on Linux manages Bluetooth, TCP+TLS with pinned device certificates, and Wayland integration.
@@ -292,10 +289,12 @@ make install
 ## Requirements
 
 ### Linux
+
 - Wayland compositor with `wlr-data-control` protocol (Hyprland, Sway, [Fenriz](https://github.com/zackb/fenriz) etc.)
 - Build tools: cmake, ninja, pkg-config
 
 ### Dependencies
+
 - `wayland-client`
 - `openssl`
 - `pkg-config`
@@ -307,6 +306,7 @@ make install
 - `bluez`, `bluez-utils`, and `bluez-obex` (for messages and notifications)
 
 #### Bluetooth (for Messages and Notifications)
+
 - BlueZ 5.86+ must be running with experimental bearer API. `tether --bt-setup`
   prints the systemd drop-in command that enables it. Do this **before** pairing.
 - A controller with BR/EDR, LE, and advertising support.
@@ -316,10 +316,10 @@ make install
 
 WiFi features need two inbound ports on the Linux machine:
 
-| Port | Why |
-|------|-----|
+| Port     | Why                                                |
+| -------- | -------------------------------------------------- |
 | 5134/tcp | The `tetherd` mTLS listener the iPhone connects to |
-| 5353/udp | mDNS service discovery `avahi-daemon` |
+| 5353/udp | mDNS service discovery `avahi-daemon`              |
 
 ## Troubleshooting
 
@@ -366,11 +366,11 @@ Report security findings privately through
 not a public issue. See [SECURITY.md](.github/SECURITY.md).
 
 ## Acknowledgements
-* [ancs4linux](https://github.com/pzmarzly/ancs4linux) for pioneering the ANCS notifications technique.
-* [iphonebridge](https://github.com/gabrielmeir53/iphonebridge) for the research on MAP Messages.
-* [BlueFerry](https://github.com/erikwb/blueferry) for the [gold mine](https://github.com/erikwb/blueferry/blob/main/PROTOCOL.md).
-* [@orychalk](https://github.com/orychalk) for many many feature ideas, bug reports, beta testing.
 
+- [ancs4linux](https://github.com/pzmarzly/ancs4linux) for pioneering the ANCS notifications technique.
+- [iphonebridge](https://github.com/gabrielmeir53/iphonebridge) for the research on MAP Messages.
+- [BlueFerry](https://github.com/erikwb/blueferry) for the [gold mine](https://github.com/erikwb/blueferry/blob/main/PROTOCOL.md).
+- [@orychalk](https://github.com/orychalk) for many many feature ideas, bug reports, beta testing.
 
 Contributions are welcome!
 
