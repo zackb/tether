@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: tether\n"
 "Report-Msgid-Bugs-To: zack@bartel.com\n"
-"POT-Creation-Date: 2026-09-08 22:55-0700\n"
+"POT-Creation-Date: 2026-09-09 11:11+0000\n"
 "PO-Revision-Date: 2026-08-23\n"
 "Last-Translator: Tether project\n"
 "Language-Team: Czech\n"
@@ -236,6 +236,29 @@ msgstr ""
 "Potřebné pouze pro přenosná sestavení; balíčky distribuce ji instalují samy."
 
 #: src/cli/main.cpp
+msgid ""
+"Write the tetherd systemd user service for this user, and print how to "
+"enable it. Needed only for portable builds; the distro packages install it."
+msgstr ""
+"Zapíše uživatelskou službu systemd tetherd pro tohoto uživatele a vypíše, "
+"jak ji zapnout. Potřeba jen u přenosných sestavení; distribuční balíčky ji "
+"instalují samy."
+
+#: src/cli/main.cpp
+msgid "Remove the tetherd systemd user service this user installed."
+msgstr ""
+"Odebere uživatelskou službu systemd tetherd, kterou tento uživatel "
+"nainstaloval."
+
+#: src/cli/main.cpp
+msgid "Show what the daemon is doing: devices, links, and recent transfers."
+msgstr "Ukáže, co démon dělá: zařízení, spojení a poslední přenosy."
+
+#: src/cli/main.cpp
+msgid "List Wi-Fi pairing requests waiting to be accepted."
+msgstr "Vypíše žádosti o spárování přes Wi-Fi, které čekají na přijetí."
+
+#: src/cli/main.cpp
 msgid "Accept a pending pairing request locally."
 msgstr "Přijmout čekající žádost o spárování místně."
 
@@ -248,12 +271,36 @@ msgid "Send a pair_request over TCP to the daemon."
 msgstr "Odeslat pair_request démonovi přes TCP."
 
 #: src/cli/main.cpp
+msgid ""
+"Update tether, or print the command that does, when another tool owns this "
+"build."
+msgstr ""
+"Aktualizuje tether, nebo vypíše příkaz, který to udělá, když toto sestavení "
+"spravuje jiný nástroj."
+
+#: src/cli/main.cpp
+msgid ""
+"Remove tether, or print the command that does, when another tool owns this "
+"build."
+msgstr ""
+"Odebere tether, nebo vypíše příkaz, který to udělá, když toto sestavení "
+"spravuje jiný nástroj."
+
+#: src/cli/main.cpp
 msgid "tether - Wayland companion CLI"
 msgstr "tether - doprovodný nástroj příkazové řádky pro Wayland"
 
 #: src/cli/main.cpp
 msgid "Options:"
 msgstr "Volby:"
+
+#: src/cli/main.cpp
+msgid "Commands:"
+msgstr "Příkazy:"
+
+#: src/cli/main.cpp
+msgid "Any --bt-<name> flag, as a subcommand."
+msgstr "Libovolný přepínač --bt-<název> jako podpříkaz."
 
 #: src/cli/main.cpp
 msgid "Examples:"
@@ -699,6 +746,169 @@ msgstr "Odesláno na %s\n"
 #: src/cli/main.cpp src/gtk/messages_view.cpp
 msgid "The message was not sent."
 msgstr "Zpráva nebyla odeslána."
+
+#: src/cli/main.cpp
+msgid "Could not read the daemon's state.\n"
+msgstr "Stav démona se nepodařilo přečíst.\n"
+
+#: src/cli/main.cpp
+msgid "Version"
+msgstr "Verze"
+
+#: src/cli/main.cpp
+msgid "Daemon"
+msgstr "Démon"
+
+#: src/cli/main.cpp
+msgid "running"
+msgstr "běží"
+
+#: src/cli/main.cpp
+msgid "Clipboard"
+msgstr "Schránka"
+
+#: src/cli/main.cpp
+msgid "syncing"
+msgstr "synchronizuje se"
+
+#: src/cli/main.cpp
+msgid "off, no Wayland session on this machine"
+msgstr "vypnuto, na tomto stroji není relace Wayland"
+
+#: src/cli/main.cpp
+msgid "mDNS"
+msgstr "mDNS"
+
+#: src/cli/main.cpp
+msgid "advertising"
+msgstr "oznamuje se"
+
+#: src/cli/main.cpp
+msgid "unavailable"
+msgstr "nedostupné"
+
+#: src/cli/main.cpp
+msgid "Firewall"
+msgstr "Firewall"
+
+#: src/cli/main.cpp
+msgid "Paired devices"
+msgstr "Spárovaná zařízení"
+
+#: src/cli/main.cpp
+msgid "Pending requests"
+msgstr "Čekající žádosti"
+
+#: src/cli/main.cpp
+msgid "Connected now"
+msgstr "Právě připojeno"
+
+#: src/cli/main.cpp
+msgid "paired"
+msgstr "spárováno"
+
+#: src/cli/main.cpp
+msgid "unpaired"
+msgstr "nespárováno"
+
+#: src/cli/main.cpp
+msgid "Recently received:"
+msgstr "Nedávno přijaté:"
+
+#: src/cli/main.cpp
+#, c-format
+msgid ""
+"\n"
+"Run 'tether pending' to see what is waiting to be accepted.\n"
+msgstr ""
+"\n"
+"Spusťte 'tether pending' a uvidíte, co čeká na přijetí.\n"
+
+#: src/cli/main.cpp
+#, c-format
+msgid "No pairing requests are waiting.\n"
+msgstr "Nečekají žádné žádosti o spárování.\n"
+
+#: src/cli/main.cpp
+#, c-format
+msgid ""
+"\n"
+"Accept one with: tether accept <fingerprint>\n"
+msgstr ""
+"\n"
+"Přijměte některou pomocí: tether accept <otisk>\n"
+
+#: src/cli/main.cpp
+#, c-format
+msgid ""
+"\n"
+"Tether does not enable it for you. To start the daemon now and on every "
+"login:\n"
+"\n"
+"systemctl --user daemon-reload\n"
+"systemctl --user enable --now tetherd.service\n"
+"\n"
+"On a server you log out of, keep the user session alive too:\n"
+"\n"
+"loginctl enable-linger $USER\n"
+msgstr ""
+"\n"
+"Tether ji za vás nezapne. Démona spustíte nyní i při každém přihlášení "
+"takto:\n"
+"\n"
+"systemctl --user daemon-reload\n"
+"systemctl --user enable --now tetherd.service\n"
+"\n"
+"Na serveru, ze kterého se odhlašujete, udržte naživu i uživatelskou relaci:\n"
+"\n"
+"loginctl enable-linger $USER\n"
+
+#: src/cli/main.cpp
+#, c-format
+msgid "No tetherd user service was installed for this user.\n"
+msgstr ""
+"Pro tohoto uživatele nebyla nainstalována žádná uživatelská služba tetherd.\n"
+
+#: src/cli/main.cpp
+#, c-format
+msgid "Removed %s\n"
+msgstr "Odebráno: %s\n"
+
+#: src/cli/main.cpp
+#, c-format
+msgid ""
+"\n"
+"Run 'systemctl --user daemon-reload' to forget it.\n"
+msgstr ""
+"\n"
+"Spusťte 'systemctl --user daemon-reload', aby na ni systemd zapomněl.\n"
+
+#: src/cli/main.cpp
+#, c++-format
+msgid "Could not run {}: {}\n"
+msgstr "Nepodařilo se spustit {}: {}\n"
+
+#: src/cli/main.cpp
+#, c-format
+msgid ""
+"Removing this build is not tether's to do. Run:\n"
+"\n"
+"%s\n"
+msgstr ""
+"Odebrání tohoto sestavení není na tetheru. Spusťte:\n"
+"\n"
+"%s\n"
+
+#: src/cli/main.cpp
+#, c-format
+msgid ""
+"Updating this build is not tether's to do. Run:\n"
+"\n"
+"%s\n"
+msgstr ""
+"Aktualizace tohoto sestavení není na tetheru. Spusťte:\n"
+"\n"
+"%s\n"
 
 #: src/cli/main.cpp
 msgid "--port expects a number.\n"
@@ -2176,7 +2386,9 @@ msgstr "Zamknout relaci, když iPhone opustí dosah"
 msgid ""
 "Locks about half a minute after the link times out. Switching Bluetooth off "
 "on the iPhone does not lock, and neither does suspending this machine."
-msgstr "Zamkne asi půl minuty po vypršení spojení. Vypnutí Bluetooth na iPhonu nezamkne, stejně jako uspání tohoto počítače."
+msgstr ""
+"Zamkne asi půl minuty po vypršení spojení. Vypnutí Bluetooth na iPhonu "
+"nezamkne, stejně jako uspání tohoto počítače."
 
 #: src/gtk/settings_view.cpp
 msgid "SMS and iMessage conversations synced over Bluetooth."

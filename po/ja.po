@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: tether\n"
 "Report-Msgid-Bugs-To: zack@bartel.com\n"
-"POT-Creation-Date: 2026-09-08 22:55-0700\n"
+"POT-Creation-Date: 2026-09-09 11:11+0000\n"
 "PO-Revision-Date: 2026-08-23\n"
 "Last-Translator: Tether project\n"
 "Language-Team: Japanese\n"
@@ -239,6 +239,28 @@ msgstr ""
 "ンストールします。"
 
 #: src/cli/main.cpp
+msgid ""
+"Write the tetherd systemd user service for this user, and print how to "
+"enable it. Needed only for portable builds; the distro packages install it."
+msgstr ""
+"このユーザー用に tetherd の systemd ユーザーサービスを書き出し、有効にする方"
+"法を表示します。ポータブルビルドでのみ必要です。ディストリビューションのパッ"
+"ケージは自動で導入します。"
+
+#: src/cli/main.cpp
+msgid "Remove the tetherd systemd user service this user installed."
+msgstr ""
+"このユーザーが導入した tetherd の systemd ユーザーサービスを削除します。"
+
+#: src/cli/main.cpp
+msgid "Show what the daemon is doing: devices, links, and recent transfers."
+msgstr "デーモンの状況を表示します: デバイス、接続、最近の転送。"
+
+#: src/cli/main.cpp
+msgid "List Wi-Fi pairing requests waiting to be accepted."
+msgstr "承認待ちの Wi-Fi ペアリング要求を一覧表示します。"
+
+#: src/cli/main.cpp
 msgid "Accept a pending pairing request locally."
 msgstr "保留中のペアリング要求をローカルで承認します。"
 
@@ -251,12 +273,36 @@ msgid "Send a pair_request over TCP to the daemon."
 msgstr "TCP でデーモンに pair_request を送信します。"
 
 #: src/cli/main.cpp
+msgid ""
+"Update tether, or print the command that does, when another tool owns this "
+"build."
+msgstr ""
+"tether を更新します。別のツールがこのビルドを管理している場合は、そのコマンド"
+"を表示します。"
+
+#: src/cli/main.cpp
+msgid ""
+"Remove tether, or print the command that does, when another tool owns this "
+"build."
+msgstr ""
+"tether を削除します。別のツールがこのビルドを管理している場合は、そのコマンド"
+"を表示します。"
+
+#: src/cli/main.cpp
 msgid "tether - Wayland companion CLI"
 msgstr "tether - Wayland 用のコンパニオン CLI"
 
 #: src/cli/main.cpp
 msgid "Options:"
 msgstr "オプション:"
+
+#: src/cli/main.cpp
+msgid "Commands:"
+msgstr "コマンド:"
+
+#: src/cli/main.cpp
+msgid "Any --bt-<name> flag, as a subcommand."
+msgstr "任意の --bt-<名前> フラグをサブコマンドとして。"
 
 #: src/cli/main.cpp
 msgid "Examples:"
@@ -689,6 +735,169 @@ msgstr "%s に送信しました\n"
 #: src/cli/main.cpp src/gtk/messages_view.cpp
 msgid "The message was not sent."
 msgstr "メッセージは送信されませんでした。"
+
+#: src/cli/main.cpp
+msgid "Could not read the daemon's state.\n"
+msgstr "デーモンの状態を読み取れませんでした。\n"
+
+#: src/cli/main.cpp
+msgid "Version"
+msgstr "バージョン"
+
+#: src/cli/main.cpp
+msgid "Daemon"
+msgstr "デーモン"
+
+#: src/cli/main.cpp
+msgid "running"
+msgstr "実行中"
+
+#: src/cli/main.cpp
+msgid "Clipboard"
+msgstr "クリップボード"
+
+#: src/cli/main.cpp
+msgid "syncing"
+msgstr "同期中"
+
+#: src/cli/main.cpp
+msgid "off, no Wayland session on this machine"
+msgstr "オフ、このマシンに Wayland セッションがありません"
+
+#: src/cli/main.cpp
+msgid "mDNS"
+msgstr "mDNS"
+
+#: src/cli/main.cpp
+msgid "advertising"
+msgstr "アドバタイズ中"
+
+#: src/cli/main.cpp
+msgid "unavailable"
+msgstr "利用できません"
+
+#: src/cli/main.cpp
+msgid "Firewall"
+msgstr "ファイアウォール"
+
+#: src/cli/main.cpp
+msgid "Paired devices"
+msgstr "ペアリング済みデバイス"
+
+#: src/cli/main.cpp
+msgid "Pending requests"
+msgstr "保留中の要求"
+
+#: src/cli/main.cpp
+msgid "Connected now"
+msgstr "現在の接続"
+
+#: src/cli/main.cpp
+msgid "paired"
+msgstr "ペアリング済み"
+
+#: src/cli/main.cpp
+msgid "unpaired"
+msgstr "未ペアリング"
+
+#: src/cli/main.cpp
+msgid "Recently received:"
+msgstr "最近受信したファイル:"
+
+#: src/cli/main.cpp
+#, c-format
+msgid ""
+"\n"
+"Run 'tether pending' to see what is waiting to be accepted.\n"
+msgstr ""
+"\n"
+"承認待ちの内容は 'tether pending' で確認できます。\n"
+
+#: src/cli/main.cpp
+#, c-format
+msgid "No pairing requests are waiting.\n"
+msgstr "保留中のペアリング要求はありません。\n"
+
+#: src/cli/main.cpp
+#, c-format
+msgid ""
+"\n"
+"Accept one with: tether accept <fingerprint>\n"
+msgstr ""
+"\n"
+"承認するには: tether accept <フィンガープリント>\n"
+
+#: src/cli/main.cpp
+#, c-format
+msgid ""
+"\n"
+"Tether does not enable it for you. To start the daemon now and on every "
+"login:\n"
+"\n"
+"systemctl --user daemon-reload\n"
+"systemctl --user enable --now tetherd.service\n"
+"\n"
+"On a server you log out of, keep the user session alive too:\n"
+"\n"
+"loginctl enable-linger $USER\n"
+msgstr ""
+"\n"
+"Tether が自動で有効にすることはありません。今すぐ、そしてログインのたびにデー"
+"モンを起動するには:\n"
+"\n"
+"systemctl --user daemon-reload\n"
+"systemctl --user enable --now tetherd.service\n"
+"\n"
+"ログアウトするサーバーでは、ユーザーセッションも維持してください:\n"
+"\n"
+"loginctl enable-linger $USER\n"
+
+#: src/cli/main.cpp
+#, c-format
+msgid "No tetherd user service was installed for this user.\n"
+msgstr ""
+"このユーザーには tetherd ユーザーサービスが導入されていませんでした。\n"
+
+#: src/cli/main.cpp
+#, c-format
+msgid "Removed %s\n"
+msgstr "%s を削除しました\n"
+
+#: src/cli/main.cpp
+#, c-format
+msgid ""
+"\n"
+"Run 'systemctl --user daemon-reload' to forget it.\n"
+msgstr ""
+"\n"
+"'systemctl --user daemon-reload' を実行すると反映されます。\n"
+
+#: src/cli/main.cpp
+#, c++-format
+msgid "Could not run {}: {}\n"
+msgstr "{} を実行できませんでした: {}\n"
+
+#: src/cli/main.cpp
+#, c-format
+msgid ""
+"Removing this build is not tether's to do. Run:\n"
+"\n"
+"%s\n"
+msgstr ""
+"このビルドの削除は tether の担当ではありません。次を実行してください:\n"
+"\n"
+"%s\n"
+
+#: src/cli/main.cpp
+#, c-format
+msgid ""
+"Updating this build is not tether's to do. Run:\n"
+"\n"
+"%s\n"
+msgstr ""
+"このビルドの更新は tether の担当ではありません。次を実行してください:\n"
+"\n"
+"%s\n"
 
 #: src/cli/main.cpp
 msgid "--port expects a number.\n"
@@ -2172,7 +2381,9 @@ msgstr "iPhone が範囲外になったらセッションをロックする"
 msgid ""
 "Locks about half a minute after the link times out. Switching Bluetooth off "
 "on the iPhone does not lock, and neither does suspending this machine."
-msgstr "リンクがタイムアウトしてから約 30 秒後にロックします。iPhone 側で Bluetooth を切ってもロックせず、このマシンをサスペンドしてもロックしません。"
+msgstr ""
+"リンクがタイムアウトしてから約 30 秒後にロックします。iPhone 側で Bluetooth "
+"を切ってもロックせず、このマシンをサスペンドしてもロックしません。"
 
 #: src/gtk/settings_view.cpp
 msgid "SMS and iMessage conversations synced over Bluetooth."

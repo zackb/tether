@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: tether 0.2.28\n"
 "Report-Msgid-Bugs-To: zack@bartel.com\n"
-"POT-Creation-Date: 2026-09-08 22:55-0700\n"
+"POT-Creation-Date: 2026-09-09 11:11+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -217,6 +217,24 @@ msgid ""
 msgstr ""
 
 #: src/cli/main.cpp
+msgid ""
+"Write the tetherd systemd user service for this user, and print how to "
+"enable it. Needed only for portable builds; the distro packages install it."
+msgstr ""
+
+#: src/cli/main.cpp
+msgid "Remove the tetherd systemd user service this user installed."
+msgstr ""
+
+#: src/cli/main.cpp
+msgid "Show what the daemon is doing: devices, links, and recent transfers."
+msgstr ""
+
+#: src/cli/main.cpp
+msgid "List Wi-Fi pairing requests waiting to be accepted."
+msgstr ""
+
+#: src/cli/main.cpp
 msgid "Accept a pending pairing request locally."
 msgstr ""
 
@@ -229,11 +247,31 @@ msgid "Send a pair_request over TCP to the daemon."
 msgstr ""
 
 #: src/cli/main.cpp
+msgid ""
+"Update tether, or print the command that does, when another tool owns this "
+"build."
+msgstr ""
+
+#: src/cli/main.cpp
+msgid ""
+"Remove tether, or print the command that does, when another tool owns this "
+"build."
+msgstr ""
+
+#: src/cli/main.cpp
 msgid "tether - Wayland companion CLI"
 msgstr ""
 
 #: src/cli/main.cpp
 msgid "Options:"
+msgstr ""
+
+#: src/cli/main.cpp
+msgid "Commands:"
+msgstr ""
+
+#: src/cli/main.cpp
+msgid "Any --bt-<name> flag, as a subcommand."
 msgstr ""
 
 #: src/cli/main.cpp
@@ -644,6 +682,146 @@ msgstr ""
 
 #: src/cli/main.cpp src/gtk/messages_view.cpp
 msgid "The message was not sent."
+msgstr ""
+
+#: src/cli/main.cpp
+msgid "Could not read the daemon's state.\n"
+msgstr ""
+
+#: src/cli/main.cpp
+msgid "Version"
+msgstr ""
+
+#: src/cli/main.cpp
+msgid "Daemon"
+msgstr ""
+
+#: src/cli/main.cpp
+msgid "running"
+msgstr ""
+
+#: src/cli/main.cpp
+msgid "Clipboard"
+msgstr ""
+
+#: src/cli/main.cpp
+msgid "syncing"
+msgstr ""
+
+#: src/cli/main.cpp
+msgid "off, no Wayland session on this machine"
+msgstr ""
+
+#: src/cli/main.cpp
+msgid "mDNS"
+msgstr ""
+
+#: src/cli/main.cpp
+msgid "advertising"
+msgstr ""
+
+#: src/cli/main.cpp
+msgid "unavailable"
+msgstr ""
+
+#: src/cli/main.cpp
+msgid "Firewall"
+msgstr ""
+
+#: src/cli/main.cpp
+msgid "Paired devices"
+msgstr ""
+
+#: src/cli/main.cpp
+msgid "Pending requests"
+msgstr ""
+
+#: src/cli/main.cpp
+msgid "Connected now"
+msgstr ""
+
+#: src/cli/main.cpp
+msgid "paired"
+msgstr ""
+
+#: src/cli/main.cpp
+msgid "unpaired"
+msgstr ""
+
+#: src/cli/main.cpp
+msgid "Recently received:"
+msgstr ""
+
+#: src/cli/main.cpp
+#, c-format
+msgid ""
+"\n"
+"Run 'tether pending' to see what is waiting to be accepted.\n"
+msgstr ""
+
+#: src/cli/main.cpp
+#, c-format
+msgid "No pairing requests are waiting.\n"
+msgstr ""
+
+#: src/cli/main.cpp
+#, c-format
+msgid ""
+"\n"
+"Accept one with: tether accept <fingerprint>\n"
+msgstr ""
+
+#: src/cli/main.cpp
+#, c-format
+msgid ""
+"\n"
+"Tether does not enable it for you. To start the daemon now and on every "
+"login:\n"
+"\n"
+"systemctl --user daemon-reload\n"
+"systemctl --user enable --now tetherd.service\n"
+"\n"
+"On a server you log out of, keep the user session alive too:\n"
+"\n"
+"loginctl enable-linger $USER\n"
+msgstr ""
+
+#: src/cli/main.cpp
+#, c-format
+msgid "No tetherd user service was installed for this user.\n"
+msgstr ""
+
+#: src/cli/main.cpp
+#, c-format
+msgid "Removed %s\n"
+msgstr ""
+
+#: src/cli/main.cpp
+#, c-format
+msgid ""
+"\n"
+"Run 'systemctl --user daemon-reload' to forget it.\n"
+msgstr ""
+
+#: src/cli/main.cpp
+#, c++-format
+msgid "Could not run {}: {}\n"
+msgstr ""
+
+#: src/cli/main.cpp
+#, c-format
+msgid ""
+"Removing this build is not tether's to do. Run:\n"
+"\n"
+"%s\n"
+msgstr ""
+
+#: src/cli/main.cpp
+#, c-format
+msgid ""
+"Updating this build is not tether's to do. Run:\n"
+"\n"
+"%s\n"
 msgstr ""
 
 #: src/cli/main.cpp

@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: tether\n"
 "Report-Msgid-Bugs-To: zack@bartel.com\n"
-"POT-Creation-Date: 2026-09-08 22:55-0700\n"
+"POT-Creation-Date: 2026-09-09 11:11+0000\n"
 "PO-Revision-Date: 2026-08-23\n"
 "Last-Translator: Tether project\n"
 "Language-Team: Russian\n"
@@ -239,6 +239,30 @@ msgstr ""
 "для переносимых сборок; пакеты дистрибутива устанавливают его сами."
 
 #: src/cli/main.cpp
+msgid ""
+"Write the tetherd systemd user service for this user, and print how to "
+"enable it. Needed only for portable builds; the distro packages install it."
+msgstr ""
+"Записывает пользовательскую службу systemd tetherd для этого пользователя и "
+"показывает, как её включить. Нужно только для переносимых сборок; пакеты "
+"дистрибутива устанавливают её сами."
+
+#: src/cli/main.cpp
+msgid "Remove the tetherd systemd user service this user installed."
+msgstr ""
+"Удаляет пользовательскую службу systemd tetherd, установленную этим "
+"пользователем."
+
+#: src/cli/main.cpp
+msgid "Show what the daemon is doing: devices, links, and recent transfers."
+msgstr ""
+"Показывает, чем занят демон: устройства, соединения и последние передачи."
+
+#: src/cli/main.cpp
+msgid "List Wi-Fi pairing requests waiting to be accepted."
+msgstr "Показывает запросы сопряжения по Wi-Fi, ожидающие подтверждения."
+
+#: src/cli/main.cpp
 msgid "Accept a pending pairing request locally."
 msgstr "Принять ожидающий запрос на сопряжение локально."
 
@@ -251,12 +275,36 @@ msgid "Send a pair_request over TCP to the daemon."
 msgstr "Отправить pair_request демону по TCP."
 
 #: src/cli/main.cpp
+msgid ""
+"Update tether, or print the command that does, when another tool owns this "
+"build."
+msgstr ""
+"Обновляет tether или показывает команду для этого, если сборкой управляет "
+"другой инструмент."
+
+#: src/cli/main.cpp
+msgid ""
+"Remove tether, or print the command that does, when another tool owns this "
+"build."
+msgstr ""
+"Удаляет tether или показывает команду для этого, если сборкой управляет "
+"другой инструмент."
+
+#: src/cli/main.cpp
 msgid "tether - Wayland companion CLI"
 msgstr "tether — вспомогательная утилита командной строки для Wayland"
 
 #: src/cli/main.cpp
 msgid "Options:"
 msgstr "Параметры:"
+
+#: src/cli/main.cpp
+msgid "Commands:"
+msgstr "Команды:"
+
+#: src/cli/main.cpp
+msgid "Any --bt-<name> flag, as a subcommand."
+msgstr "Любой флаг --bt-<имя> в виде подкоманды."
 
 #: src/cli/main.cpp
 msgid "Examples:"
@@ -704,6 +752,169 @@ msgstr "Отправлено в %s\n"
 #: src/cli/main.cpp src/gtk/messages_view.cpp
 msgid "The message was not sent."
 msgstr "Сообщение не отправлено."
+
+#: src/cli/main.cpp
+msgid "Could not read the daemon's state.\n"
+msgstr "Не удалось прочитать состояние демона.\n"
+
+#: src/cli/main.cpp
+msgid "Version"
+msgstr "Версия"
+
+#: src/cli/main.cpp
+msgid "Daemon"
+msgstr "Демон"
+
+#: src/cli/main.cpp
+msgid "running"
+msgstr "работает"
+
+#: src/cli/main.cpp
+msgid "Clipboard"
+msgstr "Буфер обмена"
+
+#: src/cli/main.cpp
+msgid "syncing"
+msgstr "синхронизируется"
+
+#: src/cli/main.cpp
+msgid "off, no Wayland session on this machine"
+msgstr "выключено, на этой машине нет сеанса Wayland"
+
+#: src/cli/main.cpp
+msgid "mDNS"
+msgstr "mDNS"
+
+#: src/cli/main.cpp
+msgid "advertising"
+msgstr "объявляется"
+
+#: src/cli/main.cpp
+msgid "unavailable"
+msgstr "недоступно"
+
+#: src/cli/main.cpp
+msgid "Firewall"
+msgstr "Брандмауэр"
+
+#: src/cli/main.cpp
+msgid "Paired devices"
+msgstr "Сопряжённые устройства"
+
+#: src/cli/main.cpp
+msgid "Pending requests"
+msgstr "Ожидающие запросы"
+
+#: src/cli/main.cpp
+msgid "Connected now"
+msgstr "Сейчас подключено"
+
+#: src/cli/main.cpp
+msgid "paired"
+msgstr "сопряжено"
+
+#: src/cli/main.cpp
+msgid "unpaired"
+msgstr "не сопряжено"
+
+#: src/cli/main.cpp
+msgid "Recently received:"
+msgstr "Недавно получено:"
+
+#: src/cli/main.cpp
+#, c-format
+msgid ""
+"\n"
+"Run 'tether pending' to see what is waiting to be accepted.\n"
+msgstr ""
+"\n"
+"Запустите 'tether pending', чтобы увидеть, что ждёт подтверждения.\n"
+
+#: src/cli/main.cpp
+#, c-format
+msgid "No pairing requests are waiting.\n"
+msgstr "Запросов сопряжения нет.\n"
+
+#: src/cli/main.cpp
+#, c-format
+msgid ""
+"\n"
+"Accept one with: tether accept <fingerprint>\n"
+msgstr ""
+"\n"
+"Подтвердите один командой: tether accept <отпечаток>\n"
+
+#: src/cli/main.cpp
+#, c-format
+msgid ""
+"\n"
+"Tether does not enable it for you. To start the daemon now and on every "
+"login:\n"
+"\n"
+"systemctl --user daemon-reload\n"
+"systemctl --user enable --now tetherd.service\n"
+"\n"
+"On a server you log out of, keep the user session alive too:\n"
+"\n"
+"loginctl enable-linger $USER\n"
+msgstr ""
+"\n"
+"Tether не включает её за вас. Чтобы запустить демон сейчас и при каждом "
+"входе:\n"
+"\n"
+"systemctl --user daemon-reload\n"
+"systemctl --user enable --now tetherd.service\n"
+"\n"
+"На сервере, из которого вы выходите, оставьте пользовательский сеанс "
+"работать:\n"
+"\n"
+"loginctl enable-linger $USER\n"
+
+#: src/cli/main.cpp
+#, c-format
+msgid "No tetherd user service was installed for this user.\n"
+msgstr "Для этого пользователя служба tetherd не была установлена.\n"
+
+#: src/cli/main.cpp
+#, c-format
+msgid "Removed %s\n"
+msgstr "Удалено: %s\n"
+
+#: src/cli/main.cpp
+#, c-format
+msgid ""
+"\n"
+"Run 'systemctl --user daemon-reload' to forget it.\n"
+msgstr ""
+"\n"
+"Запустите 'systemctl --user daemon-reload', чтобы systemd о ней забыл.\n"
+
+#: src/cli/main.cpp
+#, c++-format
+msgid "Could not run {}: {}\n"
+msgstr "Не удалось запустить {}: {}\n"
+
+#: src/cli/main.cpp
+#, c-format
+msgid ""
+"Removing this build is not tether's to do. Run:\n"
+"\n"
+"%s\n"
+msgstr ""
+"Удаление этой сборки — не дело tether. Запустите:\n"
+"\n"
+"%s\n"
+
+#: src/cli/main.cpp
+#, c-format
+msgid ""
+"Updating this build is not tether's to do. Run:\n"
+"\n"
+"%s\n"
+msgstr ""
+"Обновление этой сборки — не дело tether. Запустите:\n"
+"\n"
+"%s\n"
 
 #: src/cli/main.cpp
 msgid "--port expects a number.\n"
@@ -2197,7 +2408,10 @@ msgstr "Блокировать сеанс, когда iPhone выходит из
 msgid ""
 "Locks about half a minute after the link times out. Switching Bluetooth off "
 "on the iPhone does not lock, and neither does suspending this machine."
-msgstr "Блокирует примерно через полминуты после истечения времени соединения. Выключение Bluetooth на iPhone не блокирует, как и переход этой машины в спящий режим."
+msgstr ""
+"Блокирует примерно через полминуты после истечения времени соединения. "
+"Выключение Bluetooth на iPhone не блокирует, как и переход этой машины в "
+"спящий режим."
 
 #: src/gtk/settings_view.cpp
 msgid "SMS and iMessage conversations synced over Bluetooth."
