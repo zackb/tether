@@ -74,6 +74,25 @@ The extension communicates with `tetherd` via native messaging. This allows user
 
 ## Installation
 
+### Quick install
+
+```bash
+curl -fsSL https://raw.githubusercontent.com/zackb/tether/main/scripts/install.sh | sh
+```
+
+It takes the distro package where it can use one and the AppImage otherwise,
+into `~/.local` with no root needed, and installs the `tetherd` systemd user
+service without enabling anything. `--help` lists the rest:
+
+```bash
+curl -fsSL https://raw.githubusercontent.com/zackb/tether/main/scripts/install.sh | sh -s -- --help
+curl -fsSL https://raw.githubusercontent.com/zackb/tether/main/scripts/install.sh | sh -s -- --headless --enable
+```
+
+Afterwards `tether update` and `tether uninstall` do what they say. Where
+something else owns the build, a distro package or flatpak, they print the
+command that tool wants rather than working behind its back.
+
 ### iOS App
 - Get the app: [Tether - Linux Companion](https://apps.apple.com/us/app/tether-linux-companion/id6762097135)
 
@@ -237,7 +256,8 @@ make install
    or
 
    ```bash
-   tether --accept <fingerprint>   # fingerprint is printed by the daemon log
+   tether pending                  # the requests waiting, with their fingerprints
+   tether accept <fingerprint>
    ```
 
 3. Bluetooth (for Messages and Notifications):
@@ -275,6 +295,21 @@ make install
    "Show Message Notifications" and "Sync Contacts". Both are needed. They can
    take a few minutes to appear; "Show iPhone Permissions" in the GTK app
    re-advertises so they show up again.
+
+
+### No desktop on the machine?
+
+The daemon does not need a Wayland session. Everything but clipboard sync works
+over SSH, pairing included:
+
+```bash
+curl -fsSL https://raw.githubusercontent.com/zackb/tether/main/scripts/install.sh | sh -s -- --headless --enable
+tether pending          # the pairing requests waiting, with fingerprints
+tether accept 9a4f21...
+tether status           # devices, links, and recent transfers
+```
+
+See [docs/HEADLESS.md](docs/HEADLESS.md).
 
 
 ## Components

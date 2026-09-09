@@ -4,11 +4,17 @@ tether \- Wayland companion CLI for iPhone integration
 .SH SYNOPSIS
 .B tether
 [\fIOPTIONS\fR]
+.br
+.B tether
+\fICOMMAND\fR [\fIARGUMENTS\fR]
 .SH DESCRIPTION
 .B tether
 is a command-line interface for communicating with the Tether daemon (\fBtetherd\fR).
 It allows for clipboard synchronization, file transfers, and device management between
 a Linux Wayland desktop and an iOS device.
+.PP
+Every option below also has a subcommand form, so \fBtether status\fR and
+\fBtether \-\-status\fR are the same thing. See \fBCOMMANDS\fR.
 .SH OPTIONS
 .TP
 \fB\-h, \-\-help\fR
@@ -44,6 +50,16 @@ Discovery scan duration in milliseconds (default: 3000).
 \fB\-\-list-devices\fR
 List all paired connection devices and their fingerprints.
 .TP
+\fB\-\-status\fR
+Print what the daemon is doing: version, clipboard and mDNS state, how many
+devices are paired, how many pairing requests wait, which peers are connected,
+and the files most recently received.
+.TP
+\fB\-\-pending\fR
+List the Wi\-Fi pairing requests waiting to be accepted, with the fingerprint
+\fB\-\-accept\fR takes. On a machine with no GTK app to show the prompt, this
+is how a request is seen.
+.TP
 \fB\-\-accept\fR \fIFINGERPRINT\fR
 Accept a pending pairing request locally for the specified device fingerprint.
 .TP
@@ -65,6 +81,42 @@ distro packages install the manifests system\-wide.
 Write \fBtether-btclass@.service\fR to \fB/etc/systemd/system\fR. Needs root, and
 never enables it. Needed only for a portable build such as the AppImage; the distro
 packages install the unit themselves. See \fB\-\-bt-setup\fR.
+.TP
+\fB\-\-install-service\fR
+Write \fBtetherd.service\fR into \fB~/.config/systemd/user\fR and print the
+commands that enable it. Never enables or starts anything. Needed only for a
+portable build; the distro packages install the unit system\-wide.
+.TP
+\fB\-\-uninstall-service\fR
+Remove the \fBtetherd.service\fR unit this user installed.
+.TP
+\fB\-\-self-update\fR
+Update tether. When \fBscripts/install.sh\fR installed this build, it runs the
+copy it left in \fB~/.local/share/tether\fR. Otherwise the package manager,
+flatpak or source tree owns the build, and tether prints the command that
+updates it rather than acting behind that tool's back.
+.TP
+\fB\-\-uninstall\fR
+Remove tether, on the same terms as \fB\-\-self-update\fR.
+.SH COMMANDS
+Each of these is the option named beside it, so nothing behaves differently for
+having been typed as a word.
+.TP
+\fBstatus\fR, \fBdevices\fR, \fBpending\fR
+\fB\-\-status\fR, \fB\-\-list-devices\fR, \fB\-\-pending\fR
+.TP
+\fBaccept\fR \fIFINGERPRINT\fR, \fBforget\fR \fIFINGERPRINT\fR, \fBpair\fR
+\fB\-\-accept\fR, \fB\-\-forget\fR, \fB\-\-pair\fR
+.TP
+\fBdiscover\fR, \fBsend\fR \fIFILE\fR, \fBcopy\fR [\fISTRING\fR], \fBpaste\fR
+\fB\-\-discover\fR, \fB\-\-send-file\fR, \fB\-\-set-clipboard\fR, \fB\-\-get-clipboard\fR
+.TP
+\fBservice\fR, \fBupdate\fR, \fBuninstall\fR (or \fBremove\fR)
+\fB\-\-install-service\fR, \fB\-\-self-update\fR, \fB\-\-uninstall\fR
+.TP
+\fBbt\fR \fINAME\fR [\fIARGUMENTS\fR]
+The \fB\-\-bt-\fR\fINAME\fR option, so \fBtether bt pair AA:BB:CC:DD:EE:FF\fR is
+\fBtether \-\-bt-pair AA:BB:CC:DD:EE:FF\fR.
 .SH BLUETOOTH OPTIONS
 Bluetooth carries iPhone messages (MAP), contacts (PBAP), and notification
 mirroring (ANCS). It is independent of the Wi-Fi pairing above.
@@ -196,7 +248,18 @@ tether \-f document.pdf
 See what Bluetooth still needs before pairing an iPhone:
 .IP
 tether \-\-bt-setup
+.PP
+Pair an iPhone over Wi\-Fi from a machine with no desktop, after the phone has
+found the daemon:
+.IP
+tether pending && tether accept 9a4f21...
 .SH FILES
+.TP
+\fB/usr/lib/systemd/user/tetherd.service\fR
+Starts \fBtetherd\fR for one user. Installed by the distro packages but never
+enabled; a portable build writes its own copy to
+\fB~/.config/systemd/user\fR with \fB\-\-install-service\fR. The daemon does
+not need a Wayland session: without one it runs with clipboard sync off.
 .TP
 \fB/usr/lib/systemd/system/tether\-btclass@.service\fR
 Sets the Bluetooth adapter's Class of Device to A/V Hands\-Free, which iOS
@@ -205,4 +268,5 @@ by the distro packages but never enabled; a portable build writes it to
 \fB/etc/systemd/system\fR instead. See \fB\-\-bt-setup\fR.
 .SH SEE ALSO
 .BR tetherd (8),
-.BR tether-gtk (1)
+.BR tether-gtk (1),
+.BR systemd.unit (5)

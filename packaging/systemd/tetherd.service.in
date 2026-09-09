@@ -1,0 +1,19 @@
+[Unit]
+Description=Tether daemon, bridging an iPhone to this computer
+Documentation=https://github.com/zackb/tether
+# Deliberately not tied to graphical-session.target: tetherd runs without a
+# Wayland session, it just does not sync the clipboard when there is none.
+After=dbus.socket network.target bluetooth.target
+Wants=network.target
+
+[Service]
+Type=simple
+ExecStart=@TETHERD_EXEC@
+Restart=on-failure
+RestartSec=3
+# The daemon writes its own log into $XDG_STATE_HOME/tether.
+StandardOutput=null
+StandardError=journal
+
+[Install]
+WantedBy=default.target

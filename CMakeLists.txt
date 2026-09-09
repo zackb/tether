@@ -98,7 +98,24 @@ configure_file(
 install(PROGRAMS "${CMAKE_CURRENT_BINARY_DIR}/tether-native-host"
         DESTINATION ${CMAKE_INSTALL_BINDIR})
 
+# systemd user unit for the daemon. The distro packages install it with the real
+# path in ExecStart; a portable build carries a copy with a placeholder the CLI
+# fills in with wherever that build happens to live.
+set(TETHERD_EXEC "${CMAKE_INSTALL_FULL_BINDIR}/tetherd")
+configure_file(
+    "${CMAKE_CURRENT_SOURCE_DIR}/packaging/systemd/tetherd.service.in"
+    "${CMAKE_CURRENT_BINARY_DIR}/tetherd.service"
+    @ONLY
+)
+set(TETHERD_EXEC "__TETHERD_EXEC__")
+configure_file(
+    "${CMAKE_CURRENT_SOURCE_DIR}/packaging/systemd/tetherd.service.in"
+    "${CMAKE_CURRENT_BINARY_DIR}/generated/tetherd.service.tmpl"
+    @ONLY
+)
+
 # embed files only the distro packages can install, so portable build can write them out at runtime.
+file(READ "${CMAKE_CURRENT_BINARY_DIR}/generated/tetherd.service.tmpl" TETHERD_UNIT)
 file(READ "${CMAKE_CURRENT_SOURCE_DIR}/packaging/systemd/tether-btclass@.service" BTCLASS_UNIT)
 file(READ "${CMAKE_CURRENT_BINARY_DIR}/com.tether.extension.chrome.json" CHROME_MANIFEST)
 file(READ "${CMAKE_CURRENT_BINARY_DIR}/com.tether.extension.mozilla.json" MOZILLA_MANIFEST)
@@ -145,6 +162,10 @@ install(FILES "${CMAKE_CURRENT_BINARY_DIR}/man/tetherd.8"
 set(SYSTEMD_UNIT_DIR "lib/systemd/system" CACHE PATH "systemd system unit directory")
 install(FILES packaging/systemd/tether-btclass@.service
         DESTINATION "${SYSTEMD_UNIT_DIR}")
+
+set(SYSTEMD_USER_UNIT_DIR "lib/systemd/user" CACHE PATH "systemd user unit directory")
+install(FILES "${CMAKE_CURRENT_BINARY_DIR}/tetherd.service"
+        DESTINATION "${SYSTEMD_USER_UNIT_DIR}")
 
 # firewall profiles for the mTLS listener (5134/tcp) and mDNS (5353/udp) installed but not applied (user's call).
 set(UFW_APPLICATIONS_DIR "/etc/ufw/applications.d" CACHE PATH "ufw application profile directory")

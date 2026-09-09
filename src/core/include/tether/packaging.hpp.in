@@ -4,6 +4,7 @@
 // (AppImage) cannot, so they are embedded here and written out at runtime.
 namespace tether::packaging {
 
+    inline constexpr const char* TETHERD_UNIT = R"TETHER(@TETHERD_UNIT@)TETHER";
     inline constexpr const char* BTCLASS_UNIT = R"TETHER(@BTCLASS_UNIT@)TETHER";
     inline constexpr const char* NATIVE_HOST_MANIFEST_CHROME = R"TETHER(@CHROME_MANIFEST@)TETHER";
     inline constexpr const char* NATIVE_HOST_MANIFEST_MOZILLA = R"TETHER(@MOZILLA_MANIFEST@)TETHER";
