@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: tether\n"
 "Report-Msgid-Bugs-To: zack@bartel.com\n"
-"POT-Creation-Date: 2026-09-09 20:19-0700\n"
+"POT-Creation-Date: 2026-09-10 07:12+0000\n"
 "PO-Revision-Date: 2026-08-23\n"
 "Last-Translator: Tether project\n"
 "Language-Team: Simplified Chinese\n"
@@ -231,6 +231,24 @@ msgstr ""
 "root，且从不启用它。仅便携式构建需要；发行版软件包会自行安装。"
 
 #: src/cli/main.cpp
+msgid ""
+"Write the tetherd systemd user service for this user, and print how to "
+"enable it. Needed only for portable builds; the distro packages install it."
+msgstr "为此用户写入 tetherd systemd 用户服务，并打印启用方法。仅便携版构建需要；发行版软件包会自行安装。"
+
+#: src/cli/main.cpp
+msgid "Remove the tetherd systemd user service this user installed."
+msgstr "移除此用户安装的 tetherd systemd 用户服务。"
+
+#: src/cli/main.cpp
+msgid "Show what the daemon is doing: devices, links, and recent transfers."
+msgstr "显示守护进程正在做什么：设备、连接和最近的传输。"
+
+#: src/cli/main.cpp
+msgid "List Wi-Fi pairing requests waiting to be accepted."
+msgstr "列出等待接受的 Wi-Fi 配对请求。"
+
+#: src/cli/main.cpp
 msgid "Accept a pending pairing request locally."
 msgstr "在本地接受待处理的配对请求。"
 
@@ -257,7 +275,8 @@ msgstr "示例："
 #: src/cli/main.cpp
 #, c-format
 msgid "Installed %s\n"
-msgstr "已安装 %s\n"
+msgstr ""
+"已安装 %s\n"
 
 #: src/cli/main.cpp
 #, c-format
@@ -443,12 +462,12 @@ msgid "Could not read the AirPods battery from the daemon.\n"
 msgstr "无法从守护进程读取 AirPods 电量。\n"
 
 #: src/cli/main.cpp
-msgid "No AirPods connected.\n"
-msgstr "未连接 AirPods。\n"
-
-#: src/cli/main.cpp
 msgid "AirPods management is off.\n"
 msgstr "AirPods 管理已关闭。\n"
+
+#: src/cli/main.cpp
+msgid "No AirPods connected.\n"
+msgstr "未连接 AirPods。\n"
 
 #: src/cli/main.cpp
 msgid "Left"
@@ -697,6 +716,144 @@ msgstr "已发送至 %s\n"
 #: src/cli/main.cpp src/gtk/messages_view.cpp
 msgid "The message was not sent."
 msgstr "信息未发送。"
+
+#: src/cli/main.cpp
+msgid "Could not read the daemon's state.\n"
+msgstr ""
+"无法读取守护进程的状态。\n"
+
+#: src/cli/main.cpp
+msgid "Version"
+msgstr "版本"
+
+#: src/cli/main.cpp
+msgid "Daemon"
+msgstr "守护进程"
+
+#: src/cli/main.cpp
+msgid "running"
+msgstr "运行中"
+
+#: src/cli/main.cpp
+msgid "Clipboard"
+msgstr "剪贴板"
+
+#: src/cli/main.cpp
+msgid "syncing"
+msgstr "同步中"
+
+#: src/cli/main.cpp
+msgid "off, no Wayland session on this machine"
+msgstr "已关闭，此机器上没有 Wayland 会话"
+
+#: src/cli/main.cpp
+msgid "mDNS"
+msgstr "mDNS"
+
+#: src/cli/main.cpp
+msgid "advertising"
+msgstr "正在广播"
+
+#: src/cli/main.cpp
+msgid "unavailable"
+msgstr "不可用"
+
+#: src/cli/main.cpp
+msgid "Firewall"
+msgstr "防火墙"
+
+#: src/cli/main.cpp
+msgid "Paired devices"
+msgstr "已配对设备"
+
+#: src/cli/main.cpp
+msgid "Pending requests"
+msgstr "待处理请求"
+
+#: src/cli/main.cpp
+msgid "Connected now"
+msgstr "当前连接"
+
+#: src/cli/main.cpp
+msgid "paired"
+msgstr "已配对"
+
+#: src/cli/main.cpp
+msgid "unpaired"
+msgstr "未配对"
+
+#: src/cli/main.cpp
+msgid "Recently received:"
+msgstr "最近接收："
+
+#: src/cli/main.cpp
+#, c-format
+msgid ""
+"\n"
+"Run 'tether --pending' to see what is waiting to be accepted.\n"
+msgstr ""
+"\n"
+"运行 'tether --pending' 查看有哪些请求正在等待接受。\n"
+
+#: src/cli/main.cpp
+#, c-format
+msgid "No pairing requests are waiting.\n"
+msgstr ""
+"没有等待中的配对请求。\n"
+
+#: src/cli/main.cpp
+#, c-format
+msgid ""
+"\n"
+"Accept one with: tether --accept <fingerprint>\n"
+msgstr ""
+"\n"
+"使用以下命令接受：tether --accept <fingerprint>\n"
+
+#: src/cli/main.cpp
+#, c-format
+msgid ""
+"\n"
+"Tether does not enable it for you. To start the daemon now and on every "
+"login:\n"
+"\n"
+"systemctl --user daemon-reload\n"
+"systemctl --user enable --now tetherd.service\n"
+"\n"
+"On a server you log out of, keep the user session alive too:\n"
+"\n"
+"loginctl enable-linger $USER\n"
+msgstr ""
+"\n"
+"Tether 不会替你启用它。要立即启动守护进程并在每次登录时启动：\n"
+"\n"
+"systemctl --user daemon-reload\n"
+"systemctl --user enable --now tetherd.service\n"
+"\n"
+"在你会登出的服务器上，也请保持用户会话存活：\n"
+"\n"
+"loginctl enable-linger $USER\n"
+
+#: src/cli/main.cpp
+#, c-format
+msgid "No tetherd user service was installed for this user.\n"
+msgstr ""
+"未为此用户安装 tetherd 用户服务。\n"
+
+#: src/cli/main.cpp
+#, c-format
+msgid "Removed %s\n"
+msgstr ""
+"已移除 %s\n"
+
+#: src/cli/main.cpp
+#, c-format
+msgid ""
+"\n"
+"Run 'systemctl --user daemon-reload' to forget it.\n"
+msgstr ""
+"\n"
+"运行 'systemctl --user daemon-reload' 使其被忘记。\n"
 
 #: src/cli/main.cpp
 msgid "--port expects a number.\n"

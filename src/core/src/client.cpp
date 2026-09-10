@@ -6,6 +6,7 @@
 #include <arpa/inet.h>
 #include <atomic>
 #include <cerrno>
+#include <cstdlib>
 #include <cstring>
 #include <filesystem>
 #include <fstream>
@@ -58,7 +59,28 @@ namespace tether {
         return Crypto::get_peer_fingerprint(ssl_);
     }
 
+    // systemd owns the daemon once its user unit is enabled, and the wants
+    // symlink is what 'systemctl --user enable' writes. Spawning our own tetherd
+    // alongside it leaves an orphan holding the TCP listener, which the unit then
+    // cannot bind, so it would restart into the failure until systemd gives up.
+    static bool systemd_owns_tetherd() {
+        std::filesystem::path config;
+        if (const char* config_home = std::getenv("XDG_CONFIG_HOME"); config_home && *config_home == '/')
+            config = config_home;
+        else if (const char* home = std::getenv("HOME"); home && *home)
+            config = std::filesystem::path(home) / ".config";
+        else
+            return false;
+
+        std::error_code ec;
+        return std::filesystem::exists(config / "systemd/user/default.target.wants/tetherd.service", ec);
+    }
+
     void spawn_daemon() {
+        // Let systemd start it, and stay out of the way when it already does.
+        if (systemd_owns_tetherd())
+            return;
+
         // everything the child needs is resolved before the fork
         std::filesystem::path self_path = std::filesystem::read_symlink("/proc/self/exe");
         const std::string sibling = (self_path.parent_path() / "tetherd").string();

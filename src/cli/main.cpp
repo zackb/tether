@@ -20,6 +20,7 @@
 #include <tether/i18n.hpp>
 #include <tether/log.hpp>
 #include <tether/packaging.hpp>
+#include <tether/service.hpp>
 #include <tether/version.hpp>
 #include <thread>
 #include <unistd.h>
@@ -233,6 +234,12 @@ static const Opt kOptions[] = {
     {"--install-btclass-unit",
      N_("Write the tether-btclass@.service unit, which sets the Bluetooth adapter class iOS requires. Needs "
         "root, and never enables it. Needed only for portable builds; the distro packages install it.")},
+    {"--install-service",
+     N_("Write the tetherd systemd user service for this user, and print how to enable it. Needed only for "
+        "portable builds; the distro packages install it.")},
+    {"--uninstall-service", N_("Remove the tetherd systemd user service this user installed.")},
+    {"--status", N_("Show what the daemon is doing: devices, links, and recent transfers.")},
+    {"--pending", N_("List Wi-Fi pairing requests waiting to be accepted.")},
     {"--accept <fingerprint>", N_("Accept a pending pairing request locally.")},
     {"--forget <fingerprint>", N_("Remove a Wi-Fi pairing and drop its session.")},
     {"--pair", N_("Send a pair_request over TCP to the daemon.")},
@@ -1048,6 +1055,127 @@ static int send_bt_message(tether::Client& client, const std::string& thread, co
     }
 }
 
+// The daemon answers one request at a time here, but be strict about it: parse
+// the first line only, so a stray broadcast cannot turn into a parse error.
+static nlohmann::json parse_first_line(const std::string& response) {
+    const auto newline = response.find('\n');
+    return nlohmann::json::parse(newline == std::string::npos ? response : response.substr(0, newline));
+}
+
+static nlohmann::json state_snapshot(tether::Client& client) {
+    return parse_first_line(client.send_and_wait("{\"command\":\"state_snapshot\"}\n"));
+}
+
+static int print_status(tether::Client& client) {
+    nlohmann::json snap;
+    try {
+        snap = state_snapshot(client);
+    } catch (const std::exception&) {
+        debug::log(ERR, _("Could not read the daemon's state.\n"));
+        return 1;
+    }
+
+    // Defaults rather than lookups: a daemon that predates a field should
+    // still give a readable status.
+    const auto paired = snap.value("paired_devices", nlohmann::json::array());
+    const auto pending = snap.value("pending_pairs", nlohmann::json::array());
+    const auto clients = snap.value("connected_clients", nlohmann::json::array());
+
+    std::vector<Field> fields;
+    fields.emplace_back(_("Version"), tether::get_version());
+    fields.emplace_back(_("Daemon"), _("running"));
+    fields.emplace_back(_("Clipboard"),
+                        snap.value("clipboard_available", false) ? _("syncing")
+                                                                 : _("off, no Wayland session on this machine"));
+    fields.emplace_back(_("mDNS"), snap.value("mdns_available", false) ? _("advertising") : _("unavailable"));
+    fields.emplace_back(_("Firewall"), yn(snap.value("firewall_active", false)));
+    fields.emplace_back(_("Paired devices"), std::to_string(paired.size()));
+    fields.emplace_back(_("Pending requests"), std::to_string(pending.size()));
+    fields.emplace_back(_("Connected now"), std::to_string(clients.size()));
+    print_fields(fields);
+
+    for (const auto& c : clients) {
+        fprintf(stdout,
+                "\n  %s  %s  %s\n",
+                c.value("device_name", "?").c_str(),
+                c.value("address", "?").c_str(),
+                c.value("paired", false) ? _("paired") : _("unpaired"));
+    }
+
+    const auto files = snap.value("recent_received_files", nlohmann::json::array());
+    if (!files.empty()) {
+        fprintf(stdout, "\n%s\n", _("Recently received:"));
+        for (const auto& f : files)
+            fprintf(stdout, "  %s\n", f.value("path", "").c_str());
+    }
+
+    // The count is already a field above, so this only says what to do about it.
+    if (!pending.empty())
+        fprintf(stdout, _("\nRun 'tether --pending' to see what is waiting to be accepted.\n"));
+
+    return 0;
+}
+
+// The headless half of pairing: with no GTK app to show the prompt, this is how
+// a request is seen before 'tether --accept' takes it.
+static int print_pending(tether::Client& client) {
+    nlohmann::json snap;
+    try {
+        snap = state_snapshot(client);
+    } catch (const std::exception&) {
+        debug::log(ERR, _("Could not read the daemon's state.\n"));
+        return 1;
+    }
+
+    const auto pending = snap.value("pending_pairs", nlohmann::json::array());
+    if (pending.empty()) {
+        fprintf(stdout, _("No pairing requests are waiting.\n"));
+        return 0;
+    }
+
+    for (const auto& item : pending)
+        fprintf(stdout, "  %-20s  %s\n", item.value("device_name", "?").c_str(), item.value("fingerprint", "").c_str());
+
+    fprintf(stdout, _("\nAccept one with: tether --accept <fingerprint>\n"));
+    return 0;
+}
+
+static int install_service() {
+    const auto result = tether::install_tetherd_service();
+
+    for (const auto& err : result.errors)
+        debug::log(ERR, "{}\n", err);
+    if (!result.errors.empty())
+        return 1;
+
+    fprintf(stdout, _("Installed %s\n"), result.path.c_str());
+    fprintf(stdout,
+            _("\nTether does not enable it for you. To start the daemon now and on every login:\n\n"
+              "systemctl --user daemon-reload\n"
+              "systemctl --user enable --now tetherd.service\n\n"
+              "On a server you log out of, keep the user session alive too:\n\n"
+              "loginctl enable-linger $USER\n"));
+    return 0;
+}
+
+static int uninstall_service() {
+    const auto result = tether::uninstall_tetherd_service();
+
+    for (const auto& err : result.errors)
+        debug::log(ERR, "{}\n", err);
+    if (!result.errors.empty())
+        return 1;
+
+    if (!result.changed) {
+        fprintf(stdout, _("No tetherd user service was installed for this user.\n"));
+        return 0;
+    }
+
+    fprintf(stdout, _("Removed %s\n"), result.path.c_str());
+    fprintf(stdout, _("\nRun 'systemctl --user daemon-reload' to forget it.\n"));
+    return 0;
+}
+
 int main(int argc, char* argv[]) {
     tether::init_locale();
 
@@ -1079,6 +1207,14 @@ int main(int argc, char* argv[]) {
             action = "install_extension_host";
         } else if (arg == "--install-btclass-unit") {
             action = "install_btclass_unit";
+        } else if (arg == "--install-service") {
+            action = "install_service";
+        } else if (arg == "--uninstall-service") {
+            action = "uninstall_service";
+        } else if (arg == "--status") {
+            action = "status";
+        } else if (arg == "--pending") {
+            action = "pending";
         } else if (arg == "--bt-setup") {
             action = "bt_setup";
         } else if (arg == "--bt-status") {
@@ -1228,6 +1364,12 @@ int main(int argc, char* argv[]) {
     if (action == "install_btclass_unit")
         return install_btclass_unit();
 
+    if (action == "install_service")
+        return install_service();
+
+    if (action == "uninstall_service")
+        return uninstall_service();
+
     tether::Client client;
 
     // Fast-path local operations that don't need active daemon connection fundamentally
@@ -1282,6 +1424,12 @@ int main(int argc, char* argv[]) {
               "broken?\n"));
         return 1;
     }
+
+    if (action == "status")
+        return print_status(client);
+
+    if (action == "pending")
+        return print_pending(client);
 
     std::string err;
     if (action == "accept") {

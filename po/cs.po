@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: tether\n"
 "Report-Msgid-Bugs-To: zack@bartel.com\n"
-"POT-Creation-Date: 2026-09-09 20:19-0700\n"
+"POT-Creation-Date: 2026-09-10 07:12+0000\n"
 "PO-Revision-Date: 2026-08-23\n"
 "Last-Translator: Tether project\n"
 "Language-Team: Czech\n"
@@ -240,6 +240,24 @@ msgstr ""
 "Potřebné pouze pro přenosná sestavení; balíčky distribuce ji instalují samy."
 
 #: src/cli/main.cpp
+msgid ""
+"Write the tetherd systemd user service for this user, and print how to "
+"enable it. Needed only for portable builds; the distro packages install it."
+msgstr "Zapíše uživatelskou službu systemd tetherd pro tohoto uživatele a vypíše, jak ji povolit. Potřeba jen u přenosných sestavení; distribuční balíčky ji instalují samy."
+
+#: src/cli/main.cpp
+msgid "Remove the tetherd systemd user service this user installed."
+msgstr "Odebere uživatelskou službu systemd tetherd, kterou tento uživatel nainstaloval."
+
+#: src/cli/main.cpp
+msgid "Show what the daemon is doing: devices, links, and recent transfers."
+msgstr "Zobrazí, co démon dělá: zařízení, spojení a nedávné přenosy."
+
+#: src/cli/main.cpp
+msgid "List Wi-Fi pairing requests waiting to be accepted."
+msgstr "Vypíše žádosti o spárování přes Wi-Fi, které čekají na přijetí."
+
+#: src/cli/main.cpp
 msgid "Accept a pending pairing request locally."
 msgstr "Přijmout čekající žádost o spárování místně."
 
@@ -266,7 +284,8 @@ msgstr "Příklady:"
 #: src/cli/main.cpp
 #, c-format
 msgid "Installed %s\n"
-msgstr "Nainstalováno %s\n"
+msgstr ""
+"Nainstalováno %s\n"
 
 #: src/cli/main.cpp
 #, c-format
@@ -465,12 +484,12 @@ msgid "Could not read the AirPods battery from the daemon.\n"
 msgstr "Nepodařilo se načíst baterii AirPods z démona.\n"
 
 #: src/cli/main.cpp
-msgid "No AirPods connected.\n"
-msgstr "Nejsou připojena žádná AirPods.\n"
-
-#: src/cli/main.cpp
 msgid "AirPods management is off.\n"
 msgstr "Správa AirPods je vypnutá.\n"
+
+#: src/cli/main.cpp
+msgid "No AirPods connected.\n"
+msgstr "Nejsou připojena žádná AirPods.\n"
 
 #: src/cli/main.cpp
 msgid "Left"
@@ -722,6 +741,144 @@ msgstr "Odesláno na %s\n"
 #: src/cli/main.cpp src/gtk/messages_view.cpp
 msgid "The message was not sent."
 msgstr "Zpráva nebyla odeslána."
+
+#: src/cli/main.cpp
+msgid "Could not read the daemon's state.\n"
+msgstr ""
+"Nepodařilo se přečíst stav démona.\n"
+
+#: src/cli/main.cpp
+msgid "Version"
+msgstr "Verze"
+
+#: src/cli/main.cpp
+msgid "Daemon"
+msgstr "Démon"
+
+#: src/cli/main.cpp
+msgid "running"
+msgstr "běží"
+
+#: src/cli/main.cpp
+msgid "Clipboard"
+msgstr "Schránka"
+
+#: src/cli/main.cpp
+msgid "syncing"
+msgstr "synchronizuje se"
+
+#: src/cli/main.cpp
+msgid "off, no Wayland session on this machine"
+msgstr "vypnuto, na tomto počítači není relace Wayland"
+
+#: src/cli/main.cpp
+msgid "mDNS"
+msgstr "mDNS"
+
+#: src/cli/main.cpp
+msgid "advertising"
+msgstr "oznamuje se"
+
+#: src/cli/main.cpp
+msgid "unavailable"
+msgstr "nedostupné"
+
+#: src/cli/main.cpp
+msgid "Firewall"
+msgstr "Firewall"
+
+#: src/cli/main.cpp
+msgid "Paired devices"
+msgstr "Spárovaná zařízení"
+
+#: src/cli/main.cpp
+msgid "Pending requests"
+msgstr "Čekající žádosti"
+
+#: src/cli/main.cpp
+msgid "Connected now"
+msgstr "Právě připojeno"
+
+#: src/cli/main.cpp
+msgid "paired"
+msgstr "spárováno"
+
+#: src/cli/main.cpp
+msgid "unpaired"
+msgstr "nespárováno"
+
+#: src/cli/main.cpp
+msgid "Recently received:"
+msgstr "Nedávno přijaté:"
+
+#: src/cli/main.cpp
+#, c-format
+msgid ""
+"\n"
+"Run 'tether --pending' to see what is waiting to be accepted.\n"
+msgstr ""
+"\n"
+"Spusťte 'tether --pending' a zobrazte, co čeká na přijetí.\n"
+
+#: src/cli/main.cpp
+#, c-format
+msgid "No pairing requests are waiting.\n"
+msgstr ""
+"Nečekají žádné žádosti o spárování.\n"
+
+#: src/cli/main.cpp
+#, c-format
+msgid ""
+"\n"
+"Accept one with: tether --accept <fingerprint>\n"
+msgstr ""
+"\n"
+"Přijměte některou pomocí: tether --accept <fingerprint>\n"
+
+#: src/cli/main.cpp
+#, c-format
+msgid ""
+"\n"
+"Tether does not enable it for you. To start the daemon now and on every "
+"login:\n"
+"\n"
+"systemctl --user daemon-reload\n"
+"systemctl --user enable --now tetherd.service\n"
+"\n"
+"On a server you log out of, keep the user session alive too:\n"
+"\n"
+"loginctl enable-linger $USER\n"
+msgstr ""
+"\n"
+"Tether ji za vás nepovolí. Chcete-li démona spustit nyní a při každém přihlášení:\n"
+"\n"
+"systemctl --user daemon-reload\n"
+"systemctl --user enable --now tetherd.service\n"
+"\n"
+"Na serveru, ze kterého se odhlašujete, udržujte také uživatelskou relaci naživu:\n"
+"\n"
+"loginctl enable-linger $USER\n"
+
+#: src/cli/main.cpp
+#, c-format
+msgid "No tetherd user service was installed for this user.\n"
+msgstr ""
+"Pro tohoto uživatele nebyla nainstalována žádná uživatelská služba tetherd.\n"
+
+#: src/cli/main.cpp
+#, c-format
+msgid "Removed %s\n"
+msgstr ""
+"Odebráno %s\n"
+
+#: src/cli/main.cpp
+#, c-format
+msgid ""
+"\n"
+"Run 'systemctl --user daemon-reload' to forget it.\n"
+msgstr ""
+"\n"
+"Spusťte 'systemctl --user daemon-reload', aby na ni systemd zapomněl.\n"
 
 #: src/cli/main.cpp
 msgid "--port expects a number.\n"

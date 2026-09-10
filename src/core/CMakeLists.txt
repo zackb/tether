@@ -11,6 +11,7 @@ add_library(tether STATIC
     src/secret_store.cpp
     src/client.cpp
     src/extension_host.cpp
+    src/service.cpp
     src/discovery.cpp
     src/mpris.cpp
     src/audio.cpp

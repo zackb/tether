@@ -237,7 +237,8 @@ make install
    or
 
    ```bash
-   tether --accept <fingerprint>   # fingerprint is printed by the daemon log
+   tether --pending                # the requests waiting, with their fingerprints
+   tether --accept <fingerprint>
    ```
 
 3. Bluetooth (for Messages and Notifications):
@@ -275,6 +276,22 @@ make install
    "Show Message Notifications" and "Sync Contacts". Both are needed. They can
    take a few minutes to appear; "Show iPhone Permissions" in the GTK app
    re-advertises so they show up again.
+
+
+### No desktop on the machine?
+
+The daemon does not need a Wayland session. Everything but clipboard sync works
+over SSH, pairing included:
+
+```bash
+systemctl --user enable --now tetherd.service   # portable build? tether --install-service first
+tether --pending        # the pairing requests waiting, with fingerprints
+tether --accept 9a4f21...
+tether --status         # devices, links, and recent transfers
+```
+
+See [docs/HEADLESS.md](docs/HEADLESS.md).
+
 
 
 ## Components

@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: tether\n"
 "Report-Msgid-Bugs-To: zack@bartel.com\n"
-"POT-Creation-Date: 2026-09-09 20:19-0700\n"
+"POT-Creation-Date: 2026-09-10 07:12+0000\n"
 "PO-Revision-Date: 2026-08-23\n"
 "Last-Translator: Tether project\n"
 "Language-Team: Russian\n"
@@ -243,6 +243,24 @@ msgstr ""
 "для переносимых сборок; пакеты дистрибутива устанавливают его сами."
 
 #: src/cli/main.cpp
+msgid ""
+"Write the tetherd systemd user service for this user, and print how to "
+"enable it. Needed only for portable builds; the distro packages install it."
+msgstr "Записывает пользовательскую службу systemd tetherd для этого пользователя и выводит, как её включить. Нужно только для переносимых сборок; пакеты дистрибутива устанавливают её сами."
+
+#: src/cli/main.cpp
+msgid "Remove the tetherd systemd user service this user installed."
+msgstr "Удаляет пользовательскую службу systemd tetherd, установленную этим пользователем."
+
+#: src/cli/main.cpp
+msgid "Show what the daemon is doing: devices, links, and recent transfers."
+msgstr "Показывает, чем занят демон: устройства, соединения и недавние передачи."
+
+#: src/cli/main.cpp
+msgid "List Wi-Fi pairing requests waiting to be accepted."
+msgstr "Показывает запросы на сопряжение по Wi-Fi, ожидающие принятия."
+
+#: src/cli/main.cpp
 msgid "Accept a pending pairing request locally."
 msgstr "Принять ожидающий запрос на сопряжение локально."
 
@@ -269,7 +287,8 @@ msgstr "Примеры:"
 #: src/cli/main.cpp
 #, c-format
 msgid "Installed %s\n"
-msgstr "Установлено: %s\n"
+msgstr ""
+"Установлено %s\n"
 
 #: src/cli/main.cpp
 #, c-format
@@ -468,12 +487,12 @@ msgid "Could not read the AirPods battery from the daemon.\n"
 msgstr "Не удалось получить заряд AirPods от службы.\n"
 
 #: src/cli/main.cpp
-msgid "No AirPods connected.\n"
-msgstr "AirPods не подключены.\n"
-
-#: src/cli/main.cpp
 msgid "AirPods management is off.\n"
 msgstr "Управление AirPods отключено.\n"
+
+#: src/cli/main.cpp
+msgid "No AirPods connected.\n"
+msgstr "AirPods не подключены.\n"
 
 #: src/cli/main.cpp
 msgid "Left"
@@ -727,6 +746,144 @@ msgstr "Отправлено в %s\n"
 #: src/cli/main.cpp src/gtk/messages_view.cpp
 msgid "The message was not sent."
 msgstr "Сообщение не отправлено."
+
+#: src/cli/main.cpp
+msgid "Could not read the daemon's state.\n"
+msgstr ""
+"Не удалось прочитать состояние демона.\n"
+
+#: src/cli/main.cpp
+msgid "Version"
+msgstr "Версия"
+
+#: src/cli/main.cpp
+msgid "Daemon"
+msgstr "Демон"
+
+#: src/cli/main.cpp
+msgid "running"
+msgstr "работает"
+
+#: src/cli/main.cpp
+msgid "Clipboard"
+msgstr "Буфер обмена"
+
+#: src/cli/main.cpp
+msgid "syncing"
+msgstr "синхронизируется"
+
+#: src/cli/main.cpp
+msgid "off, no Wayland session on this machine"
+msgstr "выключено, на этой машине нет сеанса Wayland"
+
+#: src/cli/main.cpp
+msgid "mDNS"
+msgstr "mDNS"
+
+#: src/cli/main.cpp
+msgid "advertising"
+msgstr "объявляет"
+
+#: src/cli/main.cpp
+msgid "unavailable"
+msgstr "недоступно"
+
+#: src/cli/main.cpp
+msgid "Firewall"
+msgstr "Брандмауэр"
+
+#: src/cli/main.cpp
+msgid "Paired devices"
+msgstr "Сопряжённые устройства"
+
+#: src/cli/main.cpp
+msgid "Pending requests"
+msgstr "Ожидающие запросы"
+
+#: src/cli/main.cpp
+msgid "Connected now"
+msgstr "Подключено сейчас"
+
+#: src/cli/main.cpp
+msgid "paired"
+msgstr "сопряжено"
+
+#: src/cli/main.cpp
+msgid "unpaired"
+msgstr "не сопряжено"
+
+#: src/cli/main.cpp
+msgid "Recently received:"
+msgstr "Недавно получено:"
+
+#: src/cli/main.cpp
+#, c-format
+msgid ""
+"\n"
+"Run 'tether --pending' to see what is waiting to be accepted.\n"
+msgstr ""
+"\n"
+"Выполните 'tether --pending', чтобы увидеть, что ожидает принятия.\n"
+
+#: src/cli/main.cpp
+#, c-format
+msgid "No pairing requests are waiting.\n"
+msgstr ""
+"Нет ожидающих запросов на сопряжение.\n"
+
+#: src/cli/main.cpp
+#, c-format
+msgid ""
+"\n"
+"Accept one with: tether --accept <fingerprint>\n"
+msgstr ""
+"\n"
+"Принять можно так: tether --accept <fingerprint>\n"
+
+#: src/cli/main.cpp
+#, c-format
+msgid ""
+"\n"
+"Tether does not enable it for you. To start the daemon now and on every "
+"login:\n"
+"\n"
+"systemctl --user daemon-reload\n"
+"systemctl --user enable --now tetherd.service\n"
+"\n"
+"On a server you log out of, keep the user session alive too:\n"
+"\n"
+"loginctl enable-linger $USER\n"
+msgstr ""
+"\n"
+"Tether не включает её за вас. Чтобы запустить демона сейчас и при каждом входе:\n"
+"\n"
+"systemctl --user daemon-reload\n"
+"systemctl --user enable --now tetherd.service\n"
+"\n"
+"На сервере, с которого вы выходите, также не давайте пользовательскому сеансу закрыться:\n"
+"\n"
+"loginctl enable-linger $USER\n"
+
+#: src/cli/main.cpp
+#, c-format
+msgid "No tetherd user service was installed for this user.\n"
+msgstr ""
+"Для этого пользователя не установлена пользовательская служба tetherd.\n"
+
+#: src/cli/main.cpp
+#, c-format
+msgid "Removed %s\n"
+msgstr ""
+"Удалено %s\n"
+
+#: src/cli/main.cpp
+#, c-format
+msgid ""
+"\n"
+"Run 'systemctl --user daemon-reload' to forget it.\n"
+msgstr ""
+"\n"
+"Выполните 'systemctl --user daemon-reload', чтобы systemd забыл о ней.\n"
 
 #: src/cli/main.cpp
 msgid "--port expects a number.\n"
