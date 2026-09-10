@@ -1,5 +1,6 @@
 add_executable(tether_cli
     main.cpp
+    verbs.cpp
 )
 
 target_link_libraries(tether_cli PRIVATE tether)

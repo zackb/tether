@@ -278,6 +278,14 @@ msgid "Options:"
 msgstr "옵션:"
 
 #: src/cli/main.cpp
+msgid "Commands:"
+msgstr "명령:"
+
+#: src/cli/main.cpp
+msgid "Any --bt-<name> flag, as a subcommand."
+msgstr "모든 --bt-<name> 플래그를 하위 명령으로."
+
+#: src/cli/main.cpp
 msgid "Examples:"
 msgstr "예제:"
 

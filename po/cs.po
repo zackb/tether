@@ -278,6 +278,14 @@ msgid "Options:"
 msgstr "Volby:"
 
 #: src/cli/main.cpp
+msgid "Commands:"
+msgstr "Příkazy:"
+
+#: src/cli/main.cpp
+msgid "Any --bt-<name> flag, as a subcommand."
+msgstr "Libovolný přepínač --bt-<name> jako podpříkaz."
+
+#: src/cli/main.cpp
 msgid "Examples:"
 msgstr "Příklady:"
 

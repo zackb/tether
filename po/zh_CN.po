@@ -269,6 +269,14 @@ msgid "Options:"
 msgstr "选项："
 
 #: src/cli/main.cpp
+msgid "Commands:"
+msgstr "命令："
+
+#: src/cli/main.cpp
+msgid "Any --bt-<name> flag, as a subcommand."
+msgstr "任何 --bt-<name> 选项，均可作为子命令使用。"
+
+#: src/cli/main.cpp
 msgid "Examples:"
 msgstr "示例："
 

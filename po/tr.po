@@ -280,6 +280,14 @@ msgid "Options:"
 msgstr "Seçenekler:"
 
 #: src/cli/main.cpp
+msgid "Commands:"
+msgstr "Komutlar:"
+
+#: src/cli/main.cpp
+msgid "Any --bt-<name> flag, as a subcommand."
+msgstr "Herhangi bir --bt-<name> bayrağı, alt komut olarak."
+
+#: src/cli/main.cpp
 msgid "Examples:"
 msgstr "Örnekler:"
 

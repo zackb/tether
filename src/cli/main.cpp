@@ -1,3 +1,5 @@
+#include "verbs.hpp"
+
 #include <algorithm>
 #include <atomic>
 #include <charconv>
@@ -245,6 +247,22 @@ static const Opt kOptions[] = {
     {"--pair", N_("Send a pair_request over TCP to the daemon.")},
 };
 
+// The option row a subcommand stands for, matched on the long flag so the two
+// lists cannot drift apart.
+static const char* describe_flag(const std::string& flag) {
+    for (const auto& opt : kOptions) {
+        const std::string flags = opt.flags;
+        const auto at = flags.find(flag);
+        if (at == std::string::npos)
+            continue;
+        // "--pair" must not match "--bt-pair".
+        const auto end = at + flag.size();
+        if ((at == 0 || flags[at - 1] == ' ') && (end == flags.size() || flags[end] == ' ' || flags[end] == ','))
+            return opt.desc;
+    }
+    return "";
+}
+
 void print_help() {
     fprintf(stdout, "%s\n\n%s\n", _("tether - Wayland companion CLI"), _("Options:"));
 
@@ -263,16 +281,44 @@ void print_help() {
         }
     }
 
+    fprintf(stdout, "\n%s\n", _("Commands:"));
+
+    size_t verb_col = 0;
+    for (size_t i = 0; i < tether::cli::kVerbCount; ++i)
+        verb_col = std::max(verb_col, tether::display_width(tether::cli::kVerbs[i].usage));
+
+    const size_t verb_desc_width = total > verb_col + 8 ? total - verb_col - 4 : 40;
+    for (size_t i = 0; i < tether::cli::kVerbCount; ++i) {
+        const auto& verb = tether::cli::kVerbs[i];
+        const std::string pad(verb_col - tether::display_width(verb.usage), ' ');
+        // One description per capability: a subcommand borrows its flag's.
+        // gettext("") would hand back the catalog header, so ask only for text.
+        const char* desc = describe_flag(verb.flag);
+        auto lines = wrap(*desc ? _(desc) : "", verb_desc_width);
+        if (lines.empty())
+            lines.emplace_back();
+        for (size_t line = 0; line < lines.size(); ++line) {
+            const std::string prefix = line == 0 ? verb.usage + pad : std::string(verb_col, ' ');
+            fprintf(stdout, "  %s  %s\n", prefix.c_str(), lines[line].c_str());
+        }
+    }
+
     // Literal invocations: never translated.
     fprintf(stdout,
+            "  %-*s  %s\n",
+            static_cast<int>(verb_col),
+            "tether bt <name> ...",
+            _("Any --bt-<name> flag, as a subcommand."));
+
+    fprintf(stdout,
             "\n%s\n"
-            "  tether -g\n"
-            "  tether -g --host 127.0.0.1\n"
-            "  echo \"pipe\" | tether -s\n"
-            "  tether --discover\n"
-            "  tether --discover --timeout 5000\n"
-            "  tether -f ./report.pdf\n"
-            "  tether --accept 9a4f21...\n",
+            "  tether paste\n"
+            "  tether paste --host 127.0.0.1\n"
+            "  echo \"pipe\" | tether copy\n"
+            "  tether discover --timeout 5000\n"
+            "  tether send ./report.pdf\n"
+            "  tether accept 9a4f21...\n"
+            "  tether bt pair AA:BB:CC:DD:EE:FF\n",
             _("Examples:"));
 }
 
@@ -1178,6 +1224,15 @@ static int uninstall_service() {
 
 int main(int argc, char* argv[]) {
     tether::init_locale();
+
+    // Subcommands are rewritten into the flags below, so there is one parser.
+    const std::vector<std::string> expanded = tether::cli::expand_verbs({argv, argv + argc});
+    std::vector<char*> rewritten;
+    rewritten.reserve(expanded.size());
+    for (const auto& arg : expanded)
+        rewritten.push_back(const_cast<char*>(arg.c_str()));
+    argc = static_cast<int>(rewritten.size());
+    argv = rewritten.data();
 
     if (argc < 2) {
         print_help();

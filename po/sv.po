@@ -280,6 +280,14 @@ msgid "Options:"
 msgstr "Flaggor:"
 
 #: src/cli/main.cpp
+msgid "Commands:"
+msgstr "Kommandon:"
+
+#: src/cli/main.cpp
+msgid "Any --bt-<name> flag, as a subcommand."
+msgstr "Valfri --bt-<name>-flagga, som underkommando."
+
+#: src/cli/main.cpp
 msgid "Examples:"
 msgstr "Exempel:"
 

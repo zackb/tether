@@ -282,6 +282,14 @@ msgid "Options:"
 msgstr "Параметри:"
 
 #: src/cli/main.cpp
+msgid "Commands:"
+msgstr "Команди:"
+
+#: src/cli/main.cpp
+msgid "Any --bt-<name> flag, as a subcommand."
+msgstr "Будь-який прапорець --bt-<name> як підкоманда."
+
+#: src/cli/main.cpp
 msgid "Examples:"
 msgstr "Приклади:"
 

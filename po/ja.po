@@ -281,6 +281,14 @@ msgid "Options:"
 msgstr "オプション:"
 
 #: src/cli/main.cpp
+msgid "Commands:"
+msgstr "コマンド:"
+
+#: src/cli/main.cpp
+msgid "Any --bt-<name> flag, as a subcommand."
+msgstr "任意の --bt-<name> フラグをサブコマンドとして。"
+
+#: src/cli/main.cpp
 msgid "Examples:"
 msgstr "例:"
 
