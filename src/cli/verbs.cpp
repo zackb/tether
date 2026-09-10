@@ -3,7 +3,9 @@
 namespace tether::cli {
 
     const Verb kVerbs[] = {
+        {"status", "--status", "tether status"},
         {"devices", "--list-devices", "tether devices"},
+        {"pending", "--pending", "tether pending"},
         {"accept", "--accept", "tether accept <fingerprint>"},
         {"forget", "--forget", "tether forget <fingerprint>"},
         {"pair", "--pair", "tether pair --host <ip>"},
@@ -11,6 +13,7 @@ namespace tether::cli {
         {"send", "--send-file", "tether send <path>"},
         {"copy", "--set-clipboard", "tether copy [text]"},
         {"paste", "--get-clipboard", "tether paste"},
+        {"service", "--install-service", "tether service"},
         {"version", "--version", "tether version"},
         {"help", "--help", "tether help"},
     };

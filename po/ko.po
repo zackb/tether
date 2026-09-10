@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: tether\n"
 "Report-Msgid-Bugs-To: zack@bartel.com\n"
-"POT-Creation-Date: 2026-09-10 07:12+0000\n"
+"POT-Creation-Date: 2026-09-10 09:25-0700\n"
 "PO-Revision-Date: 2026-08-23\n"
 "Last-Translator: Tether project\n"
 "Language-Team: Korean\n"
@@ -243,7 +243,9 @@ msgstr ""
 msgid ""
 "Write the tetherd systemd user service for this user, and print how to "
 "enable it. Needed only for portable builds; the distro packages install it."
-msgstr "이 사용자를 위한 tetherd systemd 사용자 서비스를 작성하고 활성화 방법을 출력합니다. 포터블 빌드에만 필요하며, 배포판 패키지는 직접 설치합니다."
+msgstr ""
+"이 사용자를 위한 tetherd systemd 사용자 서비스를 작성하고 활성화 방법을 출력"
+"합니다. 포터블 빌드에만 필요하며, 배포판 패키지는 직접 설치합니다."
 
 #: src/cli/main.cpp
 msgid "Remove the tetherd systemd user service this user installed."
@@ -292,8 +294,7 @@ msgstr "예제:"
 #: src/cli/main.cpp
 #, c-format
 msgid "Installed %s\n"
-msgstr ""
-"%s 설치됨\n"
+msgstr "%s 설치됨\n"
 
 #: src/cli/main.cpp
 #, c-format
@@ -739,8 +740,7 @@ msgstr "메시지가 전송되지 않았습니다."
 
 #: src/cli/main.cpp
 msgid "Could not read the daemon's state.\n"
-msgstr ""
-"데몬의 상태를 읽을 수 없습니다.\n"
+msgstr "데몬의 상태를 읽을 수 없습니다.\n"
 
 #: src/cli/main.cpp
 msgid "Version"
@@ -818,8 +818,7 @@ msgstr ""
 #: src/cli/main.cpp
 #, c-format
 msgid "No pairing requests are waiting.\n"
-msgstr ""
-"대기 중인 페어링 요청이 없습니다.\n"
+msgstr "대기 중인 페어링 요청이 없습니다.\n"
 
 #: src/cli/main.cpp
 #, c-format
@@ -829,6 +828,17 @@ msgid ""
 msgstr ""
 "\n"
 "다음 명령으로 수락하세요: tether --accept <fingerprint>\n"
+
+#: src/cli/main.cpp
+#, c-format
+msgid ""
+"No systemd on this machine, so there is no user service to manage. Start "
+"tetherd from whatever this system uses for services, or let a client start "
+"it on demand.\n"
+msgstr ""
+"이 컴퓨터에는 systemd가 없으므로 관리할 사용자 서비스가 없습니다. 이 시스템이 "
+"서비스에 사용하는 방법으로 tetherd를 시작하거나, 클라이언트가 필요할 때 "
+"시작하도록 두십시오.\n"
 
 #: src/cli/main.cpp
 #, c-format
@@ -845,7 +855,8 @@ msgid ""
 "loginctl enable-linger $USER\n"
 msgstr ""
 "\n"
-"Tether가 대신 활성화하지 않습니다. 데몬을 지금 그리고 로그인할 때마다 시작하려면:\n"
+"Tether가 대신 활성화하지 않습니다. 데몬을 지금 그리고 로그인할 때마다 시작하"
+"려면:\n"
 "\n"
 "systemctl --user daemon-reload\n"
 "systemctl --user enable --now tetherd.service\n"
@@ -857,14 +868,12 @@ msgstr ""
 #: src/cli/main.cpp
 #, c-format
 msgid "No tetherd user service was installed for this user.\n"
-msgstr ""
-"이 사용자를 위해 설치된 tetherd 사용자 서비스가 없습니다.\n"
+msgstr "이 사용자를 위해 설치된 tetherd 사용자 서비스가 없습니다.\n"
 
 #: src/cli/main.cpp
 #, c-format
 msgid "Removed %s\n"
-msgstr ""
-"%s 제거됨\n"
+msgstr "%s 제거됨\n"
 
 #: src/cli/main.cpp
 #, c-format

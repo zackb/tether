@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: tether\n"
 "Report-Msgid-Bugs-To: zack@bartel.com\n"
-"POT-Creation-Date: 2026-09-10 07:12+0000\n"
+"POT-Creation-Date: 2026-09-10 09:25-0700\n"
 "PO-Revision-Date: 2026-08-23\n"
 "Last-Translator: Tether project\n"
 "Language-Team: Ukrainian\n"
@@ -247,15 +247,20 @@ msgstr ""
 msgid ""
 "Write the tetherd systemd user service for this user, and print how to "
 "enable it. Needed only for portable builds; the distro packages install it."
-msgstr "Записує службу користувача systemd tetherd для цього користувача та виводить, як її увімкнути. Потрібно лише для портативних збірок; пакунки дистрибутива встановлюють її самі."
+msgstr ""
+"Записує службу користувача systemd tetherd для цього користувача та "
+"виводить, як її увімкнути. Потрібно лише для портативних збірок; пакунки "
+"дистрибутива встановлюють її самі."
 
 #: src/cli/main.cpp
 msgid "Remove the tetherd systemd user service this user installed."
-msgstr "Вилучає службу користувача systemd tetherd, яку встановив цей користувач."
+msgstr ""
+"Вилучає службу користувача systemd tetherd, яку встановив цей користувач."
 
 #: src/cli/main.cpp
 msgid "Show what the daemon is doing: devices, links, and recent transfers."
-msgstr "Показує, що робить демон: пристрої, з'єднання та нещодавні передавання."
+msgstr ""
+"Показує, що робить демон: пристрої, з'єднання та нещодавні передавання."
 
 #: src/cli/main.cpp
 msgid "List Wi-Fi pairing requests waiting to be accepted."
@@ -296,8 +301,7 @@ msgstr "Приклади:"
 #: src/cli/main.cpp
 #, c-format
 msgid "Installed %s\n"
-msgstr ""
-"Встановлено %s\n"
+msgstr "Встановлено %s\n"
 
 #: src/cli/main.cpp
 #, c-format
@@ -758,8 +762,7 @@ msgstr "Повідомлення не надіслано."
 
 #: src/cli/main.cpp
 msgid "Could not read the daemon's state.\n"
-msgstr ""
-"Не вдалося прочитати стан демона.\n"
+msgstr "Не вдалося прочитати стан демона.\n"
 
 #: src/cli/main.cpp
 msgid "Version"
@@ -837,8 +840,7 @@ msgstr ""
 #: src/cli/main.cpp
 #, c-format
 msgid "No pairing requests are waiting.\n"
-msgstr ""
-"Немає запитів на спарення в очікуванні.\n"
+msgstr "Немає запитів на спарення в очікуванні.\n"
 
 #: src/cli/main.cpp
 #, c-format
@@ -848,6 +850,17 @@ msgid ""
 msgstr ""
 "\n"
 "Прийняти можна так: tether --accept <fingerprint>\n"
+
+#: src/cli/main.cpp
+#, c-format
+msgid ""
+"No systemd on this machine, so there is no user service to manage. Start "
+"tetherd from whatever this system uses for services, or let a client start "
+"it on demand.\n"
+msgstr ""
+"На цій машині немає systemd, тож немає користувацької служби для керування. "
+"Запустіть tetherd тим, що ця система використовує для служб, або дозвольте "
+"клієнту запустити його на вимогу.\n"
 
 #: src/cli/main.cpp
 #, c-format
@@ -864,26 +877,26 @@ msgid ""
 "loginctl enable-linger $USER\n"
 msgstr ""
 "\n"
-"Tether не вмикає її за вас. Щоб запустити демона зараз і під час кожного входу:\n"
+"Tether не вмикає її за вас. Щоб запустити демона зараз і під час кожного "
+"входу:\n"
 "\n"
 "systemctl --user daemon-reload\n"
 "systemctl --user enable --now tetherd.service\n"
 "\n"
-"На сервері, з якого ви виходите, також підтримуйте сеанс користувача активним:\n"
+"На сервері, з якого ви виходите, також підтримуйте сеанс користувача "
+"активним:\n"
 "\n"
 "loginctl enable-linger $USER\n"
 
 #: src/cli/main.cpp
 #, c-format
 msgid "No tetherd user service was installed for this user.\n"
-msgstr ""
-"Для цього користувача не встановлено службу користувача tetherd.\n"
+msgstr "Для цього користувача не встановлено службу користувача tetherd.\n"
 
 #: src/cli/main.cpp
 #, c-format
 msgid "Removed %s\n"
-msgstr ""
-"Вилучено %s\n"
+msgstr "Вилучено %s\n"
 
 #: src/cli/main.cpp
 #, c-format

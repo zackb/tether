@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: tether\n"
 "Report-Msgid-Bugs-To: zack@bartel.com\n"
-"POT-Creation-Date: 2026-09-10 07:12+0000\n"
+"POT-Creation-Date: 2026-09-10 09:25-0700\n"
 "PO-Revision-Date: 2026-08-23\n"
 "Last-Translator: Tether project\n"
 "Language-Team: Simplified Chinese\n"
@@ -234,7 +234,9 @@ msgstr ""
 msgid ""
 "Write the tetherd systemd user service for this user, and print how to "
 "enable it. Needed only for portable builds; the distro packages install it."
-msgstr "为此用户写入 tetherd systemd 用户服务，并打印启用方法。仅便携版构建需要；发行版软件包会自行安装。"
+msgstr ""
+"为此用户写入 tetherd systemd 用户服务，并打印启用方法。仅便携版构建需要；发行"
+"版软件包会自行安装。"
 
 #: src/cli/main.cpp
 msgid "Remove the tetherd systemd user service this user installed."
@@ -283,8 +285,7 @@ msgstr "示例："
 #: src/cli/main.cpp
 #, c-format
 msgid "Installed %s\n"
-msgstr ""
-"已安装 %s\n"
+msgstr "已安装 %s\n"
 
 #: src/cli/main.cpp
 #, c-format
@@ -727,8 +728,7 @@ msgstr "信息未发送。"
 
 #: src/cli/main.cpp
 msgid "Could not read the daemon's state.\n"
-msgstr ""
-"无法读取守护进程的状态。\n"
+msgstr "无法读取守护进程的状态。\n"
 
 #: src/cli/main.cpp
 msgid "Version"
@@ -806,8 +806,7 @@ msgstr ""
 #: src/cli/main.cpp
 #, c-format
 msgid "No pairing requests are waiting.\n"
-msgstr ""
-"没有等待中的配对请求。\n"
+msgstr "没有等待中的配对请求。\n"
 
 #: src/cli/main.cpp
 #, c-format
@@ -817,6 +816,16 @@ msgid ""
 msgstr ""
 "\n"
 "使用以下命令接受：tether --accept <fingerprint>\n"
+
+#: src/cli/main.cpp
+#, c-format
+msgid ""
+"No systemd on this machine, so there is no user service to manage. Start "
+"tetherd from whatever this system uses for services, or let a client start "
+"it on demand.\n"
+msgstr ""
+"本机没有 systemd，因此没有可管理的用户服务。请用本系统管理服务的方式启动 "
+"tetherd，或者让客户端在需要时启动它。\n"
 
 #: src/cli/main.cpp
 #, c-format
@@ -845,14 +854,12 @@ msgstr ""
 #: src/cli/main.cpp
 #, c-format
 msgid "No tetherd user service was installed for this user.\n"
-msgstr ""
-"未为此用户安装 tetherd 用户服务。\n"
+msgstr "未为此用户安装 tetherd 用户服务。\n"
 
 #: src/cli/main.cpp
 #, c-format
 msgid "Removed %s\n"
-msgstr ""
-"已移除 %s\n"
+msgstr "已移除 %s\n"
 
 #: src/cli/main.cpp
 #, c-format

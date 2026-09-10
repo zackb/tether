@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: tether\n"
 "Report-Msgid-Bugs-To: zack@bartel.com\n"
-"POT-Creation-Date: 2026-09-10 07:12+0000\n"
+"POT-Creation-Date: 2026-09-10 09:25-0700\n"
 "PO-Revision-Date: 2026-08-22\n"
 "Last-Translator: Tether project\n"
 "Language-Team: German\n"
@@ -247,15 +247,21 @@ msgstr ""
 msgid ""
 "Write the tetherd systemd user service for this user, and print how to "
 "enable it. Needed only for portable builds; the distro packages install it."
-msgstr "Schreibt den systemd-Benutzerdienst tetherd für diesen Benutzer und gibt aus, wie er aktiviert wird. Nur für portable Builds nötig; die Distributionspakete installieren ihn selbst."
+msgstr ""
+"Schreibt den systemd-Benutzerdienst tetherd für diesen Benutzer und gibt "
+"aus, wie er aktiviert wird. Nur für portable Builds nötig; die "
+"Distributionspakete installieren ihn selbst."
 
 #: src/cli/main.cpp
 msgid "Remove the tetherd systemd user service this user installed."
-msgstr "Entfernt den systemd-Benutzerdienst tetherd, den dieser Benutzer installiert hat."
+msgstr ""
+"Entfernt den systemd-Benutzerdienst tetherd, den dieser Benutzer installiert "
+"hat."
 
 #: src/cli/main.cpp
 msgid "Show what the daemon is doing: devices, links, and recent transfers."
-msgstr "Zeigt, was der Daemon tut: Geräte, Verbindungen und letzte Übertragungen."
+msgstr ""
+"Zeigt, was der Daemon tut: Geräte, Verbindungen und letzte Übertragungen."
 
 #: src/cli/main.cpp
 msgid "List Wi-Fi pairing requests waiting to be accepted."
@@ -296,8 +302,7 @@ msgstr "Beispiele:"
 #: src/cli/main.cpp
 #, c-format
 msgid "Installed %s\n"
-msgstr ""
-"%s installiert\n"
+msgstr "%s installiert\n"
 
 #: src/cli/main.cpp
 #, c-format
@@ -758,8 +763,7 @@ msgstr "Die Nachricht wurde nicht gesendet."
 
 #: src/cli/main.cpp
 msgid "Could not read the daemon's state.\n"
-msgstr ""
-"Der Zustand des Daemons konnte nicht gelesen werden.\n"
+msgstr "Der Zustand des Daemons konnte nicht gelesen werden.\n"
 
 #: src/cli/main.cpp
 msgid "Version"
@@ -837,8 +841,7 @@ msgstr ""
 #: src/cli/main.cpp
 #, c-format
 msgid "No pairing requests are waiting.\n"
-msgstr ""
-"Es warten keine Kopplungsanfragen.\n"
+msgstr "Es warten keine Kopplungsanfragen.\n"
 
 #: src/cli/main.cpp
 #, c-format
@@ -848,6 +851,17 @@ msgid ""
 msgstr ""
 "\n"
 "Eine annehmen mit: tether --accept <fingerprint>\n"
+
+#: src/cli/main.cpp
+#, c-format
+msgid ""
+"No systemd on this machine, so there is no user service to manage. Start "
+"tetherd from whatever this system uses for services, or let a client start "
+"it on demand.\n"
+msgstr ""
+"Auf diesem Rechner läuft kein systemd, es gibt also keinen Benutzerdienst zu "
+"verwalten. Starten Sie tetherd über das, was dieses System für Dienste nutzt, "
+"oder lassen Sie ihn von einem Client bei Bedarf starten.\n"
 
 #: src/cli/main.cpp
 #, c-format
@@ -864,26 +878,26 @@ msgid ""
 "loginctl enable-linger $USER\n"
 msgstr ""
 "\n"
-"Tether aktiviert ihn nicht für Sie. Um den Daemon jetzt und bei jeder Anmeldung zu starten:\n"
+"Tether aktiviert ihn nicht für Sie. Um den Daemon jetzt und bei jeder "
+"Anmeldung zu starten:\n"
 "\n"
 "systemctl --user daemon-reload\n"
 "systemctl --user enable --now tetherd.service\n"
 "\n"
-"Auf einem Server, von dem Sie sich abmelden, halten Sie auch die Benutzersitzung am Leben:\n"
+"Auf einem Server, von dem Sie sich abmelden, halten Sie auch die "
+"Benutzersitzung am Leben:\n"
 "\n"
 "loginctl enable-linger $USER\n"
 
 #: src/cli/main.cpp
 #, c-format
 msgid "No tetherd user service was installed for this user.\n"
-msgstr ""
-"Für diesen Benutzer wurde kein tetherd-Benutzerdienst installiert.\n"
+msgstr "Für diesen Benutzer wurde kein tetherd-Benutzerdienst installiert.\n"
 
 #: src/cli/main.cpp
 #, c-format
 msgid "Removed %s\n"
-msgstr ""
-"%s entfernt\n"
+msgstr "%s entfernt\n"
 
 #: src/cli/main.cpp
 #, c-format
@@ -892,7 +906,8 @@ msgid ""
 "Run 'systemctl --user daemon-reload' to forget it.\n"
 msgstr ""
 "\n"
-"Führen Sie 'systemctl --user daemon-reload' aus, damit systemd sie vergisst.\n"
+"Führen Sie 'systemctl --user daemon-reload' aus, damit systemd sie "
+"vergisst.\n"
 
 #: src/cli/main.cpp
 msgid "--port expects a number.\n"

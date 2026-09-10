@@ -1186,7 +1186,21 @@ static int print_pending(tether::Client& client) {
     return 0;
 }
 
+// systemd is what runs the unit, so writing one where there is no systemd would
+// leave a dead file and instructions that go nowhere.
+static bool has_systemd() {
+    if (!tether::which_program("systemctl").empty())
+        return true;
+    fprintf(stdout,
+            _("No systemd on this machine, so there is no user service to manage. Start tetherd from "
+              "whatever this system uses for services, or let a client start it on demand.\n"));
+    return false;
+}
+
 static int install_service() {
+    if (!has_systemd())
+        return 1;
+
     const auto result = tether::install_tetherd_service();
 
     for (const auto& err : result.errors)
@@ -1205,6 +1219,9 @@ static int install_service() {
 }
 
 static int uninstall_service() {
+    if (!has_systemd())
+        return 1;
+
     const auto result = tether::uninstall_tetherd_service();
 
     for (const auto& err : result.errors)

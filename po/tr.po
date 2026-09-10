@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: tether\n"
 "Report-Msgid-Bugs-To: zack@bartel.com\n"
-"POT-Creation-Date: 2026-09-10 07:12+0000\n"
+"POT-Creation-Date: 2026-09-10 09:25-0700\n"
 "PO-Revision-Date: 2026-08-23\n"
 "Last-Translator: Tether project\n"
 "Language-Team: Turkish\n"
@@ -245,7 +245,10 @@ msgstr ""
 msgid ""
 "Write the tetherd systemd user service for this user, and print how to "
 "enable it. Needed only for portable builds; the distro packages install it."
-msgstr "Bu kullanıcı için tetherd systemd kullanıcı hizmetini yazar ve nasıl etkinleştirileceğini gösterir. Yalnızca taşınabilir yapılar için gereklidir; dağıtım paketleri bunu kendisi kurar."
+msgstr ""
+"Bu kullanıcı için tetherd systemd kullanıcı hizmetini yazar ve nasıl "
+"etkinleştirileceğini gösterir. Yalnızca taşınabilir yapılar için gereklidir; "
+"dağıtım paketleri bunu kendisi kurar."
 
 #: src/cli/main.cpp
 msgid "Remove the tetherd systemd user service this user installed."
@@ -253,7 +256,9 @@ msgstr "Bu kullanıcının kurduğu tetherd systemd kullanıcı hizmetini kaldı
 
 #: src/cli/main.cpp
 msgid "Show what the daemon is doing: devices, links, and recent transfers."
-msgstr "Arka plandaki sürecin ne yaptığını gösterir: cihazlar, bağlantılar ve son aktarımlar."
+msgstr ""
+"Arka plandaki sürecin ne yaptığını gösterir: cihazlar, bağlantılar ve son "
+"aktarımlar."
 
 #: src/cli/main.cpp
 msgid "List Wi-Fi pairing requests waiting to be accepted."
@@ -294,8 +299,7 @@ msgstr "Örnekler:"
 #: src/cli/main.cpp
 #, c-format
 msgid "Installed %s\n"
-msgstr ""
-"%s kuruldu\n"
+msgstr "%s kuruldu\n"
 
 #: src/cli/main.cpp
 #, c-format
@@ -751,8 +755,7 @@ msgstr "Mesaj gönderilmedi."
 
 #: src/cli/main.cpp
 msgid "Could not read the daemon's state.\n"
-msgstr ""
-"Arka plandaki tetherd sürecinin durumu okunamadı.\n"
+msgstr "Arka plandaki tetherd sürecinin durumu okunamadı.\n"
 
 #: src/cli/main.cpp
 msgid "Version"
@@ -830,8 +833,7 @@ msgstr ""
 #: src/cli/main.cpp
 #, c-format
 msgid "No pairing requests are waiting.\n"
-msgstr ""
-"Bekleyen eşleştirme isteği yok.\n"
+msgstr "Bekleyen eşleştirme isteği yok.\n"
 
 #: src/cli/main.cpp
 #, c-format
@@ -841,6 +843,17 @@ msgid ""
 msgstr ""
 "\n"
 "Birini şununla kabul edin: tether --accept <fingerprint>\n"
+
+#: src/cli/main.cpp
+#, c-format
+msgid ""
+"No systemd on this machine, so there is no user service to manage. Start "
+"tetherd from whatever this system uses for services, or let a client start "
+"it on demand.\n"
+msgstr ""
+"Bu makinede systemd yok, dolayısıyla yönetilecek bir kullanıcı servisi de yok. "
+"tetherd'i bu sistemin servisler için kullandığı şeyle başlatın ya da bir "
+"istemcinin gerektiğinde başlatmasına izin verin.\n"
 
 #: src/cli/main.cpp
 #, c-format
@@ -857,7 +870,8 @@ msgid ""
 "loginctl enable-linger $USER\n"
 msgstr ""
 "\n"
-"Tether bunu sizin için etkinleştirmez. Süreci şimdi ve her oturum açışta başlatmak için:\n"
+"Tether bunu sizin için etkinleştirmez. Süreci şimdi ve her oturum açışta "
+"başlatmak için:\n"
 "\n"
 "systemctl --user daemon-reload\n"
 "systemctl --user enable --now tetherd.service\n"
@@ -869,14 +883,12 @@ msgstr ""
 #: src/cli/main.cpp
 #, c-format
 msgid "No tetherd user service was installed for this user.\n"
-msgstr ""
-"Bu kullanıcı için kurulmuş bir tetherd kullanıcı hizmeti yok.\n"
+msgstr "Bu kullanıcı için kurulmuş bir tetherd kullanıcı hizmeti yok.\n"
 
 #: src/cli/main.cpp
 #, c-format
 msgid "Removed %s\n"
-msgstr ""
-"%s kaldırıldı\n"
+msgstr "%s kaldırıldı\n"
 
 #: src/cli/main.cpp
 #, c-format

@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: tether 0.2.29\n"
 "Report-Msgid-Bugs-To: zack@bartel.com\n"
-"POT-Creation-Date: 2026-09-10 07:12+0000\n"
+"POT-Creation-Date: 2026-09-10 09:25-0700\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -778,6 +778,14 @@ msgstr ""
 msgid ""
 "\n"
 "Accept one with: tether --accept <fingerprint>\n"
+msgstr ""
+
+#: src/cli/main.cpp
+#, c-format
+msgid ""
+"No systemd on this machine, so there is no user service to manage. Start "
+"tetherd from whatever this system uses for services, or let a client start "
+"it on demand.\n"
 msgstr ""
 
 #: src/cli/main.cpp

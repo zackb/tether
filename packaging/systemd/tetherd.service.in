@@ -5,17 +5,19 @@ Documentation=https://github.com/zackb/tether
 # Wayland session, it just does not sync the clipboard when there is none.
 After=dbus.socket network.target bluetooth.target
 Wants=network.target
-# A tetherd a client spawned on its own still holds the TCP listener, so this
-# unit cannot bind it. Give up and say so rather than restarting into it forever.
+# A tetherd a client spawned on its own holds the runtime lock, so this unit's
+# tetherd exits. Give up and say so rather than restarting into it forever.
 StartLimitIntervalSec=60
 StartLimitBurst=3
 
 [Service]
 Type=simple
 # A client spawns tetherd on its own when one is not already running, so there
-# may be one from before this unit was enabled. It holds the TCP listener, which
-# this unit would then fail to bind, so take it over rather than start into it.
-ExecStartPre=-/usr/bin/pkill -x tetherd
+# may be one from before this unit was enabled. It holds the runtime lock, which
+# makes this unit's tetherd exit, so take it over rather than start into it.
+# Matched on the command line, not the process name: a client spawns the daemon
+# as argv[0] "tetherd", but an AppImage's name is what lands in comm.
+ExecStartPre=-/usr/bin/pkill -f ^tetherd
 ExecStart=@TETHERD_EXEC@
 Restart=on-failure
 RestartSec=3

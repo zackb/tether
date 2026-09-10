@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: tether\n"
 "Report-Msgid-Bugs-To: zack@bartel.com\n"
-"POT-Creation-Date: 2026-09-10 07:12+0000\n"
+"POT-Creation-Date: 2026-09-10 09:25-0700\n"
 "PO-Revision-Date: 2026-08-22\n"
 "Last-Translator: Tether project\n"
 "Language-Team: Spanish\n"
@@ -249,19 +249,26 @@ msgstr ""
 msgid ""
 "Write the tetherd systemd user service for this user, and print how to "
 "enable it. Needed only for portable builds; the distro packages install it."
-msgstr "Escribe el servicio de usuario de systemd tetherd para este usuario e imprime cómo habilitarlo. Solo es necesario para compilaciones portables; los paquetes de la distribución lo instalan."
+msgstr ""
+"Escribe el servicio de usuario de systemd tetherd para este usuario e "
+"imprime cómo habilitarlo. Solo es necesario para compilaciones portables; "
+"los paquetes de la distribución lo instalan."
 
 #: src/cli/main.cpp
 msgid "Remove the tetherd systemd user service this user installed."
-msgstr "Elimina el servicio de usuario de systemd tetherd que instaló este usuario."
+msgstr ""
+"Elimina el servicio de usuario de systemd tetherd que instaló este usuario."
 
 #: src/cli/main.cpp
 msgid "Show what the daemon is doing: devices, links, and recent transfers."
-msgstr "Muestra qué está haciendo el demonio: dispositivos, conexiones y transferencias recientes."
+msgstr ""
+"Muestra qué está haciendo el demonio: dispositivos, conexiones y "
+"transferencias recientes."
 
 #: src/cli/main.cpp
 msgid "List Wi-Fi pairing requests waiting to be accepted."
-msgstr "Lista las solicitudes de emparejamiento por Wi-Fi que esperan ser aceptadas."
+msgstr ""
+"Lista las solicitudes de emparejamiento por Wi-Fi que esperan ser aceptadas."
 
 #: src/cli/main.cpp
 msgid "Accept a pending pairing request locally."
@@ -298,8 +305,7 @@ msgstr "Ejemplos:"
 #: src/cli/main.cpp
 #, c-format
 msgid "Installed %s\n"
-msgstr ""
-"Instalado %s\n"
+msgstr "Instalado %s\n"
 
 #: src/cli/main.cpp
 #, c-format
@@ -757,8 +763,7 @@ msgstr "El mensaje no se envió."
 
 #: src/cli/main.cpp
 msgid "Could not read the daemon's state.\n"
-msgstr ""
-"No se pudo leer el estado del demonio.\n"
+msgstr "No se pudo leer el estado del demonio.\n"
 
 #: src/cli/main.cpp
 msgid "Version"
@@ -836,8 +841,7 @@ msgstr ""
 #: src/cli/main.cpp
 #, c-format
 msgid "No pairing requests are waiting.\n"
-msgstr ""
-"No hay solicitudes de emparejamiento esperando.\n"
+msgstr "No hay solicitudes de emparejamiento esperando.\n"
 
 #: src/cli/main.cpp
 #, c-format
@@ -847,6 +851,17 @@ msgid ""
 msgstr ""
 "\n"
 "Acepte una con: tether --accept <fingerprint>\n"
+
+#: src/cli/main.cpp
+#, c-format
+msgid ""
+"No systemd on this machine, so there is no user service to manage. Start "
+"tetherd from whatever this system uses for services, or let a client start "
+"it on demand.\n"
+msgstr ""
+"Esta máquina no tiene systemd, así que no hay ningún servicio de usuario que "
+"gestionar. Inicia tetherd con lo que este sistema use para servicios, o deja "
+"que un cliente lo inicie cuando haga falta.\n"
 
 #: src/cli/main.cpp
 #, c-format
@@ -863,26 +878,26 @@ msgid ""
 "loginctl enable-linger $USER\n"
 msgstr ""
 "\n"
-"Tether no lo habilita por usted. Para iniciar el demonio ahora y en cada inicio de sesión:\n"
+"Tether no lo habilita por usted. Para iniciar el demonio ahora y en cada "
+"inicio de sesión:\n"
 "\n"
 "systemctl --user daemon-reload\n"
 "systemctl --user enable --now tetherd.service\n"
 "\n"
-"En un servidor del que cierra sesión, mantenga también viva la sesión de usuario:\n"
+"En un servidor del que cierra sesión, mantenga también viva la sesión de "
+"usuario:\n"
 "\n"
 "loginctl enable-linger $USER\n"
 
 #: src/cli/main.cpp
 #, c-format
 msgid "No tetherd user service was installed for this user.\n"
-msgstr ""
-"No se instaló ningún servicio de usuario tetherd para este usuario.\n"
+msgstr "No se instaló ningún servicio de usuario tetherd para este usuario.\n"
 
 #: src/cli/main.cpp
 #, c-format
 msgid "Removed %s\n"
-msgstr ""
-"Eliminado %s\n"
+msgstr "Eliminado %s\n"
 
 #: src/cli/main.cpp
 #, c-format

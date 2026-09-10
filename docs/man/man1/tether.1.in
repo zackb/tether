@@ -94,8 +94,8 @@ Each of these is the option named beside it, so nothing behaves differently for
 having been typed as a word. A first argument that is not one of these, or that
 starts with a dash, is left for the option parser.
 .TP
-\fBdevices\fR
-\fB\-\-list-devices\fR
+\fBstatus\fR, \fBdevices\fR, \fBpending\fR
+\fB\-\-status\fR, \fB\-\-list-devices\fR, \fB\-\-pending\fR
 .TP
 \fBaccept\fR \fIFINGERPRINT\fR, \fBforget\fR \fIFINGERPRINT\fR, \fBpair\fR
 \fB\-\-accept\fR, \fB\-\-forget\fR, \fB\-\-pair\fR
@@ -103,8 +103,8 @@ starts with a dash, is left for the option parser.
 \fBdiscover\fR, \fBsend\fR \fIFILE\fR, \fBcopy\fR [\fISTRING\fR], \fBpaste\fR
 \fB\-\-discover\fR, \fB\-\-send-file\fR, \fB\-\-set-clipboard\fR, \fB\-\-get-clipboard\fR
 .TP
-\fBversion\fR, \fBhelp\fR
-\fB\-\-version\fR, \fB\-\-help\fR
+\fBservice\fR, \fBversion\fR, \fBhelp\fR
+\fB\-\-install-service\fR, \fB\-\-version\fR, \fB\-\-help\fR
 .TP
 \fBbt\fR \fINAME\fR [\fIARGUMENTS\fR]
 The \fB\-\-bt-\fR\fINAME\fR option, so \fBtether bt pair AA:BB:CC:DD:EE:FF\fR is

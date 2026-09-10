@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: tether\n"
 "Report-Msgid-Bugs-To: zack@bartel.com\n"
-"POT-Creation-Date: 2026-09-10 07:12+0000\n"
+"POT-Creation-Date: 2026-09-10 09:25-0700\n"
 "PO-Revision-Date: 2026-08-23\n"
 "Last-Translator: Tether project\n"
 "Language-Team: Japanese\n"
@@ -246,11 +246,16 @@ msgstr ""
 msgid ""
 "Write the tetherd systemd user service for this user, and print how to "
 "enable it. Needed only for portable builds; the distro packages install it."
-msgstr "このユーザー向けの tetherd systemd ユーザーサービスを書き込み、有効化の方法を表示します。ポータブルビルドでのみ必要です。ディストリビューションのパッケージは自分でインストールします。"
+msgstr ""
+"このユーザー向けの tetherd systemd ユーザーサービスを書き込み、有効化の方法を"
+"表示します。ポータブルビルドでのみ必要です。ディストリビューションのパッケー"
+"ジは自分でインストールします。"
 
 #: src/cli/main.cpp
 msgid "Remove the tetherd systemd user service this user installed."
-msgstr "このユーザーがインストールした tetherd の systemd ユーザーサービスを削除します。"
+msgstr ""
+"このユーザーがインストールした tetherd の systemd ユーザーサービスを削除しま"
+"す。"
 
 #: src/cli/main.cpp
 msgid "Show what the daemon is doing: devices, links, and recent transfers."
@@ -295,8 +300,7 @@ msgstr "例:"
 #: src/cli/main.cpp
 #, c-format
 msgid "Installed %s\n"
-msgstr ""
-"%s をインストールしました\n"
+msgstr "%s をインストールしました\n"
 
 #: src/cli/main.cpp
 #, c-format
@@ -743,8 +747,7 @@ msgstr "メッセージは送信されませんでした。"
 
 #: src/cli/main.cpp
 msgid "Could not read the daemon's state.\n"
-msgstr ""
-"デーモンの状態を読み取れませんでした。\n"
+msgstr "デーモンの状態を読み取れませんでした。\n"
 
 #: src/cli/main.cpp
 msgid "Version"
@@ -822,8 +825,7 @@ msgstr ""
 #: src/cli/main.cpp
 #, c-format
 msgid "No pairing requests are waiting.\n"
-msgstr ""
-"待機中のペアリングリクエストはありません。\n"
+msgstr "待機中のペアリングリクエストはありません。\n"
 
 #: src/cli/main.cpp
 #, c-format
@@ -833,6 +835,17 @@ msgid ""
 msgstr ""
 "\n"
 "次のコマンドで承認します: tether --accept <fingerprint>\n"
+
+#: src/cli/main.cpp
+#, c-format
+msgid ""
+"No systemd on this machine, so there is no user service to manage. Start "
+"tetherd from whatever this system uses for services, or let a client start "
+"it on demand.\n"
+msgstr ""
+"このマシンには systemd がないため、管理するユーザーサービスはありません。この"
+"システムがサービスに使っているもので tetherd を起動するか、クライアントが必要"
+"に応じて起動するのに任せてください。\n"
 
 #: src/cli/main.cpp
 #, c-format
@@ -849,7 +862,8 @@ msgid ""
 "loginctl enable-linger $USER\n"
 msgstr ""
 "\n"
-"Tether が代わりに有効化することはありません。デーモンを今すぐ、そしてログインのたびに起動するには:\n"
+"Tether が代わりに有効化することはありません。デーモンを今すぐ、そしてログイン"
+"のたびに起動するには:\n"
 "\n"
 "systemctl --user daemon-reload\n"
 "systemctl --user enable --now tetherd.service\n"
@@ -867,8 +881,7 @@ msgstr ""
 #: src/cli/main.cpp
 #, c-format
 msgid "Removed %s\n"
-msgstr ""
-"%s を削除しました\n"
+msgstr "%s を削除しました\n"
 
 #: src/cli/main.cpp
 #, c-format

@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: tether\n"
 "Report-Msgid-Bugs-To: zack@bartel.com\n"
-"POT-Creation-Date: 2026-09-10 07:12+0000\n"
+"POT-Creation-Date: 2026-09-10 09:25-0700\n"
 "PO-Revision-Date: 2026-08-23\n"
 "Last-Translator: Tether project\n"
 "Language-Team: Czech\n"
@@ -243,11 +243,16 @@ msgstr ""
 msgid ""
 "Write the tetherd systemd user service for this user, and print how to "
 "enable it. Needed only for portable builds; the distro packages install it."
-msgstr "Zapíše uživatelskou službu systemd tetherd pro tohoto uživatele a vypíše, jak ji povolit. Potřeba jen u přenosných sestavení; distribuční balíčky ji instalují samy."
+msgstr ""
+"Zapíše uživatelskou službu systemd tetherd pro tohoto uživatele a vypíše, "
+"jak ji povolit. Potřeba jen u přenosných sestavení; distribuční balíčky ji "
+"instalují samy."
 
 #: src/cli/main.cpp
 msgid "Remove the tetherd systemd user service this user installed."
-msgstr "Odebere uživatelskou službu systemd tetherd, kterou tento uživatel nainstaloval."
+msgstr ""
+"Odebere uživatelskou službu systemd tetherd, kterou tento uživatel "
+"nainstaloval."
 
 #: src/cli/main.cpp
 msgid "Show what the daemon is doing: devices, links, and recent transfers."
@@ -292,8 +297,7 @@ msgstr "Příklady:"
 #: src/cli/main.cpp
 #, c-format
 msgid "Installed %s\n"
-msgstr ""
-"Nainstalováno %s\n"
+msgstr "Nainstalováno %s\n"
 
 #: src/cli/main.cpp
 #, c-format
@@ -752,8 +756,7 @@ msgstr "Zpráva nebyla odeslána."
 
 #: src/cli/main.cpp
 msgid "Could not read the daemon's state.\n"
-msgstr ""
-"Nepodařilo se přečíst stav démona.\n"
+msgstr "Nepodařilo se přečíst stav démona.\n"
 
 #: src/cli/main.cpp
 msgid "Version"
@@ -831,8 +834,7 @@ msgstr ""
 #: src/cli/main.cpp
 #, c-format
 msgid "No pairing requests are waiting.\n"
-msgstr ""
-"Nečekají žádné žádosti o spárování.\n"
+msgstr "Nečekají žádné žádosti o spárování.\n"
 
 #: src/cli/main.cpp
 #, c-format
@@ -842,6 +844,17 @@ msgid ""
 msgstr ""
 "\n"
 "Přijměte některou pomocí: tether --accept <fingerprint>\n"
+
+#: src/cli/main.cpp
+#, c-format
+msgid ""
+"No systemd on this machine, so there is no user service to manage. Start "
+"tetherd from whatever this system uses for services, or let a client start "
+"it on demand.\n"
+msgstr ""
+"V tomto počítači není systemd, takže není žádná uživatelská služba ke správě. "
+"Spusťte tetherd tím, co tento systém používá pro služby, nebo jej nechte "
+"spustit klientem na vyžádání.\n"
 
 #: src/cli/main.cpp
 #, c-format
@@ -858,12 +871,14 @@ msgid ""
 "loginctl enable-linger $USER\n"
 msgstr ""
 "\n"
-"Tether ji za vás nepovolí. Chcete-li démona spustit nyní a při každém přihlášení:\n"
+"Tether ji za vás nepovolí. Chcete-li démona spustit nyní a při každém "
+"přihlášení:\n"
 "\n"
 "systemctl --user daemon-reload\n"
 "systemctl --user enable --now tetherd.service\n"
 "\n"
-"Na serveru, ze kterého se odhlašujete, udržujte také uživatelskou relaci naživu:\n"
+"Na serveru, ze kterého se odhlašujete, udržujte také uživatelskou relaci "
+"naživu:\n"
 "\n"
 "loginctl enable-linger $USER\n"
 
@@ -876,8 +891,7 @@ msgstr ""
 #: src/cli/main.cpp
 #, c-format
 msgid "Removed %s\n"
-msgstr ""
-"Odebráno %s\n"
+msgstr "Odebráno %s\n"
 
 #: src/cli/main.cpp
 #, c-format
