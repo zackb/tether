@@ -38,7 +38,7 @@ mkdir -p "$BUILD_DIR"
 
 VERSION=$(git -C "$ROOT" describe --tags --always --dirty 2>/dev/null | sed 's/^v//')
 VERSION=${VERSION:-unknown}
-OUTPUT=$BUILD_DIR/tether-$VERSION.flatpak
+OUTPUT=$BUILD_DIR/tether-$VERSION-$(uname -m).flatpak
 
 flatpak build-bundle "$BUILD_DIR/repo" "$OUTPUT" "$APP_ID" --runtime-repo=https://flathub.org/repo/flathub.flatpakrepo
 

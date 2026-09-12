@@ -17,13 +17,25 @@ jobs:
           - image: ubuntu:24.04
             generator: DEB
             name: deb
+            runner: ubuntu-latest
+          - image: ubuntu:24.04
+            generator: DEB
+            name: deb-arm64
+            runner: ubuntu-24.04-arm
           - image: fedora:latest
             generator: RPM
             name: rpm
+            runner: ubuntu-latest
+          - image: fedora:latest
+            generator: RPM
+            name: rpm-arm64
+            runner: ubuntu-24.04-arm
+          # archlinux has no arm64 image.
           - image: archlinux:base-devel
             generator: TGZ
             name: tgz
-    runs-on: ubuntu-latest
+            runner: ubuntu-latest
+    runs-on: ${{ matrix.runner }}
     container: ${{ matrix.image }}
     steps:
       - name: bootstrap git
@@ -65,7 +77,11 @@ jobs:
           if-no-files-found: error
 
   appimage:
-    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        runner: [ubuntu-latest, ubuntu-24.04-arm]
+    runs-on: ${{ matrix.runner }}
     # oldest glibc tether supports
     container: ubuntu:24.04
     steps:
@@ -90,12 +106,16 @@ jobs:
 
       - uses: actions/upload-artifact@v4
         with:
-          name: appimage
+          name: appimage-${{ matrix.runner }}
           path: build/appimage/*.AppImage
           if-no-files-found: error
 
   flatpak:
-    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        runner: [ubuntu-latest, ubuntu-24.04-arm]
+    runs-on: ${{ matrix.runner }}
     steps:
       - uses: actions/checkout@v4
         with:
@@ -111,7 +131,7 @@ jobs:
 
       - uses: actions/upload-artifact@v4
         with:
-          name: flatpak
+          name: flatpak-${{ matrix.runner }}
           path: build/flatpak/*.flatpak
           if-no-files-found: error
 

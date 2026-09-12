@@ -92,14 +92,14 @@ yay -S tether
 ### AppImage
 
 One file, no install, for distros without a package and for immutable systems.
-Download `tether-<version>-x86_64.AppImage` from the
+Download `tether-<version>-<arch>.AppImage` from the
 [releases page](https://github.com/zackb/tether/releases), then:
 
 ```bash
-chmod +x tether-*-x86_64.AppImage
-./tether-*-x86_64.AppImage                              # the GTK app
-./tether-*-x86_64.AppImage --bt-setup                   # the CLI, same binary
-./tether-*-x86_64.AppImage --install-extension-host     # if you use the browser or mail extension
+chmod +x tether-*.AppImage
+./tether-*.AppImage                              # the GTK app
+./tether-*.AppImage --bt-setup                   # the CLI, same binary
+./tether-*.AppImage --install-extension-host     # if you use the browser or mail extension
 ```
 
 The iPhone Bluetooth features need one-time system setup the AppImage cannot do for you.
@@ -109,7 +109,7 @@ Requires glibc 2.38 and libstdc++ from GCC 13 (Fedora 39+, Ubuntu 23.10+, Debian
 
 ### Flatpak
 
-Download `tether-<version>.flatpak` from the
+Download `tether-<version>-<arch>.flatpak` from the
 [releases page](https://github.com/zackb/tether/releases) if you're into that, then:
 
 ```bash
@@ -311,6 +311,7 @@ See [docs/HEADLESS.md](docs/HEADLESS.md).
 ### Linux
 - Wayland compositor with `wlr-data-control` protocol (Hyprland, Sway, [Fenriz](https://github.com/zackb/fenriz) etc.)
 - Build tools: cmake, ninja, pkg-config
+- x86_64 or aarch64 (Asahi, Raspberry Pi OS Trixie+). 32-bit ARM is not supported.
 
 ### Dependencies
 - `wayland-client`
