@@ -292,8 +292,13 @@ a peer: a node that still trusts it will keep dialling it (see §3).
 
 ### `send_file` (Local Client -> Daemon)
 Offloads an entire file transfer to the daemon. The daemon spawns a thread to read the local filesystem and pushes the chunks sequence securely.
-**Payload**: `{"command": "send_file", "path": "/absolute/path/to/my_video.mp4"}`
-**Response**: `{"command": "file_send_complete", "success": true, "message": "Sent my_video.mp4"}`
+**Payload**: `{"command": "send_file", "path": "/absolute/path/to/my_video.mp4", "operation_id": "file-1"}`
+The `operation_id` is optional. When supplied, the asynchronous
+`file_send_complete` event echoes it, including on failure, so a local client
+can match the result to its request. Existing clients may omit it; their result
+remains `{"command": "file_send_complete", "success": true, "message": "Sent my_video.mp4"}`.
+The ID correlates results and does not authorize the request. The file must
+remain available at the path until the terminal result arrives.
 
 ---
 
@@ -520,9 +525,12 @@ Writes through to the phone over OBEX, so it answers asynchronously with a
 `bt_message_read` event carrying `success` and, on failure, `message`.
 
 #### `bt_send_message` (Client -> Daemon, broadcast)
-**Payload**: `{"command": "bt_send_message", "thread": "tel:+15035550101", "body": "on my way"}`
+**Payload**: `{"command": "bt_send_message", "thread": "tel:+15035550101", "body": "on my way", "operation_id": "send-1"}`
 Builds a bMessage and pushes it to the phone's outbox. Answers asynchronously with
-`bt_send_result` (`success`, and `message` when it failed).
+`bt_send_result` (`thread`, `success`, and `message` when it failed). The optional
+`operation_id` is echoed in that result, including on failure; legacy clients
+may omit it. It correlates a local client's send with the result and does not
+authorize the request.
 
 Recipients are validated before they are interpolated into the bMessage: an address
 containing CR, LF, or a vCard delimiter is rejected rather than escaped, because such an

@@ -411,6 +411,142 @@ namespace {
         EXPECT_EQ(result.value("operation_id", ""), "web-unpair-1");
     }
 
+    TEST(UnixServerTest, FileSendCompletionEchoesOptionalOperationId) {
+        const std::string runtime_dir = unique_test_dir("tether_unix_file_send_test");
+        CleanupGuard cleanup_guard(runtime_dir);
+        std::filesystem::remove_all(runtime_dir);
+        std::filesystem::create_directories(runtime_dir);
+        ScopedEnvVar xdg_runtime_dir("XDG_RUNTIME_DIR", runtime_dir);
+
+        tether::EpollEventLoop loop;
+        tether::TcpServer tcp_server(loop, 0);
+        tether::UnixServer unix_server(loop, tcp_server);
+        ASSERT_TRUE(unix_server.start());
+        EventLoopGuard loop_guard(loop);
+
+        const int client = socket(AF_UNIX, SOCK_STREAM, 0);
+        ASSERT_GE(client, 0);
+        timeval timeout{2, 0};
+        ASSERT_EQ(setsockopt(client, SOL_SOCKET, SO_RCVTIMEO, &timeout, sizeof(timeout)), 0);
+        sockaddr_un address{};
+        address.sun_family = AF_UNIX;
+        std::snprintf(
+            address.sun_path, sizeof(address.sun_path), "%s", (tether::get_runtime_dir() + "/tetherd.sock").c_str());
+        ASSERT_EQ(connect(client, reinterpret_cast<sockaddr*>(&address), sizeof(address)), 0);
+
+        const std::string subscribe = "{\"command\":\"subscribe\"}\n";
+        ASSERT_EQ(write(client, subscribe.data(), subscribe.size()), static_cast<ssize_t>(subscribe.size()));
+        ASSERT_FALSE(read_socket_line(client).empty());
+
+        for (const std::string operation_id : {"web-file-1", ""}) {
+            nlohmann::json send = {{"command", "send_file"}, {"path", runtime_dir + "/missing.txt"}};
+            if (!operation_id.empty())
+                send["operation_id"] = operation_id;
+            const std::string payload = send.dump() + "\n";
+            ASSERT_EQ(write(client, payload.data(), payload.size()), static_cast<ssize_t>(payload.size()));
+
+            nlohmann::json result;
+            for (int attempt = 0; attempt < 8; ++attempt) {
+                const std::string line = read_socket_line(client);
+                if (line.empty())
+                    break;
+                try {
+                    auto candidate = nlohmann::json::parse(line);
+                    if (candidate.value("command", "") == "file_send_complete") {
+                        result = std::move(candidate);
+                        break;
+                    }
+                } catch (...) {
+                }
+            }
+            ASSERT_FALSE(result.is_null());
+            EXPECT_FALSE(result.value("success", true));
+            if (operation_id.empty())
+                EXPECT_FALSE(result.contains("operation_id"));
+            else
+                EXPECT_EQ(result.value("operation_id", ""), operation_id);
+        }
+
+        // The subscribed socket stays open, but an oversized runtime path makes
+        // the worker's internal Client::connect fail without spawning a daemon.
+        {
+            ScopedEnvVar unconnectable_runtime("XDG_RUNTIME_DIR", runtime_dir + "/" + std::string(110, 'x'));
+            const std::string payload = nlohmann::json{{"command", "send_file"},
+                                                       {"path", runtime_dir + "/missing.txt"},
+                                                       {"operation_id", "web-connect-failure"}}
+                                            .dump() +
+                                        "\n";
+            ASSERT_EQ(write(client, payload.data(), payload.size()), static_cast<ssize_t>(payload.size()));
+            const std::string line = read_socket_line(client);
+            ASSERT_FALSE(line.empty()) << "internal connect failure must produce a terminal event";
+            const auto result = nlohmann::json::parse(line);
+            EXPECT_EQ(result.value("command", ""), "file_send_complete");
+            EXPECT_FALSE(result.value("success", true));
+            EXPECT_FALSE(result.value("message", "").empty());
+            EXPECT_EQ(result.value("operation_id", ""), "web-connect-failure");
+        }
+        close(client);
+    }
+
+    TEST(UnixServerTest, MessageSendResultEchoesOptionalOperationId) {
+        const std::string runtime_dir = unique_test_dir("tether_unix_message_send_test");
+        CleanupGuard cleanup_guard(runtime_dir);
+        std::filesystem::remove_all(runtime_dir);
+        std::filesystem::create_directories(runtime_dir);
+        ScopedEnvVar xdg_runtime_dir("XDG_RUNTIME_DIR", runtime_dir);
+
+        tether::EpollEventLoop loop;
+        tether::TcpServer tcp_server(loop, 0);
+        tether::UnixServer unix_server(loop, tcp_server);
+        ASSERT_TRUE(unix_server.start());
+        EventLoopGuard loop_guard(loop);
+
+        const int client = socket(AF_UNIX, SOCK_STREAM, 0);
+        ASSERT_GE(client, 0);
+        timeval timeout{2, 0};
+        ASSERT_EQ(setsockopt(client, SOL_SOCKET, SO_RCVTIMEO, &timeout, sizeof(timeout)), 0);
+        sockaddr_un address{};
+        address.sun_family = AF_UNIX;
+        std::snprintf(
+            address.sun_path, sizeof(address.sun_path), "%s", (tether::get_runtime_dir() + "/tetherd.sock").c_str());
+        ASSERT_EQ(connect(client, reinterpret_cast<sockaddr*>(&address), sizeof(address)), 0);
+
+        const std::string subscribe = "{\"command\":\"subscribe\"}\n";
+        ASSERT_EQ(write(client, subscribe.data(), subscribe.size()), static_cast<ssize_t>(subscribe.size()));
+        ASSERT_FALSE(read_socket_line(client).empty());
+
+        for (const std::string operation_id : {"web-message-1", ""}) {
+            nlohmann::json send = {{"command", "bt_send_message"}, {"thread", "invalid"}, {"body", "test"}};
+            if (!operation_id.empty())
+                send["operation_id"] = operation_id;
+            const std::string payload = send.dump() + "\n";
+            ASSERT_EQ(write(client, payload.data(), payload.size()), static_cast<ssize_t>(payload.size()));
+
+            nlohmann::json result;
+            for (int attempt = 0; attempt < 8; ++attempt) {
+                const std::string line = read_socket_line(client);
+                if (line.empty())
+                    break;
+                try {
+                    auto candidate = nlohmann::json::parse(line);
+                    if (candidate.value("command", "") == "bt_send_result") {
+                        result = std::move(candidate);
+                        break;
+                    }
+                } catch (...) {
+                }
+            }
+            ASSERT_FALSE(result.is_null());
+            EXPECT_FALSE(result.value("success", true));
+            EXPECT_EQ(result.value("thread", ""), "invalid");
+            if (operation_id.empty())
+                EXPECT_FALSE(result.contains("operation_id"));
+            else
+                EXPECT_EQ(result.value("operation_id", ""), operation_id);
+        }
+        close(client);
+    }
+
     TEST(ControlProtocolTest, AdvertisesVersionedCapabilities) {
         const auto info = tether::build_protocol_info();
         EXPECT_EQ(info.value("command", ""), "protocol_info");
