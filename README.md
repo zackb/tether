@@ -214,7 +214,7 @@ On Debian/Ubuntu:
 
 ```bash
 sudo apt install build-essential cmake ninja-build pkg-config git \
-    libwayland-dev libavahi-client-dev libssl-dev \
+    libwayland-dev libavahi-client-dev libssl-dev libsecret-1-dev \
     libglib2.0-dev libgtk-3-dev libgtk-layer-shell-dev libnotify-dev \
     npm zip
 ```
@@ -223,7 +223,7 @@ On Fedora:
 
 ```bash
 sudo dnf install gcc-c++ cmake ninja-build pkgconf-pkg-config git \
-    wayland-devel avahi-devel openssl-devel \
+    wayland-devel avahi-devel openssl-devel libsecret-devel \
     glib2-devel gtk3-devel gtk-layer-shell-devel libnotify-devel \
     npm zip
 ```
