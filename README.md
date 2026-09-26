@@ -224,7 +224,7 @@ On Fedora:
 ```bash
 sudo dnf install gcc-c++ cmake ninja-build pkgconf-pkg-config git \
     wayland-devel avahi-devel openssl-devel \
-    glib2-devel gtk3-devel gtk-layer-shell-devel libnotify-devel \
+    glib2-devel gtk3-devel gtk-layer-shell-devel libnotify-devel libsecret-devel \
     npm zip
 ```
 
