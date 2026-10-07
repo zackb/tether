@@ -462,7 +462,10 @@ static int print_bt_status(tether::Client& client) {
                             "\n" + tether::tr_format(_("secure-connections={}"), secure));
 
     if (cap.value("bonded_device_present", false))
-        fields.emplace_back(_("Bond"), cap.value("bond_has_le", false) ? "BR/EDR + LE" : "BR/EDR only");
+        fields.emplace_back(_("Bond"),
+                            cap.value("bond_has_le", false)         ? "BR/EDR + LE"
+                            : cap.value("bond_carries_ancs", false) ? _("BR/EDR, notifications live")
+                                                                    : "BR/EDR only");
     // Mirroring off is otherwise invisible here, and it takes the ANCS
     // solicitation off air, so the iPhone never offers notification access.
     fields.emplace_back(_("Notifications"),

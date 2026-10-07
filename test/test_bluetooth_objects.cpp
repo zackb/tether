@@ -514,6 +514,35 @@ TEST(Capability, ClassicOnlyBondOnANonPhoneIsNotReported) {
         EXPECT_EQ(reason.find("BR/EDR only"), std::string::npos) << "blamed a headset for having no LE bond";
 }
 
+// Issue #226: BlueZ 5.72 has no bearer API, so no bond there can show an LE
+// half, yet ANCS was live on it. A working subscription outranks the inference.
+TEST(Capability, LiveAncsOnABondWithNoLeHalfIsNotReported) {
+    Payload p(join(ADAPTER_FULL, R"({
+      '/org/bluez/hci0/dev_02_00_00_00_00_01': {
+        'org.bluez.Device1': {
+          'Paired': <true>,
+          'Bonded': <true>,
+          'Connected': <true>,
+          'ServicesResolved': <true>,
+          'UUIDs': <['00001132-0000-1000-8000-00805f9b34fb', '0000112f-0000-1000-8000-00805f9b34fb']>
+        }
+      },
+      '/org/bluez/hci0/dev_02_00_00_00_00_01/service004f/char0050': {
+        'org.bluez.GattCharacteristic1': { 'UUID': <'9FBF120D-6301-42D9-8C58-25E699A21DBD'>, 'Notifying': <true> }
+      }
+    })")
+                  .c_str());
+    auto objects = parse_managed_objects(p.v);
+    objects.experimental_api = true;
+    auto cap = resolve_capability(objects);
+
+    ASSERT_TRUE(cap.bonded_device_present);
+    EXPECT_FALSE(cap.bond_has_le);
+    EXPECT_TRUE(cap.bond_carries_ancs);
+    for (const auto& reason : cap.reasons)
+        EXPECT_EQ(reason.find("BR/EDR only"), std::string::npos) << "called a working ANCS bond broken";
+}
+
 // Observed on a MediaTek MT7925 with the phone's ANCS session live and
 // delivering: Bearer.LE1.Connected read false the whole time, because the phone
 // opened the link inbound in answer to the solicitation advert. GATT exists only
