@@ -25,18 +25,62 @@ namespace tether::ui {
         RouteIndicator& indicator(Route route) { return g_routes[route == Route::WiFi ? 0 : 1]; }
 
         constexpr const char* STYLE = R"CSS(
+.tether-app { background-color: @theme_bg_color; }
+.tether-app .tether-nav {
+    background-color: mix(@theme_bg_color, @theme_fg_color, 0.045);
+    border-right: 1px solid alpha(@theme_fg_color, 0.09);
+    padding: 20px 10px 16px;
+    min-width: 142px;
+}
+.tether-brand { font-size: 23px; font-weight: bold; padding: 2px 12px 26px; }
+.tether-nav-item { border: none; box-shadow: none; background: transparent; border-radius: 10px; padding: 12px; }
+.tether-nav-item:hover { background-color: alpha(@theme_fg_color, 0.07); }
+.tether-nav-item:checked { background-color: alpha(@theme_selected_bg_color, 0.20); color: @theme_fg_color; font-weight: bold; }
+.tether-app headerbar { min-height: 42px; box-shadow: none; border-bottom: 1px solid alpha(@theme_fg_color, 0.08); }
+.tether-page-header { padding: 22px 24px; border-bottom: 1px solid alpha(@theme_fg_color, 0.08); }
+.tether-page-title { font-size: 22px; font-weight: bold; }
+.tether-hero-title { font-size: 23px; font-weight: bold; }
+.tether-hero-icon { color: @theme_selected_bg_color; background-color: alpha(@theme_selected_bg_color, 0.10); border-radius: 20px; padding: 18px; }
+.tether-card { background-color: mix(@theme_bg_color, @theme_fg_color, 0.045); border: 1px solid alpha(@theme_fg_color, 0.09); border-radius: 16px; padding: 22px; }
+.tether-detail { margin: 24px; }
+.tether-modes button { border-radius: 8px; padding: 10px; }
+.tether-app .tether-list { background: transparent; padding: 8px; }
+.tether-app .tether-list row { padding: 0; margin: 3px 0; border-radius: 12px; border: 1px solid transparent; }
+.tether-app .tether-list row:hover { background-color: alpha(@theme_fg_color, 0.055); }
+.tether-app .tether-list row:selected { background-color: alpha(@theme_selected_bg_color, 0.14); border-color: alpha(@theme_selected_bg_color, 0.28); color: @theme_fg_color; }
+.tether-avatar { min-width: 36px; min-height: 36px; border-radius: 24px; background-color: alpha(@theme_selected_bg_color, 0.15); color: @theme_fg_color; font-size: 16px; font-weight: bold; }
+.tether-app .tether-feed { padding: 12px 24px 24px; }
+.tether-app .tether-feed row { background-color: mix(@theme_bg_color, @theme_fg_color, 0.035); border: 1px solid alpha(@theme_fg_color, 0.09); border-radius: 14px; margin: 0 0 10px; padding: 8px; }
+.tether-app entry { border-radius: 10px; min-height: 34px; box-shadow: none; }
+.tether-thread-pane { background-color: alpha(@theme_fg_color, 0.025); border-right: 1px solid alpha(@theme_fg_color, 0.08); }
+.tether-app .tether-conversation { padding: 16px 12px; background: transparent; }
+.tether-app .tether-conversation row { background: transparent; }
+.tether-conversation-header { padding: 14px 10px; font-size: 120%; background-color: alpha(@theme_fg_color, 0.025); }
+.tether-composer { margin: 12px 16px 16px; border: 1px solid alpha(@theme_fg_color, 0.14); background-color: alpha(@theme_fg_color, 0.03); border-radius: 16px; padding: 8px; }
+.tether-composer scrolledwindow, .tether-composer textview, .tether-composer textview text { border: none; box-shadow: none; background: transparent; }
+.tether-composer button { border-radius: 10px; min-height: 32px; }
+.tether-settings { background-color: @theme_bg_color; }
+.tether-settings list { background-color: mix(@theme_bg_color, @theme_fg_color, 0.035); border: 1px solid alpha(@theme_fg_color, 0.10); border-radius: 14px; }
+.tether-settings list row { background: transparent; padding: 5px 8px; border-bottom: 1px solid alpha(@theme_fg_color, 0.06); }
+.tether-settings list row:last-child { border-bottom: none; }
+.tether-settings-heading { font-size: 115%; padding: 18px 0 6px; }
+.tether-setting-title { font-weight: bold; }
+.tether-empty { padding: 36px; }
+.tether-empty label { font-size: 110%; }
+.tether-app button.suggested-action { border-radius: 10px; padding: 9px 16px; }
 .muted {
     opacity: 0.75;
     font-size: 90%;
 }
 
 .tether-bubble {
-    padding: 8px 12px;
-    border-radius: 14px;
+    padding: 11px 16px;
+    border-radius: 18px;
 }
 
 .tether-bubble-in {
-    background-color: alpha(@theme_fg_color, 0.10);
+    background-color: mix(@theme_bg_color, @theme_fg_color, 0.09);
+    border: 1px solid alpha(@theme_fg_color, 0.08);
 }
 
 .tether-bubble-out {
@@ -45,7 +89,9 @@ namespace tether::ui {
 }
 
 .tether-route-bar {
-    border-top: 1px solid alpha(@theme_fg_color, 0.12);
+    border-top: 1px solid alpha(@theme_fg_color, 0.09);
+    padding: 5px 12px;
+    font-size: 90%;
 }
 
 .tether-route-off {
@@ -84,7 +130,7 @@ namespace tether::ui {
 .tether-dropzone {
     border: 2px dashed alpha(@theme_fg_color, 0.28);
     border-radius: 12px;
-    padding: 20px 28px;
+    padding: 32px;
 }
 
 .tether-dropzone-active {
@@ -139,6 +185,150 @@ namespace tether::ui {
             g_variant_unref(value);
         }
     } // namespace
+
+    void style(GtkWidget* widget, const char* name) {
+        gtk_style_context_add_class(gtk_widget_get_style_context(widget), name);
+    }
+
+    GtkWidget* navigation_icon(const char* name, int size) {
+        GtkWidget* icon = gtk_drawing_area_new();
+        gtk_widget_set_size_request(icon, size, size);
+        gtk_widget_set_valign(icon, GTK_ALIGN_CENTER);
+        g_object_set_data_full(G_OBJECT(icon), "icon-name", g_strdup(name), g_free);
+        g_signal_connect(icon,
+                         "draw",
+                         G_CALLBACK(+[](GtkWidget* widget, cairo_t* cr, gpointer) -> gboolean {
+                             GtkStyleContext* context = gtk_widget_get_style_context(widget);
+                             const int width = gtk_widget_get_allocated_width(widget);
+                             const int height = gtk_widget_get_allocated_height(widget);
+                             gtk_render_background(context, cr, 0, 0, width, height);
+                             gtk_render_frame(context, cr, 0, 0, width, height);
+                             GdkRGBA color;
+                             gtk_style_context_get_color(
+                                 gtk_widget_get_style_context(widget), gtk_widget_get_state_flags(widget), &color);
+                             gdk_cairo_set_source_rgba(cr, &color);
+                             cairo_scale(cr,
+                                         gtk_widget_get_allocated_width(widget) / 24.0,
+                                         gtk_widget_get_allocated_height(widget) / 24.0);
+                             cairo_set_line_width(cr, 1.7);
+                             cairo_set_line_cap(cr, CAIRO_LINE_CAP_ROUND);
+                             cairo_set_line_join(cr, CAIRO_LINE_JOIN_ROUND);
+                             const std::string name =
+                                 static_cast<const char*>(g_object_get_data(G_OBJECT(widget), "icon-name"));
+                             if (name == "logo") {
+                                 // The two linked rings from tether-symbolic.svg.
+                                 cairo_set_line_width(cr, 2.4);
+                                 cairo_arc(cr, 7.35, 12, 3.9, 0, 6.283185);
+                                 cairo_stroke(cr);
+                                 cairo_arc(cr, 16.65, 12, 3.9, 0, 6.283185);
+                             } else if (name == "contacts") {
+                                 cairo_arc(cr, 12, 7, 3.5, 0, 6.283185);
+                                 cairo_stroke(cr);
+                                 cairo_move_to(cr, 4, 21);
+                                 cairo_curve_to(cr, 4, 11, 20, 11, 20, 21);
+                             } else if (name == "messages") {
+                                 cairo_move_to(cr, 4, 4);
+                                 cairo_line_to(cr, 20, 4);
+                                 cairo_line_to(cr, 20, 17);
+                                 cairo_line_to(cr, 10, 17);
+                                 cairo_line_to(cr, 4, 21);
+                                 cairo_close_path(cr);
+                                 cairo_move_to(cr, 8, 9);
+                                 cairo_line_to(cr, 16, 9);
+                                 cairo_move_to(cr, 8, 13);
+                                 cairo_line_to(cr, 13, 13);
+                             } else if (name == "notifications") {
+                                 cairo_move_to(cr, 5, 17);
+                                 cairo_line_to(cr, 7, 14);
+                                 cairo_line_to(cr, 7, 9);
+                                 cairo_curve_to(cr, 7, 2, 17, 2, 17, 9);
+                                 cairo_line_to(cr, 17, 14);
+                                 cairo_line_to(cr, 19, 17);
+                                 cairo_close_path(cr);
+                                 cairo_move_to(cr, 10, 21);
+                                 cairo_line_to(cr, 14, 21);
+                             } else if (name == "settings") {
+                                 cairo_arc(cr, 12, 12, 3, 0, 6.283185);
+                                 cairo_stroke(cr);
+                                 cairo_arc(cr, 12, 12, 7, 0, 6.283185);
+                                 cairo_stroke(cr);
+                                 for (int i = 0; i < 8; ++i) {
+                                     cairo_save(cr);
+                                     cairo_translate(cr, 12, 12);
+                                     cairo_rotate(cr, i * 0.785398);
+                                     cairo_move_to(cr, 0, 7);
+                                     cairo_line_to(cr, 0, 10);
+                                     cairo_stroke(cr);
+                                     cairo_restore(cr);
+                                 }
+                             } else if (name == "calls") {
+                                 cairo_move_to(cr, 5, 3);
+                                 cairo_line_to(cr, 9, 3);
+                                 cairo_line_to(cr, 11, 8);
+                                 cairo_line_to(cr, 8, 10);
+                                 cairo_curve_to(cr, 10, 14, 11, 15, 15, 17);
+                                 cairo_line_to(cr, 17, 14);
+                                 cairo_line_to(cr, 21, 16);
+                                 cairo_line_to(cr, 21, 20);
+                                 cairo_curve_to(cr, 12, 25, -1, 12, 5, 3);
+                             } else {
+                                 cairo_rectangle(cr, 6, 2, 12, 20);
+                                 cairo_move_to(cr, 10, 5);
+                                 cairo_line_to(cr, 14, 5);
+                                 cairo_move_to(cr, 11, 19);
+                                 cairo_line_to(cr, 13, 19);
+                             }
+                             cairo_stroke(cr);
+                             return FALSE;
+                         }),
+                         nullptr);
+        return icon;
+    }
+
+    GtkWidget* avatar(const std::string& name) {
+        std::string first;
+        std::string last;
+        bool in_word = false;
+        for (const char* cursor = name.c_str(); *cursor; cursor = g_utf8_next_char(cursor)) {
+            const gunichar character = g_utf8_get_char(cursor);
+            if (g_unichar_isspace(character)) {
+                in_word = false;
+            } else if (!in_word) {
+                const std::string initial(cursor, g_utf8_next_char(cursor) - cursor);
+                if (first.empty())
+                    first = initial;
+                else
+                    last = initial;
+                in_word = true;
+            }
+        }
+        const std::string initials = first + last;
+        gchar* upper = g_utf8_strup(initials.c_str(), -1);
+        GtkWidget* label = gtk_label_new(*upper ? upper : "•");
+        g_free(upper);
+        style(label, "tether-avatar");
+        gtk_widget_set_valign(label, GTK_ALIGN_CENTER);
+        return label;
+    }
+
+    GtkWidget* page_header(const std::string& title, const char* icon) {
+        GtkWidget* header = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, 12);
+        style(header, "tether-page-header");
+        gtk_box_pack_start(GTK_BOX(header), navigation_icon(icon, 26), FALSE, FALSE, 0);
+        GtkWidget* label = gtk_label_new(title.c_str());
+        gtk_label_set_xalign(GTK_LABEL(label), 0);
+        style(label, "tether-page-title");
+        gtk_box_pack_start(GTK_BOX(header), label, TRUE, TRUE, 0);
+        return header;
+    }
+
+    GtkWidget* page_frame(GtkWidget* content, const std::string& title, const char* icon) {
+        GtkWidget* page = gtk_box_new(GTK_ORIENTATION_VERTICAL, 0);
+        style(page, "tether-page");
+        gtk_box_pack_start(GTK_BOX(page), page_header(title, icon), FALSE, FALSE, 0);
+        gtk_box_pack_start(GTK_BOX(page), content, TRUE, TRUE, 0);
+        return page;
+    }
 
     void follow_system_color_scheme() {
         // An explicit GTK_THEME overrides.

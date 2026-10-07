@@ -24,6 +24,7 @@ namespace {
     GtkWidget* g_refresh_button = nullptr;
     GtkWidget* g_stack = nullptr;
     GtkWidget* g_calls_page = nullptr;
+    GtkWidget* g_calls_nav = nullptr;
     gboolean g_start_hidden = FALSE;
 
     // what the current invocation asked to see
@@ -36,6 +37,8 @@ namespace {
         if (!g_calls_page)
             return;
         gtk_widget_set_visible(g_calls_page, enabled);
+        if (g_calls_nav)
+            gtk_widget_set_visible(g_calls_nav, enabled);
         if (enabled || !g_stack)
             return;
         const gchar* name = gtk_stack_get_visible_child_name(GTK_STACK(g_stack));
@@ -195,9 +198,10 @@ namespace {
         GtkWidget* window = gtk_application_window_new(app);
         gtk_window_set_title(GTK_WINDOW(window), _("Tether"));
         gtk_window_set_default_size(
-            GTK_WINDOW(window), prefs().value("window_width", 820), prefs().value("window_height", 560));
+            GTK_WINDOW(window), prefs().value("window_width", 1040), prefs().value("window_height", 680));
         if (prefs().value("window_maximized", false))
             gtk_window_maximize(GTK_WINDOW(window));
+        gtk_style_context_add_class(gtk_widget_get_style_context(window), "tether-app");
         set_main_window(window);
         g_signal_connect(window, "delete-event", G_CALLBACK(on_window_delete), nullptr);
         g_signal_connect(
@@ -225,27 +229,103 @@ namespace {
         GtkWidget* stack = gtk_stack_new();
         g_stack = stack;
         gtk_stack_set_transition_type(GTK_STACK(stack), GTK_STACK_TRANSITION_TYPE_CROSSFADE);
-        gtk_stack_add_titled(GTK_STACK(stack), devices_view_new(), "devices", _("Devices"));
+        gtk_stack_add_titled(
+            GTK_STACK(stack), page_frame(devices_view_new(), _("Devices"), "devices"), "devices", _("Devices"));
         gtk_stack_add_titled(GTK_STACK(stack), messages_view_new(), "messages", _("Messages"));
-        gtk_stack_add_titled(GTK_STACK(stack), notifications_view_new(), "notifications", _("Notifications"));
-        g_calls_page = calls_view_new();
+        gtk_stack_add_titled(GTK_STACK(stack),
+                             page_frame(notifications_view_new(), _("Notifications"), "notifications"),
+                             "notifications",
+                             _("Notifications"));
+        g_calls_page = page_frame(calls_view_new(), _("Calls"), "calls");
         gtk_stack_add_titled(GTK_STACK(stack), g_calls_page, "calls", _("Calls"));
         gtk_stack_add_titled(GTK_STACK(stack),
-                             contacts_view_new([](const std::string& thread_key) {
-                                 show_view("messages");
-                                 messages_view_open_thread(thread_key);
-                             }),
+                             page_frame(contacts_view_new([](const std::string& thread_key) {
+                                            show_view("messages");
+                                            messages_view_open_thread(thread_key);
+                                        }),
+                                        _("Contacts"),
+                                        "contacts"),
                              "contacts",
                              _("Contacts"));
 
-        GtkWidget* switcher = gtk_stack_switcher_new();
-        gtk_stack_switcher_set_stack(GTK_STACK_SWITCHER(switcher), GTK_STACK(stack));
-        gtk_header_bar_set_custom_title(GTK_HEADER_BAR(header_bar), switcher);
+        GtkWidget* sidebar = gtk_box_new(GTK_ORIENTATION_VERTICAL, 6);
+        gtk_style_context_add_class(gtk_widget_get_style_context(sidebar), "tether-nav");
+        GtkWidget* logo = navigation_icon("logo", 42);
+        gtk_widget_set_halign(logo, GTK_ALIGN_START);
+        gtk_widget_set_margin_start(logo, 12);
+        gtk_widget_set_margin_bottom(logo, 8);
+        set_accessible_name(logo, _("Tether"));
+        gtk_box_pack_start(GTK_BOX(sidebar), logo, FALSE, FALSE, 0);
+        GtkWidget* brand = gtk_label_new(_("Tether"));
+        gtk_label_set_xalign(GTK_LABEL(brand), 0);
+        gtk_style_context_add_class(gtk_widget_get_style_context(brand), "tether-brand");
+        gtk_box_pack_start(GTK_BOX(sidebar), brand, FALSE, FALSE, 0);
+
+        struct NavItem {
+            const char* name;
+            const char* title;
+        };
+        const NavItem items[] = {
+            {"devices", _("Devices")},
+            {"messages", _("Messages")},
+            {"notifications", _("Notifications")},
+            {"contacts", _("Contacts")},
+            {"calls", _("Calls")},
+        };
+        GtkRadioButton* group = nullptr;
+        for (const auto& item : items) {
+            GtkWidget* button = gtk_radio_button_new_from_widget(group);
+            if (!group)
+                group = GTK_RADIO_BUTTON(button);
+            gtk_toggle_button_set_mode(GTK_TOGGLE_BUTTON(button), FALSE);
+            gtk_style_context_add_class(gtk_widget_get_style_context(button), "tether-nav-item");
+            GtkWidget* content = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, 12);
+            gtk_box_pack_start(GTK_BOX(content), navigation_icon(item.name), FALSE, FALSE, 0);
+            GtkWidget* label = gtk_label_new(item.title);
+            gtk_label_set_xalign(GTK_LABEL(label), 0);
+            gtk_box_pack_start(GTK_BOX(content), label, TRUE, TRUE, 0);
+            gtk_container_add(GTK_CONTAINER(button), content);
+            set_accessible_name(button, item.title);
+            g_object_set_data(G_OBJECT(button), "view-name", const_cast<char*>(item.name));
+            g_signal_connect(button,
+                             "toggled",
+                             G_CALLBACK(+[](GtkToggleButton* button, gpointer) {
+                                 if (gtk_toggle_button_get_active(button))
+                                     show_view(
+                                         static_cast<const char*>(g_object_get_data(G_OBJECT(button), "view-name")));
+                             }),
+                             nullptr);
+            g_signal_connect(stack,
+                             "notify::visible-child-name",
+                             G_CALLBACK(+[](GObject* stack, GParamSpec*, gpointer data) {
+                                 auto* button = GTK_TOGGLE_BUTTON(data);
+                                 const char* name =
+                                     static_cast<const char*>(g_object_get_data(G_OBJECT(button), "view-name"));
+                                 if (g_strcmp0(name, gtk_stack_get_visible_child_name(GTK_STACK(stack))) == 0)
+                                     gtk_toggle_button_set_active(button, TRUE);
+                             }),
+                             button);
+            gtk_box_pack_start(GTK_BOX(sidebar), button, FALSE, FALSE, 0);
+            if (g_strcmp0(item.name, "calls") == 0) {
+                g_calls_nav = button;
+                gtk_widget_set_no_show_all(button, TRUE);
+                gtk_widget_show_all(content);
+            }
+        }
+        GtkWidget* settings = gtk_button_new_with_label(_("Settings"));
+        gtk_button_set_image(GTK_BUTTON(settings), navigation_icon("settings"));
+        gtk_button_set_always_show_image(GTK_BUTTON(settings), TRUE);
+        gtk_style_context_add_class(gtk_widget_get_style_context(settings), "tether-nav-item");
+        gtk_actionable_set_action_name(GTK_ACTIONABLE(settings), "win.settings");
+        gtk_box_pack_end(GTK_BOX(sidebar), settings, FALSE, FALSE, 0);
 
         g_signal_connect(stack, "notify::visible-child-name", G_CALLBACK(on_visible_view_changed), nullptr);
 
         GtkWidget* root = gtk_box_new(GTK_ORIENTATION_VERTICAL, 0);
-        gtk_box_pack_start(GTK_BOX(root), stack, TRUE, TRUE, 0);
+        GtkWidget* body = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, 0);
+        gtk_box_pack_start(GTK_BOX(body), sidebar, FALSE, FALSE, 0);
+        gtk_box_pack_start(GTK_BOX(body), stack, TRUE, TRUE, 0);
+        gtk_box_pack_start(GTK_BOX(root), body, TRUE, TRUE, 0);
         gtk_box_pack_start(GTK_BOX(root), create_route_bar(), FALSE, FALSE, 0);
         gtk_container_add(GTK_CONTAINER(window), root);
 

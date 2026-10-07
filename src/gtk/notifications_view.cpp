@@ -64,7 +64,7 @@ namespace tether::ui {
             GtkWidget* row = gtk_list_box_row_new();
             gtk_list_box_row_set_selectable(GTK_LIST_BOX_ROW(row), FALSE);
 
-            GtkWidget* box = gtk_box_new(GTK_ORIENTATION_VERTICAL, 2);
+            GtkWidget* box = gtk_box_new(GTK_ORIENTATION_VERTICAL, 10);
             gtk_container_set_border_width(GTK_CONTAINER(box), 10);
 
             GtkWidget* header = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, 8);
@@ -179,6 +179,7 @@ namespace tether::ui {
 
         GtkWidget* status_box = gtk_box_new(GTK_ORIENTATION_VERTICAL, 10);
         gtk_widget_set_valign(status_box, GTK_ALIGN_CENTER);
+        style(status_box, "tether-empty");
         gtk_widget_set_halign(status_box, GTK_ALIGN_CENTER);
         GtkWidget* icon =
             gtk_image_new_from_icon_name("preferences-system-notifications-symbolic", GTK_ICON_SIZE_DIALOG);
@@ -194,6 +195,7 @@ namespace tether::ui {
         GtkWidget* scroll = gtk_scrolled_window_new(nullptr, nullptr);
         gtk_scrolled_window_set_policy(GTK_SCROLLED_WINDOW(scroll), GTK_POLICY_NEVER, GTK_POLICY_AUTOMATIC);
         g_notifications.list = gtk_list_box_new();
+        gtk_style_context_add_class(gtk_widget_get_style_context(g_notifications.list), "tether-feed");
         gtk_list_box_set_selection_mode(GTK_LIST_BOX(g_notifications.list), GTK_SELECTION_NONE);
         gtk_container_add(GTK_CONTAINER(scroll), g_notifications.list);
         gtk_stack_add_named(GTK_STACK(g_notifications.stack), scroll, "list");

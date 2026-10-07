@@ -5,6 +5,13 @@
 
 namespace tether::ui {
 
+    // App-owned line icons avoid missing glyphs in third-party desktop themes.
+    GtkWidget* navigation_icon(const char* name, int size = 20);
+    GtkWidget* avatar(const std::string& name);
+    GtkWidget* page_header(const std::string& title, const char* icon);
+    GtkWidget* page_frame(GtkWidget* content, const std::string& title, const char* icon);
+    void style(GtkWidget* widget, const char* name);
+
     // Loads the application stylesheet.
     void install_style();
 

@@ -55,6 +55,10 @@ namespace tether::ui {
 
             GtkWidget* text = gtk_box_new(GTK_ORIENTATION_VERTICAL, 2);
             GtkWidget* title_label = gtk_label_new(title.c_str());
+            style(title_label, "tether-setting-title");
+            gtk_label_set_line_wrap(GTK_LABEL(title_label), TRUE);
+            gtk_label_set_line_wrap_mode(GTK_LABEL(title_label), PANGO_WRAP_WORD_CHAR);
+            gtk_label_set_max_width_chars(GTK_LABEL(title_label), 42);
             gtk_label_set_xalign(GTK_LABEL(title_label), 0.0);
             gtk_box_pack_start(GTK_BOX(text), title_label, FALSE, FALSE, 0);
             // Lets screen readers name the control after the row title.
@@ -81,6 +85,7 @@ namespace tether::ui {
         // Heading, optional one-line explanation, and the framed list the rows go in.
         GtkWidget* add_group(GtkWidget* column, const std::string& heading, const std::string& description) {
             GtkWidget* heading_label = gtk_label_new(nullptr);
+            style(heading_label, "tether-settings-heading");
             gtk_label_set_xalign(GTK_LABEL(heading_label), 0.0);
             set_markup(heading_label, "<b>" + escape_markup(heading) + "</b>");
             gtk_widget_set_margin_top(heading_label, 8);
@@ -205,8 +210,13 @@ namespace tether::ui {
 
         void build_window() {
             GtkWidget* window = gtk_window_new(GTK_WINDOW_TOPLEVEL);
+            gtk_style_context_add_class(gtk_widget_get_style_context(window), "tether-settings");
             g_settings.window = window;
             gtk_window_set_title(GTK_WINDOW(window), _("Settings"));
+            GtkWidget* header = gtk_header_bar_new();
+            gtk_header_bar_set_title(GTK_HEADER_BAR(header), _("Settings"));
+            gtk_header_bar_set_show_close_button(GTK_HEADER_BAR(header), TRUE);
+            gtk_window_set_titlebar(GTK_WINDOW(window), header);
             gtk_window_set_default_size(GTK_WINDOW(window), 540, 760);
             gtk_window_set_type_hint(GTK_WINDOW(window), GDK_WINDOW_TYPE_HINT_DIALOG);
             if (GtkWidget* parent = main_window())
@@ -229,10 +239,13 @@ namespace tether::ui {
 
             GtkWidget* scroll = gtk_scrolled_window_new(nullptr, nullptr);
             gtk_scrolled_window_set_policy(GTK_SCROLLED_WINDOW(scroll), GTK_POLICY_NEVER, GTK_POLICY_AUTOMATIC);
-            gtk_container_add(GTK_CONTAINER(window), scroll);
+            GtkWidget* layout = gtk_box_new(GTK_ORIENTATION_VERTICAL, 0);
+            gtk_container_add(GTK_CONTAINER(window), layout);
+            gtk_box_pack_start(GTK_BOX(layout), page_header(_("Settings"), "settings"), FALSE, FALSE, 0);
+            gtk_box_pack_start(GTK_BOX(layout), scroll, TRUE, TRUE, 0);
 
             GtkWidget* column = gtk_box_new(GTK_ORIENTATION_VERTICAL, 6);
-            gtk_container_set_border_width(GTK_CONTAINER(column), 18);
+            gtk_container_set_border_width(GTK_CONTAINER(column), 28);
             gtk_container_add(GTK_CONTAINER(scroll), column);
 
             g_settings.lbl_bt_hint = gtk_label_new(_("No iPhone is paired over Bluetooth, so the Bluetooth "

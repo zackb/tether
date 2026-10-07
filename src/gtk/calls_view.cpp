@@ -247,7 +247,7 @@ namespace tether::ui {
         GtkWidget* root = gtk_box_new(GTK_ORIENTATION_VERTICAL, 0);
 
         GtkWidget* dial_bar = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, 8);
-        gtk_container_set_border_width(GTK_CONTAINER(dial_bar), 10);
+        gtk_container_set_border_width(GTK_CONTAINER(dial_bar), 24);
         g_calls.entry = gtk_entry_new();
         gtk_entry_set_placeholder_text(GTK_ENTRY(g_calls.entry), _("Number to call"));
         set_accessible_name(g_calls.entry, _("Number to call"));
@@ -278,6 +278,8 @@ namespace tether::ui {
             GTK_BOX(status_box), gtk_image_new_from_icon_name("call-start", GTK_ICON_SIZE_DIALOG), FALSE, FALSE, 0);
         g_calls.status_label = gtk_label_new(_("Waiting for the iPhone."));
         gtk_label_set_line_wrap(GTK_LABEL(g_calls.status_label), TRUE);
+        gtk_label_set_max_width_chars(GTK_LABEL(g_calls.status_label), 42);
+        style(status_box, "tether-empty");
         gtk_label_set_justify(GTK_LABEL(g_calls.status_label), GTK_JUSTIFY_CENTER);
         gtk_style_context_add_class(gtk_widget_get_style_context(g_calls.status_label), "muted");
         gtk_box_pack_start(GTK_BOX(status_box), g_calls.status_label, FALSE, FALSE, 0);
@@ -286,6 +288,7 @@ namespace tether::ui {
         GtkWidget* scroll = gtk_scrolled_window_new(nullptr, nullptr);
         gtk_scrolled_window_set_policy(GTK_SCROLLED_WINDOW(scroll), GTK_POLICY_NEVER, GTK_POLICY_AUTOMATIC);
         g_calls.list = gtk_list_box_new();
+        gtk_style_context_add_class(gtk_widget_get_style_context(g_calls.list), "tether-feed");
         gtk_list_box_set_selection_mode(GTK_LIST_BOX(g_calls.list), GTK_SELECTION_NONE);
         gtk_container_add(GTK_CONTAINER(scroll), g_calls.list);
         gtk_stack_add_named(GTK_STACK(g_calls.stack), scroll, "list");
