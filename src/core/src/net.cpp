@@ -8,6 +8,7 @@
 #include <gio/gio.h>
 #include <netdb.h>
 #include <netinet/in.h>
+#include <netinet/tcp.h>
 #include <sys/file.h>
 #include <sys/socket.h>
 #include <sys/stat.h>
@@ -183,24 +184,36 @@ namespace tether {
         local_subscribers.erase(fd);
     }
 
-    // Helper for robust SSL writes on non-blocking sockets.
-    // Handles SSL_ERROR_WANT_WRITE by retrying.
+    // Writes all of buf on a non-blocking SSL socket, retrying WANT_WRITE. Runs on the
+    // event loop, so a peer that stops reading must not hold it: after ~5 s without
+    // progress the socket is shut down, and the loop's read path drops the session.
     static int robust_ssl_write(SSL* ssl, const void* buf, int num) {
         if (!ssl)
             return -1;
+        constexpr int STALL_LIMIT = 5000;
         int total_written = 0;
+        int stalls = 0;
         const char* p = static_cast<const char*>(buf);
         while (total_written < num) {
             int n = SSL_write(ssl, p + total_written, num - total_written);
             if (n <= 0) {
                 int err = SSL_get_error(ssl, n);
                 if (err == SSL_ERROR_WANT_WRITE || err == SSL_ERROR_WANT_READ) {
-                    usleep(1000); // Yield to avoid busy-wait
+                    if (++stalls > STALL_LIMIT) {
+                        const int fd = SSL_get_fd(ssl);
+                        debug::log(
+                            ERR, "net: ssl fd {} is not draining; {} of {} bytes written", fd, total_written, num);
+                        // A partial TLS record leaves the stream unusable.
+                        shutdown(fd, SHUT_RDWR);
+                        return -1;
+                    }
+                    usleep(1000);
                     continue;
                 }
                 return n; // Fatal error
             }
             total_written += n;
+            stalls = 0;
         }
         return total_written;
     }
@@ -1834,6 +1847,18 @@ namespace tether {
         close(fd);
     }
 
+    // Drops peers that vanish without FIN/RST: keepalive covers idle sessions (~90 s),
+    // TCP_USER_TIMEOUT covers sessions with unacked data queued (30 s).
+    static void enable_dead_peer_detection(int fd) {
+        int on = 1, idle = 60, interval = 10, count = 3;
+        unsigned int user_timeout_ms = 30000;
+        setsockopt(fd, SOL_SOCKET, SO_KEEPALIVE, &on, sizeof(on));
+        setsockopt(fd, IPPROTO_TCP, TCP_KEEPIDLE, &idle, sizeof(idle));
+        setsockopt(fd, IPPROTO_TCP, TCP_KEEPINTVL, &interval, sizeof(interval));
+        setsockopt(fd, IPPROTO_TCP, TCP_KEEPCNT, &count, sizeof(count));
+        setsockopt(fd, IPPROTO_TCP, TCP_USER_TIMEOUT, &user_timeout_ms, sizeof(user_timeout_ms));
+    }
+
     // Text form of an accepted peer.
     static std::string peer_ip(const sockaddr_storage& ss, socklen_t len) {
         if (ss.ss_family == AF_INET6) {
@@ -1863,6 +1888,7 @@ namespace tether {
         // Set non-blocking
         int flags = fcntl(client_fd, F_GETFL, 0);
         fcntl(client_fd, F_SETFL, flags | O_NONBLOCK);
+        enable_dead_peer_detection(client_fd);
 
         const std::string ip = peer_ip(client_addr, addrlen);
         debug::log(INFO, "TcpServer: New connection from {} (fd: {})", ip, client_fd);
@@ -2007,6 +2033,7 @@ namespace tether {
 
         int flags = fcntl(fd, F_GETFL, 0);
         fcntl(fd, F_SETFL, flags | O_NONBLOCK);
+        enable_dead_peer_detection(fd);
 
         debug::log(INFO, "TcpServer: Dialled {} (fd: {})", host, fd);
 
