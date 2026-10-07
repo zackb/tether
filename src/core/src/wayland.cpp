@@ -3,9 +3,13 @@
 #include "wayland_protocols/wayland.hpp"
 #include "wayland_protocols/wlr-data-control-unstable-v1.hpp"
 
+#include <algorithm>
+#include <cstdlib>
 #include <cstring>
 #include <poll.h>
+#include <sys/timerfd.h>
 #include <tether/log.hpp>
+#include <unistd.h>
 #include <wayland-client.h>
 
 namespace tether {
@@ -14,34 +18,114 @@ namespace tether {
 
     WaylandContext::WaylandContext(EpollEventLoop& loop) : loop_(loop) {}
 
+    std::vector<std::string> wayland_sockets(const std::filesystem::path& runtime_dir) {
+        std::vector<std::string> names;
+        std::error_code ec;
+        for (const auto& entry : std::filesystem::directory_iterator(runtime_dir, ec)) {
+            const std::string name = entry.path().filename().string();
+            if (!name.starts_with("wayland-") || name.ends_with(".lock"))
+                continue;
+            if (entry.is_socket(ec))
+                names.push_back(name);
+        }
+        std::sort(names.begin(), names.end());
+        return names;
+    }
+
     WaylandContext::~WaylandContext() {
         g_wayland = nullptr;
-        if (raw_display_) {
-            // Crucial: Destroy all regular proxies BEFORE disconnecting the display.
-            clipboard_.reset();
-            ext_data_control_manager_.reset();
-            wlr_data_control_manager_.reset();
-            seat_.reset();
-            registry_.reset();
-
-            // High-level wrapper for the display itself.
-            if (display_) {
-                display_.release();
-            }
-
-            loop_.removeFd(wl_display_get_fd(raw_display_));
-            wl_display_disconnect(raw_display_);
-            raw_display_ = nullptr;
+        if (retry_fd_ >= 0) {
+            loop_.removeFd(retry_fd_);
+            close(retry_fd_);
         }
+        disconnect();
+    }
+
+    void WaylandContext::disconnect() {
+        if (!raw_display_)
+            return;
+        // Crucial: Destroy all regular proxies BEFORE disconnecting the display.
+        clipboard_.reset();
+        ext_data_control_manager_.reset();
+        wlr_data_control_manager_.reset();
+        seat_.reset();
+        registry_.reset();
+
+        // High-level wrapper for the display itself.
+        if (display_) {
+            display_.release();
+        }
+
+        loop_.removeFd(wl_display_get_fd(raw_display_));
+        wl_display_disconnect(raw_display_);
+        raw_display_ = nullptr;
+        display_name_.clear();
+    }
+
+    // A unit started at boot runs before the compositor and without its
+    // WAYLAND_DISPLAY, so fall back to any compositor socket in the runtime dir.
+    bool WaylandContext::connect_display() {
+        const char* env = std::getenv("WAYLAND_DISPLAY");
+        const std::string env_name = env && *env ? env : "wayland-0";
+        if ((raw_display_ = wl_display_connect(nullptr))) {
+            display_name_ = env_name;
+            return true;
+        }
+        const char* runtime_dir = std::getenv("XDG_RUNTIME_DIR");
+        if (!runtime_dir || !*runtime_dir)
+            return false;
+        for (const auto& name : wayland_sockets(runtime_dir)) {
+            if (name == env_name)
+                continue;
+            if ((raw_display_ = wl_display_connect(name.c_str()))) {
+                display_name_ = name;
+                return true;
+            }
+        }
+        return false;
+    }
+
+    void WaylandContext::start_retry() {
+        if (retry_fd_ >= 0)
+            return;
+        // libwayland can find no socket without it, and complains on every attempt.
+        const char* runtime_dir = std::getenv("XDG_RUNTIME_DIR");
+        if (!runtime_dir || !*runtime_dir) {
+            debug::log(ERR, "WaylandContext: XDG_RUNTIME_DIR unset; clipboard sync unavailable.");
+            return;
+        }
+        retry_fd_ = timerfd_create(CLOCK_MONOTONIC, TFD_CLOEXEC | TFD_NONBLOCK);
+        if (retry_fd_ < 0) {
+            debug::log(ERR, "WaylandContext: no compositor and no retry timer; clipboard sync unavailable.");
+            return;
+        }
+        itimerspec spec{};
+        spec.it_value.tv_sec = 2;
+        spec.it_interval.tv_sec = 2;
+        timerfd_settime(retry_fd_, 0, &spec, nullptr);
+        debug::log(INFO, "WaylandContext: no Wayland display yet; waiting for a compositor.");
+        loop_.addFd(retry_fd_, [this](int fd) {
+            uint64_t ticks = 0;
+            ssize_t ignored = read(fd, &ticks, sizeof(ticks));
+            (void)ignored;
+            if (!connect_display())
+                return;
+            loop_.removeFd(fd);
+            close(fd);
+            retry_fd_ = -1;
+            setup();
+        });
     }
 
     bool WaylandContext::init() {
-        raw_display_ = wl_display_connect(nullptr);
-        if (!raw_display_) {
-            debug::log(ERR, "WaylandContext: Failed to connect to Wayland display");
+        if (!connect_display()) {
+            start_retry();
             return false;
         }
+        return setup();
+    }
 
+    bool WaylandContext::setup() {
         display_ = std::make_unique<CCWlDisplay>((wl_proxy*)raw_display_);
 
         auto proxy = display_->sendGetRegistry();
@@ -119,14 +203,15 @@ namespace tether {
         loop_.addFd(fd, [this](int wfd) {
             struct pollfd pfd{wfd, 0, 0};
             if (poll(&pfd, 1, 0) == 1 && (pfd.revents & (POLLHUP | POLLERR))) {
-                debug::log(ERR, "WaylandContext: compositor hung up; exiting for on-demand restart.");
-                loop_.stop();
+                debug::log(ERR, "WaylandContext: compositor hung up; waiting for the next one.");
+                disconnect();
+                start_retry();
                 return;
             }
             if (wl_display_dispatch(raw_display_) < 0) {
-                // Display connection is dead
-                debug::log(ERR, "WaylandContext: Display connection lost; shutting down for on-demand restart.");
-                loop_.stop();
+                debug::log(ERR, "WaylandContext: Display connection lost; waiting for a compositor.");
+                disconnect();
+                start_retry();
                 return;
             }
             wl_display_flush(raw_display_); // flush requests queued during dispatch (offer/source destroys)
@@ -135,7 +220,7 @@ namespace tether {
         // Flush any pending requests
         wl_display_flush(raw_display_);
 
-        debug::log(INFO, "WaylandContext initialized successfully.");
+        debug::log(INFO, "WaylandContext initialized successfully on {}.", display_name_);
         return true;
     }
 

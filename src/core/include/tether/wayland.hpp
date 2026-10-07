@@ -2,10 +2,12 @@
 
 #include "tether/clipboard.hpp"
 #include "tether/event_loop.hpp"
+#include <filesystem>
 #include <functional>
 #include <memory>
 #include <mutex>
 #include <string>
+#include <vector>
 
 class CCWlDisplay;
 class CCWlRegistry;
@@ -21,7 +23,12 @@ namespace tether {
         WaylandContext(EpollEventLoop& loop);
         ~WaylandContext();
 
+        // Connects now if a compositor is up, otherwise keeps retrying on the loop.
+        // False only means clipboard sync is not available yet.
         bool init();
+
+        // Socket name of the connected compositor, empty while disconnected.
+        const std::string& display_name() const { return display_name_; }
 
         bool clipboard_available() const { return clipboard_ != nullptr; }
         void set_clipboard_callback(std::function<void(const std::string&)> cb);
@@ -32,11 +39,18 @@ namespace tether {
         std::string get_clipboard_image();
 
     private:
+        bool connect_display();
+        bool setup();
+        void disconnect();
+        void start_retry();
+
         std::mutex clip_mutex_;
         std::string cached_clipboard_;
         std::string cached_clipboard_image_;
         EpollEventLoop& loop_;
         wl_display* raw_display_ = nullptr;
+        std::string display_name_;
+        int retry_fd_ = -1;
         std::unique_ptr<CCWlDisplay> display_;
         std::unique_ptr<CCWlRegistry> registry_;
 
@@ -48,6 +62,9 @@ namespace tether {
         std::function<void(const std::string&)> clipboard_cb_;
         std::function<void(const std::string&)> clipboard_image_cb_;
     };
+
+    // Sorted wayland-* socket names in runtime_dir, lock files and non-sockets skipped.
+    std::vector<std::string> wayland_sockets(const std::filesystem::path& runtime_dir);
 
     extern WaylandContext* g_wayland;
 
