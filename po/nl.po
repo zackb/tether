@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: tether\n"
 "Report-Msgid-Bugs-To: zack@bartel.com\n"
-"POT-Creation-Date: 2026-10-02 19:39-0700\n"
+"POT-Creation-Date: 2026-10-06 18:58-0700\n"
 "PO-Revision-Date: 2026-08-23\n"
 "Last-Translator: Tether project\n"
 "Language-Team: Dutch\n"
@@ -420,6 +420,10 @@ msgstr "Secure Connections={}"
 #: src/cli/main.cpp
 msgid "Bond"
 msgstr "Koppeling"
+
+#: src/cli/main.cpp
+msgid "BR/EDR, notifications live"
+msgstr "BR/EDR, meldingen actief"
 
 #: src/cli/main.cpp src/gtk/devices_view.cpp src/gtk/main.cpp
 msgid "Notifications"

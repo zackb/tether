@@ -194,6 +194,7 @@ namespace tether::bluetooth {
         bool class_ok = false;
         bool bonded_device_present = false;
         bool bond_has_le = false;
+        bool bond_carries_ancs = false;
         bool secure_connections = false;
         bool secure_connections_known = false;
         // Adapter the steps below apply to, e.g. "hci0". The class unit is templated on it.
