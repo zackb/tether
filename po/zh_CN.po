@@ -400,9 +400,8 @@ msgid "Bond"
 msgstr "绑定"
 
 #: src/cli/main.cpp
-#, fuzzy
 msgid "BR/EDR, notifications live"
-msgstr "暂无通知。"
+msgstr "BR/EDR，通知已启用"
 
 #: src/cli/main.cpp src/gtk/devices_view.cpp src/gtk/main.cpp
 msgid "Notifications"

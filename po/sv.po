@@ -420,9 +420,8 @@ msgid "Bond"
 msgstr "Bindning"
 
 #: src/cli/main.cpp
-#, fuzzy
 msgid "BR/EDR, notifications live"
-msgstr "Inga aviseringar ännu."
+msgstr "BR/EDR, aviseringar aktiva"
 
 #: src/cli/main.cpp src/gtk/devices_view.cpp src/gtk/main.cpp
 msgid "Notifications"

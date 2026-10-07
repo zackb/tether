@@ -423,9 +423,8 @@ msgid "Bond"
 msgstr "Зв'язок"
 
 #: src/cli/main.cpp
-#, fuzzy
 msgid "BR/EDR, notifications live"
-msgstr "Сповіщень поки немає."
+msgstr "BR/EDR, сповіщення активні"
 
 #: src/cli/main.cpp src/gtk/devices_view.cpp src/gtk/main.cpp
 msgid "Notifications"

@@ -418,9 +418,8 @@ msgid "Bond"
 msgstr "Bağ"
 
 #: src/cli/main.cpp
-#, fuzzy
 msgid "BR/EDR, notifications live"
-msgstr "Henüz bildirim yok."
+msgstr "BR/EDR, bildirimler etkin"
 
 #: src/cli/main.cpp src/gtk/devices_view.cpp src/gtk/main.cpp
 msgid "Notifications"

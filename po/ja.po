@@ -416,9 +416,8 @@ msgid "Bond"
 msgstr "ボンド"
 
 #: src/cli/main.cpp
-#, fuzzy
 msgid "BR/EDR, notifications live"
-msgstr "まだ通知はありません。"
+msgstr "BR/EDR、通知は有効"
 
 #: src/cli/main.cpp src/gtk/devices_view.cpp src/gtk/main.cpp
 msgid "Notifications"

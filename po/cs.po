@@ -419,9 +419,8 @@ msgid "Bond"
 msgstr "Vazba"
 
 #: src/cli/main.cpp
-#, fuzzy
 msgid "BR/EDR, notifications live"
-msgstr "Zatím žádná oznámení."
+msgstr "BR/EDR, oznámení aktivní"
 
 #: src/cli/main.cpp src/gtk/devices_view.cpp src/gtk/main.cpp
 msgid "Notifications"

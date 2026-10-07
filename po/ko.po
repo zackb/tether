@@ -410,9 +410,8 @@ msgid "Bond"
 msgstr "본드"
 
 #: src/cli/main.cpp
-#, fuzzy
 msgid "BR/EDR, notifications live"
-msgstr "아직 알림이 없습니다."
+msgstr "BR/EDR, 알림 활성"
 
 #: src/cli/main.cpp src/gtk/devices_view.cpp src/gtk/main.cpp
 msgid "Notifications"
