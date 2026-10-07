@@ -95,7 +95,11 @@ namespace tether {
             cb_ = std::move(cb);
         }
 
-        void copy(const std::string& text) override { offer(text, {"text/plain", "UTF8_STRING"}); }
+        // GTK asks for text/plain;charset=utf-8 first and reads a bare text/plain as Latin-1,
+        // so offer every text type wl-copy does.
+        void copy(const std::string& text) override {
+            offer(text, {"text/plain;charset=utf-8", "text/plain", "UTF8_STRING", "TEXT", "STRING"});
+        }
 
         void copy_image(const std::string& png) override { offer(png, {CLIPBOARD_IMAGE_MIME}); }
 

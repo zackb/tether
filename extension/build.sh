@@ -51,6 +51,15 @@ echo "Bundling Chromium extension..."
 "$ESBUILD" extension/src/background/background.js --bundle --outfile="$CHROME_DIR/src/background/background.js"
 "$ESBUILD" extension/src/content/autofill.js --bundle --outfile="$CHROME_DIR/src/content/autofill.js"
 cp extension/manifest-browser.json "$CHROME_DIR/manifest.json"
+# Chrome MV3 uses a service worker; Firefox-only manifest fields are omitted.
+node --input-type=module - "$CHROME_DIR/manifest.json" <<'JS'
+import { readFileSync, writeFileSync } from 'node:fs';
+const path = process.argv[2];
+const manifest = JSON.parse(readFileSync(path, 'utf8'));
+delete manifest.browser_specific_settings;
+delete manifest.background.scripts;
+writeFileSync(path, JSON.stringify(manifest, null, 2) + '\n');
+JS
 if [ -d "extension/icons" ]; then cp -R extension/icons "$CHROME_DIR/"; fi
 make_archive "$CHROME_DIR" ../tether-chromium-extension.zip
 

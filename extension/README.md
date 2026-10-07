@@ -47,3 +47,32 @@ mkdir -p ~/.config/chromium/NativeMessagingHosts/
 ln -s $(pwd)/build/com.tether.extension.chrome.json ~/.config/chromium/NativeMessagingHosts/com.tether.extension.json
 ```
 
+
+## Local Chrome / Chromium installation
+
+From the repository root, run `bash extension/build.sh` (Node.js, npm and zip
+are required). The Chrome build is written to `build/extension/chromium` and
+archived as `build/extension/tether-chromium-extension.zip`.
+
+1. Open `chrome://extensions` in the desired browser profile.
+2. Enable **Developer mode**, click **Load unpacked**, and select the absolute
+   path to `build/extension/chromium` in this checkout.
+3. Copy the extension ID displayed by the browser.
+4. With Tether installed, register the native host:
+
+   ```sh
+   python3 extension/host/install-chromium-host.py EXTENSION_ID
+   # For Chromium instead of Google Chrome:
+   python3 extension/host/install-chromium-host.py EXTENSION_ID --browser chromium
+   ```
+
+The helper finds `tether-native-host` on PATH. Use `--host /absolute/path` if
+installed elsewhere. It backs up an existing user registration and preserves
+its allowed extension origins. No sudo is needed. Reload the extension after
+registration. Tether's daemon must be running for OTP autofill.
+
+Load the extension separately in each desired profile. Keep the checkout at
+its current path, rebuild after updating it, then click **Reload** in the
+extensions page. This is an unpacked local installation, not a signed CRX or
+Chrome Web Store release. The extension ID can change if its path changes;
+rerun the helper with the new ID when necessary.

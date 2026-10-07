@@ -81,6 +81,7 @@ The extension communicates with `tetherd` via native messaging. This allows user
 
 ### Browser Extension
 - Firefox: [Tether Browser Extension](https://addons.mozilla.org/en-US/firefox/addon/tether-browser-extension/)
+- Google Chrome / Chromium: [Build and install locally](extension/README.md#local-chrome--chromium-installation).
 
 ### Mail Extension
 - Thunderbird: [Tether Mail Extension](https://addons.thunderbird.net/en-US/thunderbird/addon/tether-mail-extension/)
@@ -306,7 +307,11 @@ tether status                                  # devices, links, and recent tran
 See [docs/HEADLESS.md](docs/HEADLESS.md), or [the container guide](docs/CONTAINER.md)
 for Docker deployment.
 
+## Alternative web UI
 
+The [tether-web project](https://github.com/napisani/tether-web) provides a lightweight browser interface for running Tether without a desktop session. It runs `tetherd` in headless mode and lets you pair and manage a Bluetooth-connected iPhone from a browser.
+
+This setup is useful for homelabs and headless Linux servers where a full GTK desktop is not available. The iPhone must remain within Bluetooth range of the Linux host. The current interface focuses on guided pairing and connection status.
 
 ## Components
 
