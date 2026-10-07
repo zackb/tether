@@ -3,6 +3,12 @@
 #include <tether/base64.hpp>
 #include <tether/clipboard.hpp>
 #include <tether/net.hpp>
+#include <tether/wayland.hpp>
+
+#include <fstream>
+#include <sys/socket.h>
+#include <sys/un.h>
+#include <unistd.h>
 
 TEST(ClipboardMimeTest, TextWinsOverImage) {
     EXPECT_EQ(tether::pick_clipboard_mime({"image/png", "text/plain"}), "text/plain");
@@ -76,4 +82,32 @@ TEST(ClipboardImageTest, ReceiverDropsBadTransfers) {
     ASSERT_TRUE(rx.start("over", 4));
     EXPECT_TRUE(rx.chunk("over", b64));
     EXPECT_EQ(rx.finish("over"), "");
+}
+
+TEST(WaylandSocketTest, OnlyCompositorSocketsAreCandidates) {
+    char dir[] = "/tmp/tether-wl-XXXXXX";
+    ASSERT_NE(mkdtemp(dir), nullptr);
+    const std::filesystem::path root = dir;
+    std::ofstream(root / "wayland-0");      // stale regular file
+    std::ofstream(root / "wayland-1.lock"); // compositor lock file
+
+    const auto bind_socket = [&](const std::string& name) {
+        int fd = socket(AF_UNIX, SOCK_STREAM, 0);
+        sockaddr_un addr{};
+        addr.sun_family = AF_UNIX;
+        std::strncpy(addr.sun_path, (root / name).c_str(), sizeof(addr.sun_path) - 1);
+        EXPECT_EQ(bind(fd, reinterpret_cast<sockaddr*>(&addr), sizeof(addr)), 0);
+        return fd;
+    };
+    int fd2 = bind_socket("wayland-2");
+    int fd1 = bind_socket("wayland-1");
+    int other = bind_socket("pipewire-0");
+
+    EXPECT_EQ(tether::wayland_sockets(root), (std::vector<std::string>{"wayland-1", "wayland-2"}));
+    EXPECT_TRUE(tether::wayland_sockets(root / "missing").empty());
+
+    close(fd1);
+    close(fd2);
+    close(other);
+    std::filesystem::remove_all(root);
 }

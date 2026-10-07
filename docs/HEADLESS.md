@@ -131,7 +131,9 @@ launch a desktop dialog does not by itself reject or accept the request.
 
 `tether status` says `Clipboard: off, no Wayland session on this machine` and
 that is the whole story: without a compositor there is no clipboard to sync. The
-rest of the daemon does not care. If the machine does run a compositor and this
+rest of the daemon does not care. A compositor that starts later, such as at
+login after the unit started at boot, is picked up within a few seconds, with
+or without `WAYLAND_DISPLAY`. If the machine does run a compositor and this
 still says off, the compositor is missing `wlr-data-control` or
 `ext-data-control`.
 

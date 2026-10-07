@@ -704,9 +704,8 @@ namespace tether {
 
     static void run_bt_unpair(const std::string& address, const std::string& operation_id) {
         if (!bluetooth::g_bluez) {
-            nlohmann::json event{{"command", "bt_unpair_result"},
-                                 {"success", false},
-                                 {"message", _("Bluetooth is unavailable.")}};
+            nlohmann::json event{
+                {"command", "bt_unpair_result"}, {"success", false}, {"message", _("Bluetooth is unavailable.")}};
             set_operation_id(event, operation_id);
             broadcast_local_event(event.dump());
             return;
@@ -1708,7 +1707,8 @@ namespace tether {
                                        : tr_format(_("Send failed: {}"), err.empty() ? _("unknown error") : err);
                             } else {
                                 resp["success"] = false;
-                                resp["message"] = tr_format(_("Send failed: {}"), _("Could not reach the Tether daemon."));
+                                resp["message"] =
+                                    tr_format(_("Send failed: {}"), _("Could not reach the Tether daemon."));
                             }
                             broadcast_local_event(resp.dump());
                         }).detach();
@@ -2500,9 +2500,11 @@ namespace tether {
         // A headless client approves through the command socket. No GUI is not a rejection.
         // WAYLAND_DISPLAY alone would also skip a working X11 session: tether-dialog
         // falls back to an ordinary window when gtk-layer-shell isn't available.
+        // A daemon started before the compositor finds it later, without WAYLAND_DISPLAY.
+        const std::string live_display = g_wayland ? g_wayland->display_name() : std::string{};
         const char* wayland_display = std::getenv("WAYLAND_DISPLAY");
         const char* x11_display = std::getenv("DISPLAY");
-        if ((!wayland_display || !*wayland_display) && (!x11_display || !*x11_display))
+        if (live_display.empty() && (!wayland_display || !*wayland_display) && (!x11_display || !*x11_display))
             return;
 
         // Translated before the fork: gettext takes a lock, and calling it in the
@@ -2516,6 +2518,29 @@ namespace tether {
         const std::string title = _("Pairing Request");
         const std::string accept = _("Accept");
         const std::string reject = _("Reject");
+
+        // build before the fork, child of a thread must not allocate
+        const std::string live_env = "WAYLAND_DISPLAY=" + live_display;
+        std::vector<char*> envp;
+        for (char** e = environ; *e; ++e) {
+            if (live_display.empty() || std::strncmp(*e, "WAYLAND_DISPLAY=", 16) != 0)
+                envp.push_back(*e);
+        }
+        if (!live_display.empty())
+            envp.push_back(const_cast<char*>(live_env.c_str()));
+        envp.push_back(nullptr);
+        const char* const argv[] = {"tether-dialog",
+                                    "--title",
+                                    title.c_str(),
+                                    "--body",
+                                    body.c_str(),
+                                    "--accept",
+                                    accept.c_str(),
+                                    "--reject",
+                                    reject.c_str(),
+                                    "--timeout",
+                                    "60",
+                                    nullptr};
 
         // Create a pipe so the parent can detect when the child exits via epoll
         int pipefd[2];
@@ -2546,33 +2571,9 @@ namespace tether {
             }
             std::string sibling = (self_path.parent_path() / "tether-dialog").string();
 
-            execl(sibling.c_str(),
-                  "tether-dialog",
-                  "--title",
-                  title.c_str(),
-                  "--body",
-                  body.c_str(),
-                  "--accept",
-                  accept.c_str(),
-                  "--reject",
-                  reject.c_str(),
-                  "--timeout",
-                  "60",
-                  nullptr);
+            execve(sibling.c_str(), const_cast<char* const*>(argv), envp.data());
             // If sibling path failed, try PATH
-            execlp("tether-dialog",
-                   "tether-dialog",
-                   "--title",
-                   title.c_str(),
-                   "--body",
-                   body.c_str(),
-                   "--accept",
-                   accept.c_str(),
-                   "--reject",
-                   reject.c_str(),
-                   "--timeout",
-                   "60",
-                   nullptr);
+            execvpe("tether-dialog", const_cast<char* const*>(argv), envp.data());
             // exec failed entirely
             debug::log(ERR, "spawn_pair_dialog: exec failed: {}", std::strerror(errno));
             _exit(3);

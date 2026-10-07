@@ -154,18 +154,16 @@ int main(int argc, char** argv) {
 
     tether::WaylandContext wayland_srv(loop);
     tether::g_wayland = &wayland_srv;
-    if (wayland_srv.init()) {
-        wayland_srv.set_clipboard_callback([](const std::string& text) {
-            nlohmann::json j;
-            j["command"] = "clipboard_updated";
-            j["content"] = text;
-            // replace bad UTF-8 instead of throwing; a clipboard
-            // app can still mislabel binary as text/plain. Don't abort the daemon.
-            tether::broadcast_message(j.dump(-1, ' ', false, nlohmann::json::error_handler_t::replace));
-        });
-        wayland_srv.set_clipboard_image_callback(
-            [](const std::string& png) { tether::broadcast_clipboard_image(png); });
-    }
+    wayland_srv.set_clipboard_callback([](const std::string& text) {
+        nlohmann::json j;
+        j["command"] = "clipboard_updated";
+        j["content"] = text;
+        // replace bad UTF-8 instead of throwing; a clipboard
+        // app can still mislabel binary as text/plain. Don't abort the daemon.
+        tether::broadcast_message(j.dump(-1, ' ', false, nlohmann::json::error_handler_t::replace));
+    });
+    wayland_srv.set_clipboard_image_callback([](const std::string& png) { tether::broadcast_clipboard_image(png); });
+    wayland_srv.init();
 
     tether::FileReceiveManager file_mgr;
     tether::DesktopNotifier notifier;
