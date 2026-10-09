@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: tether\n"
 "Report-Msgid-Bugs-To: zack@bartel.com\n"
-"POT-Creation-Date: 2026-10-08 19:43-0700\n"
+"POT-Creation-Date: 2026-10-08 20:06-0700\n"
 "PO-Revision-Date: 2026-08-23\n"
 "Last-Translator: Tether project\n"
 "Language-Team: Italian\n"
@@ -2490,6 +2490,14 @@ msgstr "Sincronizzazione degli appunti richiesta..."
 msgid "Forget"
 msgstr "Dimentica"
 
+#: src/gtk/main.cpp
+msgid "Expand sidebar"
+msgstr "Espandi la barra laterale"
+
+#: src/gtk/main.cpp
+msgid "Collapse sidebar"
+msgstr "Comprimi la barra laterale"
+
 #: src/gtk/main.cpp src/gtk/settings_view.cpp
 msgid "Settings"
 msgstr "Impostazioni"
@@ -2509,6 +2517,10 @@ msgstr "Cerca dispositivi"
 #: src/gtk/main.cpp
 msgid "Devices"
 msgstr "Dispositivi"
+
+#: src/gtk/main.cpp
+msgid "Toggle sidebar"
+msgstr "Attiva/disattiva la barra laterale"
 
 #: src/gtk/main.cpp
 msgid "Start hidden in the system tray"

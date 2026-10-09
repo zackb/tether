@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: tether\n"
 "Report-Msgid-Bugs-To: zack@bartel.com\n"
-"POT-Creation-Date: 2026-10-08 19:43-0700\n"
+"POT-Creation-Date: 2026-10-08 20:06-0700\n"
 "PO-Revision-Date: 2026-08-23\n"
 "Last-Translator: Tether project\n"
 "Language-Team: Russian\n"
@@ -2478,6 +2478,14 @@ msgstr "Запрошена синхронизация буфера обмена.
 msgid "Forget"
 msgstr "Забыть"
 
+#: src/gtk/main.cpp
+msgid "Expand sidebar"
+msgstr "Развернуть боковую панель"
+
+#: src/gtk/main.cpp
+msgid "Collapse sidebar"
+msgstr "Свернуть боковую панель"
+
 #: src/gtk/main.cpp src/gtk/settings_view.cpp
 msgid "Settings"
 msgstr "Настройки"
@@ -2497,6 +2505,10 @@ msgstr "Искать устройства"
 #: src/gtk/main.cpp
 msgid "Devices"
 msgstr "Устройства"
+
+#: src/gtk/main.cpp
+msgid "Toggle sidebar"
+msgstr "Переключить боковую панель"
 
 #: src/gtk/main.cpp
 msgid "Start hidden in the system tray"
