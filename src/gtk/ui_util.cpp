@@ -32,7 +32,9 @@ namespace tether::ui {
     padding: 20px 10px 16px;
     min-width: 142px;
 }
-.tether-brand { font-size: 23px; font-weight: bold; padding: 2px 12px 26px; }
+.tether-app .tether-nav.collapsed { min-width: 0; }
+.tether-nav-logo { border: none; box-shadow: none; background: transparent; border-radius: 10px; padding: 4px 8px; }
+.tether-nav-logo:hover { background-color: alpha(@theme_fg_color, 0.07); }
 .tether-nav-item { border: none; box-shadow: none; background: transparent; border-radius: 10px; padding: 12px; }
 .tether-nav-item:hover { background-color: alpha(@theme_fg_color, 0.07); }
 .tether-nav-item:checked { background-color: alpha(@theme_selected_bg_color, 0.20); color: @theme_fg_color; font-weight: bold; }

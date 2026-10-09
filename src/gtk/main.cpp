@@ -16,6 +16,7 @@
 #include <string>
 #include <tether/crypto.hpp>
 #include <tether/i18n.hpp>
+#include <vector>
 
 namespace {
 
@@ -26,6 +27,42 @@ namespace {
     GtkWidget* g_calls_page = nullptr;
     GtkWidget* g_calls_nav = nullptr;
     gboolean g_start_hidden = FALSE;
+
+    GtkWidget* g_sidebar = nullptr;
+    GtkWidget* g_sidebar_toggle = nullptr;
+    struct NavEntry {
+        GtkWidget* button;
+        GtkWidget* label;
+    };
+    std::vector<NavEntry> g_nav_entries;
+
+    // Collapsed shows icons only; labels move into tooltips.
+    void apply_sidebar_collapsed(bool collapsed) {
+        GtkStyleContext* style = gtk_widget_get_style_context(g_sidebar);
+        if (collapsed)
+            gtk_style_context_add_class(style, "collapsed");
+        else
+            gtk_style_context_remove_class(style, "collapsed");
+        for (const auto& entry : g_nav_entries) {
+            gtk_widget_set_visible(entry.label, !collapsed);
+            gtk_widget_set_tooltip_text(entry.button, collapsed ? gtk_label_get_text(GTK_LABEL(entry.label)) : nullptr);
+        }
+        gtk_widget_set_tooltip_text(g_sidebar_toggle, collapsed ? _("Expand sidebar") : _("Collapse sidebar"));
+    }
+
+    // Icon plus a separate label, so the label can hide when collapsed.
+    GtkWidget* nav_item_content(GtkWidget* button, const char* icon, const char* title) {
+        gtk_style_context_add_class(gtk_widget_get_style_context(button), "tether-nav-item");
+        GtkWidget* content = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, 12);
+        gtk_box_pack_start(GTK_BOX(content), navigation_icon(icon), FALSE, FALSE, 0);
+        GtkWidget* label = gtk_label_new(title);
+        gtk_label_set_xalign(GTK_LABEL(label), 0);
+        gtk_box_pack_start(GTK_BOX(content), label, TRUE, TRUE, 0);
+        gtk_container_add(GTK_CONTAINER(button), content);
+        set_accessible_name(button, title);
+        g_nav_entries.push_back({button, label});
+        return content;
+    }
 
     // what the current invocation asked to see
     std::string g_requested_view;
@@ -250,16 +287,25 @@ namespace {
 
         GtkWidget* sidebar = gtk_box_new(GTK_ORIENTATION_VERTICAL, 6);
         gtk_style_context_add_class(gtk_widget_get_style_context(sidebar), "tether-nav");
-        GtkWidget* logo = navigation_icon("logo", 42);
+        g_sidebar = sidebar;
+        GtkWidget* logo = gtk_button_new();
+        gtk_button_set_relief(GTK_BUTTON(logo), GTK_RELIEF_NONE);
+        gtk_container_add(GTK_CONTAINER(logo), navigation_icon("logo", 42));
+        gtk_style_context_add_class(gtk_widget_get_style_context(logo), "tether-nav-logo");
         gtk_widget_set_halign(logo, GTK_ALIGN_START);
-        gtk_widget_set_margin_start(logo, 12);
-        gtk_widget_set_margin_bottom(logo, 8);
-        set_accessible_name(logo, _("Tether"));
+        gtk_widget_set_margin_bottom(logo, 20);
+        set_accessible_name(logo, _("Toggle sidebar"));
+        g_sidebar_toggle = logo;
+        g_signal_connect(logo,
+                         "clicked",
+                         G_CALLBACK(+[](GtkButton*, gpointer) {
+                             const bool collapsed = !prefs().value("sidebar_collapsed", false);
+                             prefs()["sidebar_collapsed"] = collapsed;
+                             prefs_save();
+                             apply_sidebar_collapsed(collapsed);
+                         }),
+                         nullptr);
         gtk_box_pack_start(GTK_BOX(sidebar), logo, FALSE, FALSE, 0);
-        GtkWidget* brand = gtk_label_new(_("Tether"));
-        gtk_label_set_xalign(GTK_LABEL(brand), 0);
-        gtk_style_context_add_class(gtk_widget_get_style_context(brand), "tether-brand");
-        gtk_box_pack_start(GTK_BOX(sidebar), brand, FALSE, FALSE, 0);
 
         struct NavItem {
             const char* name;
@@ -278,14 +324,7 @@ namespace {
             if (!group)
                 group = GTK_RADIO_BUTTON(button);
             gtk_toggle_button_set_mode(GTK_TOGGLE_BUTTON(button), FALSE);
-            gtk_style_context_add_class(gtk_widget_get_style_context(button), "tether-nav-item");
-            GtkWidget* content = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, 12);
-            gtk_box_pack_start(GTK_BOX(content), navigation_icon(item.name), FALSE, FALSE, 0);
-            GtkWidget* label = gtk_label_new(item.title);
-            gtk_label_set_xalign(GTK_LABEL(label), 0);
-            gtk_box_pack_start(GTK_BOX(content), label, TRUE, TRUE, 0);
-            gtk_container_add(GTK_CONTAINER(button), content);
-            set_accessible_name(button, item.title);
+            GtkWidget* content = nav_item_content(button, item.name, item.title);
             g_object_set_data(G_OBJECT(button), "view-name", const_cast<char*>(item.name));
             g_signal_connect(button,
                              "toggled",
@@ -312,10 +351,8 @@ namespace {
                 gtk_widget_show_all(content);
             }
         }
-        GtkWidget* settings = gtk_button_new_with_label(_("Settings"));
-        gtk_button_set_image(GTK_BUTTON(settings), navigation_icon("settings"));
-        gtk_button_set_always_show_image(GTK_BUTTON(settings), TRUE);
-        gtk_style_context_add_class(gtk_widget_get_style_context(settings), "tether-nav-item");
+        GtkWidget* settings = gtk_button_new();
+        nav_item_content(settings, "settings", _("Settings"));
         gtk_actionable_set_action_name(GTK_ACTIONABLE(settings), "win.settings");
         gtk_box_pack_end(GTK_BOX(sidebar), settings, FALSE, FALSE, 0);
 
@@ -357,6 +394,7 @@ namespace {
 
         gtk_widget_show_all(root);
         gtk_widget_show_all(header_bar);
+        apply_sidebar_collapsed(prefs().value("sidebar_collapsed", false));
         set_calls_tab_visible(false);
         if (!g_start_hidden)
             gtk_widget_show(window);
