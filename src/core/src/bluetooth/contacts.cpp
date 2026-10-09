@@ -11,6 +11,7 @@
 #include <filesystem>
 #include <fstream>
 #include <glib.h>
+#include <set>
 #include <unistd.h>
 
 namespace tether::bluetooth {
@@ -103,8 +104,6 @@ namespace tether::bluetooth {
         const std::string wanted = fold(needle);
         std::vector<VCard> out;
         for (const auto& card : contacts_) {
-            if (out.size() >= limit)
-                break;
             if (wanted.empty()) {
                 out.push_back(card);
                 continue;
@@ -117,8 +116,37 @@ namespace tether::bluetooth {
             if (haystack.find(wanted) != std::string::npos)
                 out.push_back(card);
         }
-        std::sort(out.begin(), out.end(), [](const VCard& a, const VCard& b) { return fold(a.name) < fold(b.name); });
+        // Sorted before the limit applies, so a favorite is never cut off.
+        std::sort(out.begin(), out.end(), [](const VCard& a, const VCard& b) {
+            if (a.favorite != b.favorite)
+                return a.favorite;
+            return fold(a.name) < fold(b.name);
+        });
+        if (out.size() > limit)
+            out.resize(limit);
         return out;
+    }
+
+    void mark_favorites(std::vector<VCard>& contacts, const std::vector<VCard>& favorites) {
+        std::set<std::string> keys;
+        for (const auto& fav : favorites) {
+            for (const auto& tel : fav.tels)
+                if (std::string normalized = normalize_phone(tel); !normalized.empty())
+                    keys.insert("tel:" + normalized);
+            for (const auto& email : fav.emails)
+                if (std::string normalized = normalize_email(email); !normalized.empty())
+                    keys.insert("email:" + normalized);
+            if (fav.tels.empty() && fav.emails.empty() && !fav.name.empty())
+                keys.insert("name:" + fold(fav.name));
+        }
+
+        for (auto& card : contacts) {
+            card.favorite = keys.count("name:" + fold(card.name)) > 0;
+            for (const auto& tel : card.tels)
+                card.favorite = card.favorite || keys.count("tel:" + normalize_phone(tel)) > 0;
+            for (const auto& email : card.emails)
+                card.favorite = card.favorite || keys.count("email:" + normalize_email(email)) > 0;
+        }
     }
 
     std::string contacts_path(Retention mode) {
@@ -138,6 +166,7 @@ namespace tether::bluetooth {
             c["name"] = card.name;
             c["tels"] = card.tels;
             c["emails"] = card.emails;
+            c["favorite"] = card.favorite;
             j["contacts"].push_back(std::move(c));
         }
 
@@ -157,6 +186,7 @@ namespace tether::bluetooth {
                 card.name = c.value("name", "");
                 card.tels = c.value("tels", std::vector<std::string>{});
                 card.emails = c.value("emails", std::vector<std::string>{});
+                card.favorite = c.value("favorite", false);
                 if (!card.empty())
                     cards.push_back(std::move(card));
             }

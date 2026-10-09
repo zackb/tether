@@ -151,6 +151,28 @@ TEST(VCard, RecoversFromUnterminatedCard) {
     EXPECT_EQ(cards[1].name, "Second");
 }
 
+// iOS sends the call type as a bare parameter, as seen on an iPhone's cch.
+TEST(VCard, ParsesCallHistoryEntry) {
+    auto cards = parse_vcards("BEGIN:VCARD\nVERSION:3.0\nFN:\nN:\nTEL;TYPE=CELL:+15551234567\n"
+                              "X-IRMC-CALL-DATETIME;MISSED:20261007T111657\nEND:VCARD\n"
+                              "BEGIN:VCARD\nFN:Ada\nX-IRMC-CALL-DATETIME;TYPE=DIALED:20261005T092933\nEND:VCARD\n");
+
+    ASSERT_EQ(cards.size(), 2u);
+    EXPECT_EQ(cards[0].call_type, "MISSED");
+    EXPECT_EQ(cards[0].call_time, "20261007T111657");
+    EXPECT_EQ(cards[0].tels, std::vector<std::string>{"+15551234567"});
+    EXPECT_EQ(cards[1].call_type, "DIALED");
+}
+
+// A withheld caller has no number and no name, only the time.
+TEST(VCard, KeepsCallEntryWithNoNumber) {
+    auto cards = parse_vcards("BEGIN:VCARD\nX-IRMC-CALL-DATETIME;RECEIVED:20261005T122204\nEND:VCARD\n");
+
+    ASSERT_EQ(cards.size(), 1u);
+    EXPECT_TRUE(cards[0].tels.empty());
+    EXPECT_EQ(cards[0].call_type, "RECEIVED");
+}
+
 TEST(ContactStore, ResolvesNamesByTelAndEmail) {
     ContactStore store;
     store.set(parse_vcards("BEGIN:VCARD\nFN:Ada\nTEL:+1 (555) 123-4567\nEMAIL:Ada@Example.COM\nEND:VCARD\n"));
@@ -413,4 +435,28 @@ TEST(ContactStore, AnInterruptedMigrationKeepsTheDestinationNotTheSource) {
     EXPECT_EQ(loaded.name_for("tel:+15551234567"), "Ada Lovelace") << "the sealed cache was replaced by the source";
     EXPECT_EQ(loaded.name_for("tel:+15550000009"), "") << "the stale source won over the destination";
     EXPECT_FALSE(std::filesystem::exists(scoped.store() / "contacts.json")) << "the plaintext copy is still on disk";
+}
+
+// iOS sends fav cards in a different number format than pb.
+TEST(ContactSearch, ListsFavoritesFirstAndNeverCutsThemOff) {
+    auto cards = parse_vcards("BEGIN:VCARD\nFN:Ada Lovelace\nTEL:+1 (555) 123-4567\nEND:VCARD\n"
+                              "BEGIN:VCARD\nFN:Grace Hopper\nEMAIL:grace@example.com\nEND:VCARD\n"
+                              "BEGIN:VCARD\nFN:Alan Turing\nTEL:+15559876543\nEND:VCARD\n");
+    mark_favorites(cards, parse_vcards("BEGIN:VCARD\nFN:Alan\nTEL:+1 555 987 6543\nEND:VCARD\n"));
+    ContactStore store;
+    store.set(std::move(cards));
+
+    EXPECT_EQ(names_of(store.search("", 10)),
+              (std::vector<std::string>{"Alan Turing", "Ada Lovelace", "Grace Hopper"}));
+    EXPECT_EQ(names_of(store.search("", 1)), (std::vector<std::string>{"Alan Turing"}));
+}
+
+TEST(ContactStore, FavoriteSurvivesJsonRoundTrip) {
+    auto cards = parse_vcards("BEGIN:VCARD\nFN:Ada\nTEL:+15551234567\nEND:VCARD\n");
+    mark_favorites(cards, cards);
+    ContactStore store;
+    store.set(std::move(cards));
+
+    ScopedStore scope("favorite-roundtrip");
+    ASSERT_TRUE(deserialize_contacts(serialize_contacts(store)).contacts().at(0).favorite);
 }

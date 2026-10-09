@@ -813,6 +813,7 @@ namespace tether {
             for (const auto& card : bluetooth::contact_store().search(query, limit)) {
                 nlohmann::json entry;
                 entry["name"] = card.name;
+                entry["favorite"] = card.favorite;
                 // Namespaced the same way threads are, so an address here can be
                 // handed straight back as the thread of a bt_send_message.
                 nlohmann::json addresses = nlohmann::json::array();
@@ -1465,6 +1466,14 @@ namespace tether {
                         nlohmann::json payload;
                         payload["command"] = "bt_calls";
                         payload["calls"] = bluetooth::g_bt_connections ? bluetooth::g_bt_connections->calls()
+                                                                       : nlohmann::json::array();
+                        std::string out = payload.dump(-1, ' ', false, nlohmann::json::error_handler_t::replace) + "\n";
+                        write_plain_packet(client_fd, out);
+                        continue;
+                    } else if (j.contains("command") && j["command"] == "bt_list_call_history") {
+                        nlohmann::json payload;
+                        payload["command"] = "bt_call_history";
+                        payload["calls"] = bluetooth::g_bt_connections ? bluetooth::g_bt_connections->call_history()
                                                                        : nlohmann::json::array();
                         std::string out = payload.dump(-1, ' ', false, nlohmann::json::error_handler_t::replace) + "\n";
                         write_plain_packet(client_fd, out);

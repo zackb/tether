@@ -72,6 +72,10 @@ namespace tether::bluetooth {
         // Whether the phone has Hands-Free up.
         bool calls_available() const;
 
+        // The phone's recent calls, newest first: number, name, type
+        void set_call_history_handler(CallsFn on_history);
+        nlohmann::json call_history() const;
+
         nlohmann::json notifications(size_t limit = 50) const;
         ~ConnectionManager();
 

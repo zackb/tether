@@ -4,6 +4,7 @@
 #include "ui_util.hpp"
 #include <tether/i18n.hpp>
 
+#include <ctime>
 #include <string>
 
 namespace tether::ui {
@@ -13,6 +14,7 @@ namespace tether::ui {
         struct CallsState {
             GtkWidget* status_label = nullptr;
             GtkWidget* list = nullptr;
+            GtkWidget* history = nullptr;
             GtkWidget* stack = nullptr;
             GtkWidget* entry = nullptr;
             GtkWidget* dial_button = nullptr;
@@ -20,6 +22,8 @@ namespace tether::ui {
             bool visible = false;
             bool available = false;
             bool audio_routable = false;
+            bool has_calls = false;
+            bool has_history = false;
         };
 
         CallsState g_calls;
@@ -28,6 +32,14 @@ namespace tether::ui {
             nlohmann::json j;
             j["command"] = "bt_list_calls";
             daemon_send(j);
+            j["command"] = "bt_list_call_history";
+            daemon_send(j);
+        }
+
+        // Live calls take the page; otherwise recent calls; otherwise the status text.
+        void update_stack() {
+            const char* page = g_calls.has_calls ? "list" : (g_calls.has_history ? "history" : "status");
+            gtk_stack_set_visible_child_name(GTK_STACK(g_calls.stack), page);
         }
 
         void send_action(const std::string& action, const std::string& path) {
@@ -61,6 +73,16 @@ namespace tether::ui {
             j["number"] = number;
             daemon_send(j);
             gtk_entry_set_text(GTK_ENTRY(g_calls.entry), "");
+        }
+
+        void on_redial_clicked(GtkButton* button, gpointer) {
+            const char* number = static_cast<const char*>(g_object_get_data(G_OBJECT(button), "call-number"));
+            if (!number || !*number)
+                return;
+            nlohmann::json j;
+            j["command"] = "bt_call_dial";
+            j["number"] = number;
+            daemon_send(j);
         }
 
         void attach_path(GtkWidget* button, const std::string& path) {
@@ -185,6 +207,96 @@ namespace tether::ui {
             return row;
         }
 
+        // Time of day for today's calls, the date as well for older ones.
+        std::string format_call_time(int64_t epoch) {
+            if (epoch <= 0)
+                return "";
+            const std::time_t t = static_cast<std::time_t>(epoch);
+            const std::time_t now = std::time(nullptr);
+            std::tm tm{}, today{};
+            localtime_r(&t, &tm);
+            localtime_r(&now, &today);
+            const bool same_day = tm.tm_year == today.tm_year && tm.tm_yday == today.tm_yday;
+
+            char buffer[64];
+            // xgettext:no-c-format
+            std::strftime(buffer, sizeof(buffer), same_day ? _("%H:%M") : _("%b %d, %H:%M"), &tm);
+            return buffer;
+        }
+
+        GtkWidget* build_history_row(const nlohmann::json& entry) {
+            const std::string number = entry.value("number", "");
+            const std::string name = entry.value("name", "");
+            const std::string type = entry.value("type", "");
+
+            const char* icon = "call-incoming-symbolic";
+            const char* kind = _("Incoming");
+            if (type == "missed") {
+                icon = "call-missed-symbolic";
+                kind = _("Missed");
+            } else if (type == "dialed") {
+                icon = "call-outgoing-symbolic";
+                kind = _("Outgoing");
+            }
+
+            GtkWidget* row = gtk_list_box_row_new();
+            gtk_list_box_row_set_selectable(GTK_LIST_BOX_ROW(row), FALSE);
+
+            GtkWidget* box = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, 10);
+            gtk_container_set_border_width(GTK_CONTAINER(box), 10);
+            GtkWidget* image = gtk_image_new_from_icon_name(icon, GTK_ICON_SIZE_LARGE_TOOLBAR);
+            set_accessible_name(image, kind);
+            gtk_box_pack_start(GTK_BOX(box), image, FALSE, FALSE, 0);
+
+            GtkWidget* text = gtk_box_new(GTK_ORIENTATION_VERTICAL, 2);
+            const std::string primary = !name.empty() ? name : (!number.empty() ? number : _("Unknown caller"));
+            GtkWidget* primary_label = gtk_label_new(nullptr);
+            gtk_label_set_markup(GTK_LABEL(primary_label), ("<b>" + escape_markup(primary) + "</b>").c_str());
+            gtk_label_set_xalign(GTK_LABEL(primary_label), 0.0);
+            if (type == "missed")
+                gtk_style_context_add_class(gtk_widget_get_style_context(primary_label), "error");
+            gtk_box_pack_start(GTK_BOX(text), primary_label, FALSE, FALSE, 0);
+
+            std::string secondary = kind;
+            if (!name.empty() && !number.empty())
+                secondary += "  -  " + number;
+            if (const std::string when = format_call_time(entry.value("timestamp", static_cast<int64_t>(0)));
+                !when.empty())
+                secondary += "  -  " + when;
+            GtkWidget* secondary_label = gtk_label_new(secondary.c_str());
+            gtk_label_set_xalign(GTK_LABEL(secondary_label), 0.0);
+            gtk_style_context_add_class(gtk_widget_get_style_context(secondary_label), "muted");
+            gtk_box_pack_start(GTK_BOX(text), secondary_label, FALSE, FALSE, 0);
+            gtk_box_pack_start(GTK_BOX(box), text, TRUE, TRUE, 0);
+
+            if (!number.empty()) {
+                GtkWidget* call = gtk_button_new_from_icon_name("call-start-symbolic", GTK_ICON_SIZE_BUTTON);
+                // TRANSLATORS: Button that calls a recent caller back, {} is their name or number.
+                const std::string label = tether::tr_format(_("Call {}"), primary);
+                gtk_widget_set_tooltip_text(call, label.c_str());
+                set_accessible_name(call, label);
+                g_object_set_data_full(G_OBJECT(call), "call-number", g_strdup(number.c_str()), g_free);
+                g_signal_connect(call, "clicked", G_CALLBACK(on_redial_clicked), nullptr);
+                gtk_widget_set_sensitive(call, g_calls.available);
+                gtk_widget_set_valign(call, GTK_ALIGN_CENTER);
+                gtk_box_pack_start(GTK_BOX(box), call, FALSE, FALSE, 0);
+            }
+
+            gtk_container_add(GTK_CONTAINER(row), box);
+            return row;
+        }
+
+        void show_history(const nlohmann::json& event) {
+            clear_list_box(g_calls.history);
+            const auto& calls = event.contains("calls") ? event["calls"] : nlohmann::json();
+            g_calls.has_history = calls.is_array() && !calls.empty();
+            if (g_calls.has_history)
+                for (const auto& entry : calls)
+                    gtk_list_box_insert(GTK_LIST_BOX(g_calls.history), build_history_row(entry), -1);
+            gtk_widget_show_all(g_calls.history);
+            update_stack();
+        }
+
         void show_calls(const nlohmann::json& event) {
             clear_list_box(g_calls.list);
             const bool empty = !event.contains("calls") || event["calls"].empty();
@@ -193,7 +305,8 @@ namespace tether::ui {
                     gtk_list_box_insert(GTK_LIST_BOX(g_calls.list), build_row(call), -1);
             }
             gtk_widget_show_all(g_calls.list);
-            gtk_stack_set_visible_child_name(GTK_STACK(g_calls.stack), empty ? "status" : "list");
+            g_calls.has_calls = !empty;
+            update_stack();
         }
 
     } // namespace
@@ -212,6 +325,10 @@ namespace tether::ui {
 
         if (command == "bt_calls") {
             show_calls(event);
+            return true;
+        }
+        if (command == "bt_call_history") {
+            show_history(event);
             return true;
         }
         if (command == "bt_call_result") {
@@ -292,6 +409,15 @@ namespace tether::ui {
         gtk_list_box_set_selection_mode(GTK_LIST_BOX(g_calls.list), GTK_SELECTION_NONE);
         gtk_container_add(GTK_CONTAINER(scroll), g_calls.list);
         gtk_stack_add_named(GTK_STACK(g_calls.stack), scroll, "list");
+
+        GtkWidget* history_scroll = gtk_scrolled_window_new(nullptr, nullptr);
+        gtk_scrolled_window_set_policy(GTK_SCROLLED_WINDOW(history_scroll), GTK_POLICY_NEVER, GTK_POLICY_AUTOMATIC);
+        g_calls.history = gtk_list_box_new();
+        gtk_style_context_add_class(gtk_widget_get_style_context(g_calls.history), "tether-feed");
+        gtk_list_box_set_selection_mode(GTK_LIST_BOX(g_calls.history), GTK_SELECTION_NONE);
+        set_accessible_name(g_calls.history, _("Recent calls"));
+        gtk_container_add(GTK_CONTAINER(history_scroll), g_calls.history);
+        gtk_stack_add_named(GTK_STACK(g_calls.stack), history_scroll, "history");
 
         gtk_stack_set_visible_child_name(GTK_STACK(g_calls.stack), "status");
         gtk_box_pack_start(GTK_BOX(root), g_calls.stack, TRUE, TRUE, 0);

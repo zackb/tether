@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: tether\n"
 "Report-Msgid-Bugs-To: zack@bartel.com\n"
-"POT-Creation-Date: 2026-10-06 18:58-0700\n"
+"POT-Creation-Date: 2026-10-08 19:43-0700\n"
 "PO-Revision-Date: 2026-08-23\n"
 "Last-Translator: Tether project\n"
 "Language-Team: Simplified Chinese\n"
@@ -1449,7 +1449,8 @@ msgstr ""
 
 #. TRANSLATORS: the feature name Tether shows for this profile.
 #: src/core/src/bluetooth/profile_supervisor.cpp src/daemon/main.cpp
-#: src/gtk/devices_view.cpp src/gtk/main.cpp src/gtk/settings_view.cpp
+#: src/gtk/devices_view.cpp src/gtk/main.cpp src/gtk/messages_view.cpp
+#: src/gtk/settings_view.cpp
 msgid "Messages"
 msgstr "信息"
 
@@ -1755,6 +1756,30 @@ msgstr "拒接"
 msgid "Hang up"
 msgstr "挂断"
 
+#. TRANSLATORS: strftime clock time on today's conversations, e.g. "%I:%M %p" for 12-hour.
+#: src/gtk/calls_view.cpp src/gtk/message_format.cpp src/gtk/messages_view.cpp
+#, no-c-format
+msgid "%H:%M"
+msgstr "%H:%M"
+
+#: src/gtk/calls_view.cpp
+msgid "%b %d, %H:%M"
+msgstr "%m月%d日 %H:%M"
+
+#: src/gtk/calls_view.cpp
+msgid "Missed"
+msgstr "未接"
+
+#: src/gtk/calls_view.cpp
+msgid "Outgoing"
+msgstr "呼出"
+
+#. TRANSLATORS: Button that calls a recent caller back, {} is their name or number.
+#: src/gtk/calls_view.cpp
+#, c++-format
+msgid "Call {}"
+msgstr "呼叫 {}"
+
 #: src/gtk/calls_view.cpp
 msgid "No calls."
 msgstr "没有通话。"
@@ -1774,6 +1799,10 @@ msgstr "拨打"
 #: src/gtk/calls_view.cpp
 msgid "The iPhone's carrier, signal, and battery."
 msgstr "iPhone 的运营商、信号和电量。"
+
+#: src/gtk/calls_view.cpp
+msgid "Recent calls"
+msgstr "最近通话"
 
 #: src/gtk/contacts_view.cpp
 msgid "Copy"
@@ -1799,6 +1828,10 @@ msgstr "发送信息"
 #, c++-format
 msgid "Message {}"
 msgstr "给 {} 发信息"
+
+#: src/gtk/contacts_view.cpp
+msgid "Favorite"
+msgstr "个人收藏"
 
 #: src/gtk/contacts_view.cpp
 msgid "No contacts yet. Check the Bluetooth link on the Devices page."
@@ -2371,12 +2404,6 @@ msgstr "在此标签页中打开"
 #: src/gtk/main.cpp
 msgid "Open the messages tab on this conversation"
 msgstr "在此会话中打开信息标签页"
-
-#. TRANSLATORS: strftime clock time on today's conversations, e.g. "%I:%M %p" for 12-hour.
-#: src/gtk/message_format.cpp src/gtk/messages_view.cpp
-#, no-c-format
-msgid "%H:%M"
-msgstr "%H:%M"
 
 #: src/gtk/message_format.cpp
 msgid "Yesterday"

@@ -159,6 +159,12 @@ namespace tether::ui {
             GtkWidget* identity = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, 14);
             gtk_box_pack_start(GTK_BOX(identity), avatar(name), FALSE, FALSE, 0);
             gtk_box_pack_start(GTK_BOX(identity), title, TRUE, TRUE, 0);
+            if (contact.value("favorite", false)) {
+                GtkWidget* star = gtk_image_new_from_icon_name("starred-symbolic", GTK_ICON_SIZE_BUTTON);
+                gtk_widget_set_tooltip_text(star, _("Favorite"));
+                set_accessible_name(star, _("Favorite"));
+                gtk_box_pack_start(GTK_BOX(identity), star, FALSE, FALSE, 0);
+            }
             gtk_expander_set_label_widget(GTK_EXPANDER(expander), identity);
 
             GtkWidget* addresses = gtk_box_new(GTK_ORIENTATION_VERTICAL, 4);

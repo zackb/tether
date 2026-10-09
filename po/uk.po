@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: tether\n"
 "Report-Msgid-Bugs-To: zack@bartel.com\n"
-"POT-Creation-Date: 2026-10-06 18:58-0700\n"
+"POT-Creation-Date: 2026-10-08 19:43-0700\n"
 "PO-Revision-Date: 2026-08-23\n"
 "Last-Translator: Tether project\n"
 "Language-Team: Ukrainian\n"
@@ -1525,7 +1525,8 @@ msgstr ""
 
 #. TRANSLATORS: the feature name Tether shows for this profile.
 #: src/core/src/bluetooth/profile_supervisor.cpp src/daemon/main.cpp
-#: src/gtk/devices_view.cpp src/gtk/main.cpp src/gtk/settings_view.cpp
+#: src/gtk/devices_view.cpp src/gtk/main.cpp src/gtk/messages_view.cpp
+#: src/gtk/settings_view.cpp
 msgid "Messages"
 msgstr "Повідомлення"
 
@@ -1837,6 +1838,30 @@ msgstr "Відхилити"
 msgid "Hang up"
 msgstr "Завершити"
 
+#. TRANSLATORS: strftime clock time on today's conversations, e.g. "%I:%M %p" for 12-hour.
+#: src/gtk/calls_view.cpp src/gtk/message_format.cpp src/gtk/messages_view.cpp
+#, no-c-format
+msgid "%H:%M"
+msgstr "%H:%M"
+
+#: src/gtk/calls_view.cpp
+msgid "%b %d, %H:%M"
+msgstr "%d %b, %H:%M"
+
+#: src/gtk/calls_view.cpp
+msgid "Missed"
+msgstr "Пропущений"
+
+#: src/gtk/calls_view.cpp
+msgid "Outgoing"
+msgstr "Вихідний"
+
+#. TRANSLATORS: Button that calls a recent caller back, {} is their name or number.
+#: src/gtk/calls_view.cpp
+#, c++-format
+msgid "Call {}"
+msgstr "Зателефонувати {}"
+
 #: src/gtk/calls_view.cpp
 msgid "No calls."
 msgstr "Викликів немає."
@@ -1858,6 +1883,10 @@ msgstr "Подзвонити"
 #: src/gtk/calls_view.cpp
 msgid "The iPhone's carrier, signal, and battery."
 msgstr "Оператор, сигнал і батарея iPhone."
+
+#: src/gtk/calls_view.cpp
+msgid "Recent calls"
+msgstr "Недавні виклики"
 
 #: src/gtk/contacts_view.cpp
 msgid "Copy"
@@ -1883,6 +1912,10 @@ msgstr "Написати повідомлення"
 #, c++-format
 msgid "Message {}"
 msgstr "Написати {}"
+
+#: src/gtk/contacts_view.cpp
+msgid "Favorite"
+msgstr "Обране"
 
 #: src/gtk/contacts_view.cpp
 msgid "No contacts yet. Check the Bluetooth link on the Devices page."
@@ -2472,12 +2505,6 @@ msgstr "Відкрити на цій вкладці"
 #: src/gtk/main.cpp
 msgid "Open the messages tab on this conversation"
 msgstr "Відкрити вкладку повідомлень на цій розмові"
-
-#. TRANSLATORS: strftime clock time on today's conversations, e.g. "%I:%M %p" for 12-hour.
-#: src/gtk/message_format.cpp src/gtk/messages_view.cpp
-#, no-c-format
-msgid "%H:%M"
-msgstr "%H:%M"
 
 #: src/gtk/message_format.cpp
 msgid "Yesterday"

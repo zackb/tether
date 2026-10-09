@@ -12,8 +12,14 @@ namespace tether::bluetooth {
         std::string name;
         std::vector<std::string> tels;
         std::vector<std::string> emails;
+        // Call history only (X-IRMC-CALL-DATETIME): MISSED, RECEIVED or DIALED,
+        // and the phone's local time as "YYYYMMDDTHHMMSS".
+        std::string call_type;
+        std::string call_time;
+        // On the phone's Favorites list (PBAP fav).
+        bool favorite = false;
 
-        bool empty() const { return name.empty() && tels.empty() && emails.empty(); }
+        bool empty() const { return name.empty() && tels.empty() && emails.empty() && call_time.empty(); }
     };
 
     // Parses a vCard 3.0 document containing any number of cards.

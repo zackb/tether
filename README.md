@@ -55,6 +55,7 @@ Connections run over TLS 1.2 and both sides present a self-signed X.509 certific
 
 ### Phone Calls
 Place, answer and end calls on the iPhone from the desktop, complete with caller ID and the phone's carrier and signal. 
+Recent calls from the iPhone are listed with a button to call back, and the iPhone's favorites are starred at the top of Contacts. These need **Phone Recents** and **Phone Favorites** turned on under the iPhone's Bluetooth settings for this computer.
 The call audio stays on the iPhone. If you've used Linux long enough you know why (it sounds like "FalsePotty-o"). PulsAlsaWire is too hard to support across all deployment targets.
 
 Stock PipeWire makes the computer a speaker for the phone, which takes call control away and moves the iPhone's music and sounds to the desktop. The recommended audio setting is in [Keeping the phone's audio on the phone](docs/BLUETOOTH.md#keeping-the-phones-audio-on-the-phone).
@@ -307,7 +308,7 @@ tether status                                  # devices, links, and recent tran
 See [docs/HEADLESS.md](docs/HEADLESS.md), or [the container guide](docs/CONTAINER.md)
 for Docker deployment.
 
-## Alternative web UI
+### Alternative web UI
 
 The [tether-web project](https://github.com/napisani/tether-web) provides a lightweight browser interface for running Tether without a desktop session. It runs `tetherd` in headless mode and lets you pair and manage a Bluetooth-connected iPhone from a browser.
 
