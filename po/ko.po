@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: tether\n"
 "Report-Msgid-Bugs-To: zack@bartel.com\n"
-"POT-Creation-Date: 2026-10-08 19:43-0700\n"
+"POT-Creation-Date: 2026-10-08 20:06-0700\n"
 "PO-Revision-Date: 2026-08-23\n"
 "Last-Translator: Tether project\n"
 "Language-Team: Korean\n"
@@ -2423,6 +2423,14 @@ msgstr "클립보드 동기화를 요청했습니다..."
 msgid "Forget"
 msgstr "삭제"
 
+#: src/gtk/main.cpp
+msgid "Expand sidebar"
+msgstr "사이드바 펼치기"
+
+#: src/gtk/main.cpp
+msgid "Collapse sidebar"
+msgstr "사이드바 접기"
+
 #: src/gtk/main.cpp src/gtk/settings_view.cpp
 msgid "Settings"
 msgstr "설정"
@@ -2442,6 +2450,10 @@ msgstr "기기 찾기"
 #: src/gtk/main.cpp
 msgid "Devices"
 msgstr "기기"
+
+#: src/gtk/main.cpp
+msgid "Toggle sidebar"
+msgstr "사이드바 전환"
 
 #: src/gtk/main.cpp
 msgid "Start hidden in the system tray"

@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: tether\n"
 "Report-Msgid-Bugs-To: zack@bartel.com\n"
-"POT-Creation-Date: 2026-10-08 19:43-0700\n"
+"POT-Creation-Date: 2026-10-08 20:06-0700\n"
 "PO-Revision-Date: 2026-08-23\n"
 "Last-Translator: Tether project\n"
 "Language-Team: Czech\n"
@@ -2457,6 +2457,14 @@ msgstr "Vyžádána synchronizace schránky..."
 msgid "Forget"
 msgstr "Zapomenout"
 
+#: src/gtk/main.cpp
+msgid "Expand sidebar"
+msgstr "Rozbalit postranní panel"
+
+#: src/gtk/main.cpp
+msgid "Collapse sidebar"
+msgstr "Sbalit postranní panel"
+
 #: src/gtk/main.cpp src/gtk/settings_view.cpp
 msgid "Settings"
 msgstr "Nastavení"
@@ -2476,6 +2484,10 @@ msgstr "Hledat zařízení"
 #: src/gtk/main.cpp
 msgid "Devices"
 msgstr "Zařízení"
+
+#: src/gtk/main.cpp
+msgid "Toggle sidebar"
+msgstr "Přepnout postranní panel"
 
 #: src/gtk/main.cpp
 msgid "Start hidden in the system tray"
