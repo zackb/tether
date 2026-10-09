@@ -158,6 +158,16 @@ namespace tether::bluetooth {
                 current.name = vcard_unescape(value);
             else if (name == "N")
                 structured_name = vcard_name_from_n(vcard_unescape(value));
+            else if (name == "X-IRMC-CALL-DATETIME") {
+                // The call type is the parameter: ";MISSED:" (iOS) or ";TYPE=MISSED:".
+                const std::string head = token.substr(0, token.find(':'));
+                const size_t semi = head.find(';');
+                std::string type = semi == std::string::npos ? std::string{} : trim(head.substr(semi + 1));
+                if (type.rfind("TYPE=", 0) == 0)
+                    type.erase(0, 5);
+                current.call_type = type;
+                current.call_time = value;
+            }
         }
 
         if (in_card)

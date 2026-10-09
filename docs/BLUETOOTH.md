@@ -934,6 +934,8 @@ checks the daemon does not make.
 | Messages and contacts worked, then stopped, and the error mentions a service record | `bluetoothd` restarted and reset the Class of Device | `sudo systemctl enable --now tether-btclass@hci0`, then re-pair if the phone dropped the bond |
 | The phone never offers notifications / Sync Contacts | The class is wrong, or the ANCS advertisement is not running | Check for `class=ok` in `tether --bt-status`, can take minutes |
 | MAP or PBAP reports `forbidden` | The matching toggle on the phone is off | Turn it on. This is not a pairing failure |
+| Contacts shows no favorites | **Phone Favorites** is off under the iPhone's Bluetooth settings for this computer | Turn it on, then reconnect the phone |
+| Calls tab shows no recent calls | **Phone Recents** is off under the iPhone's Bluetooth settings for this computer | Turn it on. History is pulled again after the next call ends |
 | Pairing never starts, and the only log line is a profile connect refused with `Connection refused (111)` | `Device1.Connect()` induces pairing only as a side effect of a profile connect, and this phone refuses that profile from an unbonded device | Nothing. Tether retries the transaction as an explicit `Device1.Pair()` on its own. To go straight there, `tether --bt-pair <addr> --explicit-pair` |
 | The phone shows a pairing code, then "Pairing Unsuccessful" a moment later, and the daemon reports the transaction failed about 90s after `confirm` | `tetherd` has no display, so the confirmation dialog could not be shown, and an unshowable dialog used to count as a refusal | Fixed. The comparison now goes to whichever client started the pairing -- the CLI prompts on the terminal, the GTK app opens its own dialog. On an older build, start `tetherd` from a graphical session so it inherits `DISPLAY` or `WAYLAND_DISPLAY` |
 | Pairing fails a few hundred ms after `confirm`, and `tetherd.log` says `tether-dialog: error while loading shared libraries: libgtk-layer-shell.so.0` | `tether-dialog` is linked against `gtk-layer-shell`, which the package did not depend on, so it died in the dynamic loader with exit 127 -- read as the user refusing | Install `gtk-layer-shell`. Fixed in the package dependencies, and a dialog that cannot run now routes the comparison to the client that started the pairing instead of declining it -- see 2026-08-29 below |
@@ -1649,6 +1651,23 @@ The transfer object disappears from D-Bus the moment it finishes, so a vanished 
 is a normal terminal state rather than a failure (file may still take a bit to appear afterwards),
 which is why the pull waits instead of giving up. Contacts are staged in `$XDG_RUNTIME_DIR` rather than `/tmp`, since a
 phonebook is personal data.
+
+#### Call history (2026-10-08)
+
+With "Phone Favorites" and "Phone Recents" on, an iPhone 15 Pro served `cch`, `ich`, `och`,
+`mch` and `fav` over the same PBAP session, and refused `spd` with `Not Found`.
+
+- Each history card carries `X-IRMC-CALL-DATETIME;MISSED:20261007T111657`. The type is a
+  bare parameter rather than `TYPE=`, and the time is local with no zone.
+- `cch` comes back newest first, with missed, received and dialed calls mixed together.
+- 17 of 20 `cch` cards had an empty `FN`, so names are resolved against the `pb` pull by number.
+- `fav` returned 6 cards in the ordinary contact form, with no call fields. Tether pulls it
+  right after `pb` and marks the matching `pb` contacts, by number or email, as favorites.
+- Calls the iPhone blocks never reach HFP and are left out of its recents. Calls silenced
+  by "Silence Unknown Callers" show up in `cch` as missed.
+
+Tether pulls the 100 newest `cch` entries (`Fields: [N, FN, TEL, X-IRMC-CALL-DATETIME]`)
+when a PBAP session opens and again after each call ends. They are kept in memory only.
 
 ### The store at rest
 

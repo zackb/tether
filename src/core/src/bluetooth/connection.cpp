@@ -1,5 +1,6 @@
 #include "tether/bluetooth/connection.hpp"
 #include "tether/bluetooth/ancs/client.hpp"
+#include "tether/bluetooth/bmessage.hpp"
 #include "tether/bluetooth/config.hpp"
 #include "tether/bluetooth/contacts.hpp"
 #include "tether/bluetooth/groups.hpp"
@@ -710,6 +711,14 @@ namespace tether::bluetooth {
         bool map_session_backfill = true;
         std::string pulled_pbap_path;
 
+        // The phone's recent calls (PBAP cch), newest first. Memory only.
+        std::vector<VCard> call_history;
+        mutable std::mutex call_history_mutex;
+        // Set by a new PBAP session and by a call ending, which can happen on
+        // refresh_calls()'s thread.
+        std::atomic<bool> call_history_stale{true};
+        ConnectionManager::CallsFn on_call_history;
+
         std::shared_ptr<ancs::AncsClient> ancs_client;
         mutable std::mutex ancs_mutex;
         ConnectionManager::NotificationFn on_notification;
@@ -749,6 +758,8 @@ namespace tether::bluetooth {
 
         void sync_messages(int64_t now);
         void sync_contacts();
+        void sync_call_history();
+        nlohmann::json call_history_json() const;
         void sync_ancs(int64_t now);
 
         // Brings the ANCS client and the bearer supervisor in line with the wanted preference and the controller's
@@ -1064,6 +1075,7 @@ namespace tether::bluetooth {
         if (pulled_pbap_path == profiles->pbap_session())
             return;
         pulled_pbap_path = profiles->pbap_session();
+        call_history_stale = true;
 
         PbapSession session(profile_ops->bus(), pulled_pbap_path);
         std::string err;
@@ -1078,12 +1090,76 @@ namespace tether::bluetooth {
             return;
         }
 
+        // The phone refuses fav when its "Phone Favorites" sync toggle is off.
+        std::vector<VCard> favorites;
+        if (session.select_phonebook(err, "int", "fav"))
+            favorites = session.pull_all(err);
+        if (err.empty())
+            mark_favorites(contacts, favorites);
+        else
+            debug::log(INFO, "bluetooth: favorites unavailable: {}", err);
+
         {
             std::lock_guard<std::mutex> lock(g_messages_mutex);
             contact_store().set(std::move(contacts));
         }
         save_contacts(contact_store());
-        debug::log(INFO, "bluetooth: pulled {} contacts", contact_store().size());
+        debug::log(INFO, "bluetooth: pulled {} contacts, {} favorites", contact_store().size(), favorites.size());
+    }
+
+    // Re-pulls recent calls when stale. Clearing the flag before the pull means a
+    // call that ends mid-transfer schedules another pull instead of being missed.
+    void ConnectionState::sync_call_history() {
+        if (!profiles->status().pbap_open || pulled_pbap_path != profiles->pbap_session())
+            return;
+        if (!call_history_stale.exchange(false))
+            return;
+
+        PbapSession session(profile_ops->bus(), pulled_pbap_path);
+        std::string err;
+        std::vector<VCard> history;
+        if (session.select_phonebook(err, "int", "cch"))
+            history = session.pull_all(err, PBAP_MAX_CALLS, PBAP_CALL_FIELDS);
+        // The phone refuses cch when its "Phone Recents" sync toggle is off.
+        if (!err.empty()) {
+            debug::log(INFO, "bluetooth: call history unavailable: {}", err);
+            return;
+        }
+
+        debug::log(INFO, "bluetooth: pulled {} recent calls", history.size());
+        {
+            std::lock_guard<std::mutex> lock(call_history_mutex);
+            call_history = std::move(history);
+        }
+        if (on_call_history)
+            on_call_history(call_history_json());
+    }
+
+    nlohmann::json ConnectionState::call_history_json() const {
+        std::vector<VCard> history;
+        {
+            std::lock_guard<std::mutex> lock(call_history_mutex);
+            history = call_history;
+        }
+
+        nlohmann::json out = nlohmann::json::array();
+        std::lock_guard<std::mutex> lock(g_messages_mutex);
+        for (const auto& card : history) {
+            const std::string number = card.tels.empty() ? std::string{} : normalize_phone(card.tels.front());
+            std::string name = card.name;
+            if (name.empty() && !number.empty())
+                name = contact_store().name_for("tel:" + number);
+            std::string type = card.call_type;
+            std::transform(type.begin(), type.end(), type.begin(), [](unsigned char c) { return std::tolower(c); });
+
+            nlohmann::json entry;
+            entry["number"] = number;
+            entry["name"] = name;
+            entry["type"] = type;
+            entry["timestamp"] = parse_map_timestamp(card.call_time);
+            out.push_back(std::move(entry));
+        }
+        return out;
     }
 
     // Keeps the ANCS client pointed at the LE session and drains its work.
@@ -1236,6 +1312,8 @@ namespace tether::bluetooth {
         nlohmann::json calls = client->calls();
         if (calls == last_calls)
             return;
+        if (last_calls.is_array() && calls.size() < last_calls.size())
+            call_history_stale = true;
         last_calls = calls;
         if (on_calls)
             on_calls(std::move(calls));
@@ -1316,6 +1394,7 @@ namespace tether::bluetooth {
             publish();
 
             sync_contacts();
+            sync_call_history();
             sync_messages(now);
             sync_ancs(now);
             sync_calls();
@@ -1445,6 +1524,10 @@ namespace tether::bluetooth {
 
         state_->open_map_path.clear();
         state_->pulled_pbap_path.clear();
+        {
+            std::lock_guard<std::mutex> lock(state_->call_history_mutex);
+            state_->call_history.clear();
+        }
         state_->map_session_backfill = true;
         state_->map_failures = 0;
         state_->next_message_poll = 0;
@@ -1485,6 +1568,12 @@ namespace tether::bluetooth {
     void ConnectionManager::set_call_handler(CallsFn on_calls) { state_->on_calls = std::move(on_calls); }
 
     void ConnectionManager::refresh_calls() { state_->sync_calls(); }
+
+    void ConnectionManager::set_call_history_handler(CallsFn on_history) {
+        state_->on_call_history = std::move(on_history);
+    }
+
+    nlohmann::json ConnectionManager::call_history() const { return state_->call_history_json(); }
 
     void ConnectionManager::set_calls_enabled(bool enabled) { state_->calls_wanted = enabled; }
 

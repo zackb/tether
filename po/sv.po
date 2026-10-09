@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: tether\n"
 "Report-Msgid-Bugs-To: zack@bartel.com\n"
-"POT-Creation-Date: 2026-10-06 18:58-0700\n"
+"POT-Creation-Date: 2026-10-08 19:43-0700\n"
 "PO-Revision-Date: 2026-08-23\n"
 "Last-Translator: Tether project\n"
 "Language-Team: Swedish\n"
@@ -1514,7 +1514,8 @@ msgstr ""
 
 #. TRANSLATORS: the feature name Tether shows for this profile.
 #: src/core/src/bluetooth/profile_supervisor.cpp src/daemon/main.cpp
-#: src/gtk/devices_view.cpp src/gtk/main.cpp src/gtk/settings_view.cpp
+#: src/gtk/devices_view.cpp src/gtk/main.cpp src/gtk/messages_view.cpp
+#: src/gtk/settings_view.cpp
 msgid "Messages"
 msgstr "Meddelanden"
 
@@ -1825,6 +1826,30 @@ msgstr "Avvisa"
 msgid "Hang up"
 msgstr "Lägg på"
 
+#. TRANSLATORS: strftime clock time on today's conversations, e.g. "%I:%M %p" for 12-hour.
+#: src/gtk/calls_view.cpp src/gtk/message_format.cpp src/gtk/messages_view.cpp
+#, no-c-format
+msgid "%H:%M"
+msgstr "%H:%M"
+
+#: src/gtk/calls_view.cpp
+msgid "%b %d, %H:%M"
+msgstr "%d %b, %H:%M"
+
+#: src/gtk/calls_view.cpp
+msgid "Missed"
+msgstr "Missat"
+
+#: src/gtk/calls_view.cpp
+msgid "Outgoing"
+msgstr "Utgående"
+
+#. TRANSLATORS: Button that calls a recent caller back, {} is their name or number.
+#: src/gtk/calls_view.cpp
+#, c++-format
+msgid "Call {}"
+msgstr "Ring {}"
+
 #: src/gtk/calls_view.cpp
 msgid "No calls."
 msgstr "Inga samtal."
@@ -1844,6 +1869,10 @@ msgstr "Ring"
 #: src/gtk/calls_view.cpp
 msgid "The iPhone's carrier, signal, and battery."
 msgstr "iPhones operatör, signal och batteri."
+
+#: src/gtk/calls_view.cpp
+msgid "Recent calls"
+msgstr "Senaste samtal"
 
 #: src/gtk/contacts_view.cpp
 msgid "Copy"
@@ -1869,6 +1898,10 @@ msgstr "Skicka meddelande"
 #, c++-format
 msgid "Message {}"
 msgstr "Skicka meddelande till {}"
+
+#: src/gtk/contacts_view.cpp
+msgid "Favorite"
+msgstr "Favorit"
 
 #: src/gtk/contacts_view.cpp
 msgid "No contacts yet. Check the Bluetooth link on the Devices page."
@@ -2456,12 +2489,6 @@ msgstr "Öppna på den här fliken"
 #: src/gtk/main.cpp
 msgid "Open the messages tab on this conversation"
 msgstr "Öppna meddelandefliken på den här konversationen"
-
-#. TRANSLATORS: strftime clock time on today's conversations, e.g. "%I:%M %p" for 12-hour.
-#: src/gtk/message_format.cpp src/gtk/messages_view.cpp
-#, no-c-format
-msgid "%H:%M"
-msgstr "%H:%M"
 
 #: src/gtk/message_format.cpp
 msgid "Yesterday"

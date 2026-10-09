@@ -23,6 +23,7 @@ namespace tether::bluetooth {
         std::vector<std::string> addresses_for_name(const std::string& name) const;
 
         // Contacts whose name or any of their addresses contains `needle`, case- and accent-insensitively.
+        // Favorites first, then by name.
         std::vector<VCard> search(const std::string& needle, size_t limit) const;
 
         size_t size() const { return contacts_.size(); }
@@ -35,6 +36,10 @@ namespace tether::bluetooth {
         // Last ten digits of each contact number, for the national-vs-international fallback in name_for.
         std::map<std::string, std::string> by_tel_suffix_;
     };
+
+    // Flags each contact that shares a phone number or email with a card from
+    // the phone's Favorites list, or its name when that card has neither.
+    void mark_favorites(std::vector<VCard>& contacts, const std::vector<VCard>& favorites);
 
     std::string contacts_path(Retention mode);
     std::string contacts_path();

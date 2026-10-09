@@ -14,6 +14,10 @@ namespace tether::bluetooth {
     inline constexpr int PBAP_TRANSFER_TIMEOUT_SECONDS = 60;
     inline constexpr int PBAP_FILE_GRACE_SECONDS = 3;
     inline constexpr int PBAP_MAX_CONTACTS = 5000;
+    inline constexpr int PBAP_MAX_CALLS = 100;
+
+    inline constexpr const char* PBAP_CONTACT_FIELDS = "['N','FN','TEL','EMAIL']";
+    inline constexpr const char* PBAP_CALL_FIELDS = "['N','FN','TEL','X-IRMC-CALL-DATETIME']";
 
     struct PbapSessionState;
 
@@ -36,7 +40,8 @@ namespace tether::bluetooth {
         //
         // Uses PullAll's MaxCount filter. MaxListCount is MAP's option and makes a
         // PBAP transfer fail or return nothing at all.
-        std::vector<VCard> pull_all(std::string& err, int max = PBAP_MAX_CONTACTS);
+        std::vector<VCard>
+            pull_all(std::string& err, int max = PBAP_MAX_CONTACTS, const char* fields = PBAP_CONTACT_FIELDS);
 
         const std::string& path() const;
 

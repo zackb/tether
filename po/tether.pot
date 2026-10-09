@@ -6,9 +6,9 @@
 #, fuzzy
 msgid ""
 msgstr ""
-"Project-Id-Version: tether 0.2.35\n"
+"Project-Id-Version: tether 0.2.36\n"
 "Report-Msgid-Bugs-To: zack@bartel.com\n"
-"POT-Creation-Date: 2026-10-06 18:58-0700\n"
+"POT-Creation-Date: 2026-10-08 19:43-0700\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -1355,7 +1355,8 @@ msgstr ""
 
 #. TRANSLATORS: the feature name Tether shows for this profile.
 #: src/core/src/bluetooth/profile_supervisor.cpp src/daemon/main.cpp
-#: src/gtk/devices_view.cpp src/gtk/main.cpp src/gtk/settings_view.cpp
+#: src/gtk/devices_view.cpp src/gtk/main.cpp src/gtk/messages_view.cpp
+#: src/gtk/settings_view.cpp
 msgid "Messages"
 msgstr ""
 
@@ -1648,6 +1649,30 @@ msgstr ""
 msgid "Hang up"
 msgstr ""
 
+#. TRANSLATORS: strftime clock time on today's conversations, e.g. "%I:%M %p" for 12-hour.
+#: src/gtk/calls_view.cpp src/gtk/message_format.cpp src/gtk/messages_view.cpp
+#, no-c-format
+msgid "%H:%M"
+msgstr ""
+
+#: src/gtk/calls_view.cpp
+msgid "%b %d, %H:%M"
+msgstr ""
+
+#: src/gtk/calls_view.cpp
+msgid "Missed"
+msgstr ""
+
+#: src/gtk/calls_view.cpp
+msgid "Outgoing"
+msgstr ""
+
+#. TRANSLATORS: Button that calls a recent caller back, {} is their name or number.
+#: src/gtk/calls_view.cpp
+#, c++-format
+msgid "Call {}"
+msgstr ""
+
 #: src/gtk/calls_view.cpp
 msgid "No calls."
 msgstr ""
@@ -1666,6 +1691,10 @@ msgstr ""
 
 #: src/gtk/calls_view.cpp
 msgid "The iPhone's carrier, signal, and battery."
+msgstr ""
+
+#: src/gtk/calls_view.cpp
+msgid "Recent calls"
 msgstr ""
 
 #: src/gtk/contacts_view.cpp
@@ -1691,6 +1720,10 @@ msgstr ""
 #: src/gtk/contacts_view.cpp
 #, c++-format
 msgid "Message {}"
+msgstr ""
+
+#: src/gtk/contacts_view.cpp
+msgid "Favorite"
 msgstr ""
 
 #: src/gtk/contacts_view.cpp
@@ -2230,12 +2263,6 @@ msgstr ""
 
 #: src/gtk/main.cpp
 msgid "Open the messages tab on this conversation"
-msgstr ""
-
-#. TRANSLATORS: strftime clock time on today's conversations, e.g. "%I:%M %p" for 12-hour.
-#: src/gtk/message_format.cpp src/gtk/messages_view.cpp
-#, no-c-format
-msgid "%H:%M"
 msgstr ""
 
 #: src/gtk/message_format.cpp
