@@ -26,6 +26,7 @@
   runtimeShell,
   gnugrep,
   coreutils,
+  procps,
 }:
 
 stdenv.mkDerivation (finalAttrs: {
@@ -116,6 +117,8 @@ stdenv.mkDerivation (finalAttrs: {
       --replace-fail "btmgmt --index" "${bluez}/bin/btmgmt --index" \
       --replace-fail "| grep -q" "| ${gnugrep}/bin/grep -q" \
       --replace-fail "    sleep 1;" "    ${coreutils}/bin/sleep 1;"
+    substituteInPlace packaging/systemd/tetherd.service.in \
+      --replace-fail "/usr/bin/pkill" "${procps}/bin/pkill"
   '';
 
   doCheck = true;
