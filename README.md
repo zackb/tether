@@ -147,7 +147,8 @@ nix run .#tetherd
 ```
 
 Bare `nix run` launches `tether-gtk`. The named app outputs are `tether` (CLI),
-`tether-gtk` (GUI), `tetherd` (daemon), and `tether-dialog` (dialog helper).
+`tether-gtk` (GUI), `tether-tui` (terminal UI), `tetherd` (daemon), and
+`tether-dialog` (dialog helper).
 
 #### Use the package in NixOS
 
@@ -218,7 +219,7 @@ On Debian/Ubuntu:
 sudo apt install build-essential cmake ninja-build pkg-config git \
     libwayland-dev libavahi-client-dev libssl-dev libsecret-1-dev \
     libglib2.0-dev libgtk-3-dev libgtk-layer-shell-dev libnotify-dev \
-    npm zip
+    libncurses-dev npm zip
 ```
 
 On Fedora:
@@ -227,7 +228,7 @@ On Fedora:
 sudo dnf install gcc-c++ cmake ninja-build pkgconf-pkg-config git \
     wayland-devel avahi-devel openssl-devel libsecret-devel \
     glib2-devel gtk3-devel gtk-layer-shell-devel libnotify-devel \
-    npm zip
+    ncurses-devel npm zip
 ```
 
 ```bash
@@ -238,7 +239,7 @@ cd tether
 # Build and test
 make release
 
-# Install the daemon, cli, and GTK app
+# Install the daemon, cli, GTK app, and terminal UI
 make install
 ```
 
@@ -308,6 +309,13 @@ tether status                                  # devices, links, and recent tran
 See [docs/HEADLESS.md](docs/HEADLESS.md), or [the container guide](docs/CONTAINER.md)
 for Docker deployment.
 
+### Terminal UI
+
+`tether-tui` is a front end for tetherd in the terminal, with vim keys: `j`/`k`
+to move, `h`/`l` between panes, `1`-`6` or `gt`/`gT` for tabs, `/` to filter,
+`i` to write in a conversation, `o` for a new message, `dd` to dismiss or
+forget, `:q` to quit. Press `?` for the full list.
+
 ### Alternative web UI
 
 The [tether-web project](https://github.com/napisani/tether-web) provides a lightweight browser interface for running Tether without a desktop session. It runs `tetherd` in headless mode and lets you pair and manage a Bluetooth-connected iPhone from a browser.
@@ -320,7 +328,7 @@ This setup is useful for homelabs and headless Linux servers where a full GTK de
 
 2. **`tether`**: A CLI to communicate with the daemon. This also allows the WebExtension to interface with the daemon via native messaging.
 
-3. **`tether-gtk`**: An application for Linux that provides a graphical interface to manage devices, send files, trigger clipboard sync, read and reply to iPhone messages, see mirrored notifications, and monitor connection status.
+3. **`tether-gtk`**: An application for Linux that provides a graphical interface to manage devices, send files, trigger clipboard sync, read and reply to iPhone messages, see mirrored notifications, and monitor connection status. **`tether-tui`** does the same in a terminal.
 
 4. **iPhone App**: Discovers the daemon via Bonjour/mDNS, utilizing Apple's `Network.framework` for secure TLS negotiation. Not required for SMS/iMessage and notification mirroring, which use Bluetooth.
 
@@ -339,6 +347,7 @@ This setup is useful for homelabs and headless Linux servers where a full GTK de
 - `pkg-config`
 - `ninja`
 - `gtk3` (for `tether-gtk`)
+- `ncurses` (for `tether-tui`; turn off with `-DTETHER_BUILD_TUI=OFF`)
 - `nlohmann-json`
 - `glib2`
 - `avahi`

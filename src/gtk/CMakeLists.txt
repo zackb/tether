@@ -5,7 +5,6 @@ add_executable(tether-gtk
     main.cpp
     ui_util.cpp
     prefs.cpp
-    message_format.cpp
     calls_view.cpp
     contact_completion.cpp
     contacts_view.cpp
@@ -18,7 +17,7 @@ add_executable(tether-gtk
 )
 
 target_include_directories(tether-gtk PRIVATE ${GTK3_INCLUDE_DIRS})
-target_link_libraries(tether-gtk PRIVATE tether ${GTK3_LIBRARIES})
+target_link_libraries(tether-gtk PRIVATE tether tether_ui_common ${GTK3_LIBRARIES})
 target_compile_options(tether-gtk PRIVATE ${GTK3_CFLAGS_OTHER})
 
 # Output into root build dir instead of nested build/src/gtk

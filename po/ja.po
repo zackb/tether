@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: tether\n"
 "Report-Msgid-Bugs-To: zack@bartel.com\n"
-"POT-Creation-Date: 2026-10-08 20:06-0700\n"
+"POT-Creation-Date: 2026-10-09 20:43-0700\n"
 "PO-Revision-Date: 2026-08-23\n"
 "Last-Translator: Tether project\n"
 "Language-Team: Japanese\n"
@@ -420,6 +420,7 @@ msgid "BR/EDR, notifications live"
 msgstr "BR/EDR、通知は有効"
 
 #: src/cli/main.cpp src/gtk/devices_view.cpp src/gtk/main.cpp
+#: src/tui/devices.cpp src/tui/notifications.cpp
 msgid "Notifications"
 msgstr "通知"
 
@@ -507,7 +508,7 @@ msgid "Right"
 msgstr "右"
 
 #. TRANSLATORS: The AirPods charging case, on the device row beside the two earbuds.
-#: src/cli/main.cpp src/gtk/devices_view.cpp
+#: src/cli/main.cpp src/ui_common/ui_text.cpp
 msgid "Case"
 msgstr "ケース"
 
@@ -636,7 +637,7 @@ msgstr "通信事業者なし"
 msgid " signal {0}/5 battery {1}/5"
 msgstr " 信号 {0}/5 バッテリー {1}/5"
 
-#: src/cli/main.cpp src/gtk/calls_view.cpp
+#: src/cli/main.cpp src/ui_common/ui_text.cpp
 msgid "roaming"
 msgstr "ローミング"
 
@@ -648,7 +649,7 @@ msgstr "通話 (HFP)"
 msgid "Could not read Bluetooth diagnostics from the daemon.\n"
 msgstr "デーモンから Bluetooth の診断情報を読み取れませんでした。\n"
 
-#: src/cli/main.cpp src/gtk/calls_view.cpp
+#: src/cli/main.cpp src/gtk/calls_view.cpp src/tui/calls.cpp
 msgid "The call could not be placed."
 msgstr "発信できませんでした。"
 
@@ -689,7 +690,7 @@ msgid "({} unread)"
 msgid_plural "({} unread)"
 msgstr[0] "({} 件未読)"
 
-#: src/cli/main.cpp src/gtk/devices_view.cpp
+#: src/cli/main.cpp src/gtk/devices_view.cpp src/tui/devices.cpp
 #, c++-format
 msgid ""
 "The running tetherd is {}, but this is tether {}. Stop it and it\n"
@@ -700,7 +701,7 @@ msgstr ""
 "て自動で起動します:\n"
 "    pkill tetherd\n"
 
-#: src/cli/main.cpp src/gtk/devices_view.cpp
+#: src/cli/main.cpp src/gtk/devices_view.cpp src/tui/devices.cpp
 msgid "an older build"
 msgstr "より古いビルド"
 
@@ -745,7 +746,7 @@ msgstr "メッセージが送信される前にデーモンが接続を閉じま
 msgid "Sent to %s\n"
 msgstr "%s に送信しました\n"
 
-#: src/cli/main.cpp src/gtk/messages_view.cpp
+#: src/cli/main.cpp src/gtk/messages_view.cpp src/tui/messages.cpp
 msgid "The message was not sent."
 msgstr "メッセージは送信されませんでした。"
 
@@ -1200,6 +1201,7 @@ msgid "Nothing to send."
 msgstr "送信するものがありません。"
 
 #: src/core/src/bluetooth/connection.cpp src/gtk/messages_view.cpp
+#: src/tui/messages.cpp
 msgid "Messages are not connected."
 msgstr "メッセージは接続されていません。"
 
@@ -1505,12 +1507,13 @@ msgstr ""
 #. TRANSLATORS: the feature name Tether shows for this profile.
 #: src/core/src/bluetooth/profile_supervisor.cpp src/daemon/main.cpp
 #: src/gtk/devices_view.cpp src/gtk/main.cpp src/gtk/messages_view.cpp
-#: src/gtk/settings_view.cpp
+#: src/gtk/settings_view.cpp src/tui/devices.cpp src/tui/messages.cpp
+#: src/tui/settings.cpp
 msgid "Messages"
 msgstr "メッセージ"
 
 #: src/core/src/bluetooth/profile_supervisor.cpp src/gtk/devices_view.cpp
-#: src/gtk/main.cpp
+#: src/gtk/main.cpp src/tui/contacts.cpp src/tui/devices.cpp
 msgid "Contacts"
 msgstr "連絡先"
 
@@ -1579,7 +1582,7 @@ msgid "{} could not be opened."
 msgstr "{} を開けませんでした。"
 
 #: src/core/src/bluetooth/profile_supervisor.cpp src/gtk/calls_view.cpp
-#: src/gtk/notifications_view.cpp
+#: src/gtk/notifications_view.cpp src/tui/notifications.cpp
 msgid "Waiting for the iPhone."
 msgstr "iPhone を待っています。"
 
@@ -1648,7 +1651,7 @@ msgstr "Bluetooth スキャンが完了しました。"
 msgid "Another pairing attempt is already in progress."
 msgstr "別のペアリングがすでに進行中です。"
 
-#: src/core/src/net.cpp src/gtk/devices_view.cpp
+#: src/core/src/net.cpp src/gtk/devices_view.cpp src/tui/devices.cpp
 msgid "Bluetooth is unavailable on this machine."
 msgstr "このマシンでは Bluetooth を利用できません。"
 
@@ -1660,7 +1663,7 @@ msgstr "AirPods ではありません。"
 msgid "Unknown listening mode."
 msgstr "不明なリスニングモードです。"
 
-#: src/core/src/net.cpp src/gtk/devices_view.cpp
+#: src/core/src/net.cpp src/gtk/devices_view.cpp src/tui/devices.cpp
 msgid "No AirPods are connected."
 msgstr "AirPods が接続されていません。"
 
@@ -1697,6 +1700,7 @@ msgid "unknown error"
 msgstr "不明なエラー"
 
 #: src/core/src/net.cpp src/gtk/devices_view.cpp src/gtk/messages_view.cpp
+#: src/tui/devices.cpp src/tui/messages.cpp
 msgid "Could not reach the Tether daemon."
 msgstr "Tether デーモンに接続できませんでした。"
 
@@ -1756,99 +1760,49 @@ msgstr "コードをコピー"
 msgid "Open in {}"
 msgstr "{} で開く"
 
-#: src/gtk/calls_view.cpp
-msgid "Incoming"
-msgstr "着信"
-
-#: src/gtk/calls_view.cpp
-msgid "Call waiting"
-msgstr "キャッチホン"
-
-#: src/gtk/calls_view.cpp
-msgid "Dialing"
-msgstr "発信中"
-
-#: src/gtk/calls_view.cpp
-msgid "Ringing"
-msgstr "呼び出し中"
-
-#: src/gtk/calls_view.cpp
-msgid "On call"
-msgstr "通話中"
-
-#: src/gtk/calls_view.cpp
-msgid "On hold"
-msgstr "保留中"
-
-#: src/gtk/calls_view.cpp
-msgid "Ended"
-msgstr "終了"
-
-#: src/gtk/calls_view.cpp
-msgid "No service"
-msgstr "圏外"
-
-#. TRANSLATORS: Cellular signal strength read aloud, {} is 0 to 5.
-#: src/gtk/calls_view.cpp
-#, c++-format
-msgid "signal {} of 5"
-msgstr "電波 {}/5"
-
-#. TRANSLATORS: The iPhone's battery level read aloud, {} is like "80%".
-#: src/gtk/calls_view.cpp
-#, c++-format
-msgid "battery {}"
-msgstr "バッテリー {}"
-
-#: src/gtk/calls_view.cpp
+#: src/gtk/calls_view.cpp src/tui/calls.cpp
 msgid "Unknown caller"
 msgstr "不明な発信者"
 
-#: src/gtk/calls_view.cpp
+#: src/gtk/calls_view.cpp src/tui/calls.cpp
 msgid "Answer"
 msgstr "応答"
 
-#: src/gtk/calls_view.cpp
+#: src/gtk/calls_view.cpp src/tui/calls.cpp
 msgid "Audio here"
 msgstr "音声をここに移す"
 
-#: src/gtk/calls_view.cpp
+#: src/gtk/calls_view.cpp src/tui/calls.cpp
 msgid "Decline"
 msgstr "拒否"
 
-#: src/gtk/calls_view.cpp
+#: src/gtk/calls_view.cpp src/tui/calls.cpp
 msgid "Hang up"
 msgstr "終了"
 
-#. TRANSLATORS: strftime clock time on today's conversations, e.g. "%I:%M %p" for 12-hour.
-#: src/gtk/calls_view.cpp src/gtk/message_format.cpp src/gtk/messages_view.cpp
-#, no-c-format
-msgid "%H:%M"
-msgstr "%H:%M"
+#: src/gtk/calls_view.cpp src/tui/calls.cpp src/ui_common/ui_text.cpp
+msgid "Incoming"
+msgstr "着信"
 
-#: src/gtk/calls_view.cpp
-msgid "%b %d, %H:%M"
-msgstr "%m月%d日 %H:%M"
-
-#: src/gtk/calls_view.cpp
+#: src/gtk/calls_view.cpp src/tui/calls.cpp
 msgid "Missed"
 msgstr "不在着信"
 
-#: src/gtk/calls_view.cpp
+#: src/gtk/calls_view.cpp src/tui/calls.cpp
 msgid "Outgoing"
 msgstr "発信"
 
 #. TRANSLATORS: Button that calls a recent caller back, {} is their name or number.
-#: src/gtk/calls_view.cpp
+#: src/gtk/calls_view.cpp src/tui/calls.cpp
 #, c++-format
 msgid "Call {}"
 msgstr "{}に発信"
 
-#: src/gtk/calls_view.cpp
+#: src/gtk/calls_view.cpp src/tui/calls.cpp
 msgid "No calls."
 msgstr "通話はありません。"
 
-#: src/gtk/calls_view.cpp
+#: src/gtk/calls_view.cpp src/tui/calls.cpp
 msgid "Call control is off. Turn it on with 'tether --bt-calls-enable on'."
 msgstr ""
 "通話操作はオフです。'tether --bt-calls-enable on' でオンにしてください。"
@@ -1857,7 +1811,7 @@ msgstr ""
 msgid "Number to call"
 msgstr "発信先の番号"
 
-#: src/gtk/calls_view.cpp
+#: src/gtk/calls_view.cpp src/tui/calls.cpp
 msgid "Call"
 msgstr "発信"
 
@@ -1865,7 +1819,7 @@ msgstr "発信"
 msgid "The iPhone's carrier, signal, and battery."
 msgstr "iPhone の通信事業者、電波、バッテリー。"
 
-#: src/gtk/calls_view.cpp
+#: src/gtk/calls_view.cpp src/tui/calls.cpp
 msgid "Recent calls"
 msgstr "最近の通話"
 
@@ -1879,7 +1833,7 @@ msgstr "コピー"
 msgid "Copy {}"
 msgstr "{} をコピー"
 
-#: src/gtk/contacts_view.cpp
+#: src/gtk/contacts_view.cpp src/tui/main.cpp
 msgid "Copied to the clipboard."
 msgstr "クリップボードにコピーしました。"
 
@@ -1894,11 +1848,11 @@ msgstr "メッセージを送信"
 msgid "Message {}"
 msgstr "{} にメッセージ"
 
-#: src/gtk/contacts_view.cpp
+#: src/gtk/contacts_view.cpp src/tui/contacts.cpp
 msgid "Favorite"
 msgstr "よく使う項目"
 
-#: src/gtk/contacts_view.cpp
+#: src/gtk/contacts_view.cpp src/tui/contacts.cpp
 msgid "No contacts yet. Check the Bluetooth link on the Devices page."
 msgstr ""
 "まだ連絡先はありません。デバイスページで Bluetooth 接続を確認してください。"
@@ -1907,107 +1861,88 @@ msgstr ""
 msgid "Search contacts"
 msgstr "連絡先を検索"
 
-#: src/gtk/daemon_client.cpp
+#: src/gtk/daemon_client.cpp src/tui/main.cpp
 msgid "Daemon Offline"
 msgstr "デーモンはオフライン"
 
-#: src/gtk/daemon_client.cpp src/gtk/messages_view.cpp
+#: src/gtk/daemon_client.cpp src/gtk/messages_view.cpp src/tui/main.cpp
+#: src/tui/messages.cpp
 msgid "The Tether daemon is not running."
 msgstr "Tether デーモンが動作していません。"
 
-#: src/gtk/daemon_client.cpp
+#: src/gtk/daemon_client.cpp src/tui/main.cpp
 msgid "Daemon Online"
 msgstr "デーモンはオンライン"
 
-#. TRANSLATORS: Left earbud, read aloud by screen readers before its battery level.
-#: src/gtk/devices_view.cpp
-msgid "Left earbud"
-msgstr "左イヤホン"
-
-#. TRANSLATORS: Left earbud, abbreviated to fit the device row. One or two letters.
-#: src/gtk/devices_view.cpp
-msgid "L"
-msgstr "左"
-
-#. TRANSLATORS: Right earbud, read aloud by screen readers before its battery level.
-#: src/gtk/devices_view.cpp
-msgid "Right earbud"
-msgstr "右イヤホン"
-
-#. TRANSLATORS: Right earbud, abbreviated to fit the device row. One or two letters.
-#: src/gtk/devices_view.cpp
-msgid "R"
-msgstr "右"
-
-#: src/gtk/devices_view.cpp
+#: src/gtk/devices_view.cpp src/tui/devices.cpp
 msgid "Reading battery…"
 msgstr "バッテリーを読み取り中…"
 
-#: src/gtk/devices_view.cpp
+#: src/gtk/devices_view.cpp src/tui/devices.cpp
 msgid "Not connected yet."
 msgstr "まだ接続していません。"
 
-#: src/gtk/devices_view.cpp
+#: src/gtk/devices_view.cpp src/tui/devices.cpp
 msgid "Connected."
 msgstr "接続しました。"
 
-#: src/gtk/devices_view.cpp
+#: src/gtk/devices_view.cpp src/tui/devices.cpp
 msgid "Scanning for nearby devices..."
 msgstr "近くのデバイスを検索しています..."
 
-#: src/gtk/devices_view.cpp
+#: src/gtk/devices_view.cpp src/tui/devices.cpp
 msgid "Off"
 msgstr "オフ"
 
-#: src/gtk/devices_view.cpp
+#: src/gtk/devices_view.cpp src/tui/devices.cpp
 msgid "Transparency"
 msgstr "外部音取り込み"
 
-#: src/gtk/devices_view.cpp
+#: src/gtk/devices_view.cpp src/tui/devices.cpp
 msgid "Adaptive"
 msgstr "アダプティブ"
 
-#: src/gtk/devices_view.cpp
+#: src/gtk/devices_view.cpp src/tui/devices.cpp
 msgid "Noise Cancellation"
 msgstr "ノイズキャンセリング"
 
-#: src/gtk/devices_view.cpp
+#: src/gtk/devices_view.cpp src/tui/devices.cpp
 msgid "Disconnect"
 msgstr "切断"
 
-#: src/gtk/devices_view.cpp
+#: src/gtk/devices_view.cpp src/tui/devices.cpp
 msgid "Connect"
 msgstr "接続"
 
-#: src/gtk/devices_view.cpp
+#: src/gtk/devices_view.cpp src/tui/devices.cpp
 msgid "Tether is not managing the AirPods, so another program can use them."
 msgstr "Tether は AirPods を管理していないため、別のプログラムが使用できます。"
 
-#: src/gtk/devices_view.cpp
+#: src/gtk/devices_view.cpp src/tui/devices.cpp
 msgid "These AirPods do not report a listening mode."
 msgstr "この AirPods はリスニングモードを報告しません。"
 
-#: src/gtk/devices_view.cpp
+#: src/gtk/devices_view.cpp src/tui/devices.cpp
 msgid "These AirPods do not report whether they are being worn."
 msgstr "この AirPods は装着状態を報告しません。"
 
-#: src/gtk/devices_view.cpp
+#: src/gtk/devices_view.cpp src/tui/devices.cpp
 msgid "Both buds are in."
 msgstr "両方のイヤホンを装着しています。"
 
-#: src/gtk/devices_view.cpp
+#: src/gtk/devices_view.cpp src/tui/devices.cpp
 msgid "One bud is in."
 msgstr "片方のイヤホンを装着しています。"
 
-#: src/gtk/devices_view.cpp
+#: src/gtk/devices_view.cpp src/tui/devices.cpp
 msgid "Neither bud is in."
 msgstr "イヤホンを装着していません。"
 
-#: src/gtk/devices_view.cpp
+#: src/gtk/devices_view.cpp src/tui/devices.cpp
 msgid "The buds are handed over with Apple's own handoff."
 msgstr "AirPods は Apple 本来のハンドオフで渡されます。"
 
-#: src/gtk/devices_view.cpp
+#: src/gtk/devices_view.cpp src/tui/devices.cpp
 msgid ""
 "The buds are handed over by disconnecting them. For Apple's own handoff, put "
 "DeviceID = bluetooth:004C:0000:0000 under [General] in /etc/bluetooth/"
@@ -2017,68 +1952,68 @@ msgstr ""
 "bluetooth/main.conf の [General] に DeviceID = bluetooth:004C:0000:0000 を追"
 "加し、bluetooth を再起動してください。"
 
-#: src/gtk/devices_view.cpp
+#: src/gtk/devices_view.cpp src/tui/devices.cpp
 msgid "Full mode — messages, contacts, and notifications."
 msgstr "フルモード — メッセージ、連絡先、通知。"
 
-#: src/gtk/devices_view.cpp
+#: src/gtk/devices_view.cpp src/tui/devices.cpp
 msgid "Compatibility mode — messages and contacts, no notification mirroring."
 msgstr "互換モード — メッセージと連絡先のみ、通知のミラーリングなし。"
 
-#: src/gtk/devices_view.cpp
+#: src/gtk/devices_view.cpp src/tui/devices.cpp
 msgid "This machine cannot carry the Bluetooth features."
 msgstr "このマシンでは Bluetooth 機能を利用できません。"
 
-#: src/gtk/devices_view.cpp
+#: src/gtk/devices_view.cpp src/tui/devices.cpp
 msgid "Link"
 msgstr "リンク"
 
-#: src/gtk/devices_view.cpp
+#: src/gtk/devices_view.cpp src/tui/devices.cpp
 msgid "Not paired over Bluetooth yet."
 msgstr "まだ Bluetooth でペアリングしていません。"
 
-#: src/gtk/devices_view.cpp
+#: src/gtk/devices_view.cpp src/tui/devices.cpp
 msgid "Tether is not using this device. Pair it to select it."
 msgstr ""
 "Tether はこのデバイスを使用していません。選択するにはペアリングしてください。"
 
-#: src/gtk/devices_view.cpp
+#: src/gtk/devices_view.cpp src/tui/devices.cpp
 msgid "Bluetooth is switched off for this iPhone."
 msgstr "この iPhone では Bluetooth がオフになっています。"
 
-#: src/gtk/devices_view.cpp
+#: src/gtk/devices_view.cpp src/tui/devices.cpp
 msgid "Connected and ready."
 msgstr "接続済みで使用できます。"
 
-#: src/gtk/devices_view.cpp
+#: src/gtk/devices_view.cpp src/tui/devices.cpp
 msgid "Device is offline. Make sure it is switched on and on the same network."
 msgstr ""
 "デバイスはオフラインです。電源が入っていて同じネットワーク上にあることを確認"
 "してください。"
 
-#: src/gtk/devices_view.cpp
+#: src/gtk/devices_view.cpp src/tui/devices.cpp
 #, c++-format
 msgid "Found at {0}:{1}"
 msgstr "{0}:{1} で見つかりました"
 
-#: src/gtk/devices_view.cpp
+#: src/gtk/devices_view.cpp src/tui/devices.cpp
 msgid "Sending pair request..."
 msgstr "ペアリング要求を送信しています..."
 
-#: src/gtk/devices_view.cpp
+#: src/gtk/devices_view.cpp src/tui/devices.cpp
 msgid "Pair request sent. Approve on remote device!"
 msgstr "ペアリング要求を送信しました。リモートデバイスで承認してください。"
 
-#: src/gtk/devices_view.cpp
+#: src/gtk/devices_view.cpp src/tui/devices.cpp
 msgid "Pairing… confirm the prompt on the iPhone."
 msgstr "ペアリング中… iPhone の確認画面で承認してください。"
 
-#: src/gtk/devices_view.cpp
+#: src/gtk/devices_view.cpp src/tui/devices.cpp
 #, c-format
 msgid "Remove the Bluetooth pairing with %s?"
 msgstr "%s との Bluetooth ペアリングを解除しますか?"
 
-#: src/gtk/devices_view.cpp
+#: src/gtk/devices_view.cpp src/tui/devices.cpp
 msgid ""
 "Also delete this computer from the iPhone's Bluetooth settings before "
 "pairing again, or the phone will keep the stale bond."
@@ -2086,16 +2021,16 @@ msgstr ""
 "もう一度ペアリングする前に、iPhone の Bluetooth 設定からもこのコンピュータを"
 "削除してください。そうしないと古いボンドが残ります。"
 
-#: src/gtk/devices_view.cpp
+#: src/gtk/devices_view.cpp src/tui/devices.cpp
 msgid "Removing the pairing…"
 msgstr "ペアリングを解除しています…"
 
-#: src/gtk/devices_view.cpp
+#: src/gtk/devices_view.cpp src/tui/devices.cpp
 #, c-format
 msgid "Forget %s?"
 msgstr "%s を削除しますか？"
 
-#: src/gtk/devices_view.cpp
+#: src/gtk/devices_view.cpp src/tui/devices.cpp
 msgid ""
 "Tether will stop connecting to it. Forget this computer on the other device "
 "too, then pair again to reconnect."
@@ -2107,27 +2042,28 @@ msgstr ""
 msgid "Setup commands copied to the clipboard."
 msgstr "設定用コマンドをクリップボードにコピーしました。"
 
-#: src/gtk/devices_view.cpp src/gtk/messages_view.cpp
+#: src/gtk/devices_view.cpp src/gtk/messages_view.cpp src/tui/devices.cpp
+#: src/tui/messages.cpp
 msgid "Asking the iPhone to show its Bluetooth permissions…"
 msgstr "iPhone に Bluetooth の許可設定を表示するよう要求しています…"
 
 #. TRANSLATORS: {} is a file name.
-#: src/gtk/devices_view.cpp
+#: src/gtk/devices_view.cpp src/tui/devices.cpp
 #, c++-format
 msgid "Sending {}…"
 msgstr "{} を送信しています…"
 
 #. TRANSLATORS: {0} is the current file's position, {1} the batch size.
-#: src/gtk/devices_view.cpp
+#: src/gtk/devices_view.cpp src/tui/devices.cpp
 #, c++-format
 msgid "({0} of {1})"
 msgstr "({1} 件中 {0} 件)"
 
-#: src/gtk/devices_view.cpp
+#: src/gtk/devices_view.cpp src/tui/devices.cpp
 msgid "Daemon unavailable."
 msgstr "デーモンを利用できません。"
 
-#: src/gtk/devices_view.cpp
+#: src/gtk/devices_view.cpp src/tui/devices.cpp
 msgid "Send File"
 msgstr "ファイルを送信"
 
@@ -2139,15 +2075,15 @@ msgstr "キャンセル(_C)"
 msgid "_Send"
 msgstr "送信(_S)"
 
-#: src/gtk/devices_view.cpp
+#: src/gtk/devices_view.cpp src/tui/devices.cpp
 msgid "Folders can't be sent — drop files instead."
 msgstr "フォルダは送信できません。ファイルをドロップしてください。"
 
-#: src/gtk/devices_view.cpp
+#: src/gtk/devices_view.cpp src/tui/devices.cpp
 msgid "Clipboard, files, and OTP are connected."
 msgstr "クリップボード、ファイル、OTP が接続されています。"
 
-#: src/gtk/devices_view.cpp
+#: src/gtk/devices_view.cpp src/tui/devices.cpp
 msgid ""
 "Files and OTP are connected. This compositor does not give Tether clipboard "
 "access, so clipboard sync is off."
@@ -2155,7 +2091,7 @@ msgstr ""
 "ファイルと OTP は接続されています。このコンポジターは Tether にクリップボード"
 "へのアクセスを許可しないため、クリップボード同期はオフです。"
 
-#: src/gtk/devices_view.cpp
+#: src/gtk/devices_view.cpp src/tui/devices.cpp
 msgid ""
 "avahi-daemon isn't running, so other devices can't find this PC. Start it "
 "with: sudo systemctl enable --now avahi-daemon"
@@ -2164,7 +2100,7 @@ msgstr ""
 "せん。次のコマンドで起動してください: sudo systemctl enable --now avahi-"
 "daemon"
 
-#: src/gtk/devices_view.cpp
+#: src/gtk/devices_view.cpp src/tui/devices.cpp
 msgid ""
 "A device is on the network but cannot reach this PC. A firewall is running; "
 "Tether needs inbound TCP 5134. Allow it with: sudo ufw allow 5134/tcp"
@@ -2173,42 +2109,43 @@ msgstr ""
 "ウォールが有効です。Tether は受信 TCP 5134 が必要です。次のコマンドで許可して"
 "ください: sudo ufw allow 5134/tcp"
 
-#: src/gtk/devices_view.cpp
+#: src/gtk/devices_view.cpp src/tui/devices.cpp
 msgid "No paired device is connected. Switch it on and join the same network."
 msgstr ""
 "ペアリング済みのデバイスが接続されていません。電源を入れて同じネットワークに"
 "接続してください。"
 
-#: src/gtk/devices_view.cpp
+#: src/gtk/devices_view.cpp src/tui/devices.cpp
 msgid "Unknown Device"
 msgstr "不明なデバイス"
 
-#: src/gtk/devices_view.cpp
+#: src/gtk/devices_view.cpp src/tui/devices.cpp
 msgid "Connected"
 msgstr "接続済み"
 
-#: src/gtk/devices_view.cpp
+#: src/gtk/devices_view.cpp src/tui/devices.cpp
 msgid "Offline"
 msgstr "オフライン"
 
-#: src/gtk/devices_view.cpp
+#: src/gtk/devices_view.cpp src/tui/devices.cpp
 msgid "Nearby (Tap to Pair)"
 msgstr "近くにあります (タップしてペアリング)"
 
-#: src/gtk/devices_view.cpp
+#: src/gtk/devices_view.cpp src/tui/devices.cpp
 msgid "Partially connected"
 msgstr "部分的に接続"
 
-#: src/gtk/devices_view.cpp
+#: src/gtk/devices_view.cpp src/tui/devices.cpp
 msgid "Paired"
 msgstr "ペアリング済み"
 
-#: src/gtk/devices_view.cpp
+#. TRANSLATORS: {0} is the name of the device being paired with.
+#: src/gtk/devices_view.cpp src/tui/devices.cpp
 #, c++-format
 msgid "Waiting for approval on {0}..."
 msgstr "{0} での承認を待っています…"
 
-#: src/gtk/devices_view.cpp
+#: src/gtk/devices_view.cpp src/tui/devices.cpp
 msgid ""
 "Could not reach that device. If a firewall is running, Tether needs inbound "
 "TCP 5134 on the other machine."
@@ -2216,51 +2153,52 @@ msgstr ""
 "そのデバイスに到達できませんでした。ファイアウォールが有効な場合、相手のマシ"
 "ンで受信 TCP 5134 が必要です。"
 
-#: src/gtk/devices_view.cpp
+#: src/gtk/devices_view.cpp src/tui/devices.cpp
 msgid "That device refused the connection. Is Tether running on it?"
 msgstr "そのデバイスは接続を拒否しました。Tether は動作していますか?"
 
-#: src/gtk/devices_view.cpp
+#: src/gtk/devices_view.cpp src/tui/devices.cpp
 msgid "That address could not be resolved."
 msgstr "そのアドレスを解決できませんでした。"
 
-#: src/gtk/devices_view.cpp
+#: src/gtk/devices_view.cpp src/tui/devices.cpp
 msgid "Could not connect to that device."
 msgstr "そのデバイスに接続できませんでした。"
 
-#: src/gtk/devices_view.cpp
+#: src/gtk/devices_view.cpp src/tui/devices.cpp
 msgid "Pair request was rejected."
 msgstr "ペアリング要求は拒否されました。"
 
-#: src/gtk/devices_view.cpp
+#: src/gtk/devices_view.cpp src/tui/devices.cpp
 msgid "Ready"
 msgstr "準備完了"
 
-#: src/gtk/devices_view.cpp
+#. TRANSLATORS: {0} is how many were sent, {1} the batch size.
+#: src/gtk/devices_view.cpp src/tui/devices.cpp
 #, c++-format
 msgid "Sent {0} of {1} file."
 msgid_plural "Sent {0} of {1} files."
 msgstr[0] "{1} 件中 {0} 件のファイルを送信しました。"
 
-#: src/gtk/devices_view.cpp
+#: src/gtk/devices_view.cpp src/tui/devices.cpp
 #, c++-format
 msgid "Skipped {} non-file item."
 msgid_plural "Skipped {} non-file items."
 msgstr[0] "ファイルでない項目を {} 件スキップしました。"
 
-#: src/gtk/devices_view.cpp
+#: src/gtk/devices_view.cpp src/tui/devices.cpp
 msgid "Clipboard is empty."
 msgstr "クリップボードは空です。"
 
-#: src/gtk/devices_view.cpp
+#: src/gtk/devices_view.cpp src/tui/devices.cpp
 msgid "Desktop Clipboard Sync triggered."
 msgstr "デスクトップのクリップボード同期を実行しました。"
 
-#: src/gtk/devices_view.cpp
+#: src/gtk/devices_view.cpp src/tui/devices.cpp
 msgid "Messages and notifications are connected."
 msgstr "メッセージと通知が接続されています。"
 
-#: src/gtk/devices_view.cpp
+#: src/gtk/devices_view.cpp src/tui/devices.cpp
 msgid ""
 "No iPhone found. Unlock the phone and open Settings > Bluetooth so it "
 "advertises, then scan again."
@@ -2268,7 +2206,7 @@ msgstr ""
 "iPhone が見つかりません。iPhone のロックを解除し、設定 > Bluetooth を開いてア"
 "ドバタイズさせてから、もう一度検索してください。"
 
-#: src/gtk/devices_view.cpp
+#: src/gtk/devices_view.cpp src/tui/devices.cpp
 #, c-format
 msgid ""
 "Does the iPhone show this code?\n"
@@ -2311,11 +2249,11 @@ msgstr ""
 "2.  「Bluetooth でペアリング」を押す\n"
 "3.  iPhone で 2 つの許可を与える"
 
-#: src/gtk/devices_view.cpp
+#: src/gtk/devices_view.cpp src/tui/devices.cpp
 msgid "Scan for devices"
 msgstr "デバイスを検索"
 
-#: src/gtk/devices_view.cpp
+#: src/gtk/devices_view.cpp src/tui/devices.cpp
 msgid "Manage AirPods from Tether"
 msgstr "AirPods を Tether で管理する"
 
@@ -2327,7 +2265,7 @@ msgstr ""
 "AirPods のチャンネルは 1 台につき 1 つのプログラムしか使えません。オフにする"
 "と解放され、別の AirPods プログラムが使用できます。"
 
-#: src/gtk/devices_view.cpp
+#: src/gtk/devices_view.cpp src/tui/devices.cpp
 msgid "Listening mode"
 msgstr "リスニングモード"
 
@@ -2335,19 +2273,19 @@ msgstr "リスニングモード"
 msgid "In-ear detection"
 msgstr "装着検出"
 
-#: src/gtk/devices_view.cpp
+#: src/gtk/devices_view.cpp src/tui/devices.cpp
 msgid "Pause playback when:"
 msgstr "再生を一時停止する条件:"
 
-#: src/gtk/devices_view.cpp
+#: src/gtk/devices_view.cpp src/tui/devices.cpp
 msgid "Never"
 msgstr "しない"
 
-#: src/gtk/devices_view.cpp
+#: src/gtk/devices_view.cpp src/tui/devices.cpp
 msgid "One bud is removed"
 msgstr "片方を外したとき"
 
-#: src/gtk/devices_view.cpp
+#: src/gtk/devices_view.cpp src/tui/devices.cpp
 msgid "Both buds are removed"
 msgstr "両方を外したとき"
 
@@ -2359,11 +2297,11 @@ msgstr ""
 "このコンピュータで再生中のものを一時停止し、イヤホンを装着し直すと再開しま"
 "す。Tether が一時停止した再生のみを再開します。"
 
-#: src/gtk/devices_view.cpp src/gtk/main.cpp
+#: src/gtk/devices_view.cpp src/gtk/main.cpp src/tui/calls.cpp
 msgid "Calls"
 msgstr "通話"
 
-#: src/gtk/devices_view.cpp
+#: src/gtk/devices_view.cpp src/tui/devices.cpp
 msgid "Hand the AirPods to the iPhone during a call"
 msgstr "通話中に AirPods を iPhone へ渡す"
 
@@ -2393,7 +2331,7 @@ msgstr ""
 "これらをターミナルで実行してください。Tether が独自に Bluetooth アダプタや "
 "bluetoothd を変更することはありません。"
 
-#: src/gtk/devices_view.cpp
+#: src/gtk/devices_view.cpp src/tui/devices.cpp
 msgid "Connect to this iPhone over Bluetooth"
 msgstr "Bluetooth でこの iPhone に接続"
 
@@ -2407,11 +2345,12 @@ msgstr ""
 "ると Tether は再接続しなくなります。すでに確立しているリンクは、切断するまで"
 "維持されます。"
 
-#: src/gtk/devices_view.cpp
+#: src/gtk/devices_view.cpp src/tui/devices.cpp
 msgid "Pair over Bluetooth"
 msgstr "Bluetooth でペアリング"
 
-#: src/gtk/devices_view.cpp src/gtk/messages_view.cpp
+#: src/gtk/devices_view.cpp src/gtk/messages_view.cpp src/tui/devices.cpp
+#: src/tui/messages.cpp
 msgid "Show iPhone Permissions"
 msgstr "iPhone の許可設定を表示"
 
@@ -2423,15 +2362,15 @@ msgstr ""
 "アドバタイズし直し、iPhone の 設定 > Bluetooth > (i) に「メッセージ通知を表"
 "示」と「連絡先を同期」が表示されるようにします。"
 
-#: src/gtk/devices_view.cpp
+#: src/gtk/devices_view.cpp src/tui/devices.cpp
 msgid "Unpair"
 msgstr "ペアリングを解除"
 
-#: src/gtk/devices_view.cpp
+#: src/gtk/devices_view.cpp src/tui/devices.cpp
 msgid "Pair Device"
 msgstr "デバイスとペアリング"
 
-#: src/gtk/devices_view.cpp
+#: src/gtk/devices_view.cpp src/tui/devices.cpp
 msgid "Force Trust (Accept Pending)"
 msgstr "強制的に信頼 (保留中を承認)"
 
@@ -2439,15 +2378,15 @@ msgstr "強制的に信頼 (保留中を承認)"
 msgid "Drop files here to send"
 msgstr "送信するファイルをここにドロップ"
 
-#: src/gtk/devices_view.cpp
+#: src/gtk/devices_view.cpp src/tui/devices.cpp
 msgid "Send Clipboard"
 msgstr "クリップボードを送信"
 
-#: src/gtk/devices_view.cpp
+#: src/gtk/devices_view.cpp src/tui/devices.cpp
 msgid "Clipboard sync requested..."
 msgstr "クリップボードの同期を要求しました..."
 
-#: src/gtk/devices_view.cpp
+#: src/gtk/devices_view.cpp src/tui/devices.cpp
 msgid "Forget"
 msgstr "削除"
 
@@ -2459,11 +2398,11 @@ msgstr "サイドバーを展開"
 msgid "Collapse sidebar"
 msgstr "サイドバーを折りたたむ"
 
-#: src/gtk/main.cpp src/gtk/settings_view.cpp
+#: src/gtk/main.cpp src/gtk/settings_view.cpp src/tui/settings.cpp
 msgid "Settings"
 msgstr "設定"
 
-#: src/gtk/main.cpp
+#: src/gtk/main.cpp src/tui/main.cpp
 msgid "Quit"
 msgstr "終了"
 
@@ -2475,7 +2414,7 @@ msgstr "メインメニュー"
 msgid "Look for devices"
 msgstr "デバイスを探す"
 
-#: src/gtk/main.cpp
+#: src/gtk/main.cpp src/tui/devices.cpp
 msgid "Devices"
 msgstr "デバイス"
 
@@ -2495,28 +2434,7 @@ msgstr "このタブで開く"
 msgid "Open the messages tab on this conversation"
 msgstr "この会話でメッセージタブを開く"
 
-#: src/gtk/message_format.cpp
-msgid "Yesterday"
-msgstr "昨日"
-
-#. TRANSLATORS: strftime short date for older conversations; reorder to the local
-#. convention, e.g. "%-d %b".
-#: src/gtk/message_format.cpp
-#, no-c-format
-msgid "%b %-d"
-msgstr "%-m月%-d日"
-
-#: src/gtk/message_format.cpp
-msgid "Today"
-msgstr "今日"
-
-#. TRANSLATORS: strftime date heading above older messages, e.g. "%A %-d %B".
-#: src/gtk/message_format.cpp
-#, no-c-format
-msgid "%A, %b %-d"
-msgstr "%-m月%-d日(%a)"
-
-#: src/gtk/messages_view.cpp src/gtk/tray.cpp
+#: src/gtk/messages_view.cpp src/gtk/tray.cpp src/tui/main.cpp
 #, c++-format
 msgid "{} unread message"
 msgid_plural "{} unread messages"
@@ -2534,45 +2452,45 @@ msgstr "送信: {}"
 msgid "Received: {}"
 msgstr "受信: {}"
 
-#: src/gtk/messages_view.cpp
+#: src/gtk/messages_view.cpp src/tui/messages.cpp
 msgid "Bluetooth connection needed to sync messages."
 msgstr "メッセージの同期にはBluetooth接続が必要です。"
 
-#: src/gtk/messages_view.cpp
+#: src/gtk/messages_view.cpp src/tui/messages.cpp
 msgid "Select a conversation"
 msgstr "会話を選択"
 
-#: src/gtk/messages_view.cpp
+#: src/gtk/messages_view.cpp src/tui/messages.cpp
 msgid "Sending…"
 msgstr "送信中…"
 
-#: src/gtk/messages_view.cpp
+#: src/gtk/messages_view.cpp src/tui/messages.cpp
 msgid "Enter a recipient."
 msgstr "宛先を入力してください。"
 
-#: src/gtk/messages_view.cpp
+#: src/gtk/messages_view.cpp src/tui/messages.cpp
 msgid "Select a conversation first."
 msgstr "先に会話を選択してください。"
 
-#: src/gtk/messages_view.cpp
+#: src/gtk/messages_view.cpp src/tui/messages.cpp
 msgid "Replying to this conversation is not available."
 msgstr "この会話への返信は利用できません。"
 
-#: src/gtk/messages_view.cpp
+#: src/gtk/messages_view.cpp src/tui/messages.cpp
 msgid "No answer about that message; it may still have been sent."
 msgstr ""
 "そのメッセージについて応答がありません。送信されている可能性はあります。"
 
-#: src/gtk/messages_view.cpp
+#: src/gtk/messages_view.cpp src/tui/messages.cpp
 msgid "Could not reach the Tether daemon; the message was not sent."
 msgstr ""
 "Tether デーモンに接続できませんでした。メッセージは送信されていません。"
 
-#: src/gtk/messages_view.cpp
+#: src/gtk/messages_view.cpp src/tui/messages.cpp
 msgid "Sent"
 msgstr "送信済み"
 
-#: src/gtk/messages_view.cpp
+#: src/gtk/messages_view.cpp src/tui/messages.cpp
 msgid "New Message"
 msgstr "新規メッセージ"
 
@@ -2580,7 +2498,7 @@ msgstr "新規メッセージ"
 msgid "Search conversations"
 msgstr "会話を検索"
 
-#: src/gtk/messages_view.cpp
+#: src/gtk/messages_view.cpp src/tui/messages.cpp
 msgid "To:"
 msgstr "宛先:"
 
@@ -2596,7 +2514,7 @@ msgstr "送信"
 msgid "Retry"
 msgstr "再試行"
 
-#: src/gtk/notifications_view.cpp
+#: src/gtk/notifications_view.cpp src/tui/notifications.cpp
 msgid "Dismiss on the iPhone"
 msgstr "iPhone で消去"
 
@@ -2606,23 +2524,23 @@ msgstr "iPhone で消去"
 msgid "Dismiss {} notification"
 msgstr "{} の通知を消去"
 
-#: src/gtk/notifications_view.cpp
+#: src/gtk/notifications_view.cpp src/tui/notifications.cpp
 msgid "New notification"
 msgstr "新しい通知"
 
-#: src/gtk/notifications_view.cpp
+#: src/gtk/notifications_view.cpp src/tui/notifications.cpp
 msgid "The iPhone would not take the dismissal."
 msgstr "iPhone が消去を受け付けませんでした。"
 
-#: src/gtk/notifications_view.cpp
+#: src/gtk/notifications_view.cpp src/tui/notifications.cpp
 msgid "No notifications yet."
 msgstr "まだ通知はありません。"
 
-#: src/gtk/notifications_view.cpp
+#: src/gtk/notifications_view.cpp src/tui/notifications.cpp
 msgid "Notification mirroring is unavailable."
 msgstr "通知のミラーリングは利用できません。"
 
-#: src/gtk/settings_view.cpp
+#: src/gtk/settings_view.cpp src/tui/settings.cpp
 msgid ""
 "No iPhone is paired over Bluetooth, so the Bluetooth settings below cannot "
 "be changed yet."
@@ -2660,7 +2578,7 @@ msgid ""
 msgstr ""
 "シンボリックはパネルの色に従います。次回の Tether 起動時に反映されます。"
 
-#: src/gtk/settings_view.cpp
+#: src/gtk/settings_view.cpp src/tui/settings.cpp
 msgid "iPhone notifications"
 msgstr "iPhone の通知"
 
@@ -2668,23 +2586,23 @@ msgstr "iPhone の通知"
 msgid "Alerts your iPhone forwards to this computer over Bluetooth."
 msgstr "iPhone が Bluetooth 経由でこのコンピューターに転送する通知です。"
 
-#: src/gtk/settings_view.cpp
+#: src/gtk/settings_view.cpp src/tui/settings.cpp
 msgid "Mirror iPhone notifications"
 msgstr "iPhone の通知をミラーリング"
 
-#: src/gtk/settings_view.cpp
+#: src/gtk/settings_view.cpp src/tui/settings.cpp
 msgid "Disabled when pairing cannot support LE."
 msgstr "ペアリングが LE に対応しない場合は無効になります。"
 
-#: src/gtk/settings_view.cpp
+#: src/gtk/settings_view.cpp src/tui/settings.cpp
 msgid "Include the notification text"
 msgstr "通知の本文を含める"
 
-#: src/gtk/settings_view.cpp
+#: src/gtk/settings_view.cpp src/tui/settings.cpp
 msgid "Title and message content are shown, not just which app sent it."
 msgstr "送信元アプリだけでなく、タイトルと本文も表示されます。"
 
-#: src/gtk/settings_view.cpp
+#: src/gtk/settings_view.cpp src/tui/settings.cpp
 msgid "Desktop popups"
 msgstr "デスクトップのポップアップ"
 
@@ -2692,25 +2610,25 @@ msgstr "デスクトップのポップアップ"
 msgid "What Tether shows in your notification area."
 msgstr "Tether が通知領域に表示する内容です。"
 
-#: src/gtk/settings_view.cpp
+#: src/gtk/settings_view.cpp src/tui/settings.cpp
 msgid "Show desktop popups"
 msgstr "デスクトップのポップアップを表示"
 
-#: src/gtk/settings_view.cpp
+#: src/gtk/settings_view.cpp src/tui/settings.cpp
 msgid "Off silences iPhone alerts, new messages and arriving files."
 msgstr ""
 "オフにすると iPhone の通知、新着メッセージ、受信ファイルがすべて表示されませ"
 "ん。"
 
-#: src/gtk/settings_view.cpp
+#: src/gtk/settings_view.cpp src/tui/settings.cpp
 msgid "Show message previews"
 msgstr "メッセージのプレビューを表示"
 
-#: src/gtk/settings_view.cpp
+#: src/gtk/settings_view.cpp src/tui/settings.cpp
 msgid "Off shows only the sender."
 msgstr "オフにすると送信者のみ表示します。"
 
-#: src/gtk/settings_view.cpp
+#: src/gtk/settings_view.cpp src/tui/settings.cpp
 msgid "Security"
 msgstr "セキュリティ"
 
@@ -2718,11 +2636,11 @@ msgstr "セキュリティ"
 msgid "What Tether does when the iPhone leaves."
 msgstr "iPhone が離れたときに Tether が行うこと。"
 
-#: src/gtk/settings_view.cpp
+#: src/gtk/settings_view.cpp src/tui/settings.cpp
 msgid "Lock the session when the iPhone goes out of range"
 msgstr "iPhone が範囲外になったらセッションをロックする"
 
-#: src/gtk/settings_view.cpp
+#: src/gtk/settings_view.cpp src/tui/settings.cpp
 msgid ""
 "Locks about half a minute after the link times out. Switching Bluetooth off "
 "on the iPhone does not lock, and neither does suspending this machine."
@@ -2734,23 +2652,23 @@ msgstr ""
 msgid "SMS and iMessage conversations synced over Bluetooth."
 msgstr "Bluetooth 経由で同期される SMS と iMessage の会話です。"
 
-#: src/gtk/settings_view.cpp
+#: src/gtk/settings_view.cpp src/tui/settings.cpp
 msgid "Encrypted"
 msgstr "暗号化する"
 
-#: src/gtk/settings_view.cpp
+#: src/gtk/settings_view.cpp src/tui/settings.cpp
 msgid "Unencrypted"
 msgstr "暗号化しない"
 
-#: src/gtk/settings_view.cpp
+#: src/gtk/settings_view.cpp src/tui/settings.cpp
 msgid "Do not keep"
 msgstr "保持しない"
 
-#: src/gtk/settings_view.cpp
+#: src/gtk/settings_view.cpp src/tui/settings.cpp
 msgid "Keep message history"
 msgstr "メッセージ履歴を保持"
 
-#: src/gtk/settings_view.cpp
+#: src/gtk/settings_view.cpp src/tui/settings.cpp
 msgid ""
 "Encrypted uses a key from your desktop keyring. Do not keep deletes what is "
 "stored."
@@ -2758,14 +2676,14 @@ msgstr ""
 "暗号化するはデスクトップのキーリングの鍵を使います。保持しないは保存済みのも"
 "のを削除します。"
 
-#: src/gtk/settings_view.cpp
+#: src/gtk/settings_view.cpp src/tui/settings.cpp
 msgid ""
 "Paused: no key from the desktop keyring. Unlock it, or choose Unencrypted."
 msgstr ""
 "一時停止中: デスクトップのキーリングから鍵を取得できません。ロックを解除する"
 "か、暗号化しないを選んでください。"
 
-#: src/gtk/settings_view.cpp
+#: src/gtk/settings_view.cpp src/tui/settings.cpp
 msgid "Experimental"
 msgstr "実験的機能"
 
@@ -2773,36 +2691,266 @@ msgstr "実験的機能"
 msgid "Unfinished features. These can stop working at any time."
 msgstr "未完成の機能です。いつ動作しなくなってもおかしくありません。"
 
-#: src/gtk/settings_view.cpp
+#: src/gtk/settings_view.cpp src/tui/settings.cpp
 msgid "Call control over Bluetooth"
 msgstr "Bluetooth 経由の通話操作"
 
-#: src/gtk/settings_view.cpp
+#: src/gtk/settings_view.cpp src/tui/settings.cpp
 msgid "Answer and place calls from the Calls tab."
 msgstr "「通話」タブから通話の応答と発信ができます。"
 
-#: src/gtk/tray.cpp src/gtk/ui_util.cpp
+#: src/gtk/tray.cpp src/gtk/ui_util.cpp src/tui/main.cpp
 msgid "connected"
 msgstr "接続済み"
 
-#: src/gtk/tray.cpp src/gtk/ui_util.cpp
+#: src/gtk/tray.cpp src/gtk/ui_util.cpp src/tui/main.cpp
 msgid "not connected"
 msgstr "未接続"
 
 #. TRANSLATORS: {} is a transport name, "Wi-Fi" or "Bluetooth", or a device name.
 #. TRANSLATORS: {} is a transport name, "Wi-Fi" or "Bluetooth".
-#: src/gtk/tray.cpp src/gtk/ui_util.cpp
+#: src/gtk/tray.cpp src/gtk/ui_util.cpp src/tui/main.cpp
 #, c++-format
 msgid "{}: {}"
 msgstr "{}: {}"
 
-#: src/gtk/tray.cpp
+#: src/gtk/tray.cpp src/tui/main.cpp
 msgid "Daemon: not running"
 msgstr "デーモン: 動作していません"
 
-#: src/gtk/ui_util.cpp
+#: src/gtk/ui_util.cpp src/tui/main.cpp
 msgid "Waiting for the Tether daemon."
 msgstr "Tether デーモンを待っています。"
+
+#: src/tui/devices.cpp
+msgid "Overview"
+msgstr "概要"
+
+#: src/tui/devices.cpp
+msgid "Select a device first."
+msgstr "先にデバイスを選択してください。"
+
+#: src/tui/devices.cpp
+msgid "Modes: off, transparency, adaptive, anc"
+msgstr "モード: off、transparency、adaptive、anc"
+
+#: src/tui/devices.cpp
+#, c++-format
+msgid "Found {}. Select it under BLUETOOTH to pair."
+msgstr "{} が見つかりました。BLUETOOTH の下で選択してペアリングしてください。"
+
+#: src/tui/devices.cpp
+msgid "Usage: :send FILE…"
+msgstr "使い方: :send ファイル…"
+
+#: src/tui/main.cpp
+msgid "-- INSERT --"
+msgstr "-- 挿入 --"
+
+#: src/tui/main.cpp
+msgid "Move down / up"
+msgstr "下へ / 上へ"
+
+#: src/tui/main.cpp
+msgid "First / last"
+msgstr "先頭 / 末尾"
+
+#: src/tui/main.cpp
+msgid "Half a page down / up"
+msgstr "半ページ下へ / 上へ"
+
+#: src/tui/main.cpp
+msgid "Focus the list / the detail pane"
+msgstr "リスト / 詳細ペインにフォーカス"
+
+#: src/tui/main.cpp
+msgid "Open, or run the highlighted action"
+msgstr "開く、または強調表示された操作を実行"
+
+#: src/tui/main.cpp
+msgid "Toggle the highlighted setting"
+msgstr "強調表示された設定を切り替え"
+
+#: src/tui/main.cpp
+msgid "Switch tab"
+msgstr "タブを切り替え"
+
+#: src/tui/main.cpp
+msgid "Filter the list"
+msgstr "リストを絞り込む"
+
+#: src/tui/main.cpp
+msgid "Clear the filter, leave insert mode"
+msgstr "絞り込みを解除、挿入モードを終了"
+
+#: src/tui/main.cpp
+msgid "Write in the open conversation"
+msgstr "開いている会話に入力"
+
+#: src/tui/main.cpp
+msgid "Send / new line (insert mode)"
+msgstr "送信 / 改行（挿入モード）"
+
+#: src/tui/main.cpp
+msgid "New message, or dial on Calls"
+msgstr "新規メッセージ、通話タブでは発信"
+
+#: src/tui/main.cpp
+msgid "Dismiss, forget, unpair, or hang up"
+msgstr "消去、削除、ペアリング解除、または終話"
+
+#: src/tui/main.cpp
+msgid "Copy the highlighted address or text"
+msgstr "強調表示されたアドレスまたはテキストをコピー"
+
+#: src/tui/main.cpp
+msgid "Refresh, or scan for devices"
+msgstr "更新、またはデバイスを検索"
+
+#: src/tui/main.cpp
+msgid "Send files to the selected device"
+msgstr "選択したデバイスにファイルを送信"
+
+#: src/tui/main.cpp
+msgid "Send the clipboard"
+msgstr "クリップボードを送信"
+
+#: src/tui/main.cpp
+msgid "Place a call"
+msgstr "電話をかける"
+
+#: src/tui/main.cpp
+msgid "Message someone"
+msgstr "メッセージを送る"
+
+#: src/tui/main.cpp
+msgid "Keys"
+msgstr "キー"
+
+#: src/tui/main.cpp
+msgid "Terminal too small"
+msgstr "端末が小さすぎます"
+
+#: src/tui/main.cpp
+msgid "Press i to write a message"
+msgstr "i を押してメッセージを入力"
+
+#: src/tui/main.cpp
+#, c++-format
+msgid "Not a command: {}"
+msgstr "コマンドではありません: {}"
+
+#: src/tui/main.cpp
+msgid "Type :q and press Enter to quit"
+msgstr ":q と入力して Enter で終了"
+
+#: src/tui/main.cpp
+msgid ""
+"Usage: tether-tui [--devices|--messages|--notifications|--contacts|--calls|--"
+"settings] [--thread KEY]"
+msgstr ""
+"使い方: tether-tui [--devices|--messages|--notifications|--contacts|--"
+"calls|--settings] [--thread キー]"
+
+#: src/tui/main.cpp
+msgid "tether-tui needs a terminal."
+msgstr "tether-tui には端末が必要です。"
+
+#: src/tui/settings.cpp
+#, c++-format
+msgid "Settings: {}"
+msgstr "設定: {}"
+
+#. TRANSLATORS: strftime clock time on today's conversations, e.g. "%I:%M %p" for 12-hour.
+#: src/ui_common/message_format.cpp src/ui_common/ui_text.cpp
+#, no-c-format
+msgid "%H:%M"
+msgstr "%H:%M"
+
+#: src/ui_common/message_format.cpp
+msgid "Yesterday"
+msgstr "昨日"
+
+#. TRANSLATORS: strftime short date for older conversations; reorder to the local
+#. convention, e.g. "%-d %b".
+#: src/ui_common/message_format.cpp
+#, no-c-format
+msgid "%b %-d"
+msgstr "%-m月%-d日"
+
+#: src/ui_common/message_format.cpp
+msgid "Today"
+msgstr "今日"
+
+#. TRANSLATORS: strftime date heading above older messages, e.g. "%A %-d %B".
+#: src/ui_common/message_format.cpp
+#, no-c-format
+msgid "%A, %b %-d"
+msgstr "%-m月%-d日(%a)"
+
+#. TRANSLATORS: Left earbud, read aloud by screen readers before its battery level.
+#: src/ui_common/ui_text.cpp
+msgid "Left earbud"
+msgstr "左イヤホン"
+
+#. TRANSLATORS: Left earbud, abbreviated to fit the device row. One or two letters.
+#: src/ui_common/ui_text.cpp
+msgid "L"
+msgstr "左"
+
+#. TRANSLATORS: Right earbud, read aloud by screen readers before its battery level.
+#: src/ui_common/ui_text.cpp
+msgid "Right earbud"
+msgstr "右イヤホン"
+
+#. TRANSLATORS: Right earbud, abbreviated to fit the device row. One or two letters.
+#: src/ui_common/ui_text.cpp
+msgid "R"
+msgstr "右"
+
+#: src/ui_common/ui_text.cpp
+msgid "Call waiting"
+msgstr "キャッチホン"
+
+#: src/ui_common/ui_text.cpp
+msgid "Dialing"
+msgstr "発信中"
+
+#: src/ui_common/ui_text.cpp
+msgid "Ringing"
+msgstr "呼び出し中"
+
+#: src/ui_common/ui_text.cpp
+msgid "On call"
+msgstr "通話中"
+
+#: src/ui_common/ui_text.cpp
+msgid "On hold"
+msgstr "保留中"
+
+#: src/ui_common/ui_text.cpp
+msgid "Ended"
+msgstr "終了"
+
+#: src/ui_common/ui_text.cpp
+msgid "No service"
+msgstr "圏外"
+
+#. TRANSLATORS: Cellular signal strength read aloud, {} is 0 to 5.
+#: src/ui_common/ui_text.cpp
+#, c++-format
+msgid "signal {} of 5"
+msgstr "電波 {}/5"
+
+#. TRANSLATORS: The iPhone's battery level read aloud, {} is like "80%".
+#: src/ui_common/ui_text.cpp
+#, c++-format
+msgid "battery {}"
+msgstr "バッテリー {}"
+
+#: src/ui_common/ui_text.cpp
+msgid "%b %d, %H:%M"
+msgstr "%m月%d日 %H:%M"
 
 #: src/gtk/tether-gtk.desktop.in
 msgid "Device Synchronization"

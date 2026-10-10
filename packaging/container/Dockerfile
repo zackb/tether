@@ -11,7 +11,7 @@ ARG TETHER_VERSION=0.2.32-container-dev
 ARG BUILD_JOBS=4
 RUN cmake -S . -B /build -G Ninja -DCMAKE_BUILD_TYPE=Release \
       -DCMAKE_INSTALL_PREFIX=/usr/local -DTETHER_VERSION="${TETHER_VERSION}" \
-      -DTETHER_BUILD_EXTENSIONS=OFF \
+      -DTETHER_BUILD_EXTENSIONS=OFF -DTETHER_BUILD_TUI=OFF \
     && cmake --build /build --target tetherd tether_cli translations -j "${BUILD_JOBS}" \
     && mkdir -p /payload/bin /payload/share/locale \
     && install -m 755 /build/tether /build/tetherd /payload/bin/ \

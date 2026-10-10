@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: tether\n"
 "Report-Msgid-Bugs-To: zack@bartel.com\n"
-"POT-Creation-Date: 2026-10-08 20:06-0700\n"
+"POT-Creation-Date: 2026-10-09 20:43-0700\n"
 "PO-Revision-Date: 2026-08-23\n"
 "Last-Translator: Tether project\n"
 "Language-Team: Ukrainian\n"
@@ -427,6 +427,7 @@ msgid "BR/EDR, notifications live"
 msgstr "BR/EDR, сповіщення активні"
 
 #: src/cli/main.cpp src/gtk/devices_view.cpp src/gtk/main.cpp
+#: src/tui/devices.cpp src/tui/notifications.cpp
 msgid "Notifications"
 msgstr "Сповіщення"
 
@@ -520,7 +521,7 @@ msgid "Right"
 msgstr "Правий"
 
 #. TRANSLATORS: The AirPods charging case, on the device row beside the two earbuds.
-#: src/cli/main.cpp src/gtk/devices_view.cpp
+#: src/cli/main.cpp src/ui_common/ui_text.cpp
 msgid "Case"
 msgstr "Футляр"
 
@@ -650,7 +651,7 @@ msgstr "немає оператора"
 msgid " signal {0}/5 battery {1}/5"
 msgstr " сигнал {0}/5 батарея {1}/5"
 
-#: src/cli/main.cpp src/gtk/calls_view.cpp
+#: src/cli/main.cpp src/ui_common/ui_text.cpp
 msgid "roaming"
 msgstr "роумінг"
 
@@ -662,7 +663,7 @@ msgstr "Виклики (HFP)"
 msgid "Could not read Bluetooth diagnostics from the daemon.\n"
 msgstr "Не вдалося прочитати діагностику Bluetooth у демона.\n"
 
-#: src/cli/main.cpp src/gtk/calls_view.cpp
+#: src/cli/main.cpp src/gtk/calls_view.cpp src/tui/calls.cpp
 msgid "The call could not be placed."
 msgstr "Не вдалося здійснити виклик."
 
@@ -705,7 +706,7 @@ msgstr[0] "({} непрочитане)"
 msgstr[1] "({} непрочитані)"
 msgstr[2] "({} непрочитаних)"
 
-#: src/cli/main.cpp src/gtk/devices_view.cpp
+#: src/cli/main.cpp src/gtk/devices_view.cpp src/tui/devices.cpp
 #, c++-format
 msgid ""
 "The running tetherd is {}, but this is tether {}. Stop it and it\n"
@@ -716,7 +717,7 @@ msgstr ""
 "за потреби:\n"
 "    pkill tetherd\n"
 
-#: src/cli/main.cpp src/gtk/devices_view.cpp
+#: src/cli/main.cpp src/gtk/devices_view.cpp src/tui/devices.cpp
 msgid "an older build"
 msgstr "старіша збірка"
 
@@ -760,7 +761,7 @@ msgstr "Демон закрив з'єднання до того, як повід
 msgid "Sent to %s\n"
 msgstr "Надіслано до %s\n"
 
-#: src/cli/main.cpp src/gtk/messages_view.cpp
+#: src/cli/main.cpp src/gtk/messages_view.cpp src/tui/messages.cpp
 msgid "The message was not sent."
 msgstr "Повідомлення не надіслано."
 
@@ -1219,6 +1220,7 @@ msgid "Nothing to send."
 msgstr "Немає чого надсилати."
 
 #: src/core/src/bluetooth/connection.cpp src/gtk/messages_view.cpp
+#: src/tui/messages.cpp
 msgid "Messages are not connected."
 msgstr "Повідомлення не під'єднано."
 
@@ -1526,12 +1528,13 @@ msgstr ""
 #. TRANSLATORS: the feature name Tether shows for this profile.
 #: src/core/src/bluetooth/profile_supervisor.cpp src/daemon/main.cpp
 #: src/gtk/devices_view.cpp src/gtk/main.cpp src/gtk/messages_view.cpp
-#: src/gtk/settings_view.cpp
+#: src/gtk/settings_view.cpp src/tui/devices.cpp src/tui/messages.cpp
+#: src/tui/settings.cpp
 msgid "Messages"
 msgstr "Повідомлення"
 
 #: src/core/src/bluetooth/profile_supervisor.cpp src/gtk/devices_view.cpp
-#: src/gtk/main.cpp
+#: src/gtk/main.cpp src/tui/contacts.cpp src/tui/devices.cpp
 msgid "Contacts"
 msgstr "Контакти"
 
@@ -1599,7 +1602,7 @@ msgid "{} could not be opened."
 msgstr "Не вдалося відкрити {}."
 
 #: src/core/src/bluetooth/profile_supervisor.cpp src/gtk/calls_view.cpp
-#: src/gtk/notifications_view.cpp
+#: src/gtk/notifications_view.cpp src/tui/notifications.cpp
 msgid "Waiting for the iPhone."
 msgstr "Очікування iPhone."
 
@@ -1666,7 +1669,7 @@ msgstr "Пошук Bluetooth завершено."
 msgid "Another pairing attempt is already in progress."
 msgstr "Інша спроба створення пари вже триває."
 
-#: src/core/src/net.cpp src/gtk/devices_view.cpp
+#: src/core/src/net.cpp src/gtk/devices_view.cpp src/tui/devices.cpp
 msgid "Bluetooth is unavailable on this machine."
 msgstr "Bluetooth недоступний на цій машині."
 
@@ -1678,7 +1681,7 @@ msgstr "Це не пристрій AirPods."
 msgid "Unknown listening mode."
 msgstr "Невідомий режим прослуховування."
 
-#: src/core/src/net.cpp src/gtk/devices_view.cpp
+#: src/core/src/net.cpp src/gtk/devices_view.cpp src/tui/devices.cpp
 msgid "No AirPods are connected."
 msgstr "AirPods не під'єднано."
 
@@ -1716,6 +1719,7 @@ msgid "unknown error"
 msgstr "невідома помилка"
 
 #: src/core/src/net.cpp src/gtk/devices_view.cpp src/gtk/messages_view.cpp
+#: src/tui/devices.cpp src/tui/messages.cpp
 msgid "Could not reach the Tether daemon."
 msgstr "Не вдалося зв'язатися з демоном Tether."
 
@@ -1774,99 +1778,49 @@ msgstr "Скопіювати код"
 msgid "Open in {}"
 msgstr "Відкрити в {}"
 
-#: src/gtk/calls_view.cpp
-msgid "Incoming"
-msgstr "Вхідний"
-
-#: src/gtk/calls_view.cpp
-msgid "Call waiting"
-msgstr "Виклик очікує"
-
-#: src/gtk/calls_view.cpp
-msgid "Dialing"
-msgstr "Набір"
-
-#: src/gtk/calls_view.cpp
-msgid "Ringing"
-msgstr "Дзвінок"
-
-#: src/gtk/calls_view.cpp
-msgid "On call"
-msgstr "Розмова"
-
-#: src/gtk/calls_view.cpp
-msgid "On hold"
-msgstr "На утриманні"
-
-#: src/gtk/calls_view.cpp
-msgid "Ended"
-msgstr "Завершено"
-
-#: src/gtk/calls_view.cpp
-msgid "No service"
-msgstr "Немає мережі"
-
-#. TRANSLATORS: Cellular signal strength read aloud, {} is 0 to 5.
-#: src/gtk/calls_view.cpp
-#, c++-format
-msgid "signal {} of 5"
-msgstr "сигнал {} з 5"
-
-#. TRANSLATORS: The iPhone's battery level read aloud, {} is like "80%".
-#: src/gtk/calls_view.cpp
-#, c++-format
-msgid "battery {}"
-msgstr "батарея {}"
-
-#: src/gtk/calls_view.cpp
+#: src/gtk/calls_view.cpp src/tui/calls.cpp
 msgid "Unknown caller"
 msgstr "Невідомий абонент"
 
-#: src/gtk/calls_view.cpp
+#: src/gtk/calls_view.cpp src/tui/calls.cpp
 msgid "Answer"
 msgstr "Відповісти"
 
-#: src/gtk/calls_view.cpp
+#: src/gtk/calls_view.cpp src/tui/calls.cpp
 msgid "Audio here"
 msgstr "Перевести звук сюди"
 
-#: src/gtk/calls_view.cpp
+#: src/gtk/calls_view.cpp src/tui/calls.cpp
 msgid "Decline"
 msgstr "Відхилити"
 
-#: src/gtk/calls_view.cpp
+#: src/gtk/calls_view.cpp src/tui/calls.cpp
 msgid "Hang up"
 msgstr "Завершити"
 
-#. TRANSLATORS: strftime clock time on today's conversations, e.g. "%I:%M %p" for 12-hour.
-#: src/gtk/calls_view.cpp src/gtk/message_format.cpp src/gtk/messages_view.cpp
-#, no-c-format
-msgid "%H:%M"
-msgstr "%H:%M"
+#: src/gtk/calls_view.cpp src/tui/calls.cpp src/ui_common/ui_text.cpp
+msgid "Incoming"
+msgstr "Вхідний"
 
-#: src/gtk/calls_view.cpp
-msgid "%b %d, %H:%M"
-msgstr "%d %b, %H:%M"
-
-#: src/gtk/calls_view.cpp
+#: src/gtk/calls_view.cpp src/tui/calls.cpp
 msgid "Missed"
 msgstr "Пропущений"
 
-#: src/gtk/calls_view.cpp
+#: src/gtk/calls_view.cpp src/tui/calls.cpp
 msgid "Outgoing"
 msgstr "Вихідний"
 
 #. TRANSLATORS: Button that calls a recent caller back, {} is their name or number.
-#: src/gtk/calls_view.cpp
+#: src/gtk/calls_view.cpp src/tui/calls.cpp
 #, c++-format
 msgid "Call {}"
 msgstr "Зателефонувати {}"
 
-#: src/gtk/calls_view.cpp
+#: src/gtk/calls_view.cpp src/tui/calls.cpp
 msgid "No calls."
 msgstr "Викликів немає."
 
-#: src/gtk/calls_view.cpp
+#: src/gtk/calls_view.cpp src/tui/calls.cpp
 msgid "Call control is off. Turn it on with 'tether --bt-calls-enable on'."
 msgstr ""
 "Керування викликами вимкнено. Увімкніть його командою 'tether --bt-calls-"
@@ -1876,7 +1830,7 @@ msgstr ""
 msgid "Number to call"
 msgstr "Номер для виклику"
 
-#: src/gtk/calls_view.cpp
+#: src/gtk/calls_view.cpp src/tui/calls.cpp
 msgid "Call"
 msgstr "Подзвонити"
 
@@ -1884,7 +1838,7 @@ msgstr "Подзвонити"
 msgid "The iPhone's carrier, signal, and battery."
 msgstr "Оператор, сигнал і батарея iPhone."
 
-#: src/gtk/calls_view.cpp
+#: src/gtk/calls_view.cpp src/tui/calls.cpp
 msgid "Recent calls"
 msgstr "Недавні виклики"
 
@@ -1898,7 +1852,7 @@ msgstr "Копіювати"
 msgid "Copy {}"
 msgstr "Копіювати {}"
 
-#: src/gtk/contacts_view.cpp
+#: src/gtk/contacts_view.cpp src/tui/main.cpp
 msgid "Copied to the clipboard."
 msgstr "Скопійовано до буфера обміну."
 
@@ -1913,11 +1867,11 @@ msgstr "Написати повідомлення"
 msgid "Message {}"
 msgstr "Написати {}"
 
-#: src/gtk/contacts_view.cpp
+#: src/gtk/contacts_view.cpp src/tui/contacts.cpp
 msgid "Favorite"
 msgstr "Обране"
 
-#: src/gtk/contacts_view.cpp
+#: src/gtk/contacts_view.cpp src/tui/contacts.cpp
 msgid "No contacts yet. Check the Bluetooth link on the Devices page."
 msgstr ""
 "Контактів поки немає. Перевірте зʼєднання Bluetooth на сторінці «Пристрої»."
@@ -1926,107 +1880,88 @@ msgstr ""
 msgid "Search contacts"
 msgstr "Пошук контактів"
 
-#: src/gtk/daemon_client.cpp
+#: src/gtk/daemon_client.cpp src/tui/main.cpp
 msgid "Daemon Offline"
 msgstr "Демон не в мережі"
 
-#: src/gtk/daemon_client.cpp src/gtk/messages_view.cpp
+#: src/gtk/daemon_client.cpp src/gtk/messages_view.cpp src/tui/main.cpp
+#: src/tui/messages.cpp
 msgid "The Tether daemon is not running."
 msgstr "Демон Tether не запущено."
 
-#: src/gtk/daemon_client.cpp
+#: src/gtk/daemon_client.cpp src/tui/main.cpp
 msgid "Daemon Online"
 msgstr "Демон у мережі"
 
-#. TRANSLATORS: Left earbud, read aloud by screen readers before its battery level.
-#: src/gtk/devices_view.cpp
-msgid "Left earbud"
-msgstr "Лівий навушник"
-
-#. TRANSLATORS: Left earbud, abbreviated to fit the device row. One or two letters.
-#: src/gtk/devices_view.cpp
-msgid "L"
-msgstr "Л"
-
-#. TRANSLATORS: Right earbud, read aloud by screen readers before its battery level.
-#: src/gtk/devices_view.cpp
-msgid "Right earbud"
-msgstr "Правий навушник"
-
-#. TRANSLATORS: Right earbud, abbreviated to fit the device row. One or two letters.
-#: src/gtk/devices_view.cpp
-msgid "R"
-msgstr "П"
-
-#: src/gtk/devices_view.cpp
+#: src/gtk/devices_view.cpp src/tui/devices.cpp
 msgid "Reading battery…"
 msgstr "Читання заряду…"
 
-#: src/gtk/devices_view.cpp
+#: src/gtk/devices_view.cpp src/tui/devices.cpp
 msgid "Not connected yet."
 msgstr "Ще не під'єднано."
 
-#: src/gtk/devices_view.cpp
+#: src/gtk/devices_view.cpp src/tui/devices.cpp
 msgid "Connected."
 msgstr "Під'єднано."
 
-#: src/gtk/devices_view.cpp
+#: src/gtk/devices_view.cpp src/tui/devices.cpp
 msgid "Scanning for nearby devices..."
 msgstr "Пошук пристроїв поблизу..."
 
-#: src/gtk/devices_view.cpp
+#: src/gtk/devices_view.cpp src/tui/devices.cpp
 msgid "Off"
 msgstr "Вимкнено"
 
-#: src/gtk/devices_view.cpp
+#: src/gtk/devices_view.cpp src/tui/devices.cpp
 msgid "Transparency"
 msgstr "Прозорість"
 
-#: src/gtk/devices_view.cpp
+#: src/gtk/devices_view.cpp src/tui/devices.cpp
 msgid "Adaptive"
 msgstr "Адаптивний"
 
-#: src/gtk/devices_view.cpp
+#: src/gtk/devices_view.cpp src/tui/devices.cpp
 msgid "Noise Cancellation"
 msgstr "Шумозаглушення"
 
-#: src/gtk/devices_view.cpp
+#: src/gtk/devices_view.cpp src/tui/devices.cpp
 msgid "Disconnect"
 msgstr "Від'єднати"
 
-#: src/gtk/devices_view.cpp
+#: src/gtk/devices_view.cpp src/tui/devices.cpp
 msgid "Connect"
 msgstr "Під'єднати"
 
-#: src/gtk/devices_view.cpp
+#: src/gtk/devices_view.cpp src/tui/devices.cpp
 msgid "Tether is not managing the AirPods, so another program can use them."
 msgstr "Tether не керує AirPods, їх може використовувати інша програма."
 
-#: src/gtk/devices_view.cpp
+#: src/gtk/devices_view.cpp src/tui/devices.cpp
 msgid "These AirPods do not report a listening mode."
 msgstr "Ці AirPods не повідомляють режим прослуховування."
 
-#: src/gtk/devices_view.cpp
+#: src/gtk/devices_view.cpp src/tui/devices.cpp
 msgid "These AirPods do not report whether they are being worn."
 msgstr "Ці AirPods не повідомляють, чи їх надіто."
 
-#: src/gtk/devices_view.cpp
+#: src/gtk/devices_view.cpp src/tui/devices.cpp
 msgid "Both buds are in."
 msgstr "Обидва навушники у вухах."
 
-#: src/gtk/devices_view.cpp
+#: src/gtk/devices_view.cpp src/tui/devices.cpp
 msgid "One bud is in."
 msgstr "Один навушник у вусі."
 
-#: src/gtk/devices_view.cpp
+#: src/gtk/devices_view.cpp src/tui/devices.cpp
 msgid "Neither bud is in."
 msgstr "Жоден навушник не у вусі."
 
-#: src/gtk/devices_view.cpp
+#: src/gtk/devices_view.cpp src/tui/devices.cpp
 msgid "The buds are handed over with Apple's own handoff."
 msgstr "AirPods передаються власним механізмом Apple."
 
-#: src/gtk/devices_view.cpp
+#: src/gtk/devices_view.cpp src/tui/devices.cpp
 msgid ""
 "The buds are handed over by disconnecting them. For Apple's own handoff, put "
 "DeviceID = bluetooth:004C:0000:0000 under [General] in /etc/bluetooth/"
@@ -2036,68 +1971,68 @@ msgstr ""
 "DeviceID = bluetooth:004C:0000:0000 у розділ [General] у /etc/bluetooth/"
 "main.conf і перезапустіть bluetooth."
 
-#: src/gtk/devices_view.cpp
+#: src/gtk/devices_view.cpp src/tui/devices.cpp
 msgid "Full mode — messages, contacts, and notifications."
 msgstr "Повний режим — повідомлення, контакти та сповіщення."
 
-#: src/gtk/devices_view.cpp
+#: src/gtk/devices_view.cpp src/tui/devices.cpp
 msgid "Compatibility mode — messages and contacts, no notification mirroring."
 msgstr "Режим сумісності — повідомлення та контакти, без дублювання сповіщень."
 
-#: src/gtk/devices_view.cpp
+#: src/gtk/devices_view.cpp src/tui/devices.cpp
 msgid "This machine cannot carry the Bluetooth features."
 msgstr "Ця машина не потягне функції Bluetooth."
 
-#: src/gtk/devices_view.cpp
+#: src/gtk/devices_view.cpp src/tui/devices.cpp
 msgid "Link"
 msgstr "З'єднання"
 
-#: src/gtk/devices_view.cpp
+#: src/gtk/devices_view.cpp src/tui/devices.cpp
 msgid "Not paired over Bluetooth yet."
 msgstr "Пару через Bluetooth ще не створено."
 
-#: src/gtk/devices_view.cpp
+#: src/gtk/devices_view.cpp src/tui/devices.cpp
 msgid "Tether is not using this device. Pair it to select it."
 msgstr ""
 "Tether не використовує цей пристрій. Створіть із ним пару, щоб вибрати його."
 
-#: src/gtk/devices_view.cpp
+#: src/gtk/devices_view.cpp src/tui/devices.cpp
 msgid "Bluetooth is switched off for this iPhone."
 msgstr "Bluetooth вимкнено для цього iPhone."
 
-#: src/gtk/devices_view.cpp
+#: src/gtk/devices_view.cpp src/tui/devices.cpp
 msgid "Connected and ready."
 msgstr "Під'єднано і готово."
 
-#: src/gtk/devices_view.cpp
+#: src/gtk/devices_view.cpp src/tui/devices.cpp
 msgid "Device is offline. Make sure it is switched on and on the same network."
 msgstr ""
 "Пристрій не в мережі. Переконайтеся, що він увімкнений і в тій самій мережі."
 
-#: src/gtk/devices_view.cpp
+#: src/gtk/devices_view.cpp src/tui/devices.cpp
 #, c++-format
 msgid "Found at {0}:{1}"
 msgstr "Знайдено за адресою {0}:{1}"
 
-#: src/gtk/devices_view.cpp
+#: src/gtk/devices_view.cpp src/tui/devices.cpp
 msgid "Sending pair request..."
 msgstr "Надсилання запиту на створення пари..."
 
-#: src/gtk/devices_view.cpp
+#: src/gtk/devices_view.cpp src/tui/devices.cpp
 msgid "Pair request sent. Approve on remote device!"
 msgstr ""
 "Запит на створення пари надіслано. Підтвердьте його на віддаленому пристрої!"
 
-#: src/gtk/devices_view.cpp
+#: src/gtk/devices_view.cpp src/tui/devices.cpp
 msgid "Pairing… confirm the prompt on the iPhone."
 msgstr "Створення пари… підтвердьте запит на iPhone."
 
-#: src/gtk/devices_view.cpp
+#: src/gtk/devices_view.cpp src/tui/devices.cpp
 #, c-format
 msgid "Remove the Bluetooth pairing with %s?"
 msgstr "Вилучити пару Bluetooth із %s?"
 
-#: src/gtk/devices_view.cpp
+#: src/gtk/devices_view.cpp src/tui/devices.cpp
 msgid ""
 "Also delete this computer from the iPhone's Bluetooth settings before "
 "pairing again, or the phone will keep the stale bond."
@@ -2105,16 +2040,16 @@ msgstr ""
 "Перед повторним створенням пари вилучіть цей комп'ютер також у параметрах "
 "Bluetooth на iPhone, інакше телефон збереже застарілий зв'язок."
 
-#: src/gtk/devices_view.cpp
+#: src/gtk/devices_view.cpp src/tui/devices.cpp
 msgid "Removing the pairing…"
 msgstr "Вилучення пари…"
 
-#: src/gtk/devices_view.cpp
+#: src/gtk/devices_view.cpp src/tui/devices.cpp
 #, c-format
 msgid "Forget %s?"
 msgstr "Забути %s?"
 
-#: src/gtk/devices_view.cpp
+#: src/gtk/devices_view.cpp src/tui/devices.cpp
 msgid ""
 "Tether will stop connecting to it. Forget this computer on the other device "
 "too, then pair again to reconnect."
@@ -2126,27 +2061,28 @@ msgstr ""
 msgid "Setup commands copied to the clipboard."
 msgstr "Команди налаштування скопійовано до буфера обміну."
 
-#: src/gtk/devices_view.cpp src/gtk/messages_view.cpp
+#: src/gtk/devices_view.cpp src/gtk/messages_view.cpp src/tui/devices.cpp
+#: src/tui/messages.cpp
 msgid "Asking the iPhone to show its Bluetooth permissions…"
 msgstr "Запит до iPhone показати свої дозволи Bluetooth…"
 
 #. TRANSLATORS: {} is a file name.
-#: src/gtk/devices_view.cpp
+#: src/gtk/devices_view.cpp src/tui/devices.cpp
 #, c++-format
 msgid "Sending {}…"
 msgstr "Надсилання {}…"
 
 #. TRANSLATORS: {0} is the current file's position, {1} the batch size.
-#: src/gtk/devices_view.cpp
+#: src/gtk/devices_view.cpp src/tui/devices.cpp
 #, c++-format
 msgid "({0} of {1})"
 msgstr "({0} з {1})"
 
-#: src/gtk/devices_view.cpp
+#: src/gtk/devices_view.cpp src/tui/devices.cpp
 msgid "Daemon unavailable."
 msgstr "Демон недоступний."
 
-#: src/gtk/devices_view.cpp
+#: src/gtk/devices_view.cpp src/tui/devices.cpp
 msgid "Send File"
 msgstr "Надіслати файл"
 
@@ -2158,15 +2094,15 @@ msgstr "_Скасувати"
 msgid "_Send"
 msgstr "_Надіслати"
 
-#: src/gtk/devices_view.cpp
+#: src/gtk/devices_view.cpp src/tui/devices.cpp
 msgid "Folders can't be sent — drop files instead."
 msgstr "Теки надіслати не можна — перетягніть замість них файли."
 
-#: src/gtk/devices_view.cpp
+#: src/gtk/devices_view.cpp src/tui/devices.cpp
 msgid "Clipboard, files, and OTP are connected."
 msgstr "Буфер обміну, файли та OTP під'єднано."
 
-#: src/gtk/devices_view.cpp
+#: src/gtk/devices_view.cpp src/tui/devices.cpp
 msgid ""
 "Files and OTP are connected. This compositor does not give Tether clipboard "
 "access, so clipboard sync is off."
@@ -2174,7 +2110,7 @@ msgstr ""
 "Файли та OTP підключені. Цей композитор не надає Tether доступу до буфера "
 "обміну, тож синхронізація буфера обміну вимкнена."
 
-#: src/gtk/devices_view.cpp
+#: src/gtk/devices_view.cpp src/tui/devices.cpp
 msgid ""
 "avahi-daemon isn't running, so other devices can't find this PC. Start it "
 "with: sudo systemctl enable --now avahi-daemon"
@@ -2182,7 +2118,7 @@ msgstr ""
 "avahi-daemon не запущено, тому інші пристрої не можуть знайти цей комп'ютер. "
 "Запустіть його командою: sudo systemctl enable --now avahi-daemon"
 
-#: src/gtk/devices_view.cpp
+#: src/gtk/devices_view.cpp src/tui/devices.cpp
 msgid ""
 "A device is on the network but cannot reach this PC. A firewall is running; "
 "Tether needs inbound TCP 5134. Allow it with: sudo ufw allow 5134/tcp"
@@ -2191,42 +2127,43 @@ msgstr ""
 "брандмауер; Tether потребує вхідного TCP 5134. Дозвольте його командою: sudo "
 "ufw allow 5134/tcp"
 
-#: src/gtk/devices_view.cpp
+#: src/gtk/devices_view.cpp src/tui/devices.cpp
 msgid "No paired device is connected. Switch it on and join the same network."
 msgstr ""
 "Жодного спареного пристрою не під'єднано. Увімкніть його та під'єднайте до "
 "тієї самої мережі."
 
-#: src/gtk/devices_view.cpp
+#: src/gtk/devices_view.cpp src/tui/devices.cpp
 msgid "Unknown Device"
 msgstr "Невідомий пристрій"
 
-#: src/gtk/devices_view.cpp
+#: src/gtk/devices_view.cpp src/tui/devices.cpp
 msgid "Connected"
 msgstr "Під'єднано"
 
-#: src/gtk/devices_view.cpp
+#: src/gtk/devices_view.cpp src/tui/devices.cpp
 msgid "Offline"
 msgstr "Не в мережі"
 
-#: src/gtk/devices_view.cpp
+#: src/gtk/devices_view.cpp src/tui/devices.cpp
 msgid "Nearby (Tap to Pair)"
 msgstr "Поблизу (торкніться, щоб створити пару)"
 
-#: src/gtk/devices_view.cpp
+#: src/gtk/devices_view.cpp src/tui/devices.cpp
 msgid "Partially connected"
 msgstr "Під'єднано частково"
 
-#: src/gtk/devices_view.cpp
+#: src/gtk/devices_view.cpp src/tui/devices.cpp
 msgid "Paired"
 msgstr "Спарено"
 
-#: src/gtk/devices_view.cpp
+#. TRANSLATORS: {0} is the name of the device being paired with.
+#: src/gtk/devices_view.cpp src/tui/devices.cpp
 #, c++-format
 msgid "Waiting for approval on {0}..."
 msgstr "Очікування підтвердження на {0}…"
 
-#: src/gtk/devices_view.cpp
+#: src/gtk/devices_view.cpp src/tui/devices.cpp
 msgid ""
 "Could not reach that device. If a firewall is running, Tether needs inbound "
 "TCP 5134 on the other machine."
@@ -2234,27 +2171,28 @@ msgstr ""
 "Не вдалося зв'язатися з цим пристроєм. Якщо працює брандмауер, Tether "
 "потребує вхідного TCP 5134 на іншій машині."
 
-#: src/gtk/devices_view.cpp
+#: src/gtk/devices_view.cpp src/tui/devices.cpp
 msgid "That device refused the connection. Is Tether running on it?"
 msgstr "Цей пристрій відхилив з'єднання. Чи запущено на ньому Tether?"
 
-#: src/gtk/devices_view.cpp
+#: src/gtk/devices_view.cpp src/tui/devices.cpp
 msgid "That address could not be resolved."
 msgstr "Не вдалося розпізнати цю адресу."
 
-#: src/gtk/devices_view.cpp
+#: src/gtk/devices_view.cpp src/tui/devices.cpp
 msgid "Could not connect to that device."
 msgstr "Не вдалося під'єднатися до цього пристрою."
 
-#: src/gtk/devices_view.cpp
+#: src/gtk/devices_view.cpp src/tui/devices.cpp
 msgid "Pair request was rejected."
 msgstr "Запит на створення пари відхилено."
 
-#: src/gtk/devices_view.cpp
+#: src/gtk/devices_view.cpp src/tui/devices.cpp
 msgid "Ready"
 msgstr "Готово"
 
-#: src/gtk/devices_view.cpp
+#. TRANSLATORS: {0} is how many were sent, {1} the batch size.
+#: src/gtk/devices_view.cpp src/tui/devices.cpp
 #, c++-format
 msgid "Sent {0} of {1} file."
 msgid_plural "Sent {0} of {1} files."
@@ -2262,7 +2200,7 @@ msgstr[0] "Надіслано {0} з {1} файлу."
 msgstr[1] "Надіслано {0} з {1} файлів."
 msgstr[2] "Надіслано {0} з {1} файлів."
 
-#: src/gtk/devices_view.cpp
+#: src/gtk/devices_view.cpp src/tui/devices.cpp
 #, c++-format
 msgid "Skipped {} non-file item."
 msgid_plural "Skipped {} non-file items."
@@ -2270,19 +2208,19 @@ msgstr[0] "Пропущено {} об'єкт, що не є файлом."
 msgstr[1] "Пропущено {} об'єкти, що не є файлами."
 msgstr[2] "Пропущено {} об'єктів, що не є файлами."
 
-#: src/gtk/devices_view.cpp
+#: src/gtk/devices_view.cpp src/tui/devices.cpp
 msgid "Clipboard is empty."
 msgstr "Буфер обміну порожній."
 
-#: src/gtk/devices_view.cpp
+#: src/gtk/devices_view.cpp src/tui/devices.cpp
 msgid "Desktop Clipboard Sync triggered."
 msgstr "Синхронізацію буфера обміну стільниці запущено."
 
-#: src/gtk/devices_view.cpp
+#: src/gtk/devices_view.cpp src/tui/devices.cpp
 msgid "Messages and notifications are connected."
 msgstr "Повідомлення та сповіщення під'єднано."
 
-#: src/gtk/devices_view.cpp
+#: src/gtk/devices_view.cpp src/tui/devices.cpp
 msgid ""
 "No iPhone found. Unlock the phone and open Settings > Bluetooth so it "
 "advertises, then scan again."
@@ -2290,7 +2228,7 @@ msgstr ""
 "iPhone не знайдено. Розблокуйте телефон і відкрийте Параметри > Bluetooth, "
 "щоб він оголошував про себе, потім повторіть пошук."
 
-#: src/gtk/devices_view.cpp
+#: src/gtk/devices_view.cpp src/tui/devices.cpp
 #, c-format
 msgid ""
 "Does the iPhone show this code?\n"
@@ -2333,11 +2271,11 @@ msgstr ""
 "2.  Натисніть «Створити пару через Bluetooth»\n"
 "3.  Надайте обидва дозволи на телефоні"
 
-#: src/gtk/devices_view.cpp
+#: src/gtk/devices_view.cpp src/tui/devices.cpp
 msgid "Scan for devices"
 msgstr "Шукати пристрої"
 
-#: src/gtk/devices_view.cpp
+#: src/gtk/devices_view.cpp src/tui/devices.cpp
 msgid "Manage AirPods from Tether"
 msgstr "Керувати AirPods із Tether"
 
@@ -2349,7 +2287,7 @@ msgstr ""
 "Канал AirPods приймає одну програму на комп'ютер. Вимкнення звільняє його "
 "для іншої програми для AirPods."
 
-#: src/gtk/devices_view.cpp
+#: src/gtk/devices_view.cpp src/tui/devices.cpp
 msgid "Listening mode"
 msgstr "Режим прослуховування"
 
@@ -2357,19 +2295,19 @@ msgstr "Режим прослуховування"
 msgid "In-ear detection"
 msgstr "Виявлення у вусі"
 
-#: src/gtk/devices_view.cpp
+#: src/gtk/devices_view.cpp src/tui/devices.cpp
 msgid "Pause playback when:"
 msgstr "Ставити на паузу, коли:"
 
-#: src/gtk/devices_view.cpp
+#: src/gtk/devices_view.cpp src/tui/devices.cpp
 msgid "Never"
 msgstr "Ніколи"
 
-#: src/gtk/devices_view.cpp
+#: src/gtk/devices_view.cpp src/tui/devices.cpp
 msgid "One bud is removed"
 msgstr "Вийнято один навушник"
 
-#: src/gtk/devices_view.cpp
+#: src/gtk/devices_view.cpp src/tui/devices.cpp
 msgid "Both buds are removed"
 msgstr "Вийнято обидва навушники"
 
@@ -2382,11 +2320,11 @@ msgstr ""
 "коли навушники повертаються у вуха. Відновлюється лише відтворення, "
 "поставлене на паузу Tether."
 
-#: src/gtk/devices_view.cpp src/gtk/main.cpp
+#: src/gtk/devices_view.cpp src/gtk/main.cpp src/tui/calls.cpp
 msgid "Calls"
 msgstr "Виклики"
 
-#: src/gtk/devices_view.cpp
+#: src/gtk/devices_view.cpp src/tui/devices.cpp
 msgid "Hand the AirPods to the iPhone during a call"
 msgstr "Передавати AirPods на iPhone під час дзвінка"
 
@@ -2416,7 +2354,7 @@ msgstr ""
 "Виконайте їх у терміналі. Tether сам по собі не змінює ваш адаптер Bluetooth "
 "чи bluetoothd."
 
-#: src/gtk/devices_view.cpp
+#: src/gtk/devices_view.cpp src/tui/devices.cpp
 msgid "Connect to this iPhone over Bluetooth"
 msgstr "Під'єднатися до цього iPhone через Bluetooth"
 
@@ -2430,11 +2368,12 @@ msgstr ""
 "воно обривається. Якщо вимкнути, Tether припинить під'єднуватися знову; уже "
 "встановлене з'єднання лишиться, доки ви його не розірвете."
 
-#: src/gtk/devices_view.cpp
+#: src/gtk/devices_view.cpp src/tui/devices.cpp
 msgid "Pair over Bluetooth"
 msgstr "Створити пару через Bluetooth"
 
-#: src/gtk/devices_view.cpp src/gtk/messages_view.cpp
+#: src/gtk/devices_view.cpp src/gtk/messages_view.cpp src/tui/devices.cpp
+#: src/tui/messages.cpp
 msgid "Show iPhone Permissions"
 msgstr "Показати дозволи iPhone"
 
@@ -2446,15 +2385,15 @@ msgstr ""
 "Знову оголошує про себе, щоб iPhone показав параметри «Показ сповіщень про "
 "повідомлення» та «Синхронізація контактів» у Параметри > Bluetooth > (i)."
 
-#: src/gtk/devices_view.cpp
+#: src/gtk/devices_view.cpp src/tui/devices.cpp
 msgid "Unpair"
 msgstr "Розірвати пару"
 
-#: src/gtk/devices_view.cpp
+#: src/gtk/devices_view.cpp src/tui/devices.cpp
 msgid "Pair Device"
 msgstr "Створити пару з пристроєм"
 
-#: src/gtk/devices_view.cpp
+#: src/gtk/devices_view.cpp src/tui/devices.cpp
 msgid "Force Trust (Accept Pending)"
 msgstr "Примусово довіряти (прийняти ті, що очікують)"
 
@@ -2462,15 +2401,15 @@ msgstr "Примусово довіряти (прийняти ті, що очі�
 msgid "Drop files here to send"
 msgstr "Перетягніть файли сюди, щоб надіслати"
 
-#: src/gtk/devices_view.cpp
+#: src/gtk/devices_view.cpp src/tui/devices.cpp
 msgid "Send Clipboard"
 msgstr "Надіслати буфер обміну"
 
-#: src/gtk/devices_view.cpp
+#: src/gtk/devices_view.cpp src/tui/devices.cpp
 msgid "Clipboard sync requested..."
 msgstr "Запитано синхронізацію буфера обміну..."
 
-#: src/gtk/devices_view.cpp
+#: src/gtk/devices_view.cpp src/tui/devices.cpp
 msgid "Forget"
 msgstr "Забути"
 
@@ -2482,11 +2421,11 @@ msgstr "Розгорнути бічну панель"
 msgid "Collapse sidebar"
 msgstr "Згорнути бічну панель"
 
-#: src/gtk/main.cpp src/gtk/settings_view.cpp
+#: src/gtk/main.cpp src/gtk/settings_view.cpp src/tui/settings.cpp
 msgid "Settings"
 msgstr "Налаштування"
 
-#: src/gtk/main.cpp
+#: src/gtk/main.cpp src/tui/main.cpp
 msgid "Quit"
 msgstr "Вийти"
 
@@ -2498,7 +2437,7 @@ msgstr "Головне меню"
 msgid "Look for devices"
 msgstr "Шукати пристрої"
 
-#: src/gtk/main.cpp
+#: src/gtk/main.cpp src/tui/devices.cpp
 msgid "Devices"
 msgstr "Пристрої"
 
@@ -2518,28 +2457,7 @@ msgstr "Відкрити на цій вкладці"
 msgid "Open the messages tab on this conversation"
 msgstr "Відкрити вкладку повідомлень на цій розмові"
 
-#: src/gtk/message_format.cpp
-msgid "Yesterday"
-msgstr "Учора"
-
-#. TRANSLATORS: strftime short date for older conversations; reorder to the local
-#. convention, e.g. "%-d %b".
-#: src/gtk/message_format.cpp
-#, no-c-format
-msgid "%b %-d"
-msgstr "%-d %b"
-
-#: src/gtk/message_format.cpp
-msgid "Today"
-msgstr "Сьогодні"
-
-#. TRANSLATORS: strftime date heading above older messages, e.g. "%A %-d %B".
-#: src/gtk/message_format.cpp
-#, no-c-format
-msgid "%A, %b %-d"
-msgstr "%A, %-d %b"
-
-#: src/gtk/messages_view.cpp src/gtk/tray.cpp
+#: src/gtk/messages_view.cpp src/gtk/tray.cpp src/tui/main.cpp
 #, c++-format
 msgid "{} unread message"
 msgid_plural "{} unread messages"
@@ -2559,44 +2477,44 @@ msgstr "Надіслано: {}"
 msgid "Received: {}"
 msgstr "Отримано: {}"
 
-#: src/gtk/messages_view.cpp
+#: src/gtk/messages_view.cpp src/tui/messages.cpp
 msgid "Bluetooth connection needed to sync messages."
 msgstr "Для синхронізації повідомлень потрібне з’єднання Bluetooth."
 
-#: src/gtk/messages_view.cpp
+#: src/gtk/messages_view.cpp src/tui/messages.cpp
 msgid "Select a conversation"
 msgstr "Виберіть розмову"
 
-#: src/gtk/messages_view.cpp
+#: src/gtk/messages_view.cpp src/tui/messages.cpp
 msgid "Sending…"
 msgstr "Надсилання…"
 
-#: src/gtk/messages_view.cpp
+#: src/gtk/messages_view.cpp src/tui/messages.cpp
 msgid "Enter a recipient."
 msgstr "Вкажіть отримувача."
 
-#: src/gtk/messages_view.cpp
+#: src/gtk/messages_view.cpp src/tui/messages.cpp
 msgid "Select a conversation first."
 msgstr "Спочатку виберіть розмову."
 
-#: src/gtk/messages_view.cpp
+#: src/gtk/messages_view.cpp src/tui/messages.cpp
 msgid "Replying to this conversation is not available."
 msgstr "Відповідь у цій розмові недоступна."
 
-#: src/gtk/messages_view.cpp
+#: src/gtk/messages_view.cpp src/tui/messages.cpp
 msgid "No answer about that message; it may still have been sent."
 msgstr ""
 "Немає відповіді щодо цього повідомлення; можливо, його все ж надіслано."
 
-#: src/gtk/messages_view.cpp
+#: src/gtk/messages_view.cpp src/tui/messages.cpp
 msgid "Could not reach the Tether daemon; the message was not sent."
 msgstr "Не вдалося зв'язатися з демоном Tether; повідомлення не надіслано."
 
-#: src/gtk/messages_view.cpp
+#: src/gtk/messages_view.cpp src/tui/messages.cpp
 msgid "Sent"
 msgstr "Надіслано"
 
-#: src/gtk/messages_view.cpp
+#: src/gtk/messages_view.cpp src/tui/messages.cpp
 msgid "New Message"
 msgstr "Нове повідомлення"
 
@@ -2604,7 +2522,7 @@ msgstr "Нове повідомлення"
 msgid "Search conversations"
 msgstr "Пошук розмов"
 
-#: src/gtk/messages_view.cpp
+#: src/gtk/messages_view.cpp src/tui/messages.cpp
 msgid "To:"
 msgstr "Кому:"
 
@@ -2620,7 +2538,7 @@ msgstr "Надіслати"
 msgid "Retry"
 msgstr "Повторити"
 
-#: src/gtk/notifications_view.cpp
+#: src/gtk/notifications_view.cpp src/tui/notifications.cpp
 msgid "Dismiss on the iPhone"
 msgstr "Прибрати на iPhone"
 
@@ -2630,23 +2548,23 @@ msgstr "Прибрати на iPhone"
 msgid "Dismiss {} notification"
 msgstr "Закрити сповіщення програми {}"
 
-#: src/gtk/notifications_view.cpp
+#: src/gtk/notifications_view.cpp src/tui/notifications.cpp
 msgid "New notification"
 msgstr "Нове сповіщення"
 
-#: src/gtk/notifications_view.cpp
+#: src/gtk/notifications_view.cpp src/tui/notifications.cpp
 msgid "The iPhone would not take the dismissal."
 msgstr "iPhone не прийняв прибирання сповіщення."
 
-#: src/gtk/notifications_view.cpp
+#: src/gtk/notifications_view.cpp src/tui/notifications.cpp
 msgid "No notifications yet."
 msgstr "Сповіщень поки немає."
 
-#: src/gtk/notifications_view.cpp
+#: src/gtk/notifications_view.cpp src/tui/notifications.cpp
 msgid "Notification mirroring is unavailable."
 msgstr "Дублювання сповіщень недоступне."
 
-#: src/gtk/settings_view.cpp
+#: src/gtk/settings_view.cpp src/tui/settings.cpp
 msgid ""
 "No iPhone is paired over Bluetooth, so the Bluetooth settings below cannot "
 "be changed yet."
@@ -2685,7 +2603,7 @@ msgstr ""
 "Символьна переймає колір панелі. Набуде чинності під час наступного запуску "
 "Tether."
 
-#: src/gtk/settings_view.cpp
+#: src/gtk/settings_view.cpp src/tui/settings.cpp
 msgid "iPhone notifications"
 msgstr "Сповіщення з iPhone"
 
@@ -2693,23 +2611,23 @@ msgstr "Сповіщення з iPhone"
 msgid "Alerts your iPhone forwards to this computer over Bluetooth."
 msgstr "Сповіщення, які iPhone передає на цей комп'ютер через Bluetooth."
 
-#: src/gtk/settings_view.cpp
+#: src/gtk/settings_view.cpp src/tui/settings.cpp
 msgid "Mirror iPhone notifications"
 msgstr "Дублювати сповіщення з iPhone"
 
-#: src/gtk/settings_view.cpp
+#: src/gtk/settings_view.cpp src/tui/settings.cpp
 msgid "Disabled when pairing cannot support LE."
 msgstr "Вимкнено, коли спарювання не підтримує LE."
 
-#: src/gtk/settings_view.cpp
+#: src/gtk/settings_view.cpp src/tui/settings.cpp
 msgid "Include the notification text"
 msgstr "Долучати текст сповіщення"
 
-#: src/gtk/settings_view.cpp
+#: src/gtk/settings_view.cpp src/tui/settings.cpp
 msgid "Title and message content are shown, not just which app sent it."
 msgstr "Показуються заголовок і текст, а не лише програма-відправник."
 
-#: src/gtk/settings_view.cpp
+#: src/gtk/settings_view.cpp src/tui/settings.cpp
 msgid "Desktop popups"
 msgstr "Спливні сповіщення"
 
@@ -2717,25 +2635,25 @@ msgstr "Спливні сповіщення"
 msgid "What Tether shows in your notification area."
 msgstr "Що Tether показує в області сповіщень."
 
-#: src/gtk/settings_view.cpp
+#: src/gtk/settings_view.cpp src/tui/settings.cpp
 msgid "Show desktop popups"
 msgstr "Показувати спливні сповіщення"
 
-#: src/gtk/settings_view.cpp
+#: src/gtk/settings_view.cpp src/tui/settings.cpp
 msgid "Off silences iPhone alerts, new messages and arriving files."
 msgstr ""
 "Вимкнено — не показуються сповіщення з iPhone, нові повідомлення та отримані "
 "файли."
 
-#: src/gtk/settings_view.cpp
+#: src/gtk/settings_view.cpp src/tui/settings.cpp
 msgid "Show message previews"
 msgstr "Показувати текст повідомлень"
 
-#: src/gtk/settings_view.cpp
+#: src/gtk/settings_view.cpp src/tui/settings.cpp
 msgid "Off shows only the sender."
 msgstr "Якщо вимкнено, показується лише відправник."
 
-#: src/gtk/settings_view.cpp
+#: src/gtk/settings_view.cpp src/tui/settings.cpp
 msgid "Security"
 msgstr "Безпека"
 
@@ -2743,11 +2661,11 @@ msgstr "Безпека"
 msgid "What Tether does when the iPhone leaves."
 msgstr "Що Tether робить, коли iPhone іде."
 
-#: src/gtk/settings_view.cpp
+#: src/gtk/settings_view.cpp src/tui/settings.cpp
 msgid "Lock the session when the iPhone goes out of range"
 msgstr "Блокувати сеанс, коли iPhone виходить із зони дії"
 
-#: src/gtk/settings_view.cpp
+#: src/gtk/settings_view.cpp src/tui/settings.cpp
 msgid ""
 "Locks about half a minute after the link times out. Switching Bluetooth off "
 "on the iPhone does not lock, and neither does suspending this machine."
@@ -2759,23 +2677,23 @@ msgstr ""
 msgid "SMS and iMessage conversations synced over Bluetooth."
 msgstr "Розмови SMS та iMessage, синхронізовані через Bluetooth."
 
-#: src/gtk/settings_view.cpp
+#: src/gtk/settings_view.cpp src/tui/settings.cpp
 msgid "Encrypted"
 msgstr "Зашифровано"
 
-#: src/gtk/settings_view.cpp
+#: src/gtk/settings_view.cpp src/tui/settings.cpp
 msgid "Unencrypted"
 msgstr "Незашифровано"
 
-#: src/gtk/settings_view.cpp
+#: src/gtk/settings_view.cpp src/tui/settings.cpp
 msgid "Do not keep"
 msgstr "Не зберігати"
 
-#: src/gtk/settings_view.cpp
+#: src/gtk/settings_view.cpp src/tui/settings.cpp
 msgid "Keep message history"
 msgstr "Зберігати історію повідомлень"
 
-#: src/gtk/settings_view.cpp
+#: src/gtk/settings_view.cpp src/tui/settings.cpp
 msgid ""
 "Encrypted uses a key from your desktop keyring. Do not keep deletes what is "
 "stored."
@@ -2783,14 +2701,14 @@ msgstr ""
 "«Зашифровано» використовує ключ зі сховища ключів. «Не зберігати» вилучає "
 "збережене."
 
-#: src/gtk/settings_view.cpp
+#: src/gtk/settings_view.cpp src/tui/settings.cpp
 msgid ""
 "Paused: no key from the desktop keyring. Unlock it, or choose Unencrypted."
 msgstr ""
 "Призупинено: немає ключа зі сховища ключів. Розблокуйте його або виберіть "
 "«Незашифровано»."
 
-#: src/gtk/settings_view.cpp
+#: src/gtk/settings_view.cpp src/tui/settings.cpp
 msgid "Experimental"
 msgstr "Експериментальні"
 
@@ -2798,36 +2716,266 @@ msgstr "Експериментальні"
 msgid "Unfinished features. These can stop working at any time."
 msgstr "Незавершені можливості. Вони можуть перестати працювати будь-коли."
 
-#: src/gtk/settings_view.cpp
+#: src/gtk/settings_view.cpp src/tui/settings.cpp
 msgid "Call control over Bluetooth"
 msgstr "Керування викликами через Bluetooth"
 
-#: src/gtk/settings_view.cpp
+#: src/gtk/settings_view.cpp src/tui/settings.cpp
 msgid "Answer and place calls from the Calls tab."
 msgstr "Відповідайте на виклики та телефонуйте з вкладки «Виклики»."
 
-#: src/gtk/tray.cpp src/gtk/ui_util.cpp
+#: src/gtk/tray.cpp src/gtk/ui_util.cpp src/tui/main.cpp
 msgid "connected"
 msgstr "під'єднано"
 
-#: src/gtk/tray.cpp src/gtk/ui_util.cpp
+#: src/gtk/tray.cpp src/gtk/ui_util.cpp src/tui/main.cpp
 msgid "not connected"
 msgstr "не під'єднано"
 
 #. TRANSLATORS: {} is a transport name, "Wi-Fi" or "Bluetooth", or a device name.
 #. TRANSLATORS: {} is a transport name, "Wi-Fi" or "Bluetooth".
-#: src/gtk/tray.cpp src/gtk/ui_util.cpp
+#: src/gtk/tray.cpp src/gtk/ui_util.cpp src/tui/main.cpp
 #, c++-format
 msgid "{}: {}"
 msgstr "{}: {}"
 
-#: src/gtk/tray.cpp
+#: src/gtk/tray.cpp src/tui/main.cpp
 msgid "Daemon: not running"
 msgstr "Демон: не запущено"
 
-#: src/gtk/ui_util.cpp
+#: src/gtk/ui_util.cpp src/tui/main.cpp
 msgid "Waiting for the Tether daemon."
 msgstr "Очікування демона Tether."
+
+#: src/tui/devices.cpp
+msgid "Overview"
+msgstr "Огляд"
+
+#: src/tui/devices.cpp
+msgid "Select a device first."
+msgstr "Спочатку виберіть пристрій."
+
+#: src/tui/devices.cpp
+msgid "Modes: off, transparency, adaptive, anc"
+msgstr "Режими: off, transparency, adaptive, anc"
+
+#: src/tui/devices.cpp
+#, c++-format
+msgid "Found {}. Select it under BLUETOOTH to pair."
+msgstr "Знайдено: {}. Виберіть його в розділі BLUETOOTH, щоб створити пару."
+
+#: src/tui/devices.cpp
+msgid "Usage: :send FILE…"
+msgstr "Використання: :send ФАЙЛ…"
+
+#: src/tui/main.cpp
+msgid "-- INSERT --"
+msgstr "-- ВСТАВЛЕННЯ --"
+
+#: src/tui/main.cpp
+msgid "Move down / up"
+msgstr "Вниз / вгору"
+
+#: src/tui/main.cpp
+msgid "First / last"
+msgstr "Перший / останній"
+
+#: src/tui/main.cpp
+msgid "Half a page down / up"
+msgstr "Пів сторінки вниз / вгору"
+
+#: src/tui/main.cpp
+msgid "Focus the list / the detail pane"
+msgstr "Перейти до списку / до панелі подробиць"
+
+#: src/tui/main.cpp
+msgid "Open, or run the highlighted action"
+msgstr "Відкрити або виконати виділену дію"
+
+#: src/tui/main.cpp
+msgid "Toggle the highlighted setting"
+msgstr "Перемкнути виділений параметр"
+
+#: src/tui/main.cpp
+msgid "Switch tab"
+msgstr "Змінити вкладку"
+
+#: src/tui/main.cpp
+msgid "Filter the list"
+msgstr "Фільтрувати список"
+
+#: src/tui/main.cpp
+msgid "Clear the filter, leave insert mode"
+msgstr "Скинути фільтр, вийти з режиму вставлення"
+
+#: src/tui/main.cpp
+msgid "Write in the open conversation"
+msgstr "Писати у відкритій розмові"
+
+#: src/tui/main.cpp
+msgid "Send / new line (insert mode)"
+msgstr "Надіслати / новий рядок (режим вставлення)"
+
+#: src/tui/main.cpp
+msgid "New message, or dial on Calls"
+msgstr "Нове повідомлення або набір номера на вкладці «Дзвінки»"
+
+#: src/tui/main.cpp
+msgid "Dismiss, forget, unpair, or hang up"
+msgstr "Приховати, забути, роз'єднати пару або завершити дзвінок"
+
+#: src/tui/main.cpp
+msgid "Copy the highlighted address or text"
+msgstr "Скопіювати виділену адресу або текст"
+
+#: src/tui/main.cpp
+msgid "Refresh, or scan for devices"
+msgstr "Оновити або шукати пристрої"
+
+#: src/tui/main.cpp
+msgid "Send files to the selected device"
+msgstr "Надіслати файли на вибраний пристрій"
+
+#: src/tui/main.cpp
+msgid "Send the clipboard"
+msgstr "Надіслати буфер обміну"
+
+#: src/tui/main.cpp
+msgid "Place a call"
+msgstr "Зателефонувати"
+
+#: src/tui/main.cpp
+msgid "Message someone"
+msgstr "Написати комусь"
+
+#: src/tui/main.cpp
+msgid "Keys"
+msgstr "Клавіші"
+
+#: src/tui/main.cpp
+msgid "Terminal too small"
+msgstr "Термінал замалий"
+
+#: src/tui/main.cpp
+msgid "Press i to write a message"
+msgstr "Натисніть i, щоб написати повідомлення"
+
+#: src/tui/main.cpp
+#, c++-format
+msgid "Not a command: {}"
+msgstr "Не команда: {}"
+
+#: src/tui/main.cpp
+msgid "Type :q and press Enter to quit"
+msgstr "Введіть :q і натисніть Enter, щоб вийти"
+
+#: src/tui/main.cpp
+msgid ""
+"Usage: tether-tui [--devices|--messages|--notifications|--contacts|--calls|--"
+"settings] [--thread KEY]"
+msgstr ""
+"Використання: tether-tui [--devices|--messages|--notifications|--contacts|--"
+"calls|--settings] [--thread КЛЮЧ]"
+
+#: src/tui/main.cpp
+msgid "tether-tui needs a terminal."
+msgstr "Для tether-tui потрібен термінал."
+
+#: src/tui/settings.cpp
+#, c++-format
+msgid "Settings: {}"
+msgstr "Налаштування: {}"
+
+#. TRANSLATORS: strftime clock time on today's conversations, e.g. "%I:%M %p" for 12-hour.
+#: src/ui_common/message_format.cpp src/ui_common/ui_text.cpp
+#, no-c-format
+msgid "%H:%M"
+msgstr "%H:%M"
+
+#: src/ui_common/message_format.cpp
+msgid "Yesterday"
+msgstr "Учора"
+
+#. TRANSLATORS: strftime short date for older conversations; reorder to the local
+#. convention, e.g. "%-d %b".
+#: src/ui_common/message_format.cpp
+#, no-c-format
+msgid "%b %-d"
+msgstr "%-d %b"
+
+#: src/ui_common/message_format.cpp
+msgid "Today"
+msgstr "Сьогодні"
+
+#. TRANSLATORS: strftime date heading above older messages, e.g. "%A %-d %B".
+#: src/ui_common/message_format.cpp
+#, no-c-format
+msgid "%A, %b %-d"
+msgstr "%A, %-d %b"
+
+#. TRANSLATORS: Left earbud, read aloud by screen readers before its battery level.
+#: src/ui_common/ui_text.cpp
+msgid "Left earbud"
+msgstr "Лівий навушник"
+
+#. TRANSLATORS: Left earbud, abbreviated to fit the device row. One or two letters.
+#: src/ui_common/ui_text.cpp
+msgid "L"
+msgstr "Л"
+
+#. TRANSLATORS: Right earbud, read aloud by screen readers before its battery level.
+#: src/ui_common/ui_text.cpp
+msgid "Right earbud"
+msgstr "Правий навушник"
+
+#. TRANSLATORS: Right earbud, abbreviated to fit the device row. One or two letters.
+#: src/ui_common/ui_text.cpp
+msgid "R"
+msgstr "П"
+
+#: src/ui_common/ui_text.cpp
+msgid "Call waiting"
+msgstr "Виклик очікує"
+
+#: src/ui_common/ui_text.cpp
+msgid "Dialing"
+msgstr "Набір"
+
+#: src/ui_common/ui_text.cpp
+msgid "Ringing"
+msgstr "Дзвінок"
+
+#: src/ui_common/ui_text.cpp
+msgid "On call"
+msgstr "Розмова"
+
+#: src/ui_common/ui_text.cpp
+msgid "On hold"
+msgstr "На утриманні"
+
+#: src/ui_common/ui_text.cpp
+msgid "Ended"
+msgstr "Завершено"
+
+#: src/ui_common/ui_text.cpp
+msgid "No service"
+msgstr "Немає мережі"
+
+#. TRANSLATORS: Cellular signal strength read aloud, {} is 0 to 5.
+#: src/ui_common/ui_text.cpp
+#, c++-format
+msgid "signal {} of 5"
+msgstr "сигнал {} з 5"
+
+#. TRANSLATORS: The iPhone's battery level read aloud, {} is like "80%".
+#: src/ui_common/ui_text.cpp
+#, c++-format
+msgid "battery {}"
+msgstr "батарея {}"
+
+#: src/ui_common/ui_text.cpp
+msgid "%b %d, %H:%M"
+msgstr "%d %b, %H:%M"
 
 #: src/gtk/tether-gtk.desktop.in
 msgid "Device Synchronization"

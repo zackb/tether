@@ -30,9 +30,11 @@ add_executable(tether_test
     test_otp.cpp
     test_paths.cpp
     test_message_format.cpp
+    test_tui_util.cpp
     test_service.cpp
     test_verbs.cpp
-    ../src/gtk/message_format.cpp
+    ../src/ui_common/message_format.cpp
+    ../src/tui/util.cpp
     ../src/cli/verbs.cpp
 )
 

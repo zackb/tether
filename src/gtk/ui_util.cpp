@@ -288,26 +288,8 @@ namespace tether::ui {
     }
 
     GtkWidget* avatar(const std::string& name) {
-        std::string first;
-        std::string last;
-        bool in_word = false;
-        for (const char* cursor = name.c_str(); *cursor; cursor = g_utf8_next_char(cursor)) {
-            const gunichar character = g_utf8_get_char(cursor);
-            if (g_unichar_isspace(character)) {
-                in_word = false;
-            } else if (!in_word) {
-                const std::string initial(cursor, g_utf8_next_char(cursor) - cursor);
-                if (first.empty())
-                    first = initial;
-                else
-                    last = initial;
-                in_word = true;
-            }
-        }
-        const std::string initials = first + last;
-        gchar* upper = g_utf8_strup(initials.c_str(), -1);
-        GtkWidget* label = gtk_label_new(*upper ? upper : "•");
-        g_free(upper);
+        const std::string letters = initials(name);
+        GtkWidget* label = gtk_label_new(letters.empty() ? "•" : letters.c_str());
         style(label, "tether-avatar");
         gtk_widget_set_valign(label, GTK_ALIGN_CENTER);
         return label;
@@ -374,15 +356,6 @@ namespace tether::ui {
         gtk_style_context_add_provider_for_screen(
             screen, GTK_STYLE_PROVIDER(provider), GTK_STYLE_PROVIDER_PRIORITY_APPLICATION);
         g_object_unref(provider);
-    }
-
-    std::string fold(const std::string& text) {
-        gchar* normalized = g_utf8_normalize(text.c_str(), -1, G_NORMALIZE_ALL);
-        gchar* folded = g_utf8_casefold(normalized ? normalized : text.c_str(), -1);
-        std::string out = folded ? folded : "";
-        g_free(normalized);
-        g_free(folded);
-        return out;
     }
 
     std::string escape_markup(const std::string& text) {

@@ -5,8 +5,6 @@
 
 #include <cstring>
 #include <map>
-#include <set>
-#include <tether/bluetooth/bmessage.hpp>
 
 namespace tether::ui {
 
@@ -92,48 +90,21 @@ namespace tether::ui {
         g_shown = payload;
 
         gtk_list_store_clear(model());
-        g_names.clear();
-        if (!event.contains("contacts") || !event["contacts"].is_array())
-            return;
-
-        std::set<std::string> seen;
-        for (const auto& card : event["contacts"]) {
-            const std::string name = card.value("name", "");
-            if (!card.contains("addresses") || !card["addresses"].is_array())
-                continue;
-            for (const auto& entry : card["addresses"]) {
-                if (!entry.is_string())
-                    continue;
-
-                bluetooth::Recipient recipient;
-                std::string err;
-                if (!bluetooth::recipient_from_thread_key(entry.get<std::string>(), recipient, err))
-                    continue;
-                const std::string key = bluetooth::thread_key_for(recipient);
-                if (key.empty() || !seen.insert(key).second)
-                    continue;
-                if (!name.empty())
-                    g_names.emplace(key, name);
-
-                const std::string display = name.empty() ? recipient.address : name + " · " + recipient.address;
-                // The normalized form is in the haystack too, so "5551234567"
-                // finds a contact whose number is stored as "+1 (555) 123-4567".
-                const std::string search = fold(name + " " + recipient.address + " " + key.substr(key.find(':') + 1));
-
-                GtkTreeIter iter;
-                gtk_list_store_append(model(), &iter);
-                gtk_list_store_set(model(),
-                                   &iter,
-                                   COL_DISPLAY,
-                                   display.c_str(),
-                                   COL_ADDRESS,
-                                   recipient.address.c_str(),
-                                   COL_SEARCH,
-                                   search.c_str(),
-                                   COL_IS_TEL,
-                                   recipient.kind == bluetooth::RecipientKind::Tel,
-                                   -1);
-            }
+        static const nlohmann::json none;
+        for (const ContactEntry& entry : contact_entries(event.contains("contacts") ? event["contacts"] : none, g_names)) {
+            GtkTreeIter iter;
+            gtk_list_store_append(model(), &iter);
+            gtk_list_store_set(model(),
+                               &iter,
+                               COL_DISPLAY,
+                               entry.display.c_str(),
+                               COL_ADDRESS,
+                               entry.address.c_str(),
+                               COL_SEARCH,
+                               entry.search.c_str(),
+                               COL_IS_TEL,
+                               entry.is_tel,
+                               -1);
         }
     }
 

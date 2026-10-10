@@ -20,6 +20,7 @@
   gtk3,
   gtk-layer-shell,
   libnotify,
+  ncurses,
   nlohmann_json,
   gtest,
   bluez,
@@ -95,6 +96,7 @@ stdenv.mkDerivation (finalAttrs: {
     gtk3
     gtk-layer-shell
     libnotify
+    ncurses
   ];
 
   cmakeFlags = [

@@ -139,43 +139,6 @@ namespace tether::ui {
             return nullptr;
         }
 
-        std::string json_string(const nlohmann::json& j, const char* key, const std::string& fallback = "") {
-            const auto it = j.find(key);
-            return it != j.end() && it->is_string() ? it->get<std::string>() : fallback;
-        }
-
-        // "L 82%  R 79%  Case 45%", omitting whatever is not reporting, or the reason
-        // there are no levels at all. Empty while the channel is still opening, which
-        // is the one state not worth reporting anywhere.
-        // "spoken" spells the earbuds out for screen readers instead of "L"/"R".
-        std::string airpods_status_text(const nlohmann::json& airpods, bool spoken = false) {
-            std::string text;
-            const auto append = [&](const char* label, int level) {
-                if (level < 0)
-                    return;
-                if (!text.empty())
-                    text += spoken ? ", " : "   ";
-                text += label + (" " + std::to_string(level) + "%");
-            };
-            // TRANSLATORS: Left earbud, read aloud by screen readers before its battery level.
-            const char* left_spoken = _("Left earbud");
-            // TRANSLATORS: Left earbud, abbreviated to fit the device row. One or two letters.
-            append(spoken ? left_spoken : _("L"), airpods.value("left", -1));
-            // TRANSLATORS: Right earbud, read aloud by screen readers before its battery level.
-            const char* right_spoken = _("Right earbud");
-            // TRANSLATORS: Right earbud, abbreviated to fit the device row. One or two letters.
-            append(spoken ? right_spoken : _("R"), airpods.value("right", -1));
-            // TRANSLATORS: The AirPods charging case, on the device row beside the two earbuds.
-            append(_("Case"), airpods.value("case", -1));
-            if (!text.empty())
-                return text;
-
-            const std::string status = json_string(airpods, "status");
-            if (status == "busy" || status == "failed")
-                return json_string(airpods, "reason");
-            return "";
-        }
-
         // The device row has room to say why it is empty; the tray tooltip does not.
         std::string airpods_row_text(const nlohmann::json& airpods) {
             const std::string text = airpods_status_text(airpods);
@@ -196,15 +159,6 @@ namespace tether::ui {
                 return false;
             const std::string supervised = g_devices.bt_status.value("device_address", "");
             return !supervised.empty() && supervised == address;
-        }
-
-        std::string connection_reason(const nlohmann::json& connection) {
-            const bool link_degraded =
-                !connection.value("classic_connected", false) || !connection.value("le_connected", false);
-            std::string reason = connection.value(link_degraded ? "link_reason" : "profile_reason", "");
-            if (reason.empty())
-                reason = connection.value("link_reason", "");
-            return reason;
         }
 
         void set_capability_row(GtkWidget* label, const std::string& title, bool ok, const std::string& note) {

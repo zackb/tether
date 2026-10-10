@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: tether\n"
 "Report-Msgid-Bugs-To: zack@bartel.com\n"
-"POT-Creation-Date: 2026-10-08 20:06-0700\n"
+"POT-Creation-Date: 2026-10-09 20:43-0700\n"
 "PO-Revision-Date: 2026-08-22\n"
 "Last-Translator: Tether project\n"
 "Language-Team: French\n"
@@ -431,6 +431,7 @@ msgid "BR/EDR, notifications live"
 msgstr "BR/EDR, notifications actives"
 
 #: src/cli/main.cpp src/gtk/devices_view.cpp src/gtk/main.cpp
+#: src/tui/devices.cpp src/tui/notifications.cpp
 msgid "Notifications"
 msgstr "Notifications"
 
@@ -521,7 +522,7 @@ msgid "Right"
 msgstr "Droite"
 
 #. TRANSLATORS: The AirPods charging case, on the device row beside the two earbuds.
-#: src/cli/main.cpp src/gtk/devices_view.cpp
+#: src/cli/main.cpp src/ui_common/ui_text.cpp
 msgid "Case"
 msgstr "Boîtier"
 
@@ -652,7 +653,7 @@ msgstr "aucun opérateur"
 msgid " signal {0}/5 battery {1}/5"
 msgstr " signal {0}/5 batterie {1}/5"
 
-#: src/cli/main.cpp src/gtk/calls_view.cpp
+#: src/cli/main.cpp src/ui_common/ui_text.cpp
 msgid "roaming"
 msgstr "itinérance"
 
@@ -664,7 +665,7 @@ msgstr "Appels (HFP)"
 msgid "Could not read Bluetooth diagnostics from the daemon.\n"
 msgstr "Impossible de lire les diagnostics Bluetooth depuis le démon.\n"
 
-#: src/cli/main.cpp src/gtk/calls_view.cpp
+#: src/cli/main.cpp src/gtk/calls_view.cpp src/tui/calls.cpp
 msgid "The call could not be placed."
 msgstr "L'appel n'a pas pu être passé."
 
@@ -708,7 +709,7 @@ msgid_plural "({} unread)"
 msgstr[0] "({} non lu)"
 msgstr[1] "({} non lus)"
 
-#: src/cli/main.cpp src/gtk/devices_view.cpp
+#: src/cli/main.cpp src/gtk/devices_view.cpp src/tui/devices.cpp
 #, c++-format
 msgid ""
 "The running tetherd is {}, but this is tether {}. Stop it and it\n"
@@ -719,7 +720,7 @@ msgstr ""
 "il redémarrera à la demande :\n"
 "    pkill tetherd\n"
 
-#: src/cli/main.cpp src/gtk/devices_view.cpp
+#: src/cli/main.cpp src/gtk/devices_view.cpp src/tui/devices.cpp
 msgid "an older build"
 msgstr "une version plus ancienne"
 
@@ -764,7 +765,7 @@ msgstr "Le démon a fermé la connexion avant l'envoi du message.\n"
 msgid "Sent to %s\n"
 msgstr "Envoyé à %s\n"
 
-#: src/cli/main.cpp src/gtk/messages_view.cpp
+#: src/cli/main.cpp src/gtk/messages_view.cpp src/tui/messages.cpp
 msgid "The message was not sent."
 msgstr "Le message n'a pas été envoyé."
 
@@ -1226,6 +1227,7 @@ msgid "Nothing to send."
 msgstr "Rien à envoyer."
 
 #: src/core/src/bluetooth/connection.cpp src/gtk/messages_view.cpp
+#: src/tui/messages.cpp
 msgid "Messages are not connected."
 msgstr "Les messages ne sont pas connectés."
 
@@ -1542,12 +1544,13 @@ msgstr ""
 #. TRANSLATORS: the feature name Tether shows for this profile.
 #: src/core/src/bluetooth/profile_supervisor.cpp src/daemon/main.cpp
 #: src/gtk/devices_view.cpp src/gtk/main.cpp src/gtk/messages_view.cpp
-#: src/gtk/settings_view.cpp
+#: src/gtk/settings_view.cpp src/tui/devices.cpp src/tui/messages.cpp
+#: src/tui/settings.cpp
 msgid "Messages"
 msgstr "Messages"
 
 #: src/core/src/bluetooth/profile_supervisor.cpp src/gtk/devices_view.cpp
-#: src/gtk/main.cpp
+#: src/gtk/main.cpp src/tui/contacts.cpp src/tui/devices.cpp
 msgid "Contacts"
 msgstr "Contacts"
 
@@ -1616,7 +1619,7 @@ msgid "{} could not be opened."
 msgstr "Impossible d'ouvrir {}."
 
 #: src/core/src/bluetooth/profile_supervisor.cpp src/gtk/calls_view.cpp
-#: src/gtk/notifications_view.cpp
+#: src/gtk/notifications_view.cpp src/tui/notifications.cpp
 msgid "Waiting for the iPhone."
 msgstr "En attente de l'iPhone."
 
@@ -1685,7 +1688,7 @@ msgstr "Recherche Bluetooth terminée."
 msgid "Another pairing attempt is already in progress."
 msgstr "Une autre tentative d'appairage est déjà en cours."
 
-#: src/core/src/net.cpp src/gtk/devices_view.cpp
+#: src/core/src/net.cpp src/gtk/devices_view.cpp src/tui/devices.cpp
 msgid "Bluetooth is unavailable on this machine."
 msgstr "Bluetooth est indisponible sur cette machine."
 
@@ -1697,7 +1700,7 @@ msgstr "Ce n'est pas un appareil AirPods."
 msgid "Unknown listening mode."
 msgstr "Mode d'écoute inconnu."
 
-#: src/core/src/net.cpp src/gtk/devices_view.cpp
+#: src/core/src/net.cpp src/gtk/devices_view.cpp src/tui/devices.cpp
 msgid "No AirPods are connected."
 msgstr "Aucun AirPods connecté."
 
@@ -1735,6 +1738,7 @@ msgid "unknown error"
 msgstr "erreur inconnue"
 
 #: src/core/src/net.cpp src/gtk/devices_view.cpp src/gtk/messages_view.cpp
+#: src/tui/devices.cpp src/tui/messages.cpp
 msgid "Could not reach the Tether daemon."
 msgstr "Impossible de joindre le démon Tether."
 
@@ -1794,99 +1798,49 @@ msgstr "Copier le code"
 msgid "Open in {}"
 msgstr "Ouvrir dans {}"
 
-#: src/gtk/calls_view.cpp
-msgid "Incoming"
-msgstr "Entrant"
-
-#: src/gtk/calls_view.cpp
-msgid "Call waiting"
-msgstr "Appel en attente"
-
-#: src/gtk/calls_view.cpp
-msgid "Dialing"
-msgstr "Numérotation"
-
-#: src/gtk/calls_view.cpp
-msgid "Ringing"
-msgstr "Sonnerie"
-
-#: src/gtk/calls_view.cpp
-msgid "On call"
-msgstr "En communication"
-
-#: src/gtk/calls_view.cpp
-msgid "On hold"
-msgstr "En attente"
-
-#: src/gtk/calls_view.cpp
-msgid "Ended"
-msgstr "Terminé"
-
-#: src/gtk/calls_view.cpp
-msgid "No service"
-msgstr "Aucun service"
-
-#. TRANSLATORS: Cellular signal strength read aloud, {} is 0 to 5.
-#: src/gtk/calls_view.cpp
-#, c++-format
-msgid "signal {} of 5"
-msgstr "signal {} sur 5"
-
-#. TRANSLATORS: The iPhone's battery level read aloud, {} is like "80%".
-#: src/gtk/calls_view.cpp
-#, c++-format
-msgid "battery {}"
-msgstr "batterie {}"
-
-#: src/gtk/calls_view.cpp
+#: src/gtk/calls_view.cpp src/tui/calls.cpp
 msgid "Unknown caller"
 msgstr "Appelant inconnu"
 
-#: src/gtk/calls_view.cpp
+#: src/gtk/calls_view.cpp src/tui/calls.cpp
 msgid "Answer"
 msgstr "Répondre"
 
-#: src/gtk/calls_view.cpp
+#: src/gtk/calls_view.cpp src/tui/calls.cpp
 msgid "Audio here"
 msgstr "Prendre l'audio ici"
 
-#: src/gtk/calls_view.cpp
+#: src/gtk/calls_view.cpp src/tui/calls.cpp
 msgid "Decline"
 msgstr "Refuser"
 
-#: src/gtk/calls_view.cpp
+#: src/gtk/calls_view.cpp src/tui/calls.cpp
 msgid "Hang up"
 msgstr "Raccrocher"
 
-#. TRANSLATORS: strftime clock time on today's conversations, e.g. "%I:%M %p" for 12-hour.
-#: src/gtk/calls_view.cpp src/gtk/message_format.cpp src/gtk/messages_view.cpp
-#, no-c-format
-msgid "%H:%M"
-msgstr "%H:%M"
+#: src/gtk/calls_view.cpp src/tui/calls.cpp src/ui_common/ui_text.cpp
+msgid "Incoming"
+msgstr "Entrant"
 
-#: src/gtk/calls_view.cpp
-msgid "%b %d, %H:%M"
-msgstr "%d %b, %H:%M"
-
-#: src/gtk/calls_view.cpp
+#: src/gtk/calls_view.cpp src/tui/calls.cpp
 msgid "Missed"
 msgstr "Manqué"
 
-#: src/gtk/calls_view.cpp
+#: src/gtk/calls_view.cpp src/tui/calls.cpp
 msgid "Outgoing"
 msgstr "Sortant"
 
 #. TRANSLATORS: Button that calls a recent caller back, {} is their name or number.
-#: src/gtk/calls_view.cpp
+#: src/gtk/calls_view.cpp src/tui/calls.cpp
 #, c++-format
 msgid "Call {}"
 msgstr "Appeler {}"
 
-#: src/gtk/calls_view.cpp
+#: src/gtk/calls_view.cpp src/tui/calls.cpp
 msgid "No calls."
 msgstr "Aucun appel."
 
-#: src/gtk/calls_view.cpp
+#: src/gtk/calls_view.cpp src/tui/calls.cpp
 msgid "Call control is off. Turn it on with 'tether --bt-calls-enable on'."
 msgstr ""
 "La gestion des appels est désactivée. Activez-la avec 'tether --bt-calls-"
@@ -1896,7 +1850,7 @@ msgstr ""
 msgid "Number to call"
 msgstr "Numéro à appeler"
 
-#: src/gtk/calls_view.cpp
+#: src/gtk/calls_view.cpp src/tui/calls.cpp
 msgid "Call"
 msgstr "Appeler"
 
@@ -1904,7 +1858,7 @@ msgstr "Appeler"
 msgid "The iPhone's carrier, signal, and battery."
 msgstr "Opérateur, signal et batterie de l'iPhone."
 
-#: src/gtk/calls_view.cpp
+#: src/gtk/calls_view.cpp src/tui/calls.cpp
 msgid "Recent calls"
 msgstr "Appels récents"
 
@@ -1918,7 +1872,7 @@ msgstr "Copier"
 msgid "Copy {}"
 msgstr "Copier {}"
 
-#: src/gtk/contacts_view.cpp
+#: src/gtk/contacts_view.cpp src/tui/main.cpp
 msgid "Copied to the clipboard."
 msgstr "Copié dans le presse-papiers."
 
@@ -1933,11 +1887,11 @@ msgstr "Envoyer un message"
 msgid "Message {}"
 msgstr "Envoyer un message à {}"
 
-#: src/gtk/contacts_view.cpp
+#: src/gtk/contacts_view.cpp src/tui/contacts.cpp
 msgid "Favorite"
 msgstr "Favori"
 
-#: src/gtk/contacts_view.cpp
+#: src/gtk/contacts_view.cpp src/tui/contacts.cpp
 msgid "No contacts yet. Check the Bluetooth link on the Devices page."
 msgstr ""
 "Aucun contact pour l'instant. Vérifiez la liaison Bluetooth sur la page "
@@ -1947,107 +1901,88 @@ msgstr ""
 msgid "Search contacts"
 msgstr "Rechercher des contacts"
 
-#: src/gtk/daemon_client.cpp
+#: src/gtk/daemon_client.cpp src/tui/main.cpp
 msgid "Daemon Offline"
 msgstr "Démon hors ligne"
 
-#: src/gtk/daemon_client.cpp src/gtk/messages_view.cpp
+#: src/gtk/daemon_client.cpp src/gtk/messages_view.cpp src/tui/main.cpp
+#: src/tui/messages.cpp
 msgid "The Tether daemon is not running."
 msgstr "Le démon Tether n'est pas lancé."
 
-#: src/gtk/daemon_client.cpp
+#: src/gtk/daemon_client.cpp src/tui/main.cpp
 msgid "Daemon Online"
 msgstr "Démon en ligne"
 
-#. TRANSLATORS: Left earbud, read aloud by screen readers before its battery level.
-#: src/gtk/devices_view.cpp
-msgid "Left earbud"
-msgstr "Écouteur gauche"
-
-#. TRANSLATORS: Left earbud, abbreviated to fit the device row. One or two letters.
-#: src/gtk/devices_view.cpp
-msgid "L"
-msgstr "G"
-
-#. TRANSLATORS: Right earbud, read aloud by screen readers before its battery level.
-#: src/gtk/devices_view.cpp
-msgid "Right earbud"
-msgstr "Écouteur droit"
-
-#. TRANSLATORS: Right earbud, abbreviated to fit the device row. One or two letters.
-#: src/gtk/devices_view.cpp
-msgid "R"
-msgstr "D"
-
-#: src/gtk/devices_view.cpp
+#: src/gtk/devices_view.cpp src/tui/devices.cpp
 msgid "Reading battery…"
 msgstr "Lecture de la batterie…"
 
-#: src/gtk/devices_view.cpp
+#: src/gtk/devices_view.cpp src/tui/devices.cpp
 msgid "Not connected yet."
 msgstr "Pas encore connecté."
 
-#: src/gtk/devices_view.cpp
+#: src/gtk/devices_view.cpp src/tui/devices.cpp
 msgid "Connected."
 msgstr "Connecté."
 
-#: src/gtk/devices_view.cpp
+#: src/gtk/devices_view.cpp src/tui/devices.cpp
 msgid "Scanning for nearby devices..."
 msgstr "Recherche d'appareils à proximité..."
 
-#: src/gtk/devices_view.cpp
+#: src/gtk/devices_view.cpp src/tui/devices.cpp
 msgid "Off"
 msgstr "Désactivé"
 
-#: src/gtk/devices_view.cpp
+#: src/gtk/devices_view.cpp src/tui/devices.cpp
 msgid "Transparency"
 msgstr "Transparence"
 
-#: src/gtk/devices_view.cpp
+#: src/gtk/devices_view.cpp src/tui/devices.cpp
 msgid "Adaptive"
 msgstr "Adaptatif"
 
-#: src/gtk/devices_view.cpp
+#: src/gtk/devices_view.cpp src/tui/devices.cpp
 msgid "Noise Cancellation"
 msgstr "Réduction de bruit"
 
-#: src/gtk/devices_view.cpp
+#: src/gtk/devices_view.cpp src/tui/devices.cpp
 msgid "Disconnect"
 msgstr "Déconnecter"
 
-#: src/gtk/devices_view.cpp
+#: src/gtk/devices_view.cpp src/tui/devices.cpp
 msgid "Connect"
 msgstr "Connecter"
 
-#: src/gtk/devices_view.cpp
+#: src/gtk/devices_view.cpp src/tui/devices.cpp
 msgid "Tether is not managing the AirPods, so another program can use them."
 msgstr "Tether ne gère pas les AirPods, un autre programme peut les utiliser."
 
-#: src/gtk/devices_view.cpp
+#: src/gtk/devices_view.cpp src/tui/devices.cpp
 msgid "These AirPods do not report a listening mode."
 msgstr "Ces AirPods ne signalent pas de mode d'écoute."
 
-#: src/gtk/devices_view.cpp
+#: src/gtk/devices_view.cpp src/tui/devices.cpp
 msgid "These AirPods do not report whether they are being worn."
 msgstr "Ces AirPods ne signalent pas s'ils sont portés."
 
-#: src/gtk/devices_view.cpp
+#: src/gtk/devices_view.cpp src/tui/devices.cpp
 msgid "Both buds are in."
 msgstr "Les deux écouteurs sont en place."
 
-#: src/gtk/devices_view.cpp
+#: src/gtk/devices_view.cpp src/tui/devices.cpp
 msgid "One bud is in."
 msgstr "Un écouteur est en place."
 
-#: src/gtk/devices_view.cpp
+#: src/gtk/devices_view.cpp src/tui/devices.cpp
 msgid "Neither bud is in."
 msgstr "Aucun écouteur n'est en place."
 
-#: src/gtk/devices_view.cpp
+#: src/gtk/devices_view.cpp src/tui/devices.cpp
 msgid "The buds are handed over with Apple's own handoff."
 msgstr "Les AirPods sont confiés avec le transfert natif d'Apple."
 
-#: src/gtk/devices_view.cpp
+#: src/gtk/devices_view.cpp src/tui/devices.cpp
 msgid ""
 "The buds are handed over by disconnecting them. For Apple's own handoff, put "
 "DeviceID = bluetooth:004C:0000:0000 under [General] in /etc/bluetooth/"
@@ -2057,68 +1992,68 @@ msgstr ""
 "d'Apple, ajoutez DeviceID = bluetooth:004C:0000:0000 sous [General] dans /"
 "etc/bluetooth/main.conf et redémarrez bluetooth."
 
-#: src/gtk/devices_view.cpp
+#: src/gtk/devices_view.cpp src/tui/devices.cpp
 msgid "Full mode — messages, contacts, and notifications."
 msgstr "Mode complet — messages, contacts et notifications."
 
-#: src/gtk/devices_view.cpp
+#: src/gtk/devices_view.cpp src/tui/devices.cpp
 msgid "Compatibility mode — messages and contacts, no notification mirroring."
 msgstr ""
 "Mode de compatibilité — messages et contacts, sans duplication des "
 "notifications."
 
-#: src/gtk/devices_view.cpp
+#: src/gtk/devices_view.cpp src/tui/devices.cpp
 msgid "This machine cannot carry the Bluetooth features."
 msgstr "Cette machine ne peut pas assurer les fonctions Bluetooth."
 
-#: src/gtk/devices_view.cpp
+#: src/gtk/devices_view.cpp src/tui/devices.cpp
 msgid "Link"
 msgstr "Lien"
 
-#: src/gtk/devices_view.cpp
+#: src/gtk/devices_view.cpp src/tui/devices.cpp
 msgid "Not paired over Bluetooth yet."
 msgstr "Pas encore appairé en Bluetooth."
 
-#: src/gtk/devices_view.cpp
+#: src/gtk/devices_view.cpp src/tui/devices.cpp
 msgid "Tether is not using this device. Pair it to select it."
 msgstr "Tether n'utilise pas cet appareil. Appairez-le pour le sélectionner."
 
-#: src/gtk/devices_view.cpp
+#: src/gtk/devices_view.cpp src/tui/devices.cpp
 msgid "Bluetooth is switched off for this iPhone."
 msgstr "Bluetooth est désactivé pour cet iPhone."
 
-#: src/gtk/devices_view.cpp
+#: src/gtk/devices_view.cpp src/tui/devices.cpp
 msgid "Connected and ready."
 msgstr "Connecté et prêt."
 
-#: src/gtk/devices_view.cpp
+#: src/gtk/devices_view.cpp src/tui/devices.cpp
 msgid "Device is offline. Make sure it is switched on and on the same network."
 msgstr ""
 "L'appareil est hors ligne. Vérifiez qu'il est allumé et sur le même réseau."
 
-#: src/gtk/devices_view.cpp
+#: src/gtk/devices_view.cpp src/tui/devices.cpp
 #, c++-format
 msgid "Found at {0}:{1}"
 msgstr "Trouvé à {0}:{1}"
 
-#: src/gtk/devices_view.cpp
+#: src/gtk/devices_view.cpp src/tui/devices.cpp
 msgid "Sending pair request..."
 msgstr "Envoi de la demande d'appairage..."
 
-#: src/gtk/devices_view.cpp
+#: src/gtk/devices_view.cpp src/tui/devices.cpp
 msgid "Pair request sent. Approve on remote device!"
 msgstr "Demande d'appairage envoyée. Approuvez-la sur l'appareil distant !"
 
-#: src/gtk/devices_view.cpp
+#: src/gtk/devices_view.cpp src/tui/devices.cpp
 msgid "Pairing… confirm the prompt on the iPhone."
 msgstr "Appairage… confirmez l'invite sur l'iPhone."
 
-#: src/gtk/devices_view.cpp
+#: src/gtk/devices_view.cpp src/tui/devices.cpp
 #, c-format
 msgid "Remove the Bluetooth pairing with %s?"
 msgstr "Supprimer l'appairage Bluetooth avec %s ?"
 
-#: src/gtk/devices_view.cpp
+#: src/gtk/devices_view.cpp src/tui/devices.cpp
 msgid ""
 "Also delete this computer from the iPhone's Bluetooth settings before "
 "pairing again, or the phone will keep the stale bond."
@@ -2126,16 +2061,16 @@ msgstr ""
 "Supprimez aussi cet ordinateur des réglages Bluetooth de l'iPhone avant de "
 "réappairer, sinon le téléphone gardera l'ancien lien."
 
-#: src/gtk/devices_view.cpp
+#: src/gtk/devices_view.cpp src/tui/devices.cpp
 msgid "Removing the pairing…"
 msgstr "Suppression de l'appairage…"
 
-#: src/gtk/devices_view.cpp
+#: src/gtk/devices_view.cpp src/tui/devices.cpp
 #, c-format
 msgid "Forget %s?"
 msgstr "Oublier %s ?"
 
-#: src/gtk/devices_view.cpp
+#: src/gtk/devices_view.cpp src/tui/devices.cpp
 msgid ""
 "Tether will stop connecting to it. Forget this computer on the other device "
 "too, then pair again to reconnect."
@@ -2147,27 +2082,28 @@ msgstr ""
 msgid "Setup commands copied to the clipboard."
 msgstr "Commandes de configuration copiées dans le presse-papiers."
 
-#: src/gtk/devices_view.cpp src/gtk/messages_view.cpp
+#: src/gtk/devices_view.cpp src/gtk/messages_view.cpp src/tui/devices.cpp
+#: src/tui/messages.cpp
 msgid "Asking the iPhone to show its Bluetooth permissions…"
 msgstr "Demande à l'iPhone d'afficher ses autorisations Bluetooth…"
 
 #. TRANSLATORS: {} is a file name.
-#: src/gtk/devices_view.cpp
+#: src/gtk/devices_view.cpp src/tui/devices.cpp
 #, c++-format
 msgid "Sending {}…"
 msgstr "Envoi de {}…"
 
 #. TRANSLATORS: {0} is the current file's position, {1} the batch size.
-#: src/gtk/devices_view.cpp
+#: src/gtk/devices_view.cpp src/tui/devices.cpp
 #, c++-format
 msgid "({0} of {1})"
 msgstr "({0} sur {1})"
 
-#: src/gtk/devices_view.cpp
+#: src/gtk/devices_view.cpp src/tui/devices.cpp
 msgid "Daemon unavailable."
 msgstr "Démon indisponible."
 
-#: src/gtk/devices_view.cpp
+#: src/gtk/devices_view.cpp src/tui/devices.cpp
 msgid "Send File"
 msgstr "Envoyer un fichier"
 
@@ -2179,16 +2115,16 @@ msgstr "_Annuler"
 msgid "_Send"
 msgstr "_Envoyer"
 
-#: src/gtk/devices_view.cpp
+#: src/gtk/devices_view.cpp src/tui/devices.cpp
 msgid "Folders can't be sent — drop files instead."
 msgstr ""
 "Les dossiers ne peuvent pas être envoyés — déposez plutôt des fichiers."
 
-#: src/gtk/devices_view.cpp
+#: src/gtk/devices_view.cpp src/tui/devices.cpp
 msgid "Clipboard, files, and OTP are connected."
 msgstr "Le presse-papiers, les fichiers et les OTP sont connectés."
 
-#: src/gtk/devices_view.cpp
+#: src/gtk/devices_view.cpp src/tui/devices.cpp
 msgid ""
 "Files and OTP are connected. This compositor does not give Tether clipboard "
 "access, so clipboard sync is off."
@@ -2197,7 +2133,7 @@ msgstr ""
 "l'accès au presse-papiers, la synchronisation du presse-papiers est donc "
 "désactivée."
 
-#: src/gtk/devices_view.cpp
+#: src/gtk/devices_view.cpp src/tui/devices.cpp
 msgid ""
 "avahi-daemon isn't running, so other devices can't find this PC. Start it "
 "with: sudo systemctl enable --now avahi-daemon"
@@ -2206,7 +2142,7 @@ msgstr ""
 "donc pas trouver cet ordinateur. Démarrez-le avec : sudo systemctl enable --"
 "now avahi-daemon"
 
-#: src/gtk/devices_view.cpp
+#: src/gtk/devices_view.cpp src/tui/devices.cpp
 msgid ""
 "A device is on the network but cannot reach this PC. A firewall is running; "
 "Tether needs inbound TCP 5134. Allow it with: sudo ufw allow 5134/tcp"
@@ -2215,42 +2151,43 @@ msgstr ""
 "est actif ; Tether a besoin du port TCP 5134 entrant. Autorisez-le avec : "
 "sudo ufw allow 5134/tcp"
 
-#: src/gtk/devices_view.cpp
+#: src/gtk/devices_view.cpp src/tui/devices.cpp
 msgid "No paired device is connected. Switch it on and join the same network."
 msgstr ""
 "Aucun appareil appairé n'est connecté. Allumez-le et connectez-le au même "
 "réseau."
 
-#: src/gtk/devices_view.cpp
+#: src/gtk/devices_view.cpp src/tui/devices.cpp
 msgid "Unknown Device"
 msgstr "Appareil inconnu"
 
-#: src/gtk/devices_view.cpp
+#: src/gtk/devices_view.cpp src/tui/devices.cpp
 msgid "Connected"
 msgstr "Connecté"
 
-#: src/gtk/devices_view.cpp
+#: src/gtk/devices_view.cpp src/tui/devices.cpp
 msgid "Offline"
 msgstr "Hors ligne"
 
-#: src/gtk/devices_view.cpp
+#: src/gtk/devices_view.cpp src/tui/devices.cpp
 msgid "Nearby (Tap to Pair)"
 msgstr "À proximité (toucher pour appairer)"
 
-#: src/gtk/devices_view.cpp
+#: src/gtk/devices_view.cpp src/tui/devices.cpp
 msgid "Partially connected"
 msgstr "Partiellement connecté"
 
-#: src/gtk/devices_view.cpp
+#: src/gtk/devices_view.cpp src/tui/devices.cpp
 msgid "Paired"
 msgstr "Appairé"
 
-#: src/gtk/devices_view.cpp
+#. TRANSLATORS: {0} is the name of the device being paired with.
+#: src/gtk/devices_view.cpp src/tui/devices.cpp
 #, c++-format
 msgid "Waiting for approval on {0}..."
 msgstr "En attente de l'approbation sur {0}…"
 
-#: src/gtk/devices_view.cpp
+#: src/gtk/devices_view.cpp src/tui/devices.cpp
 msgid ""
 "Could not reach that device. If a firewall is running, Tether needs inbound "
 "TCP 5134 on the other machine."
@@ -2258,53 +2195,54 @@ msgstr ""
 "Impossible de joindre cet appareil. Si un pare-feu est actif, Tether a "
 "besoin du port TCP 5134 entrant sur l'autre machine."
 
-#: src/gtk/devices_view.cpp
+#: src/gtk/devices_view.cpp src/tui/devices.cpp
 msgid "That device refused the connection. Is Tether running on it?"
 msgstr "Cet appareil a refusé la connexion. Tether y est-il lancé ?"
 
-#: src/gtk/devices_view.cpp
+#: src/gtk/devices_view.cpp src/tui/devices.cpp
 msgid "That address could not be resolved."
 msgstr "Cette adresse n'a pas pu être résolue."
 
-#: src/gtk/devices_view.cpp
+#: src/gtk/devices_view.cpp src/tui/devices.cpp
 msgid "Could not connect to that device."
 msgstr "Impossible de se connecter à cet appareil."
 
-#: src/gtk/devices_view.cpp
+#: src/gtk/devices_view.cpp src/tui/devices.cpp
 msgid "Pair request was rejected."
 msgstr "La demande d'appairage a été refusée."
 
-#: src/gtk/devices_view.cpp
+#: src/gtk/devices_view.cpp src/tui/devices.cpp
 msgid "Ready"
 msgstr "Prêt"
 
-#: src/gtk/devices_view.cpp
+#. TRANSLATORS: {0} is how many were sent, {1} the batch size.
+#: src/gtk/devices_view.cpp src/tui/devices.cpp
 #, c++-format
 msgid "Sent {0} of {1} file."
 msgid_plural "Sent {0} of {1} files."
 msgstr[0] "{0} fichier envoyé sur {1}."
 msgstr[1] "{0} fichiers envoyés sur {1}."
 
-#: src/gtk/devices_view.cpp
+#: src/gtk/devices_view.cpp src/tui/devices.cpp
 #, c++-format
 msgid "Skipped {} non-file item."
 msgid_plural "Skipped {} non-file items."
 msgstr[0] "{} élément non fichier ignoré."
 msgstr[1] "{} éléments non fichiers ignorés."
 
-#: src/gtk/devices_view.cpp
+#: src/gtk/devices_view.cpp src/tui/devices.cpp
 msgid "Clipboard is empty."
 msgstr "Le presse-papiers est vide."
 
-#: src/gtk/devices_view.cpp
+#: src/gtk/devices_view.cpp src/tui/devices.cpp
 msgid "Desktop Clipboard Sync triggered."
 msgstr "Synchronisation du presse-papiers du bureau déclenchée."
 
-#: src/gtk/devices_view.cpp
+#: src/gtk/devices_view.cpp src/tui/devices.cpp
 msgid "Messages and notifications are connected."
 msgstr "Les messages et les notifications sont connectés."
 
-#: src/gtk/devices_view.cpp
+#: src/gtk/devices_view.cpp src/tui/devices.cpp
 msgid ""
 "No iPhone found. Unlock the phone and open Settings > Bluetooth so it "
 "advertises, then scan again."
@@ -2312,7 +2250,7 @@ msgstr ""
 "Aucun iPhone trouvé. Déverrouillez le téléphone et ouvrez Réglages > "
 "Bluetooth pour qu'il s'annonce, puis relancez la recherche."
 
-#: src/gtk/devices_view.cpp
+#: src/gtk/devices_view.cpp src/tui/devices.cpp
 #, c-format
 msgid ""
 "Does the iPhone show this code?\n"
@@ -2355,11 +2293,11 @@ msgstr ""
 "2.  Appuyez sur Appairer en Bluetooth\n"
 "3.  Accordez les deux autorisations sur le téléphone"
 
-#: src/gtk/devices_view.cpp
+#: src/gtk/devices_view.cpp src/tui/devices.cpp
 msgid "Scan for devices"
 msgstr "Rechercher des appareils"
 
-#: src/gtk/devices_view.cpp
+#: src/gtk/devices_view.cpp src/tui/devices.cpp
 msgid "Manage AirPods from Tether"
 msgstr "Gérer les AirPods depuis Tether"
 
@@ -2371,7 +2309,7 @@ msgstr ""
 "Le canal des AirPods n'accepte qu'un programme par ordinateur. Le désactiver "
 "le libère pour un autre programme AirPods."
 
-#: src/gtk/devices_view.cpp
+#: src/gtk/devices_view.cpp src/tui/devices.cpp
 msgid "Listening mode"
 msgstr "Mode d'écoute"
 
@@ -2379,19 +2317,19 @@ msgstr "Mode d'écoute"
 msgid "In-ear detection"
 msgstr "Détection de port"
 
-#: src/gtk/devices_view.cpp
+#: src/gtk/devices_view.cpp src/tui/devices.cpp
 msgid "Pause playback when:"
 msgstr "Mettre en pause la lecture quand :"
 
-#: src/gtk/devices_view.cpp
+#: src/gtk/devices_view.cpp src/tui/devices.cpp
 msgid "Never"
 msgstr "Jamais"
 
-#: src/gtk/devices_view.cpp
+#: src/gtk/devices_view.cpp src/tui/devices.cpp
 msgid "One bud is removed"
 msgstr "Un écouteur est retiré"
 
-#: src/gtk/devices_view.cpp
+#: src/gtk/devices_view.cpp src/tui/devices.cpp
 msgid "Both buds are removed"
 msgstr "Les deux écouteurs sont retirés"
 
@@ -2404,11 +2342,11 @@ msgstr ""
 "écouteurs sont remis en place. Seule la lecture mise en pause par Tether est "
 "relancée."
 
-#: src/gtk/devices_view.cpp src/gtk/main.cpp
+#: src/gtk/devices_view.cpp src/gtk/main.cpp src/tui/calls.cpp
 msgid "Calls"
 msgstr "Appels"
 
-#: src/gtk/devices_view.cpp
+#: src/gtk/devices_view.cpp src/tui/devices.cpp
 msgid "Hand the AirPods to the iPhone during a call"
 msgstr "Confier les AirPods à l'iPhone pendant un appel"
 
@@ -2439,7 +2377,7 @@ msgstr ""
 "Lancez ceci dans un terminal. Tether ne modifie pas de lui-même votre "
 "adaptateur Bluetooth ni bluetoothd."
 
-#: src/gtk/devices_view.cpp
+#: src/gtk/devices_view.cpp src/tui/devices.cpp
 msgid "Connect to this iPhone over Bluetooth"
 msgstr "Se connecter à cet iPhone en Bluetooth"
 
@@ -2453,11 +2391,12 @@ msgstr ""
 "Désactiver ceci empêche Tether de reconnecter ; un lien déjà établi le reste "
 "jusqu'à ce que vous le coupiez."
 
-#: src/gtk/devices_view.cpp
+#: src/gtk/devices_view.cpp src/tui/devices.cpp
 msgid "Pair over Bluetooth"
 msgstr "Appairer en Bluetooth"
 
-#: src/gtk/devices_view.cpp src/gtk/messages_view.cpp
+#: src/gtk/devices_view.cpp src/gtk/messages_view.cpp src/tui/devices.cpp
+#: src/tui/messages.cpp
 msgid "Show iPhone Permissions"
 msgstr "Afficher les autorisations de l'iPhone"
 
@@ -2470,15 +2409,15 @@ msgstr ""
 "notifications de messages » et « Synchroniser les contacts » dans Réglages > "
 "Bluetooth > (i)."
 
-#: src/gtk/devices_view.cpp
+#: src/gtk/devices_view.cpp src/tui/devices.cpp
 msgid "Unpair"
 msgstr "Désappairer"
 
-#: src/gtk/devices_view.cpp
+#: src/gtk/devices_view.cpp src/tui/devices.cpp
 msgid "Pair Device"
 msgstr "Appairer l'appareil"
 
-#: src/gtk/devices_view.cpp
+#: src/gtk/devices_view.cpp src/tui/devices.cpp
 msgid "Force Trust (Accept Pending)"
 msgstr "Forcer la confiance (accepter en attente)"
 
@@ -2486,15 +2425,15 @@ msgstr "Forcer la confiance (accepter en attente)"
 msgid "Drop files here to send"
 msgstr "Déposez des fichiers ici pour les envoyer"
 
-#: src/gtk/devices_view.cpp
+#: src/gtk/devices_view.cpp src/tui/devices.cpp
 msgid "Send Clipboard"
 msgstr "Envoyer le presse-papiers"
 
-#: src/gtk/devices_view.cpp
+#: src/gtk/devices_view.cpp src/tui/devices.cpp
 msgid "Clipboard sync requested..."
 msgstr "Synchronisation du presse-papiers demandée..."
 
-#: src/gtk/devices_view.cpp
+#: src/gtk/devices_view.cpp src/tui/devices.cpp
 msgid "Forget"
 msgstr "Oublier"
 
@@ -2506,11 +2445,11 @@ msgstr "Déplier la barre latérale"
 msgid "Collapse sidebar"
 msgstr "Replier la barre latérale"
 
-#: src/gtk/main.cpp src/gtk/settings_view.cpp
+#: src/gtk/main.cpp src/gtk/settings_view.cpp src/tui/settings.cpp
 msgid "Settings"
 msgstr "Paramètres"
 
-#: src/gtk/main.cpp
+#: src/gtk/main.cpp src/tui/main.cpp
 msgid "Quit"
 msgstr "Quitter"
 
@@ -2522,7 +2461,7 @@ msgstr "Menu principal"
 msgid "Look for devices"
 msgstr "Rechercher des appareils"
 
-#: src/gtk/main.cpp
+#: src/gtk/main.cpp src/tui/devices.cpp
 msgid "Devices"
 msgstr "Appareils"
 
@@ -2542,28 +2481,7 @@ msgstr "Ouvrir sur cet onglet"
 msgid "Open the messages tab on this conversation"
 msgstr "Ouvrir l'onglet Messages sur cette conversation"
 
-#: src/gtk/message_format.cpp
-msgid "Yesterday"
-msgstr "Hier"
-
-#. TRANSLATORS: strftime short date for older conversations; reorder to the local
-#. convention, e.g. "%-d %b".
-#: src/gtk/message_format.cpp
-#, no-c-format
-msgid "%b %-d"
-msgstr "%-d %b"
-
-#: src/gtk/message_format.cpp
-msgid "Today"
-msgstr "Aujourd'hui"
-
-#. TRANSLATORS: strftime date heading above older messages, e.g. "%A %-d %B".
-#: src/gtk/message_format.cpp
-#, no-c-format
-msgid "%A, %b %-d"
-msgstr "%A %-d %b"
-
-#: src/gtk/messages_view.cpp src/gtk/tray.cpp
+#: src/gtk/messages_view.cpp src/gtk/tray.cpp src/tui/main.cpp
 #, c++-format
 msgid "{} unread message"
 msgid_plural "{} unread messages"
@@ -2582,44 +2500,44 @@ msgstr "Envoyé : {}"
 msgid "Received: {}"
 msgstr "Reçu : {}"
 
-#: src/gtk/messages_view.cpp
+#: src/gtk/messages_view.cpp src/tui/messages.cpp
 msgid "Bluetooth connection needed to sync messages."
 msgstr "Une connexion Bluetooth est nécessaire pour synchroniser les messages."
 
-#: src/gtk/messages_view.cpp
+#: src/gtk/messages_view.cpp src/tui/messages.cpp
 msgid "Select a conversation"
 msgstr "Sélectionnez une conversation"
 
-#: src/gtk/messages_view.cpp
+#: src/gtk/messages_view.cpp src/tui/messages.cpp
 msgid "Sending…"
 msgstr "Envoi…"
 
-#: src/gtk/messages_view.cpp
+#: src/gtk/messages_view.cpp src/tui/messages.cpp
 msgid "Enter a recipient."
 msgstr "Saisissez un destinataire."
 
-#: src/gtk/messages_view.cpp
+#: src/gtk/messages_view.cpp src/tui/messages.cpp
 msgid "Select a conversation first."
 msgstr "Sélectionnez d'abord une conversation."
 
-#: src/gtk/messages_view.cpp
+#: src/gtk/messages_view.cpp src/tui/messages.cpp
 msgid "Replying to this conversation is not available."
 msgstr "Répondre à cette conversation n'est pas possible."
 
-#: src/gtk/messages_view.cpp
+#: src/gtk/messages_view.cpp src/tui/messages.cpp
 msgid "No answer about that message; it may still have been sent."
 msgstr ""
 "Aucune réponse concernant ce message ; il a peut-être quand même été envoyé."
 
-#: src/gtk/messages_view.cpp
+#: src/gtk/messages_view.cpp src/tui/messages.cpp
 msgid "Could not reach the Tether daemon; the message was not sent."
 msgstr "Impossible de joindre le démon Tether ; le message n'a pas été envoyé."
 
-#: src/gtk/messages_view.cpp
+#: src/gtk/messages_view.cpp src/tui/messages.cpp
 msgid "Sent"
 msgstr "Envoyé"
 
-#: src/gtk/messages_view.cpp
+#: src/gtk/messages_view.cpp src/tui/messages.cpp
 msgid "New Message"
 msgstr "Nouveau message"
 
@@ -2627,7 +2545,7 @@ msgstr "Nouveau message"
 msgid "Search conversations"
 msgstr "Rechercher des conversations"
 
-#: src/gtk/messages_view.cpp
+#: src/gtk/messages_view.cpp src/tui/messages.cpp
 msgid "To:"
 msgstr "À :"
 
@@ -2643,7 +2561,7 @@ msgstr "Envoyer"
 msgid "Retry"
 msgstr "Réessayer"
 
-#: src/gtk/notifications_view.cpp
+#: src/gtk/notifications_view.cpp src/tui/notifications.cpp
 msgid "Dismiss on the iPhone"
 msgstr "Ignorer sur l'iPhone"
 
@@ -2653,23 +2571,23 @@ msgstr "Ignorer sur l'iPhone"
 msgid "Dismiss {} notification"
 msgstr "Ignorer la notification de {}"
 
-#: src/gtk/notifications_view.cpp
+#: src/gtk/notifications_view.cpp src/tui/notifications.cpp
 msgid "New notification"
 msgstr "Nouvelle notification"
 
-#: src/gtk/notifications_view.cpp
+#: src/gtk/notifications_view.cpp src/tui/notifications.cpp
 msgid "The iPhone would not take the dismissal."
 msgstr "L'iPhone n'a pas accepté la suppression."
 
-#: src/gtk/notifications_view.cpp
+#: src/gtk/notifications_view.cpp src/tui/notifications.cpp
 msgid "No notifications yet."
 msgstr "Aucune notification pour l'instant."
 
-#: src/gtk/notifications_view.cpp
+#: src/gtk/notifications_view.cpp src/tui/notifications.cpp
 msgid "Notification mirroring is unavailable."
 msgstr "La duplication des notifications est indisponible."
 
-#: src/gtk/settings_view.cpp
+#: src/gtk/settings_view.cpp src/tui/settings.cpp
 msgid ""
 "No iPhone is paired over Bluetooth, so the Bluetooth settings below cannot "
 "be changed yet."
@@ -2708,7 +2626,7 @@ msgstr ""
 "L'icône symbolique prend la couleur du panneau. Prend effet au prochain "
 "démarrage de Tether."
 
-#: src/gtk/settings_view.cpp
+#: src/gtk/settings_view.cpp src/tui/settings.cpp
 msgid "iPhone notifications"
 msgstr "Notifications de l'iPhone"
 
@@ -2716,24 +2634,24 @@ msgstr "Notifications de l'iPhone"
 msgid "Alerts your iPhone forwards to this computer over Bluetooth."
 msgstr "Alertes que l'iPhone transmet à cet ordinateur par Bluetooth."
 
-#: src/gtk/settings_view.cpp
+#: src/gtk/settings_view.cpp src/tui/settings.cpp
 msgid "Mirror iPhone notifications"
 msgstr "Dupliquer les notifications de l'iPhone"
 
-#: src/gtk/settings_view.cpp
+#: src/gtk/settings_view.cpp src/tui/settings.cpp
 msgid "Disabled when pairing cannot support LE."
 msgstr "Désactivé quand l'appairage ne prend pas en charge LE."
 
-#: src/gtk/settings_view.cpp
+#: src/gtk/settings_view.cpp src/tui/settings.cpp
 msgid "Include the notification text"
 msgstr "Inclure le texte de la notification"
 
-#: src/gtk/settings_view.cpp
+#: src/gtk/settings_view.cpp src/tui/settings.cpp
 msgid "Title and message content are shown, not just which app sent it."
 msgstr ""
 "Le titre et le message sont affichés, pas seulement l'application émettrice."
 
-#: src/gtk/settings_view.cpp
+#: src/gtk/settings_view.cpp src/tui/settings.cpp
 msgid "Desktop popups"
 msgstr "Bulles du bureau"
 
@@ -2741,25 +2659,25 @@ msgstr "Bulles du bureau"
 msgid "What Tether shows in your notification area."
 msgstr "Ce que Tether affiche dans votre zone de notification."
 
-#: src/gtk/settings_view.cpp
+#: src/gtk/settings_view.cpp src/tui/settings.cpp
 msgid "Show desktop popups"
 msgstr "Afficher les bulles du bureau"
 
-#: src/gtk/settings_view.cpp
+#: src/gtk/settings_view.cpp src/tui/settings.cpp
 msgid "Off silences iPhone alerts, new messages and arriving files."
 msgstr ""
 "Désactivé, cela coupe les alertes de l'iPhone, les nouveaux messages et les "
 "fichiers reçus."
 
-#: src/gtk/settings_view.cpp
+#: src/gtk/settings_view.cpp src/tui/settings.cpp
 msgid "Show message previews"
 msgstr "Afficher l'aperçu des messages"
 
-#: src/gtk/settings_view.cpp
+#: src/gtk/settings_view.cpp src/tui/settings.cpp
 msgid "Off shows only the sender."
 msgstr "Désactivé, seul l'expéditeur est affiché."
 
-#: src/gtk/settings_view.cpp
+#: src/gtk/settings_view.cpp src/tui/settings.cpp
 msgid "Security"
 msgstr "Sécurité"
 
@@ -2767,11 +2685,11 @@ msgstr "Sécurité"
 msgid "What Tether does when the iPhone leaves."
 msgstr "Ce que fait Tether quand l'iPhone s'en va."
 
-#: src/gtk/settings_view.cpp
+#: src/gtk/settings_view.cpp src/tui/settings.cpp
 msgid "Lock the session when the iPhone goes out of range"
 msgstr "Verrouiller la session quand l'iPhone sort de portée"
 
-#: src/gtk/settings_view.cpp
+#: src/gtk/settings_view.cpp src/tui/settings.cpp
 msgid ""
 "Locks about half a minute after the link times out. Switching Bluetooth off "
 "on the iPhone does not lock, and neither does suspending this machine."
@@ -2784,23 +2702,23 @@ msgstr ""
 msgid "SMS and iMessage conversations synced over Bluetooth."
 msgstr "Conversations SMS et iMessage synchronisées par Bluetooth."
 
-#: src/gtk/settings_view.cpp
+#: src/gtk/settings_view.cpp src/tui/settings.cpp
 msgid "Encrypted"
 msgstr "Chiffré"
 
-#: src/gtk/settings_view.cpp
+#: src/gtk/settings_view.cpp src/tui/settings.cpp
 msgid "Unencrypted"
 msgstr "Non chiffré"
 
-#: src/gtk/settings_view.cpp
+#: src/gtk/settings_view.cpp src/tui/settings.cpp
 msgid "Do not keep"
 msgstr "Ne pas conserver"
 
-#: src/gtk/settings_view.cpp
+#: src/gtk/settings_view.cpp src/tui/settings.cpp
 msgid "Keep message history"
 msgstr "Conserver l'historique des messages"
 
-#: src/gtk/settings_view.cpp
+#: src/gtk/settings_view.cpp src/tui/settings.cpp
 msgid ""
 "Encrypted uses a key from your desktop keyring. Do not keep deletes what is "
 "stored."
@@ -2808,14 +2726,14 @@ msgstr ""
 "Chiffré utilise une clé du trousseau. Ne pas conserver supprime ce qui est "
 "stocké."
 
-#: src/gtk/settings_view.cpp
+#: src/gtk/settings_view.cpp src/tui/settings.cpp
 msgid ""
 "Paused: no key from the desktop keyring. Unlock it, or choose Unencrypted."
 msgstr ""
 "Suspendu : aucune clé du trousseau. Déverrouillez-le, ou choisissez Non "
 "chiffré."
 
-#: src/gtk/settings_view.cpp
+#: src/gtk/settings_view.cpp src/tui/settings.cpp
 msgid "Experimental"
 msgstr "Expérimental"
 
@@ -2825,36 +2743,266 @@ msgstr ""
 "Fonctionnalités inachevées. Elles peuvent cesser de fonctionner à tout "
 "moment."
 
-#: src/gtk/settings_view.cpp
+#: src/gtk/settings_view.cpp src/tui/settings.cpp
 msgid "Call control over Bluetooth"
 msgstr "Gestion des appels par Bluetooth"
 
-#: src/gtk/settings_view.cpp
+#: src/gtk/settings_view.cpp src/tui/settings.cpp
 msgid "Answer and place calls from the Calls tab."
 msgstr "Répondez et passez des appels depuis l'onglet Appels."
 
-#: src/gtk/tray.cpp src/gtk/ui_util.cpp
+#: src/gtk/tray.cpp src/gtk/ui_util.cpp src/tui/main.cpp
 msgid "connected"
 msgstr "connecté"
 
-#: src/gtk/tray.cpp src/gtk/ui_util.cpp
+#: src/gtk/tray.cpp src/gtk/ui_util.cpp src/tui/main.cpp
 msgid "not connected"
 msgstr "non connecté"
 
 #. TRANSLATORS: {} is a transport name, "Wi-Fi" or "Bluetooth", or a device name.
 #. TRANSLATORS: {} is a transport name, "Wi-Fi" or "Bluetooth".
-#: src/gtk/tray.cpp src/gtk/ui_util.cpp
+#: src/gtk/tray.cpp src/gtk/ui_util.cpp src/tui/main.cpp
 #, c++-format
 msgid "{}: {}"
 msgstr "{} : {}"
 
-#: src/gtk/tray.cpp
+#: src/gtk/tray.cpp src/tui/main.cpp
 msgid "Daemon: not running"
 msgstr "Démon : non lancé"
 
-#: src/gtk/ui_util.cpp
+#: src/gtk/ui_util.cpp src/tui/main.cpp
 msgid "Waiting for the Tether daemon."
 msgstr "En attente du service Tether."
+
+#: src/tui/devices.cpp
+msgid "Overview"
+msgstr "Vue d'ensemble"
+
+#: src/tui/devices.cpp
+msgid "Select a device first."
+msgstr "Sélectionnez d'abord un appareil."
+
+#: src/tui/devices.cpp
+msgid "Modes: off, transparency, adaptive, anc"
+msgstr "Modes : off, transparency, adaptive, anc"
+
+#: src/tui/devices.cpp
+#, c++-format
+msgid "Found {}. Select it under BLUETOOTH to pair."
+msgstr "{} trouvé. Sélectionnez-le sous BLUETOOTH pour l'associer."
+
+#: src/tui/devices.cpp
+msgid "Usage: :send FILE…"
+msgstr "Utilisation : :send FICHIER…"
+
+#: src/tui/main.cpp
+msgid "-- INSERT --"
+msgstr "-- INSERTION --"
+
+#: src/tui/main.cpp
+msgid "Move down / up"
+msgstr "Descendre / monter"
+
+#: src/tui/main.cpp
+msgid "First / last"
+msgstr "Premier / dernier"
+
+#: src/tui/main.cpp
+msgid "Half a page down / up"
+msgstr "Une demi-page vers le bas / le haut"
+
+#: src/tui/main.cpp
+msgid "Focus the list / the detail pane"
+msgstr "Activer la liste / le panneau de détails"
+
+#: src/tui/main.cpp
+msgid "Open, or run the highlighted action"
+msgstr "Ouvrir ou exécuter l'action en surbrillance"
+
+#: src/tui/main.cpp
+msgid "Toggle the highlighted setting"
+msgstr "Basculer le réglage en surbrillance"
+
+#: src/tui/main.cpp
+msgid "Switch tab"
+msgstr "Changer d'onglet"
+
+#: src/tui/main.cpp
+msgid "Filter the list"
+msgstr "Filtrer la liste"
+
+#: src/tui/main.cpp
+msgid "Clear the filter, leave insert mode"
+msgstr "Effacer le filtre, quitter le mode insertion"
+
+#: src/tui/main.cpp
+msgid "Write in the open conversation"
+msgstr "Écrire dans la conversation ouverte"
+
+#: src/tui/main.cpp
+msgid "Send / new line (insert mode)"
+msgstr "Envoyer / nouvelle ligne (mode insertion)"
+
+#: src/tui/main.cpp
+msgid "New message, or dial on Calls"
+msgstr "Nouveau message, ou composer dans Appels"
+
+#: src/tui/main.cpp
+msgid "Dismiss, forget, unpair, or hang up"
+msgstr "Ignorer, oublier, dissocier ou raccrocher"
+
+#: src/tui/main.cpp
+msgid "Copy the highlighted address or text"
+msgstr "Copier l'adresse ou le texte en surbrillance"
+
+#: src/tui/main.cpp
+msgid "Refresh, or scan for devices"
+msgstr "Actualiser ou rechercher des appareils"
+
+#: src/tui/main.cpp
+msgid "Send files to the selected device"
+msgstr "Envoyer des fichiers à l'appareil sélectionné"
+
+#: src/tui/main.cpp
+msgid "Send the clipboard"
+msgstr "Envoyer le presse-papiers"
+
+#: src/tui/main.cpp
+msgid "Place a call"
+msgstr "Passer un appel"
+
+#: src/tui/main.cpp
+msgid "Message someone"
+msgstr "Écrire à quelqu'un"
+
+#: src/tui/main.cpp
+msgid "Keys"
+msgstr "Touches"
+
+#: src/tui/main.cpp
+msgid "Terminal too small"
+msgstr "Terminal trop petit"
+
+#: src/tui/main.cpp
+msgid "Press i to write a message"
+msgstr "Appuyez sur i pour écrire un message"
+
+#: src/tui/main.cpp
+#, c++-format
+msgid "Not a command: {}"
+msgstr "Commande inconnue : {}"
+
+#: src/tui/main.cpp
+msgid "Type :q and press Enter to quit"
+msgstr "Tapez :q puis Entrée pour quitter"
+
+#: src/tui/main.cpp
+msgid ""
+"Usage: tether-tui [--devices|--messages|--notifications|--contacts|--calls|--"
+"settings] [--thread KEY]"
+msgstr ""
+"Utilisation : tether-tui [--devices|--messages|--notifications|--contacts|--"
+"calls|--settings] [--thread CLÉ]"
+
+#: src/tui/main.cpp
+msgid "tether-tui needs a terminal."
+msgstr "tether-tui a besoin d'un terminal."
+
+#: src/tui/settings.cpp
+#, c++-format
+msgid "Settings: {}"
+msgstr "Réglages : {}"
+
+#. TRANSLATORS: strftime clock time on today's conversations, e.g. "%I:%M %p" for 12-hour.
+#: src/ui_common/message_format.cpp src/ui_common/ui_text.cpp
+#, no-c-format
+msgid "%H:%M"
+msgstr "%H:%M"
+
+#: src/ui_common/message_format.cpp
+msgid "Yesterday"
+msgstr "Hier"
+
+#. TRANSLATORS: strftime short date for older conversations; reorder to the local
+#. convention, e.g. "%-d %b".
+#: src/ui_common/message_format.cpp
+#, no-c-format
+msgid "%b %-d"
+msgstr "%-d %b"
+
+#: src/ui_common/message_format.cpp
+msgid "Today"
+msgstr "Aujourd'hui"
+
+#. TRANSLATORS: strftime date heading above older messages, e.g. "%A %-d %B".
+#: src/ui_common/message_format.cpp
+#, no-c-format
+msgid "%A, %b %-d"
+msgstr "%A %-d %b"
+
+#. TRANSLATORS: Left earbud, read aloud by screen readers before its battery level.
+#: src/ui_common/ui_text.cpp
+msgid "Left earbud"
+msgstr "Écouteur gauche"
+
+#. TRANSLATORS: Left earbud, abbreviated to fit the device row. One or two letters.
+#: src/ui_common/ui_text.cpp
+msgid "L"
+msgstr "G"
+
+#. TRANSLATORS: Right earbud, read aloud by screen readers before its battery level.
+#: src/ui_common/ui_text.cpp
+msgid "Right earbud"
+msgstr "Écouteur droit"
+
+#. TRANSLATORS: Right earbud, abbreviated to fit the device row. One or two letters.
+#: src/ui_common/ui_text.cpp
+msgid "R"
+msgstr "D"
+
+#: src/ui_common/ui_text.cpp
+msgid "Call waiting"
+msgstr "Appel en attente"
+
+#: src/ui_common/ui_text.cpp
+msgid "Dialing"
+msgstr "Numérotation"
+
+#: src/ui_common/ui_text.cpp
+msgid "Ringing"
+msgstr "Sonnerie"
+
+#: src/ui_common/ui_text.cpp
+msgid "On call"
+msgstr "En communication"
+
+#: src/ui_common/ui_text.cpp
+msgid "On hold"
+msgstr "En attente"
+
+#: src/ui_common/ui_text.cpp
+msgid "Ended"
+msgstr "Terminé"
+
+#: src/ui_common/ui_text.cpp
+msgid "No service"
+msgstr "Aucun service"
+
+#. TRANSLATORS: Cellular signal strength read aloud, {} is 0 to 5.
+#: src/ui_common/ui_text.cpp
+#, c++-format
+msgid "signal {} of 5"
+msgstr "signal {} sur 5"
+
+#. TRANSLATORS: The iPhone's battery level read aloud, {} is like "80%".
+#: src/ui_common/ui_text.cpp
+#, c++-format
+msgid "battery {}"
+msgstr "batterie {}"
+
+#: src/ui_common/ui_text.cpp
+msgid "%b %d, %H:%M"
+msgstr "%d %b, %H:%M"
 
 #: src/gtk/tether-gtk.desktop.in
 msgid "Device Synchronization"

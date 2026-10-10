@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: tether\n"
 "Report-Msgid-Bugs-To: zack@bartel.com\n"
-"POT-Creation-Date: 2026-10-08 20:06-0700\n"
+"POT-Creation-Date: 2026-10-09 20:43-0700\n"
 "PO-Revision-Date: 2026-08-23\n"
 "Last-Translator: Tether project\n"
 "Language-Team: Korean\n"
@@ -414,6 +414,7 @@ msgid "BR/EDR, notifications live"
 msgstr "BR/EDR, 알림 활성"
 
 #: src/cli/main.cpp src/gtk/devices_view.cpp src/gtk/main.cpp
+#: src/tui/devices.cpp src/tui/notifications.cpp
 msgid "Notifications"
 msgstr "알림"
 
@@ -501,7 +502,7 @@ msgid "Right"
 msgstr "오른쪽"
 
 #. TRANSLATORS: The AirPods charging case, on the device row beside the two earbuds.
-#: src/cli/main.cpp src/gtk/devices_view.cpp
+#: src/cli/main.cpp src/ui_common/ui_text.cpp
 msgid "Case"
 msgstr "케이스"
 
@@ -630,7 +631,7 @@ msgstr "통신사 없음"
 msgid " signal {0}/5 battery {1}/5"
 msgstr " 신호 {0}/5 배터리 {1}/5"
 
-#: src/cli/main.cpp src/gtk/calls_view.cpp
+#: src/cli/main.cpp src/ui_common/ui_text.cpp
 msgid "roaming"
 msgstr "로밍"
 
@@ -642,7 +643,7 @@ msgstr "통화 (HFP)"
 msgid "Could not read Bluetooth diagnostics from the daemon.\n"
 msgstr "데몬에서 Bluetooth 진단 정보를 읽지 못했습니다.\n"
 
-#: src/cli/main.cpp src/gtk/calls_view.cpp
+#: src/cli/main.cpp src/gtk/calls_view.cpp src/tui/calls.cpp
 msgid "The call could not be placed."
 msgstr "전화를 걸 수 없습니다."
 
@@ -683,7 +684,7 @@ msgid "({} unread)"
 msgid_plural "({} unread)"
 msgstr[0] "(읽지 않음 {}개)"
 
-#: src/cli/main.cpp src/gtk/devices_view.cpp
+#: src/cli/main.cpp src/gtk/devices_view.cpp src/tui/devices.cpp
 #, c++-format
 msgid ""
 "The running tetherd is {}, but this is tether {}. Stop it and it\n"
@@ -694,7 +695,7 @@ msgstr ""
 "시작됩니다:\n"
 "    pkill tetherd\n"
 
-#: src/cli/main.cpp src/gtk/devices_view.cpp
+#: src/cli/main.cpp src/gtk/devices_view.cpp src/tui/devices.cpp
 msgid "an older build"
 msgstr "이전 빌드"
 
@@ -738,7 +739,7 @@ msgstr "메시지가 전송되기 전에 데몬이 연결을 닫았습니다.\n"
 msgid "Sent to %s\n"
 msgstr "%s(으)로 보냈습니다\n"
 
-#: src/cli/main.cpp src/gtk/messages_view.cpp
+#: src/cli/main.cpp src/gtk/messages_view.cpp src/tui/messages.cpp
 msgid "The message was not sent."
 msgstr "메시지가 전송되지 않았습니다."
 
@@ -1186,6 +1187,7 @@ msgid "Nothing to send."
 msgstr "보낼 것이 없습니다."
 
 #: src/core/src/bluetooth/connection.cpp src/gtk/messages_view.cpp
+#: src/tui/messages.cpp
 msgid "Messages are not connected."
 msgstr "메시지가 연결되지 않았습니다."
 
@@ -1486,12 +1488,13 @@ msgstr ""
 #. TRANSLATORS: the feature name Tether shows for this profile.
 #: src/core/src/bluetooth/profile_supervisor.cpp src/daemon/main.cpp
 #: src/gtk/devices_view.cpp src/gtk/main.cpp src/gtk/messages_view.cpp
-#: src/gtk/settings_view.cpp
+#: src/gtk/settings_view.cpp src/tui/devices.cpp src/tui/messages.cpp
+#: src/tui/settings.cpp
 msgid "Messages"
 msgstr "메시지"
 
 #: src/core/src/bluetooth/profile_supervisor.cpp src/gtk/devices_view.cpp
-#: src/gtk/main.cpp
+#: src/gtk/main.cpp src/tui/contacts.cpp src/tui/devices.cpp
 msgid "Contacts"
 msgstr "연락처"
 
@@ -1559,7 +1562,7 @@ msgid "{} could not be opened."
 msgstr "{}을(를) 열지 못했습니다."
 
 #: src/core/src/bluetooth/profile_supervisor.cpp src/gtk/calls_view.cpp
-#: src/gtk/notifications_view.cpp
+#: src/gtk/notifications_view.cpp src/tui/notifications.cpp
 msgid "Waiting for the iPhone."
 msgstr "iPhone을 기다리는 중입니다."
 
@@ -1627,7 +1630,7 @@ msgstr "Bluetooth 검색이 끝났습니다."
 msgid "Another pairing attempt is already in progress."
 msgstr "다른 페어링 시도가 이미 진행 중입니다."
 
-#: src/core/src/net.cpp src/gtk/devices_view.cpp
+#: src/core/src/net.cpp src/gtk/devices_view.cpp src/tui/devices.cpp
 msgid "Bluetooth is unavailable on this machine."
 msgstr "이 컴퓨터에서는 Bluetooth를 사용할 수 없습니다."
 
@@ -1639,7 +1642,7 @@ msgstr "AirPods 기기가 아닙니다."
 msgid "Unknown listening mode."
 msgstr "알 수 없는 청취 모드입니다."
 
-#: src/core/src/net.cpp src/gtk/devices_view.cpp
+#: src/core/src/net.cpp src/gtk/devices_view.cpp src/tui/devices.cpp
 msgid "No AirPods are connected."
 msgstr "연결된 AirPods가 없습니다."
 
@@ -1676,6 +1679,7 @@ msgid "unknown error"
 msgstr "알 수 없는 오류"
 
 #: src/core/src/net.cpp src/gtk/devices_view.cpp src/gtk/messages_view.cpp
+#: src/tui/devices.cpp src/tui/messages.cpp
 msgid "Could not reach the Tether daemon."
 msgstr "Tether 데몬에 연결하지 못했습니다."
 
@@ -1734,99 +1738,49 @@ msgstr "코드 복사"
 msgid "Open in {}"
 msgstr "{}에서 열기"
 
-#: src/gtk/calls_view.cpp
-msgid "Incoming"
-msgstr "수신"
-
-#: src/gtk/calls_view.cpp
-msgid "Call waiting"
-msgstr "통화 대기"
-
-#: src/gtk/calls_view.cpp
-msgid "Dialing"
-msgstr "발신 중"
-
-#: src/gtk/calls_view.cpp
-msgid "Ringing"
-msgstr "벨 울리는 중"
-
-#: src/gtk/calls_view.cpp
-msgid "On call"
-msgstr "통화 중"
-
-#: src/gtk/calls_view.cpp
-msgid "On hold"
-msgstr "대기 중"
-
-#: src/gtk/calls_view.cpp
-msgid "Ended"
-msgstr "종료됨"
-
-#: src/gtk/calls_view.cpp
-msgid "No service"
-msgstr "서비스 없음"
-
-#. TRANSLATORS: Cellular signal strength read aloud, {} is 0 to 5.
-#: src/gtk/calls_view.cpp
-#, c++-format
-msgid "signal {} of 5"
-msgstr "신호 {}/5"
-
-#. TRANSLATORS: The iPhone's battery level read aloud, {} is like "80%".
-#: src/gtk/calls_view.cpp
-#, c++-format
-msgid "battery {}"
-msgstr "배터리 {}"
-
-#: src/gtk/calls_view.cpp
+#: src/gtk/calls_view.cpp src/tui/calls.cpp
 msgid "Unknown caller"
 msgstr "알 수 없는 발신자"
 
-#: src/gtk/calls_view.cpp
+#: src/gtk/calls_view.cpp src/tui/calls.cpp
 msgid "Answer"
 msgstr "받기"
 
-#: src/gtk/calls_view.cpp
+#: src/gtk/calls_view.cpp src/tui/calls.cpp
 msgid "Audio here"
 msgstr "오디오 가져오기"
 
-#: src/gtk/calls_view.cpp
+#: src/gtk/calls_view.cpp src/tui/calls.cpp
 msgid "Decline"
 msgstr "거절"
 
-#: src/gtk/calls_view.cpp
+#: src/gtk/calls_view.cpp src/tui/calls.cpp
 msgid "Hang up"
 msgstr "끊기"
 
-#. TRANSLATORS: strftime clock time on today's conversations, e.g. "%I:%M %p" for 12-hour.
-#: src/gtk/calls_view.cpp src/gtk/message_format.cpp src/gtk/messages_view.cpp
-#, no-c-format
-msgid "%H:%M"
-msgstr "%H:%M"
+#: src/gtk/calls_view.cpp src/tui/calls.cpp src/ui_common/ui_text.cpp
+msgid "Incoming"
+msgstr "수신"
 
-#: src/gtk/calls_view.cpp
-msgid "%b %d, %H:%M"
-msgstr "%m월 %d일 %H:%M"
-
-#: src/gtk/calls_view.cpp
+#: src/gtk/calls_view.cpp src/tui/calls.cpp
 msgid "Missed"
 msgstr "부재중"
 
-#: src/gtk/calls_view.cpp
+#: src/gtk/calls_view.cpp src/tui/calls.cpp
 msgid "Outgoing"
 msgstr "발신"
 
 #. TRANSLATORS: Button that calls a recent caller back, {} is their name or number.
-#: src/gtk/calls_view.cpp
+#: src/gtk/calls_view.cpp src/tui/calls.cpp
 #, c++-format
 msgid "Call {}"
 msgstr "{}에게 전화"
 
-#: src/gtk/calls_view.cpp
+#: src/gtk/calls_view.cpp src/tui/calls.cpp
 msgid "No calls."
 msgstr "통화가 없습니다."
 
-#: src/gtk/calls_view.cpp
+#: src/gtk/calls_view.cpp src/tui/calls.cpp
 msgid "Call control is off. Turn it on with 'tether --bt-calls-enable on'."
 msgstr "통화 제어가 꺼져 있습니다. 'tether --bt-calls-enable on'으로 켜십시오."
 
@@ -1834,7 +1788,7 @@ msgstr "통화 제어가 꺼져 있습니다. 'tether --bt-calls-enable on'으�
 msgid "Number to call"
 msgstr "전화를 걸 번호"
 
-#: src/gtk/calls_view.cpp
+#: src/gtk/calls_view.cpp src/tui/calls.cpp
 msgid "Call"
 msgstr "전화 걸기"
 
@@ -1842,7 +1796,7 @@ msgstr "전화 걸기"
 msgid "The iPhone's carrier, signal, and battery."
 msgstr "iPhone의 통신사, 신호, 배터리입니다."
 
-#: src/gtk/calls_view.cpp
+#: src/gtk/calls_view.cpp src/tui/calls.cpp
 msgid "Recent calls"
 msgstr "최근 통화"
 
@@ -1856,7 +1810,7 @@ msgstr "복사"
 msgid "Copy {}"
 msgstr "{} 복사"
 
-#: src/gtk/contacts_view.cpp
+#: src/gtk/contacts_view.cpp src/tui/main.cpp
 msgid "Copied to the clipboard."
 msgstr "클립보드에 복사했습니다."
 
@@ -1871,11 +1825,11 @@ msgstr "메시지 보내기"
 msgid "Message {}"
 msgstr "{}에 메시지 보내기"
 
-#: src/gtk/contacts_view.cpp
+#: src/gtk/contacts_view.cpp src/tui/contacts.cpp
 msgid "Favorite"
 msgstr "즐겨찾기"
 
-#: src/gtk/contacts_view.cpp
+#: src/gtk/contacts_view.cpp src/tui/contacts.cpp
 msgid "No contacts yet. Check the Bluetooth link on the Devices page."
 msgstr "아직 연락처가 없습니다. 기기 페이지에서 블루투스 연결을 확인하세요."
 
@@ -1883,108 +1837,89 @@ msgstr "아직 연락처가 없습니다. 기기 페이지에서 블루투스 �
 msgid "Search contacts"
 msgstr "연락처 검색"
 
-#: src/gtk/daemon_client.cpp
+#: src/gtk/daemon_client.cpp src/tui/main.cpp
 msgid "Daemon Offline"
 msgstr "데몬 오프라인"
 
-#: src/gtk/daemon_client.cpp src/gtk/messages_view.cpp
+#: src/gtk/daemon_client.cpp src/gtk/messages_view.cpp src/tui/main.cpp
+#: src/tui/messages.cpp
 msgid "The Tether daemon is not running."
 msgstr "Tether 데몬이 실행 중이 아닙니다."
 
-#: src/gtk/daemon_client.cpp
+#: src/gtk/daemon_client.cpp src/tui/main.cpp
 msgid "Daemon Online"
 msgstr "데몬 온라인"
 
-#. TRANSLATORS: Left earbud, read aloud by screen readers before its battery level.
-#: src/gtk/devices_view.cpp
-msgid "Left earbud"
-msgstr "왼쪽 이어버드"
-
-#. TRANSLATORS: Left earbud, abbreviated to fit the device row. One or two letters.
-#: src/gtk/devices_view.cpp
-msgid "L"
-msgstr "좌"
-
-#. TRANSLATORS: Right earbud, read aloud by screen readers before its battery level.
-#: src/gtk/devices_view.cpp
-msgid "Right earbud"
-msgstr "오른쪽 이어버드"
-
-#. TRANSLATORS: Right earbud, abbreviated to fit the device row. One or two letters.
-#: src/gtk/devices_view.cpp
-msgid "R"
-msgstr "우"
-
-#: src/gtk/devices_view.cpp
+#: src/gtk/devices_view.cpp src/tui/devices.cpp
 msgid "Reading battery…"
 msgstr "배터리를 읽는 중…"
 
-#: src/gtk/devices_view.cpp
+#: src/gtk/devices_view.cpp src/tui/devices.cpp
 msgid "Not connected yet."
 msgstr "아직 연결되지 않았습니다."
 
-#: src/gtk/devices_view.cpp
+#: src/gtk/devices_view.cpp src/tui/devices.cpp
 msgid "Connected."
 msgstr "연결되었습니다."
 
-#: src/gtk/devices_view.cpp
+#: src/gtk/devices_view.cpp src/tui/devices.cpp
 msgid "Scanning for nearby devices..."
 msgstr "근처 기기를 검색하는 중..."
 
-#: src/gtk/devices_view.cpp
+#: src/gtk/devices_view.cpp src/tui/devices.cpp
 msgid "Off"
 msgstr "끔"
 
-#: src/gtk/devices_view.cpp
+#: src/gtk/devices_view.cpp src/tui/devices.cpp
 msgid "Transparency"
 msgstr "주변음 허용"
 
-#: src/gtk/devices_view.cpp
+#: src/gtk/devices_view.cpp src/tui/devices.cpp
 msgid "Adaptive"
 msgstr "적응형"
 
-#: src/gtk/devices_view.cpp
+#: src/gtk/devices_view.cpp src/tui/devices.cpp
 msgid "Noise Cancellation"
 msgstr "노이즈 캔슬링"
 
-#: src/gtk/devices_view.cpp
+#: src/gtk/devices_view.cpp src/tui/devices.cpp
 msgid "Disconnect"
 msgstr "연결 해제"
 
-#: src/gtk/devices_view.cpp
+#: src/gtk/devices_view.cpp src/tui/devices.cpp
 msgid "Connect"
 msgstr "연결"
 
-#: src/gtk/devices_view.cpp
+#: src/gtk/devices_view.cpp src/tui/devices.cpp
 msgid "Tether is not managing the AirPods, so another program can use them."
 msgstr ""
 "Tether가 AirPods를 관리하지 않으므로 다른 프로그램이 사용할 수 있습니다."
 
-#: src/gtk/devices_view.cpp
+#: src/gtk/devices_view.cpp src/tui/devices.cpp
 msgid "These AirPods do not report a listening mode."
 msgstr "이 AirPods는 청취 모드를 보고하지 않습니다."
 
-#: src/gtk/devices_view.cpp
+#: src/gtk/devices_view.cpp src/tui/devices.cpp
 msgid "These AirPods do not report whether they are being worn."
 msgstr "이 AirPods는 착용 여부를 보고하지 않습니다."
 
-#: src/gtk/devices_view.cpp
+#: src/gtk/devices_view.cpp src/tui/devices.cpp
 msgid "Both buds are in."
 msgstr "양쪽 이어버드를 착용 중입니다."
 
-#: src/gtk/devices_view.cpp
+#: src/gtk/devices_view.cpp src/tui/devices.cpp
 msgid "One bud is in."
 msgstr "한쪽 이어버드를 착용 중입니다."
 
-#: src/gtk/devices_view.cpp
+#: src/gtk/devices_view.cpp src/tui/devices.cpp
 msgid "Neither bud is in."
 msgstr "이어버드를 착용하지 않았습니다."
 
-#: src/gtk/devices_view.cpp
+#: src/gtk/devices_view.cpp src/tui/devices.cpp
 msgid "The buds are handed over with Apple's own handoff."
 msgstr "AirPods는 Apple 자체 핸드오프로 넘겨집니다."
 
-#: src/gtk/devices_view.cpp
+#: src/gtk/devices_view.cpp src/tui/devices.cpp
 msgid ""
 "The buds are handed over by disconnecting them. For Apple's own handoff, put "
 "DeviceID = bluetooth:004C:0000:0000 under [General] in /etc/bluetooth/"
@@ -1994,66 +1929,66 @@ msgstr ""
 "bluetooth/main.conf의 [General]에 DeviceID = bluetooth:004C:0000:0000 을 추가"
 "하고 bluetooth를 다시 시작하세요."
 
-#: src/gtk/devices_view.cpp
+#: src/gtk/devices_view.cpp src/tui/devices.cpp
 msgid "Full mode — messages, contacts, and notifications."
 msgstr "전체 모드 — 메시지, 연락처, 알림."
 
-#: src/gtk/devices_view.cpp
+#: src/gtk/devices_view.cpp src/tui/devices.cpp
 msgid "Compatibility mode — messages and contacts, no notification mirroring."
 msgstr "호환 모드 — 메시지와 연락처만, 알림 미러링 없음."
 
-#: src/gtk/devices_view.cpp
+#: src/gtk/devices_view.cpp src/tui/devices.cpp
 msgid "This machine cannot carry the Bluetooth features."
 msgstr "이 컴퓨터는 Bluetooth 기능을 지원할 수 없습니다."
 
-#: src/gtk/devices_view.cpp
+#: src/gtk/devices_view.cpp src/tui/devices.cpp
 msgid "Link"
 msgstr "링크"
 
-#: src/gtk/devices_view.cpp
+#: src/gtk/devices_view.cpp src/tui/devices.cpp
 msgid "Not paired over Bluetooth yet."
 msgstr "아직 Bluetooth로 페어링되지 않았습니다."
 
-#: src/gtk/devices_view.cpp
+#: src/gtk/devices_view.cpp src/tui/devices.cpp
 msgid "Tether is not using this device. Pair it to select it."
 msgstr "Tether가 이 기기를 사용하고 있지 않습니다. 선택하려면 페어링하십시오."
 
-#: src/gtk/devices_view.cpp
+#: src/gtk/devices_view.cpp src/tui/devices.cpp
 msgid "Bluetooth is switched off for this iPhone."
 msgstr "이 iPhone에 대해 Bluetooth가 꺼져 있습니다."
 
-#: src/gtk/devices_view.cpp
+#: src/gtk/devices_view.cpp src/tui/devices.cpp
 msgid "Connected and ready."
 msgstr "연결되어 사용할 준비가 되었습니다."
 
-#: src/gtk/devices_view.cpp
+#: src/gtk/devices_view.cpp src/tui/devices.cpp
 msgid "Device is offline. Make sure it is switched on and on the same network."
 msgstr ""
 "기기가 오프라인입니다. 전원이 켜져 있고 같은 네트워크에 있는지 확인하십시오."
 
-#: src/gtk/devices_view.cpp
+#: src/gtk/devices_view.cpp src/tui/devices.cpp
 #, c++-format
 msgid "Found at {0}:{1}"
 msgstr "{0}:{1}에서 찾았습니다"
 
-#: src/gtk/devices_view.cpp
+#: src/gtk/devices_view.cpp src/tui/devices.cpp
 msgid "Sending pair request..."
 msgstr "페어링 요청을 보내는 중..."
 
-#: src/gtk/devices_view.cpp
+#: src/gtk/devices_view.cpp src/tui/devices.cpp
 msgid "Pair request sent. Approve on remote device!"
 msgstr "페어링 요청을 보냈습니다. 원격 기기에서 승인하십시오!"
 
-#: src/gtk/devices_view.cpp
+#: src/gtk/devices_view.cpp src/tui/devices.cpp
 msgid "Pairing… confirm the prompt on the iPhone."
 msgstr "페어링 중… iPhone의 확인 창에서 승인하십시오."
 
-#: src/gtk/devices_view.cpp
+#: src/gtk/devices_view.cpp src/tui/devices.cpp
 #, c-format
 msgid "Remove the Bluetooth pairing with %s?"
 msgstr "%s와의 Bluetooth 페어링을 제거하시겠습니까?"
 
-#: src/gtk/devices_view.cpp
+#: src/gtk/devices_view.cpp src/tui/devices.cpp
 msgid ""
 "Also delete this computer from the iPhone's Bluetooth settings before "
 "pairing again, or the phone will keep the stale bond."
@@ -2061,16 +1996,16 @@ msgstr ""
 "다시 페어링하기 전에 iPhone의 Bluetooth 설정에서도 이 컴퓨터를 삭제하십시오. "
 "그렇지 않으면 오래된 본드가 남습니다."
 
-#: src/gtk/devices_view.cpp
+#: src/gtk/devices_view.cpp src/tui/devices.cpp
 msgid "Removing the pairing…"
 msgstr "페어링을 제거하는 중…"
 
-#: src/gtk/devices_view.cpp
+#: src/gtk/devices_view.cpp src/tui/devices.cpp
 #, c-format
 msgid "Forget %s?"
 msgstr "%s을(를) 삭제할까요?"
 
-#: src/gtk/devices_view.cpp
+#: src/gtk/devices_view.cpp src/tui/devices.cpp
 msgid ""
 "Tether will stop connecting to it. Forget this computer on the other device "
 "too, then pair again to reconnect."
@@ -2082,27 +2017,28 @@ msgstr ""
 msgid "Setup commands copied to the clipboard."
 msgstr "설정 명령을 클립보드에 복사했습니다."
 
-#: src/gtk/devices_view.cpp src/gtk/messages_view.cpp
+#: src/gtk/devices_view.cpp src/gtk/messages_view.cpp src/tui/devices.cpp
+#: src/tui/messages.cpp
 msgid "Asking the iPhone to show its Bluetooth permissions…"
 msgstr "iPhone에 Bluetooth 권한을 표시하도록 요청하는 중…"
 
 #. TRANSLATORS: {} is a file name.
-#: src/gtk/devices_view.cpp
+#: src/gtk/devices_view.cpp src/tui/devices.cpp
 #, c++-format
 msgid "Sending {}…"
 msgstr "{} 보내는 중…"
 
 #. TRANSLATORS: {0} is the current file's position, {1} the batch size.
-#: src/gtk/devices_view.cpp
+#: src/gtk/devices_view.cpp src/tui/devices.cpp
 #, c++-format
 msgid "({0} of {1})"
 msgstr "({1}개 중 {0}개)"
 
-#: src/gtk/devices_view.cpp
+#: src/gtk/devices_view.cpp src/tui/devices.cpp
 msgid "Daemon unavailable."
 msgstr "데몬을 사용할 수 없습니다."
 
-#: src/gtk/devices_view.cpp
+#: src/gtk/devices_view.cpp src/tui/devices.cpp
 msgid "Send File"
 msgstr "파일 보내기"
 
@@ -2114,15 +2050,15 @@ msgstr "취소(_C)"
 msgid "_Send"
 msgstr "보내기(_S)"
 
-#: src/gtk/devices_view.cpp
+#: src/gtk/devices_view.cpp src/tui/devices.cpp
 msgid "Folders can't be sent — drop files instead."
 msgstr "폴더는 보낼 수 없습니다. 대신 파일을 놓으십시오."
 
-#: src/gtk/devices_view.cpp
+#: src/gtk/devices_view.cpp src/tui/devices.cpp
 msgid "Clipboard, files, and OTP are connected."
 msgstr "클립보드, 파일, OTP가 연결되었습니다."
 
-#: src/gtk/devices_view.cpp
+#: src/gtk/devices_view.cpp src/tui/devices.cpp
 msgid ""
 "Files and OTP are connected. This compositor does not give Tether clipboard "
 "access, so clipboard sync is off."
@@ -2130,7 +2066,7 @@ msgstr ""
 "파일과 OTP는 연결되어 있습니다. 이 컴포지터는 Tether에 클립보드 접근을 허용하"
 "지 않으므로 클립보드 동기화가 꺼져 있습니다."
 
-#: src/gtk/devices_view.cpp
+#: src/gtk/devices_view.cpp src/tui/devices.cpp
 msgid ""
 "avahi-daemon isn't running, so other devices can't find this PC. Start it "
 "with: sudo systemctl enable --now avahi-daemon"
@@ -2138,7 +2074,7 @@ msgstr ""
 "avahi-daemon이 실행되고 있지 않아 다른 기기가 이 PC를 찾을 수 없습니다. 다음 "
 "명령으로 시작하십시오: sudo systemctl enable --now avahi-daemon"
 
-#: src/gtk/devices_view.cpp
+#: src/gtk/devices_view.cpp src/tui/devices.cpp
 msgid ""
 "A device is on the network but cannot reach this PC. A firewall is running; "
 "Tether needs inbound TCP 5134. Allow it with: sudo ufw allow 5134/tcp"
@@ -2147,41 +2083,42 @@ msgstr ""
 "Tether에는 인바운드 TCP 5134가 필요합니다. 다음 명령으로 허용하세요: sudo "
 "ufw allow 5134/tcp"
 
-#: src/gtk/devices_view.cpp
+#: src/gtk/devices_view.cpp src/tui/devices.cpp
 msgid "No paired device is connected. Switch it on and join the same network."
 msgstr ""
 "연결된 페어링 기기가 없습니다. 기기를 켜고 같은 네트워크에 연결하십시오."
 
-#: src/gtk/devices_view.cpp
+#: src/gtk/devices_view.cpp src/tui/devices.cpp
 msgid "Unknown Device"
 msgstr "알 수 없는 기기"
 
-#: src/gtk/devices_view.cpp
+#: src/gtk/devices_view.cpp src/tui/devices.cpp
 msgid "Connected"
 msgstr "연결됨"
 
-#: src/gtk/devices_view.cpp
+#: src/gtk/devices_view.cpp src/tui/devices.cpp
 msgid "Offline"
 msgstr "오프라인"
 
-#: src/gtk/devices_view.cpp
+#: src/gtk/devices_view.cpp src/tui/devices.cpp
 msgid "Nearby (Tap to Pair)"
 msgstr "근처 (탭하여 페어링)"
 
-#: src/gtk/devices_view.cpp
+#: src/gtk/devices_view.cpp src/tui/devices.cpp
 msgid "Partially connected"
 msgstr "부분적으로 연결됨"
 
-#: src/gtk/devices_view.cpp
+#: src/gtk/devices_view.cpp src/tui/devices.cpp
 msgid "Paired"
 msgstr "페어링됨"
 
-#: src/gtk/devices_view.cpp
+#. TRANSLATORS: {0} is the name of the device being paired with.
+#: src/gtk/devices_view.cpp src/tui/devices.cpp
 #, c++-format
 msgid "Waiting for approval on {0}..."
 msgstr "{0}에서 승인을 기다리는 중입니다…"
 
-#: src/gtk/devices_view.cpp
+#: src/gtk/devices_view.cpp src/tui/devices.cpp
 msgid ""
 "Could not reach that device. If a firewall is running, Tether needs inbound "
 "TCP 5134 on the other machine."
@@ -2189,51 +2126,52 @@ msgstr ""
 "해당 기기에 연결할 수 없습니다. 방화벽이 실행 중이라면 상대 컴퓨터에서 인바운"
 "드 TCP 5134가 필요합니다."
 
-#: src/gtk/devices_view.cpp
+#: src/gtk/devices_view.cpp src/tui/devices.cpp
 msgid "That device refused the connection. Is Tether running on it?"
 msgstr "해당 기기가 연결을 거부했습니다. 그 기기에서 Tether가 실행 중입니까?"
 
-#: src/gtk/devices_view.cpp
+#: src/gtk/devices_view.cpp src/tui/devices.cpp
 msgid "That address could not be resolved."
 msgstr "해당 주소를 확인할 수 없습니다."
 
-#: src/gtk/devices_view.cpp
+#: src/gtk/devices_view.cpp src/tui/devices.cpp
 msgid "Could not connect to that device."
 msgstr "해당 기기에 연결할 수 없습니다."
 
-#: src/gtk/devices_view.cpp
+#: src/gtk/devices_view.cpp src/tui/devices.cpp
 msgid "Pair request was rejected."
 msgstr "페어링 요청이 거부되었습니다."
 
-#: src/gtk/devices_view.cpp
+#: src/gtk/devices_view.cpp src/tui/devices.cpp
 msgid "Ready"
 msgstr "준비됨"
 
-#: src/gtk/devices_view.cpp
+#. TRANSLATORS: {0} is how many were sent, {1} the batch size.
+#: src/gtk/devices_view.cpp src/tui/devices.cpp
 #, c++-format
 msgid "Sent {0} of {1} file."
 msgid_plural "Sent {0} of {1} files."
 msgstr[0] "파일 {1}개 중 {0}개를 보냈습니다."
 
-#: src/gtk/devices_view.cpp
+#: src/gtk/devices_view.cpp src/tui/devices.cpp
 #, c++-format
 msgid "Skipped {} non-file item."
 msgid_plural "Skipped {} non-file items."
 msgstr[0] "파일이 아닌 항목 {}개를 건너뛰었습니다."
 
-#: src/gtk/devices_view.cpp
+#: src/gtk/devices_view.cpp src/tui/devices.cpp
 msgid "Clipboard is empty."
 msgstr "클립보드가 비어 있습니다."
 
-#: src/gtk/devices_view.cpp
+#: src/gtk/devices_view.cpp src/tui/devices.cpp
 msgid "Desktop Clipboard Sync triggered."
 msgstr "데스크탑 클립보드 동기화를 실행했습니다."
 
-#: src/gtk/devices_view.cpp
+#: src/gtk/devices_view.cpp src/tui/devices.cpp
 msgid "Messages and notifications are connected."
 msgstr "메시지와 알림이 연결되었습니다."
 
-#: src/gtk/devices_view.cpp
+#: src/gtk/devices_view.cpp src/tui/devices.cpp
 msgid ""
 "No iPhone found. Unlock the phone and open Settings > Bluetooth so it "
 "advertises, then scan again."
@@ -2241,7 +2179,7 @@ msgstr ""
 "iPhone을 찾지 못했습니다. iPhone의 잠금을 해제하고 설정 > Bluetooth를 열어 광"
 "고하도록 한 뒤 다시 검색하십시오."
 
-#: src/gtk/devices_view.cpp
+#: src/gtk/devices_view.cpp src/tui/devices.cpp
 #, c-format
 msgid ""
 "Does the iPhone show this code?\n"
@@ -2284,11 +2222,11 @@ msgstr ""
 "2.  'Bluetooth로 페어링'을 누릅니다\n"
 "3.  iPhone에서 두 가지 권한을 허용합니다"
 
-#: src/gtk/devices_view.cpp
+#: src/gtk/devices_view.cpp src/tui/devices.cpp
 msgid "Scan for devices"
 msgstr "기기 검색"
 
-#: src/gtk/devices_view.cpp
+#: src/gtk/devices_view.cpp src/tui/devices.cpp
 msgid "Manage AirPods from Tether"
 msgstr "Tether에서 AirPods 관리"
 
@@ -2300,7 +2238,7 @@ msgstr ""
 "AirPods 채널은 컴퓨터당 하나의 프로그램만 사용할 수 있습니다. 이 설정을 끄면 "
 "채널이 해제되어 다른 AirPods 프로그램이 사용할 수 있습니다."
 
-#: src/gtk/devices_view.cpp
+#: src/gtk/devices_view.cpp src/tui/devices.cpp
 msgid "Listening mode"
 msgstr "청취 모드"
 
@@ -2308,19 +2246,19 @@ msgstr "청취 모드"
 msgid "In-ear detection"
 msgstr "착용 감지"
 
-#: src/gtk/devices_view.cpp
+#: src/gtk/devices_view.cpp src/tui/devices.cpp
 msgid "Pause playback when:"
 msgstr "재생을 일시정지할 때:"
 
-#: src/gtk/devices_view.cpp
+#: src/gtk/devices_view.cpp src/tui/devices.cpp
 msgid "Never"
 msgstr "안 함"
 
-#: src/gtk/devices_view.cpp
+#: src/gtk/devices_view.cpp src/tui/devices.cpp
 msgid "One bud is removed"
 msgstr "한쪽을 뺐을 때"
 
-#: src/gtk/devices_view.cpp
+#: src/gtk/devices_view.cpp src/tui/devices.cpp
 msgid "Both buds are removed"
 msgstr "양쪽을 뺐을 때"
 
@@ -2332,11 +2270,11 @@ msgstr ""
 "이 컴퓨터에서 재생 중인 것을 일시정지하고, 이어버드를 다시 착용하면 재생을 재"
 "개합니다. Tether가 일시정지한 재생만 재개됩니다."
 
-#: src/gtk/devices_view.cpp src/gtk/main.cpp
+#: src/gtk/devices_view.cpp src/gtk/main.cpp src/tui/calls.cpp
 msgid "Calls"
 msgstr "통화"
 
-#: src/gtk/devices_view.cpp
+#: src/gtk/devices_view.cpp src/tui/devices.cpp
 msgid "Hand the AirPods to the iPhone during a call"
 msgstr "통화 중에 AirPods를 iPhone에 넘기기"
 
@@ -2366,7 +2304,7 @@ msgstr ""
 "이 명령들을 터미널에서 실행하십시오. Tether가 스스로 Bluetooth 어댑터나 "
 "bluetoothd를 변경하지는 않습니다."
 
-#: src/gtk/devices_view.cpp
+#: src/gtk/devices_view.cpp src/tui/devices.cpp
 msgid "Connect to this iPhone over Bluetooth"
 msgstr "Bluetooth로 이 iPhone에 연결"
 
@@ -2379,11 +2317,12 @@ msgstr ""
 "iPhone과의 Bluetooth 링크를 유지하고 끊길 때마다 다시 연결합니다. 끄면 Tether"
 "가 다시 연결하지 않습니다. 이미 연결된 링크는 연결을 끊을 때까지 유지됩니다."
 
-#: src/gtk/devices_view.cpp
+#: src/gtk/devices_view.cpp src/tui/devices.cpp
 msgid "Pair over Bluetooth"
 msgstr "Bluetooth로 페어링"
 
-#: src/gtk/devices_view.cpp src/gtk/messages_view.cpp
+#: src/gtk/devices_view.cpp src/gtk/messages_view.cpp src/tui/devices.cpp
+#: src/tui/messages.cpp
 msgid "Show iPhone Permissions"
 msgstr "iPhone 권한 표시"
 
@@ -2395,15 +2334,15 @@ msgstr ""
 "다시 광고하여 iPhone의 설정 > Bluetooth > (i)에 '메시지 알림 보기'와 '연락처 "
 "동기화'가 표시되도록 합니다."
 
-#: src/gtk/devices_view.cpp
+#: src/gtk/devices_view.cpp src/tui/devices.cpp
 msgid "Unpair"
 msgstr "페어링 해제"
 
-#: src/gtk/devices_view.cpp
+#: src/gtk/devices_view.cpp src/tui/devices.cpp
 msgid "Pair Device"
 msgstr "기기 페어링"
 
-#: src/gtk/devices_view.cpp
+#: src/gtk/devices_view.cpp src/tui/devices.cpp
 msgid "Force Trust (Accept Pending)"
 msgstr "강제 신뢰 (대기 중 수락)"
 
@@ -2411,15 +2350,15 @@ msgstr "강제 신뢰 (대기 중 수락)"
 msgid "Drop files here to send"
 msgstr "보낼 파일을 여기에 놓으십시오"
 
-#: src/gtk/devices_view.cpp
+#: src/gtk/devices_view.cpp src/tui/devices.cpp
 msgid "Send Clipboard"
 msgstr "클립보드 보내기"
 
-#: src/gtk/devices_view.cpp
+#: src/gtk/devices_view.cpp src/tui/devices.cpp
 msgid "Clipboard sync requested..."
 msgstr "클립보드 동기화를 요청했습니다..."
 
-#: src/gtk/devices_view.cpp
+#: src/gtk/devices_view.cpp src/tui/devices.cpp
 msgid "Forget"
 msgstr "삭제"
 
@@ -2431,11 +2370,11 @@ msgstr "사이드바 펼치기"
 msgid "Collapse sidebar"
 msgstr "사이드바 접기"
 
-#: src/gtk/main.cpp src/gtk/settings_view.cpp
+#: src/gtk/main.cpp src/gtk/settings_view.cpp src/tui/settings.cpp
 msgid "Settings"
 msgstr "설정"
 
-#: src/gtk/main.cpp
+#: src/gtk/main.cpp src/tui/main.cpp
 msgid "Quit"
 msgstr "종료"
 
@@ -2447,7 +2386,7 @@ msgstr "기본 메뉴"
 msgid "Look for devices"
 msgstr "기기 찾기"
 
-#: src/gtk/main.cpp
+#: src/gtk/main.cpp src/tui/devices.cpp
 msgid "Devices"
 msgstr "기기"
 
@@ -2467,28 +2406,7 @@ msgstr "이 탭에서 열기"
 msgid "Open the messages tab on this conversation"
 msgstr "이 대화에서 메시지 탭 열기"
 
-#: src/gtk/message_format.cpp
-msgid "Yesterday"
-msgstr "어제"
-
-#. TRANSLATORS: strftime short date for older conversations; reorder to the local
-#. convention, e.g. "%-d %b".
-#: src/gtk/message_format.cpp
-#, no-c-format
-msgid "%b %-d"
-msgstr "%-m월 %-d일"
-
-#: src/gtk/message_format.cpp
-msgid "Today"
-msgstr "오늘"
-
-#. TRANSLATORS: strftime date heading above older messages, e.g. "%A %-d %B".
-#: src/gtk/message_format.cpp
-#, no-c-format
-msgid "%A, %b %-d"
-msgstr "%-m월 %-d일 %A"
-
-#: src/gtk/messages_view.cpp src/gtk/tray.cpp
+#: src/gtk/messages_view.cpp src/gtk/tray.cpp src/tui/main.cpp
 #, c++-format
 msgid "{} unread message"
 msgid_plural "{} unread messages"
@@ -2506,43 +2424,43 @@ msgstr "보냄: {}"
 msgid "Received: {}"
 msgstr "받음: {}"
 
-#: src/gtk/messages_view.cpp
+#: src/gtk/messages_view.cpp src/tui/messages.cpp
 msgid "Bluetooth connection needed to sync messages."
 msgstr "메시지를 동기화하려면 Bluetooth 연결이 필요합니다."
 
-#: src/gtk/messages_view.cpp
+#: src/gtk/messages_view.cpp src/tui/messages.cpp
 msgid "Select a conversation"
 msgstr "대화 선택"
 
-#: src/gtk/messages_view.cpp
+#: src/gtk/messages_view.cpp src/tui/messages.cpp
 msgid "Sending…"
 msgstr "보내는 중…"
 
-#: src/gtk/messages_view.cpp
+#: src/gtk/messages_view.cpp src/tui/messages.cpp
 msgid "Enter a recipient."
 msgstr "받는 사람을 입력하십시오."
 
-#: src/gtk/messages_view.cpp
+#: src/gtk/messages_view.cpp src/tui/messages.cpp
 msgid "Select a conversation first."
 msgstr "먼저 대화를 선택하십시오."
 
-#: src/gtk/messages_view.cpp
+#: src/gtk/messages_view.cpp src/tui/messages.cpp
 msgid "Replying to this conversation is not available."
 msgstr "이 대화에는 답장할 수 없습니다."
 
-#: src/gtk/messages_view.cpp
+#: src/gtk/messages_view.cpp src/tui/messages.cpp
 msgid "No answer about that message; it may still have been sent."
 msgstr "그 메시지에 대한 응답이 없습니다. 그래도 전송되었을 수 있습니다."
 
-#: src/gtk/messages_view.cpp
+#: src/gtk/messages_view.cpp src/tui/messages.cpp
 msgid "Could not reach the Tether daemon; the message was not sent."
 msgstr "Tether 데몬에 연결하지 못했습니다. 메시지가 전송되지 않았습니다."
 
-#: src/gtk/messages_view.cpp
+#: src/gtk/messages_view.cpp src/tui/messages.cpp
 msgid "Sent"
 msgstr "보냄"
 
-#: src/gtk/messages_view.cpp
+#: src/gtk/messages_view.cpp src/tui/messages.cpp
 msgid "New Message"
 msgstr "새 메시지"
 
@@ -2550,7 +2468,7 @@ msgstr "새 메시지"
 msgid "Search conversations"
 msgstr "대화 검색"
 
-#: src/gtk/messages_view.cpp
+#: src/gtk/messages_view.cpp src/tui/messages.cpp
 msgid "To:"
 msgstr "받는 사람:"
 
@@ -2566,7 +2484,7 @@ msgstr "보내기"
 msgid "Retry"
 msgstr "다시 시도"
 
-#: src/gtk/notifications_view.cpp
+#: src/gtk/notifications_view.cpp src/tui/notifications.cpp
 msgid "Dismiss on the iPhone"
 msgstr "iPhone에서 지우기"
 
@@ -2576,23 +2494,23 @@ msgstr "iPhone에서 지우기"
 msgid "Dismiss {} notification"
 msgstr "{} 알림 지우기"
 
-#: src/gtk/notifications_view.cpp
+#: src/gtk/notifications_view.cpp src/tui/notifications.cpp
 msgid "New notification"
 msgstr "새 알림"
 
-#: src/gtk/notifications_view.cpp
+#: src/gtk/notifications_view.cpp src/tui/notifications.cpp
 msgid "The iPhone would not take the dismissal."
 msgstr "iPhone이 지우기를 받아들이지 않았습니다."
 
-#: src/gtk/notifications_view.cpp
+#: src/gtk/notifications_view.cpp src/tui/notifications.cpp
 msgid "No notifications yet."
 msgstr "아직 알림이 없습니다."
 
-#: src/gtk/notifications_view.cpp
+#: src/gtk/notifications_view.cpp src/tui/notifications.cpp
 msgid "Notification mirroring is unavailable."
 msgstr "알림 미러링을 사용할 수 없습니다."
 
-#: src/gtk/settings_view.cpp
+#: src/gtk/settings_view.cpp src/tui/settings.cpp
 msgid ""
 "No iPhone is paired over Bluetooth, so the Bluetooth settings below cannot "
 "be changed yet."
@@ -2629,7 +2547,7 @@ msgid ""
 "Symbolic follows the panel's color. Takes effect the next time Tether starts."
 msgstr "심볼릭은 패널 색상을 따릅니다. 다음에 Tether를 시작할 때 적용됩니다."
 
-#: src/gtk/settings_view.cpp
+#: src/gtk/settings_view.cpp src/tui/settings.cpp
 msgid "iPhone notifications"
 msgstr "iPhone 알림"
 
@@ -2637,23 +2555,23 @@ msgstr "iPhone 알림"
 msgid "Alerts your iPhone forwards to this computer over Bluetooth."
 msgstr "iPhone이 Bluetooth로 이 컴퓨터에 전달하는 알림입니다."
 
-#: src/gtk/settings_view.cpp
+#: src/gtk/settings_view.cpp src/tui/settings.cpp
 msgid "Mirror iPhone notifications"
 msgstr "iPhone 알림 미러링"
 
-#: src/gtk/settings_view.cpp
+#: src/gtk/settings_view.cpp src/tui/settings.cpp
 msgid "Disabled when pairing cannot support LE."
 msgstr "페어링이 LE를 지원하지 못하면 꺼집니다."
 
-#: src/gtk/settings_view.cpp
+#: src/gtk/settings_view.cpp src/tui/settings.cpp
 msgid "Include the notification text"
 msgstr "알림 본문 포함"
 
-#: src/gtk/settings_view.cpp
+#: src/gtk/settings_view.cpp src/tui/settings.cpp
 msgid "Title and message content are shown, not just which app sent it."
 msgstr "보낸 앱뿐 아니라 제목과 본문도 표시됩니다."
 
-#: src/gtk/settings_view.cpp
+#: src/gtk/settings_view.cpp src/tui/settings.cpp
 msgid "Desktop popups"
 msgstr "데스크톱 팝업"
 
@@ -2661,23 +2579,23 @@ msgstr "데스크톱 팝업"
 msgid "What Tether shows in your notification area."
 msgstr "Tether가 알림 영역에 표시하는 내용입니다."
 
-#: src/gtk/settings_view.cpp
+#: src/gtk/settings_view.cpp src/tui/settings.cpp
 msgid "Show desktop popups"
 msgstr "데스크톱 팝업 표시"
 
-#: src/gtk/settings_view.cpp
+#: src/gtk/settings_view.cpp src/tui/settings.cpp
 msgid "Off silences iPhone alerts, new messages and arriving files."
 msgstr "끄면 iPhone 알림, 새 메시지, 도착한 파일이 모두 표시되지 않습니다."
 
-#: src/gtk/settings_view.cpp
+#: src/gtk/settings_view.cpp src/tui/settings.cpp
 msgid "Show message previews"
 msgstr "메시지 미리 보기 표시"
 
-#: src/gtk/settings_view.cpp
+#: src/gtk/settings_view.cpp src/tui/settings.cpp
 msgid "Off shows only the sender."
 msgstr "끄면 보낸 사람만 표시합니다."
 
-#: src/gtk/settings_view.cpp
+#: src/gtk/settings_view.cpp src/tui/settings.cpp
 msgid "Security"
 msgstr "보안"
 
@@ -2685,11 +2603,11 @@ msgstr "보안"
 msgid "What Tether does when the iPhone leaves."
 msgstr "iPhone이 멀어질 때 Tether가 하는 일."
 
-#: src/gtk/settings_view.cpp
+#: src/gtk/settings_view.cpp src/tui/settings.cpp
 msgid "Lock the session when the iPhone goes out of range"
 msgstr "iPhone이 범위를 벗어나면 세션 잠그기"
 
-#: src/gtk/settings_view.cpp
+#: src/gtk/settings_view.cpp src/tui/settings.cpp
 msgid ""
 "Locks about half a minute after the link times out. Switching Bluetooth off "
 "on the iPhone does not lock, and neither does suspending this machine."
@@ -2701,23 +2619,23 @@ msgstr ""
 msgid "SMS and iMessage conversations synced over Bluetooth."
 msgstr "Bluetooth로 동기화되는 SMS 및 iMessage 대화입니다."
 
-#: src/gtk/settings_view.cpp
+#: src/gtk/settings_view.cpp src/tui/settings.cpp
 msgid "Encrypted"
 msgstr "암호화"
 
-#: src/gtk/settings_view.cpp
+#: src/gtk/settings_view.cpp src/tui/settings.cpp
 msgid "Unencrypted"
 msgstr "암호화 안 함"
 
-#: src/gtk/settings_view.cpp
+#: src/gtk/settings_view.cpp src/tui/settings.cpp
 msgid "Do not keep"
 msgstr "보관 안 함"
 
-#: src/gtk/settings_view.cpp
+#: src/gtk/settings_view.cpp src/tui/settings.cpp
 msgid "Keep message history"
 msgstr "메시지 기록 보관"
 
-#: src/gtk/settings_view.cpp
+#: src/gtk/settings_view.cpp src/tui/settings.cpp
 msgid ""
 "Encrypted uses a key from your desktop keyring. Do not keep deletes what is "
 "stored."
@@ -2725,14 +2643,14 @@ msgstr ""
 "암호화는 데스크톱 키링의 키를 사용합니다. 보관 안 함은 저장된 것을 삭제합니"
 "다."
 
-#: src/gtk/settings_view.cpp
+#: src/gtk/settings_view.cpp src/tui/settings.cpp
 msgid ""
 "Paused: no key from the desktop keyring. Unlock it, or choose Unencrypted."
 msgstr ""
 "일시 중지됨: 데스크톱 키링에서 키를 가져올 수 없습니다. 잠금을 해제하거나 암"
 "호화 안 함을 선택하세요."
 
-#: src/gtk/settings_view.cpp
+#: src/gtk/settings_view.cpp src/tui/settings.cpp
 msgid "Experimental"
 msgstr "실험적 기능"
 
@@ -2740,36 +2658,266 @@ msgstr "실험적 기능"
 msgid "Unfinished features. These can stop working at any time."
 msgstr "미완성 기능입니다. 언제든 작동이 멈출 수 있습니다."
 
-#: src/gtk/settings_view.cpp
+#: src/gtk/settings_view.cpp src/tui/settings.cpp
 msgid "Call control over Bluetooth"
 msgstr "Bluetooth 통화 제어"
 
-#: src/gtk/settings_view.cpp
+#: src/gtk/settings_view.cpp src/tui/settings.cpp
 msgid "Answer and place calls from the Calls tab."
 msgstr "통화 탭에서 전화를 받고 걸 수 있습니다."
 
-#: src/gtk/tray.cpp src/gtk/ui_util.cpp
+#: src/gtk/tray.cpp src/gtk/ui_util.cpp src/tui/main.cpp
 msgid "connected"
 msgstr "연결됨"
 
-#: src/gtk/tray.cpp src/gtk/ui_util.cpp
+#: src/gtk/tray.cpp src/gtk/ui_util.cpp src/tui/main.cpp
 msgid "not connected"
 msgstr "연결 안 됨"
 
 #. TRANSLATORS: {} is a transport name, "Wi-Fi" or "Bluetooth", or a device name.
 #. TRANSLATORS: {} is a transport name, "Wi-Fi" or "Bluetooth".
-#: src/gtk/tray.cpp src/gtk/ui_util.cpp
+#: src/gtk/tray.cpp src/gtk/ui_util.cpp src/tui/main.cpp
 #, c++-format
 msgid "{}: {}"
 msgstr "{}: {}"
 
-#: src/gtk/tray.cpp
+#: src/gtk/tray.cpp src/tui/main.cpp
 msgid "Daemon: not running"
 msgstr "데몬: 실행 중이 아님"
 
-#: src/gtk/ui_util.cpp
+#: src/gtk/ui_util.cpp src/tui/main.cpp
 msgid "Waiting for the Tether daemon."
 msgstr "Tether 데몬을 기다리는 중입니다."
+
+#: src/tui/devices.cpp
+msgid "Overview"
+msgstr "개요"
+
+#: src/tui/devices.cpp
+msgid "Select a device first."
+msgstr "먼저 기기를 선택하십시오."
+
+#: src/tui/devices.cpp
+msgid "Modes: off, transparency, adaptive, anc"
+msgstr "모드: off, transparency, adaptive, anc"
+
+#: src/tui/devices.cpp
+#, c++-format
+msgid "Found {}. Select it under BLUETOOTH to pair."
+msgstr "{}을(를) 찾았습니다. BLUETOOTH 아래에서 선택하여 페어링하십시오."
+
+#: src/tui/devices.cpp
+msgid "Usage: :send FILE…"
+msgstr "사용법: :send 파일…"
+
+#: src/tui/main.cpp
+msgid "-- INSERT --"
+msgstr "-- 입력 --"
+
+#: src/tui/main.cpp
+msgid "Move down / up"
+msgstr "아래로 / 위로"
+
+#: src/tui/main.cpp
+msgid "First / last"
+msgstr "처음 / 마지막"
+
+#: src/tui/main.cpp
+msgid "Half a page down / up"
+msgstr "반 페이지 아래로 / 위로"
+
+#: src/tui/main.cpp
+msgid "Focus the list / the detail pane"
+msgstr "목록 / 세부 정보 창에 초점"
+
+#: src/tui/main.cpp
+msgid "Open, or run the highlighted action"
+msgstr "열기 또는 강조된 동작 실행"
+
+#: src/tui/main.cpp
+msgid "Toggle the highlighted setting"
+msgstr "강조된 설정 전환"
+
+#: src/tui/main.cpp
+msgid "Switch tab"
+msgstr "탭 전환"
+
+#: src/tui/main.cpp
+msgid "Filter the list"
+msgstr "목록 필터"
+
+#: src/tui/main.cpp
+msgid "Clear the filter, leave insert mode"
+msgstr "필터 지우기, 입력 모드 종료"
+
+#: src/tui/main.cpp
+msgid "Write in the open conversation"
+msgstr "열린 대화에 작성"
+
+#: src/tui/main.cpp
+msgid "Send / new line (insert mode)"
+msgstr "보내기 / 줄 바꿈(입력 모드)"
+
+#: src/tui/main.cpp
+msgid "New message, or dial on Calls"
+msgstr "새 메시지, 통화 탭에서는 전화 걸기"
+
+#: src/tui/main.cpp
+msgid "Dismiss, forget, unpair, or hang up"
+msgstr "닫기, 삭제, 페어링 해제 또는 끊기"
+
+#: src/tui/main.cpp
+msgid "Copy the highlighted address or text"
+msgstr "강조된 주소 또는 텍스트 복사"
+
+#: src/tui/main.cpp
+msgid "Refresh, or scan for devices"
+msgstr "새로 고침 또는 기기 검색"
+
+#: src/tui/main.cpp
+msgid "Send files to the selected device"
+msgstr "선택한 기기로 파일 보내기"
+
+#: src/tui/main.cpp
+msgid "Send the clipboard"
+msgstr "클립보드 보내기"
+
+#: src/tui/main.cpp
+msgid "Place a call"
+msgstr "전화 걸기"
+
+#: src/tui/main.cpp
+msgid "Message someone"
+msgstr "메시지 보내기"
+
+#: src/tui/main.cpp
+msgid "Keys"
+msgstr "키"
+
+#: src/tui/main.cpp
+msgid "Terminal too small"
+msgstr "터미널이 너무 작습니다"
+
+#: src/tui/main.cpp
+msgid "Press i to write a message"
+msgstr "i를 눌러 메시지 작성"
+
+#: src/tui/main.cpp
+#, c++-format
+msgid "Not a command: {}"
+msgstr "명령이 아닙니다: {}"
+
+#: src/tui/main.cpp
+msgid "Type :q and press Enter to quit"
+msgstr "종료하려면 :q를 입력하고 Enter를 누르십시오"
+
+#: src/tui/main.cpp
+msgid ""
+"Usage: tether-tui [--devices|--messages|--notifications|--contacts|--calls|--"
+"settings] [--thread KEY]"
+msgstr ""
+"사용법: tether-tui [--devices|--messages|--notifications|--contacts|--"
+"calls|--settings] [--thread 키]"
+
+#: src/tui/main.cpp
+msgid "tether-tui needs a terminal."
+msgstr "tether-tui에는 터미널이 필요합니다."
+
+#: src/tui/settings.cpp
+#, c++-format
+msgid "Settings: {}"
+msgstr "설정: {}"
+
+#. TRANSLATORS: strftime clock time on today's conversations, e.g. "%I:%M %p" for 12-hour.
+#: src/ui_common/message_format.cpp src/ui_common/ui_text.cpp
+#, no-c-format
+msgid "%H:%M"
+msgstr "%H:%M"
+
+#: src/ui_common/message_format.cpp
+msgid "Yesterday"
+msgstr "어제"
+
+#. TRANSLATORS: strftime short date for older conversations; reorder to the local
+#. convention, e.g. "%-d %b".
+#: src/ui_common/message_format.cpp
+#, no-c-format
+msgid "%b %-d"
+msgstr "%-m월 %-d일"
+
+#: src/ui_common/message_format.cpp
+msgid "Today"
+msgstr "오늘"
+
+#. TRANSLATORS: strftime date heading above older messages, e.g. "%A %-d %B".
+#: src/ui_common/message_format.cpp
+#, no-c-format
+msgid "%A, %b %-d"
+msgstr "%-m월 %-d일 %A"
+
+#. TRANSLATORS: Left earbud, read aloud by screen readers before its battery level.
+#: src/ui_common/ui_text.cpp
+msgid "Left earbud"
+msgstr "왼쪽 이어버드"
+
+#. TRANSLATORS: Left earbud, abbreviated to fit the device row. One or two letters.
+#: src/ui_common/ui_text.cpp
+msgid "L"
+msgstr "좌"
+
+#. TRANSLATORS: Right earbud, read aloud by screen readers before its battery level.
+#: src/ui_common/ui_text.cpp
+msgid "Right earbud"
+msgstr "오른쪽 이어버드"
+
+#. TRANSLATORS: Right earbud, abbreviated to fit the device row. One or two letters.
+#: src/ui_common/ui_text.cpp
+msgid "R"
+msgstr "우"
+
+#: src/ui_common/ui_text.cpp
+msgid "Call waiting"
+msgstr "통화 대기"
+
+#: src/ui_common/ui_text.cpp
+msgid "Dialing"
+msgstr "발신 중"
+
+#: src/ui_common/ui_text.cpp
+msgid "Ringing"
+msgstr "벨 울리는 중"
+
+#: src/ui_common/ui_text.cpp
+msgid "On call"
+msgstr "통화 중"
+
+#: src/ui_common/ui_text.cpp
+msgid "On hold"
+msgstr "대기 중"
+
+#: src/ui_common/ui_text.cpp
+msgid "Ended"
+msgstr "종료됨"
+
+#: src/ui_common/ui_text.cpp
+msgid "No service"
+msgstr "서비스 없음"
+
+#. TRANSLATORS: Cellular signal strength read aloud, {} is 0 to 5.
+#: src/ui_common/ui_text.cpp
+#, c++-format
+msgid "signal {} of 5"
+msgstr "신호 {}/5"
+
+#. TRANSLATORS: The iPhone's battery level read aloud, {} is like "80%".
+#: src/ui_common/ui_text.cpp
+#, c++-format
+msgid "battery {}"
+msgstr "배터리 {}"
+
+#: src/ui_common/ui_text.cpp
+msgid "%b %d, %H:%M"
+msgstr "%m월 %d일 %H:%M"
 
 #: src/gtk/tether-gtk.desktop.in
 msgid "Device Synchronization"

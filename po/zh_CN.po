@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: tether\n"
 "Report-Msgid-Bugs-To: zack@bartel.com\n"
-"POT-Creation-Date: 2026-10-08 20:06-0700\n"
+"POT-Creation-Date: 2026-10-09 20:43-0700\n"
 "PO-Revision-Date: 2026-08-23\n"
 "Last-Translator: Tether project\n"
 "Language-Team: Simplified Chinese\n"
@@ -404,6 +404,7 @@ msgid "BR/EDR, notifications live"
 msgstr "BR/EDR，通知已启用"
 
 #: src/cli/main.cpp src/gtk/devices_view.cpp src/gtk/main.cpp
+#: src/tui/devices.cpp src/tui/notifications.cpp
 msgid "Notifications"
 msgstr "通知"
 
@@ -491,7 +492,7 @@ msgid "Right"
 msgstr "右"
 
 #. TRANSLATORS: The AirPods charging case, on the device row beside the two earbuds.
-#: src/cli/main.cpp src/gtk/devices_view.cpp
+#: src/cli/main.cpp src/ui_common/ui_text.cpp
 msgid "Case"
 msgstr "充电盒"
 
@@ -619,7 +620,7 @@ msgstr "无运营商"
 msgid " signal {0}/5 battery {1}/5"
 msgstr " 信号 {0}/5 电量 {1}/5"
 
-#: src/cli/main.cpp src/gtk/calls_view.cpp
+#: src/cli/main.cpp src/ui_common/ui_text.cpp
 msgid "roaming"
 msgstr "漫游"
 
@@ -631,7 +632,7 @@ msgstr "通话 (HFP)"
 msgid "Could not read Bluetooth diagnostics from the daemon.\n"
 msgstr "无法从守护进程读取蓝牙诊断信息。\n"
 
-#: src/cli/main.cpp src/gtk/calls_view.cpp
+#: src/cli/main.cpp src/gtk/calls_view.cpp src/tui/calls.cpp
 msgid "The call could not be placed."
 msgstr "无法拨出该通话。"
 
@@ -672,7 +673,7 @@ msgid "({} unread)"
 msgid_plural "({} unread)"
 msgstr[0] "（{} 条未读）"
 
-#: src/cli/main.cpp src/gtk/devices_view.cpp
+#: src/cli/main.cpp src/gtk/devices_view.cpp src/tui/devices.cpp
 #, c++-format
 msgid ""
 "The running tetherd is {}, but this is tether {}. Stop it and it\n"
@@ -682,7 +683,7 @@ msgstr ""
 "正在运行的 tetherd 是 {}，而此处是 tether {}。停止它，它会按需重新启动:\n"
 "    pkill tetherd\n"
 
-#: src/cli/main.cpp src/gtk/devices_view.cpp
+#: src/cli/main.cpp src/gtk/devices_view.cpp src/tui/devices.cpp
 msgid "an older build"
 msgstr "较旧的版本"
 
@@ -726,7 +727,7 @@ msgstr "信息发送前守护进程已关闭连接。\n"
 msgid "Sent to %s\n"
 msgstr "已发送至 %s\n"
 
-#: src/cli/main.cpp src/gtk/messages_view.cpp
+#: src/cli/main.cpp src/gtk/messages_view.cpp src/tui/messages.cpp
 msgid "The message was not sent."
 msgstr "信息未发送。"
 
@@ -1162,6 +1163,7 @@ msgid "Nothing to send."
 msgstr "没有可发送的内容。"
 
 #: src/core/src/bluetooth/connection.cpp src/gtk/messages_view.cpp
+#: src/tui/messages.cpp
 msgid "Messages are not connected."
 msgstr "信息未连接。"
 
@@ -1450,12 +1452,13 @@ msgstr ""
 #. TRANSLATORS: the feature name Tether shows for this profile.
 #: src/core/src/bluetooth/profile_supervisor.cpp src/daemon/main.cpp
 #: src/gtk/devices_view.cpp src/gtk/main.cpp src/gtk/messages_view.cpp
-#: src/gtk/settings_view.cpp
+#: src/gtk/settings_view.cpp src/tui/devices.cpp src/tui/messages.cpp
+#: src/tui/settings.cpp
 msgid "Messages"
 msgstr "信息"
 
 #: src/core/src/bluetooth/profile_supervisor.cpp src/gtk/devices_view.cpp
-#: src/gtk/main.cpp
+#: src/gtk/main.cpp src/tui/contacts.cpp src/tui/devices.cpp
 msgid "Contacts"
 msgstr "通讯录"
 
@@ -1521,7 +1524,7 @@ msgid "{} could not be opened."
 msgstr "无法打开 {}。"
 
 #: src/core/src/bluetooth/profile_supervisor.cpp src/gtk/calls_view.cpp
-#: src/gtk/notifications_view.cpp
+#: src/gtk/notifications_view.cpp src/tui/notifications.cpp
 msgid "Waiting for the iPhone."
 msgstr "正在等待 iPhone。"
 
@@ -1586,7 +1589,7 @@ msgstr "蓝牙扫描已完成。"
 msgid "Another pairing attempt is already in progress."
 msgstr "另一次配对尝试已在进行中。"
 
-#: src/core/src/net.cpp src/gtk/devices_view.cpp
+#: src/core/src/net.cpp src/gtk/devices_view.cpp src/tui/devices.cpp
 msgid "Bluetooth is unavailable on this machine."
 msgstr "这台机器上蓝牙不可用。"
 
@@ -1598,7 +1601,7 @@ msgstr "这不是 AirPods 设备。"
 msgid "Unknown listening mode."
 msgstr "未知的聆听模式。"
 
-#: src/core/src/net.cpp src/gtk/devices_view.cpp
+#: src/core/src/net.cpp src/gtk/devices_view.cpp src/tui/devices.cpp
 msgid "No AirPods are connected."
 msgstr "未连接 AirPods。"
 
@@ -1634,6 +1637,7 @@ msgid "unknown error"
 msgstr "未知错误"
 
 #: src/core/src/net.cpp src/gtk/devices_view.cpp src/gtk/messages_view.cpp
+#: src/tui/devices.cpp src/tui/messages.cpp
 msgid "Could not reach the Tether daemon."
 msgstr "无法连接到 Tether 守护进程。"
 
@@ -1692,99 +1696,49 @@ msgstr "复制验证码"
 msgid "Open in {}"
 msgstr "在 {} 中打开"
 
-#: src/gtk/calls_view.cpp
-msgid "Incoming"
-msgstr "来电"
-
-#: src/gtk/calls_view.cpp
-msgid "Call waiting"
-msgstr "呼叫等待"
-
-#: src/gtk/calls_view.cpp
-msgid "Dialing"
-msgstr "拨号中"
-
-#: src/gtk/calls_view.cpp
-msgid "Ringing"
-msgstr "正在响铃"
-
-#: src/gtk/calls_view.cpp
-msgid "On call"
-msgstr "通话中"
-
-#: src/gtk/calls_view.cpp
-msgid "On hold"
-msgstr "已保持"
-
-#: src/gtk/calls_view.cpp
-msgid "Ended"
-msgstr "已结束"
-
-#: src/gtk/calls_view.cpp
-msgid "No service"
-msgstr "无服务"
-
-#. TRANSLATORS: Cellular signal strength read aloud, {} is 0 to 5.
-#: src/gtk/calls_view.cpp
-#, c++-format
-msgid "signal {} of 5"
-msgstr "信号 {}/5"
-
-#. TRANSLATORS: The iPhone's battery level read aloud, {} is like "80%".
-#: src/gtk/calls_view.cpp
-#, c++-format
-msgid "battery {}"
-msgstr "电池 {}"
-
-#: src/gtk/calls_view.cpp
+#: src/gtk/calls_view.cpp src/tui/calls.cpp
 msgid "Unknown caller"
 msgstr "未知来电者"
 
-#: src/gtk/calls_view.cpp
+#: src/gtk/calls_view.cpp src/tui/calls.cpp
 msgid "Answer"
 msgstr "接听"
 
-#: src/gtk/calls_view.cpp
+#: src/gtk/calls_view.cpp src/tui/calls.cpp
 msgid "Audio here"
 msgstr "将音频转到本机"
 
-#: src/gtk/calls_view.cpp
+#: src/gtk/calls_view.cpp src/tui/calls.cpp
 msgid "Decline"
 msgstr "拒接"
 
-#: src/gtk/calls_view.cpp
+#: src/gtk/calls_view.cpp src/tui/calls.cpp
 msgid "Hang up"
 msgstr "挂断"
 
-#. TRANSLATORS: strftime clock time on today's conversations, e.g. "%I:%M %p" for 12-hour.
-#: src/gtk/calls_view.cpp src/gtk/message_format.cpp src/gtk/messages_view.cpp
-#, no-c-format
-msgid "%H:%M"
-msgstr "%H:%M"
+#: src/gtk/calls_view.cpp src/tui/calls.cpp src/ui_common/ui_text.cpp
+msgid "Incoming"
+msgstr "来电"
 
-#: src/gtk/calls_view.cpp
-msgid "%b %d, %H:%M"
-msgstr "%m月%d日 %H:%M"
-
-#: src/gtk/calls_view.cpp
+#: src/gtk/calls_view.cpp src/tui/calls.cpp
 msgid "Missed"
 msgstr "未接"
 
-#: src/gtk/calls_view.cpp
+#: src/gtk/calls_view.cpp src/tui/calls.cpp
 msgid "Outgoing"
 msgstr "呼出"
 
 #. TRANSLATORS: Button that calls a recent caller back, {} is their name or number.
-#: src/gtk/calls_view.cpp
+#: src/gtk/calls_view.cpp src/tui/calls.cpp
 #, c++-format
 msgid "Call {}"
 msgstr "呼叫 {}"
 
-#: src/gtk/calls_view.cpp
+#: src/gtk/calls_view.cpp src/tui/calls.cpp
 msgid "No calls."
 msgstr "没有通话。"
 
-#: src/gtk/calls_view.cpp
+#: src/gtk/calls_view.cpp src/tui/calls.cpp
 msgid "Call control is off. Turn it on with 'tether --bt-calls-enable on'."
 msgstr "通话控制已关闭。使用 'tether --bt-calls-enable on' 开启。"
 
@@ -1792,7 +1746,7 @@ msgstr "通话控制已关闭。使用 'tether --bt-calls-enable on' 开启。"
 msgid "Number to call"
 msgstr "要拨打的号码"
 
-#: src/gtk/calls_view.cpp
+#: src/gtk/calls_view.cpp src/tui/calls.cpp
 msgid "Call"
 msgstr "拨打"
 
@@ -1800,7 +1754,7 @@ msgstr "拨打"
 msgid "The iPhone's carrier, signal, and battery."
 msgstr "iPhone 的运营商、信号和电量。"
 
-#: src/gtk/calls_view.cpp
+#: src/gtk/calls_view.cpp src/tui/calls.cpp
 msgid "Recent calls"
 msgstr "最近通话"
 
@@ -1814,7 +1768,7 @@ msgstr "复制"
 msgid "Copy {}"
 msgstr "复制 {}"
 
-#: src/gtk/contacts_view.cpp
+#: src/gtk/contacts_view.cpp src/tui/main.cpp
 msgid "Copied to the clipboard."
 msgstr "已复制到剪贴板。"
 
@@ -1829,11 +1783,11 @@ msgstr "发送信息"
 msgid "Message {}"
 msgstr "给 {} 发信息"
 
-#: src/gtk/contacts_view.cpp
+#: src/gtk/contacts_view.cpp src/tui/contacts.cpp
 msgid "Favorite"
 msgstr "个人收藏"
 
-#: src/gtk/contacts_view.cpp
+#: src/gtk/contacts_view.cpp src/tui/contacts.cpp
 msgid "No contacts yet. Check the Bluetooth link on the Devices page."
 msgstr "暂无联系人。请在“设备”页面检查蓝牙连接。"
 
@@ -1841,107 +1795,88 @@ msgstr "暂无联系人。请在“设备”页面检查蓝牙连接。"
 msgid "Search contacts"
 msgstr "搜索通讯录"
 
-#: src/gtk/daemon_client.cpp
+#: src/gtk/daemon_client.cpp src/tui/main.cpp
 msgid "Daemon Offline"
 msgstr "守护进程离线"
 
-#: src/gtk/daemon_client.cpp src/gtk/messages_view.cpp
+#: src/gtk/daemon_client.cpp src/gtk/messages_view.cpp src/tui/main.cpp
+#: src/tui/messages.cpp
 msgid "The Tether daemon is not running."
 msgstr "Tether 守护进程未在运行。"
 
-#: src/gtk/daemon_client.cpp
+#: src/gtk/daemon_client.cpp src/tui/main.cpp
 msgid "Daemon Online"
 msgstr "守护进程在线"
 
-#. TRANSLATORS: Left earbud, read aloud by screen readers before its battery level.
-#: src/gtk/devices_view.cpp
-msgid "Left earbud"
-msgstr "左耳机"
-
-#. TRANSLATORS: Left earbud, abbreviated to fit the device row. One or two letters.
-#: src/gtk/devices_view.cpp
-msgid "L"
-msgstr "左"
-
-#. TRANSLATORS: Right earbud, read aloud by screen readers before its battery level.
-#: src/gtk/devices_view.cpp
-msgid "Right earbud"
-msgstr "右耳机"
-
-#. TRANSLATORS: Right earbud, abbreviated to fit the device row. One or two letters.
-#: src/gtk/devices_view.cpp
-msgid "R"
-msgstr "右"
-
-#: src/gtk/devices_view.cpp
+#: src/gtk/devices_view.cpp src/tui/devices.cpp
 msgid "Reading battery…"
 msgstr "正在读取电量…"
 
-#: src/gtk/devices_view.cpp
+#: src/gtk/devices_view.cpp src/tui/devices.cpp
 msgid "Not connected yet."
 msgstr "尚未连接。"
 
-#: src/gtk/devices_view.cpp
+#: src/gtk/devices_view.cpp src/tui/devices.cpp
 msgid "Connected."
 msgstr "已连接。"
 
-#: src/gtk/devices_view.cpp
+#: src/gtk/devices_view.cpp src/tui/devices.cpp
 msgid "Scanning for nearby devices..."
 msgstr "正在搜索附近的设备……"
 
-#: src/gtk/devices_view.cpp
+#: src/gtk/devices_view.cpp src/tui/devices.cpp
 msgid "Off"
 msgstr "关闭"
 
-#: src/gtk/devices_view.cpp
+#: src/gtk/devices_view.cpp src/tui/devices.cpp
 msgid "Transparency"
 msgstr "通透模式"
 
-#: src/gtk/devices_view.cpp
+#: src/gtk/devices_view.cpp src/tui/devices.cpp
 msgid "Adaptive"
 msgstr "自适应"
 
-#: src/gtk/devices_view.cpp
+#: src/gtk/devices_view.cpp src/tui/devices.cpp
 msgid "Noise Cancellation"
 msgstr "降噪"
 
-#: src/gtk/devices_view.cpp
+#: src/gtk/devices_view.cpp src/tui/devices.cpp
 msgid "Disconnect"
 msgstr "断开连接"
 
-#: src/gtk/devices_view.cpp
+#: src/gtk/devices_view.cpp src/tui/devices.cpp
 msgid "Connect"
 msgstr "连接"
 
-#: src/gtk/devices_view.cpp
+#: src/gtk/devices_view.cpp src/tui/devices.cpp
 msgid "Tether is not managing the AirPods, so another program can use them."
 msgstr "Tether 未管理 AirPods，其他程序可以使用它们。"
 
-#: src/gtk/devices_view.cpp
+#: src/gtk/devices_view.cpp src/tui/devices.cpp
 msgid "These AirPods do not report a listening mode."
 msgstr "此 AirPods 不报告聆听模式。"
 
-#: src/gtk/devices_view.cpp
+#: src/gtk/devices_view.cpp src/tui/devices.cpp
 msgid "These AirPods do not report whether they are being worn."
 msgstr "此 AirPods 不报告是否正在佩戴。"
 
-#: src/gtk/devices_view.cpp
+#: src/gtk/devices_view.cpp src/tui/devices.cpp
 msgid "Both buds are in."
 msgstr "两只耳机均已佩戴。"
 
-#: src/gtk/devices_view.cpp
+#: src/gtk/devices_view.cpp src/tui/devices.cpp
 msgid "One bud is in."
 msgstr "已佩戴一只耳机。"
 
-#: src/gtk/devices_view.cpp
+#: src/gtk/devices_view.cpp src/tui/devices.cpp
 msgid "Neither bud is in."
 msgstr "未佩戴耳机。"
 
-#: src/gtk/devices_view.cpp
+#: src/gtk/devices_view.cpp src/tui/devices.cpp
 msgid "The buds are handed over with Apple's own handoff."
 msgstr "使用 Apple 原生的移交方式交出 AirPods。"
 
-#: src/gtk/devices_view.cpp
+#: src/gtk/devices_view.cpp src/tui/devices.cpp
 msgid ""
 "The buds are handed over by disconnecting them. For Apple's own handoff, put "
 "DeviceID = bluetooth:004C:0000:0000 under [General] in /etc/bluetooth/"
@@ -1951,65 +1886,65 @@ msgstr ""
 "main.conf 的 [General] 下加入 DeviceID = bluetooth:004C:0000:0000 并重启 "
 "bluetooth。"
 
-#: src/gtk/devices_view.cpp
+#: src/gtk/devices_view.cpp src/tui/devices.cpp
 msgid "Full mode — messages, contacts, and notifications."
 msgstr "完整模式 —— 信息、通讯录和通知。"
 
-#: src/gtk/devices_view.cpp
+#: src/gtk/devices_view.cpp src/tui/devices.cpp
 msgid "Compatibility mode — messages and contacts, no notification mirroring."
 msgstr "兼容模式 —— 信息和通讯录，无通知镜像。"
 
-#: src/gtk/devices_view.cpp
+#: src/gtk/devices_view.cpp src/tui/devices.cpp
 msgid "This machine cannot carry the Bluetooth features."
 msgstr "这台机器无法支持蓝牙功能。"
 
-#: src/gtk/devices_view.cpp
+#: src/gtk/devices_view.cpp src/tui/devices.cpp
 msgid "Link"
 msgstr "链路"
 
-#: src/gtk/devices_view.cpp
+#: src/gtk/devices_view.cpp src/tui/devices.cpp
 msgid "Not paired over Bluetooth yet."
 msgstr "尚未通过蓝牙配对。"
 
-#: src/gtk/devices_view.cpp
+#: src/gtk/devices_view.cpp src/tui/devices.cpp
 msgid "Tether is not using this device. Pair it to select it."
 msgstr "Tether 未使用此设备。配对后即可选择它。"
 
-#: src/gtk/devices_view.cpp
+#: src/gtk/devices_view.cpp src/tui/devices.cpp
 msgid "Bluetooth is switched off for this iPhone."
 msgstr "此 iPhone 的蓝牙已关闭。"
 
-#: src/gtk/devices_view.cpp
+#: src/gtk/devices_view.cpp src/tui/devices.cpp
 msgid "Connected and ready."
 msgstr "已连接并就绪。"
 
-#: src/gtk/devices_view.cpp
+#: src/gtk/devices_view.cpp src/tui/devices.cpp
 msgid "Device is offline. Make sure it is switched on and on the same network."
 msgstr "设备离线。请确认设备已开机并处于同一网络。"
 
-#: src/gtk/devices_view.cpp
+#: src/gtk/devices_view.cpp src/tui/devices.cpp
 #, c++-format
 msgid "Found at {0}:{1}"
 msgstr "在 {0}:{1} 找到"
 
-#: src/gtk/devices_view.cpp
+#: src/gtk/devices_view.cpp src/tui/devices.cpp
 msgid "Sending pair request..."
 msgstr "正在发送配对请求……"
 
-#: src/gtk/devices_view.cpp
+#: src/gtk/devices_view.cpp src/tui/devices.cpp
 msgid "Pair request sent. Approve on remote device!"
 msgstr "配对请求已发送。请在远程设备上批准！"
 
-#: src/gtk/devices_view.cpp
+#: src/gtk/devices_view.cpp src/tui/devices.cpp
 msgid "Pairing… confirm the prompt on the iPhone."
 msgstr "正在配对……请在 iPhone 上确认提示。"
 
-#: src/gtk/devices_view.cpp
+#: src/gtk/devices_view.cpp src/tui/devices.cpp
 #, c-format
 msgid "Remove the Bluetooth pairing with %s?"
 msgstr "移除与 %s 的蓝牙配对？"
 
-#: src/gtk/devices_view.cpp
+#: src/gtk/devices_view.cpp src/tui/devices.cpp
 msgid ""
 "Also delete this computer from the iPhone's Bluetooth settings before "
 "pairing again, or the phone will keep the stale bond."
@@ -2017,16 +1952,16 @@ msgstr ""
 "重新配对前，请同时在 iPhone 的蓝牙设置中删除这台电脑，否则 iPhone 会保留过期"
 "的绑定。"
 
-#: src/gtk/devices_view.cpp
+#: src/gtk/devices_view.cpp src/tui/devices.cpp
 msgid "Removing the pairing…"
 msgstr "正在移除配对……"
 
-#: src/gtk/devices_view.cpp
+#: src/gtk/devices_view.cpp src/tui/devices.cpp
 #, c-format
 msgid "Forget %s?"
 msgstr "忘记 %s？"
 
-#: src/gtk/devices_view.cpp
+#: src/gtk/devices_view.cpp src/tui/devices.cpp
 msgid ""
 "Tether will stop connecting to it. Forget this computer on the other device "
 "too, then pair again to reconnect."
@@ -2038,27 +1973,28 @@ msgstr ""
 msgid "Setup commands copied to the clipboard."
 msgstr "设置命令已复制到剪贴板。"
 
-#: src/gtk/devices_view.cpp src/gtk/messages_view.cpp
+#: src/gtk/devices_view.cpp src/gtk/messages_view.cpp src/tui/devices.cpp
+#: src/tui/messages.cpp
 msgid "Asking the iPhone to show its Bluetooth permissions…"
 msgstr "正在请求 iPhone 显示其蓝牙权限……"
 
 #. TRANSLATORS: {} is a file name.
-#: src/gtk/devices_view.cpp
+#: src/gtk/devices_view.cpp src/tui/devices.cpp
 #, c++-format
 msgid "Sending {}…"
 msgstr "正在发送 {}……"
 
 #. TRANSLATORS: {0} is the current file's position, {1} the batch size.
-#: src/gtk/devices_view.cpp
+#: src/gtk/devices_view.cpp src/tui/devices.cpp
 #, c++-format
 msgid "({0} of {1})"
 msgstr "（第 {0} 个，共 {1} 个）"
 
-#: src/gtk/devices_view.cpp
+#: src/gtk/devices_view.cpp src/tui/devices.cpp
 msgid "Daemon unavailable."
 msgstr "守护进程不可用。"
 
-#: src/gtk/devices_view.cpp
+#: src/gtk/devices_view.cpp src/tui/devices.cpp
 msgid "Send File"
 msgstr "发送文件"
 
@@ -2070,15 +2006,15 @@ msgstr "取消(_C)"
 msgid "_Send"
 msgstr "发送(_S)"
 
-#: src/gtk/devices_view.cpp
+#: src/gtk/devices_view.cpp src/tui/devices.cpp
 msgid "Folders can't be sent — drop files instead."
 msgstr "无法发送文件夹 —— 请改为拖放文件。"
 
-#: src/gtk/devices_view.cpp
+#: src/gtk/devices_view.cpp src/tui/devices.cpp
 msgid "Clipboard, files, and OTP are connected."
 msgstr "剪贴板、文件和 OTP 已连接。"
 
-#: src/gtk/devices_view.cpp
+#: src/gtk/devices_view.cpp src/tui/devices.cpp
 msgid ""
 "Files and OTP are connected. This compositor does not give Tether clipboard "
 "access, so clipboard sync is off."
@@ -2086,7 +2022,7 @@ msgstr ""
 "文件和 OTP 已连接。此合成器不向 Tether 提供剪贴板访问权限，因此剪贴板同步已关"
 "闭。"
 
-#: src/gtk/devices_view.cpp
+#: src/gtk/devices_view.cpp src/tui/devices.cpp
 msgid ""
 "avahi-daemon isn't running, so other devices can't find this PC. Start it "
 "with: sudo systemctl enable --now avahi-daemon"
@@ -2094,7 +2030,7 @@ msgstr ""
 "avahi-daemon 未运行，因此其他设备无法找到此电脑。请使用以下命令启动：sudo "
 "systemctl enable --now avahi-daemon"
 
-#: src/gtk/devices_view.cpp
+#: src/gtk/devices_view.cpp src/tui/devices.cpp
 msgid ""
 "A device is on the network but cannot reach this PC. A firewall is running; "
 "Tether needs inbound TCP 5134. Allow it with: sudo ufw allow 5134/tcp"
@@ -2102,98 +2038,100 @@ msgstr ""
 "网络中有一台设备，但无法连接到这台电脑。防火墙正在运行；Tether 需要入站 TCP "
 "5134。请使用以下命令放行：sudo ufw allow 5134/tcp"
 
-#: src/gtk/devices_view.cpp
+#: src/gtk/devices_view.cpp src/tui/devices.cpp
 msgid "No paired device is connected. Switch it on and join the same network."
 msgstr "没有已配对的设备处于连接状态。请开机并连接到同一网络。"
 
-#: src/gtk/devices_view.cpp
+#: src/gtk/devices_view.cpp src/tui/devices.cpp
 msgid "Unknown Device"
 msgstr "未知设备"
 
-#: src/gtk/devices_view.cpp
+#: src/gtk/devices_view.cpp src/tui/devices.cpp
 msgid "Connected"
 msgstr "已连接"
 
-#: src/gtk/devices_view.cpp
+#: src/gtk/devices_view.cpp src/tui/devices.cpp
 msgid "Offline"
 msgstr "离线"
 
-#: src/gtk/devices_view.cpp
+#: src/gtk/devices_view.cpp src/tui/devices.cpp
 msgid "Nearby (Tap to Pair)"
 msgstr "附近（轻点以配对）"
 
-#: src/gtk/devices_view.cpp
+#: src/gtk/devices_view.cpp src/tui/devices.cpp
 msgid "Partially connected"
 msgstr "部分连接"
 
-#: src/gtk/devices_view.cpp
+#: src/gtk/devices_view.cpp src/tui/devices.cpp
 msgid "Paired"
 msgstr "已配对"
 
-#: src/gtk/devices_view.cpp
+#. TRANSLATORS: {0} is the name of the device being paired with.
+#: src/gtk/devices_view.cpp src/tui/devices.cpp
 #, c++-format
 msgid "Waiting for approval on {0}..."
 msgstr "正在等待 {0} 上的批准…"
 
-#: src/gtk/devices_view.cpp
+#: src/gtk/devices_view.cpp src/tui/devices.cpp
 msgid ""
 "Could not reach that device. If a firewall is running, Tether needs inbound "
 "TCP 5134 on the other machine."
 msgstr ""
 "无法连接到该设备。如果防火墙正在运行，Tether 需要对方机器上的入站 TCP 5134。"
 
-#: src/gtk/devices_view.cpp
+#: src/gtk/devices_view.cpp src/tui/devices.cpp
 msgid "That device refused the connection. Is Tether running on it?"
 msgstr "该设备拒绝了连接。它上面运行着 Tether 吗？"
 
-#: src/gtk/devices_view.cpp
+#: src/gtk/devices_view.cpp src/tui/devices.cpp
 msgid "That address could not be resolved."
 msgstr "无法解析该地址。"
 
-#: src/gtk/devices_view.cpp
+#: src/gtk/devices_view.cpp src/tui/devices.cpp
 msgid "Could not connect to that device."
 msgstr "无法连接到该设备。"
 
-#: src/gtk/devices_view.cpp
+#: src/gtk/devices_view.cpp src/tui/devices.cpp
 msgid "Pair request was rejected."
 msgstr "配对请求被拒绝。"
 
-#: src/gtk/devices_view.cpp
+#: src/gtk/devices_view.cpp src/tui/devices.cpp
 msgid "Ready"
 msgstr "就绪"
 
-#: src/gtk/devices_view.cpp
+#. TRANSLATORS: {0} is how many were sent, {1} the batch size.
+#: src/gtk/devices_view.cpp src/tui/devices.cpp
 #, c++-format
 msgid "Sent {0} of {1} file."
 msgid_plural "Sent {0} of {1} files."
 msgstr[0] "已发送 {1} 个文件中的 {0} 个。"
 
-#: src/gtk/devices_view.cpp
+#: src/gtk/devices_view.cpp src/tui/devices.cpp
 #, c++-format
 msgid "Skipped {} non-file item."
 msgid_plural "Skipped {} non-file items."
 msgstr[0] "已跳过 {} 个非文件项目。"
 
-#: src/gtk/devices_view.cpp
+#: src/gtk/devices_view.cpp src/tui/devices.cpp
 msgid "Clipboard is empty."
 msgstr "剪贴板为空。"
 
-#: src/gtk/devices_view.cpp
+#: src/gtk/devices_view.cpp src/tui/devices.cpp
 msgid "Desktop Clipboard Sync triggered."
 msgstr "已触发桌面剪贴板同步。"
 
-#: src/gtk/devices_view.cpp
+#: src/gtk/devices_view.cpp src/tui/devices.cpp
 msgid "Messages and notifications are connected."
 msgstr "信息和通知已连接。"
 
-#: src/gtk/devices_view.cpp
+#: src/gtk/devices_view.cpp src/tui/devices.cpp
 msgid ""
 "No iPhone found. Unlock the phone and open Settings > Bluetooth so it "
 "advertises, then scan again."
 msgstr ""
 "未找到 iPhone。请解锁 iPhone 并打开 设置 > 蓝牙 使其开始广播，然后重新搜索。"
 
-#: src/gtk/devices_view.cpp
+#: src/gtk/devices_view.cpp src/tui/devices.cpp
 #, c-format
 msgid ""
 "Does the iPhone show this code?\n"
@@ -2236,11 +2174,11 @@ msgstr ""
 "2.  按下“通过蓝牙配对”\n"
 "3.  在 iPhone 上授予两项权限"
 
-#: src/gtk/devices_view.cpp
+#: src/gtk/devices_view.cpp src/tui/devices.cpp
 msgid "Scan for devices"
 msgstr "搜索设备"
 
-#: src/gtk/devices_view.cpp
+#: src/gtk/devices_view.cpp src/tui/devices.cpp
 msgid "Manage AirPods from Tether"
 msgstr "由 Tether 管理 AirPods"
 
@@ -2252,7 +2190,7 @@ msgstr ""
 "每台电脑只有一个程序能占用 AirPods 通道。关闭后即可释放，供其他 AirPods 程序"
 "使用。"
 
-#: src/gtk/devices_view.cpp
+#: src/gtk/devices_view.cpp src/tui/devices.cpp
 msgid "Listening mode"
 msgstr "聆听模式"
 
@@ -2260,19 +2198,19 @@ msgstr "聆听模式"
 msgid "In-ear detection"
 msgstr "入耳检测"
 
-#: src/gtk/devices_view.cpp
+#: src/gtk/devices_view.cpp src/tui/devices.cpp
 msgid "Pause playback when:"
 msgstr "暂停播放的时机："
 
-#: src/gtk/devices_view.cpp
+#: src/gtk/devices_view.cpp src/tui/devices.cpp
 msgid "Never"
 msgstr "从不"
 
-#: src/gtk/devices_view.cpp
+#: src/gtk/devices_view.cpp src/tui/devices.cpp
 msgid "One bud is removed"
 msgstr "取下一只耳机时"
 
-#: src/gtk/devices_view.cpp
+#: src/gtk/devices_view.cpp src/tui/devices.cpp
 msgid "Both buds are removed"
 msgstr "取下两只耳机时"
 
@@ -2284,11 +2222,11 @@ msgstr ""
 "暂停本机正在播放的内容，并在耳机重新戴上时继续播放。仅恢复由 Tether 暂停的播"
 "放。"
 
-#: src/gtk/devices_view.cpp src/gtk/main.cpp
+#: src/gtk/devices_view.cpp src/gtk/main.cpp src/tui/calls.cpp
 msgid "Calls"
 msgstr "通话"
 
-#: src/gtk/devices_view.cpp
+#: src/gtk/devices_view.cpp src/tui/devices.cpp
 msgid "Hand the AirPods to the iPhone during a call"
 msgstr "通话期间将 AirPods 交给 iPhone"
 
@@ -2316,7 +2254,7 @@ msgid ""
 msgstr ""
 "请在终端中运行这些命令。Tether 不会自行更改你的蓝牙适配器或 bluetoothd。"
 
-#: src/gtk/devices_view.cpp
+#: src/gtk/devices_view.cpp src/tui/devices.cpp
 msgid "Connect to this iPhone over Bluetooth"
 msgstr "通过蓝牙连接此 iPhone"
 
@@ -2329,11 +2267,12 @@ msgstr ""
 "保持与 iPhone 的蓝牙链路，并在每次断开时重新连接。关闭后 Tether 将不再重连；"
 "已经建立的链路会一直保持，直到你断开它。"
 
-#: src/gtk/devices_view.cpp
+#: src/gtk/devices_view.cpp src/tui/devices.cpp
 msgid "Pair over Bluetooth"
 msgstr "通过蓝牙配对"
 
-#: src/gtk/devices_view.cpp src/gtk/messages_view.cpp
+#: src/gtk/devices_view.cpp src/gtk/messages_view.cpp src/tui/devices.cpp
+#: src/tui/messages.cpp
 msgid "Show iPhone Permissions"
 msgstr "显示 iPhone 权限"
 
@@ -2345,15 +2284,15 @@ msgstr ""
 "重新广播，让 iPhone 在 设置 > 蓝牙 > (i) 中显示“显示信息通知”和“同步通讯录”开"
 "关。"
 
-#: src/gtk/devices_view.cpp
+#: src/gtk/devices_view.cpp src/tui/devices.cpp
 msgid "Unpair"
 msgstr "取消配对"
 
-#: src/gtk/devices_view.cpp
+#: src/gtk/devices_view.cpp src/tui/devices.cpp
 msgid "Pair Device"
 msgstr "配对设备"
 
-#: src/gtk/devices_view.cpp
+#: src/gtk/devices_view.cpp src/tui/devices.cpp
 msgid "Force Trust (Accept Pending)"
 msgstr "强制信任（接受待处理项）"
 
@@ -2361,15 +2300,15 @@ msgstr "强制信任（接受待处理项）"
 msgid "Drop files here to send"
 msgstr "将文件拖放到此处以发送"
 
-#: src/gtk/devices_view.cpp
+#: src/gtk/devices_view.cpp src/tui/devices.cpp
 msgid "Send Clipboard"
 msgstr "发送剪贴板"
 
-#: src/gtk/devices_view.cpp
+#: src/gtk/devices_view.cpp src/tui/devices.cpp
 msgid "Clipboard sync requested..."
 msgstr "已请求剪贴板同步……"
 
-#: src/gtk/devices_view.cpp
+#: src/gtk/devices_view.cpp src/tui/devices.cpp
 msgid "Forget"
 msgstr "忘记"
 
@@ -2381,11 +2320,11 @@ msgstr "展开侧边栏"
 msgid "Collapse sidebar"
 msgstr "折叠侧边栏"
 
-#: src/gtk/main.cpp src/gtk/settings_view.cpp
+#: src/gtk/main.cpp src/gtk/settings_view.cpp src/tui/settings.cpp
 msgid "Settings"
 msgstr "设置"
 
-#: src/gtk/main.cpp
+#: src/gtk/main.cpp src/tui/main.cpp
 msgid "Quit"
 msgstr "退出"
 
@@ -2397,7 +2336,7 @@ msgstr "主菜单"
 msgid "Look for devices"
 msgstr "查找设备"
 
-#: src/gtk/main.cpp
+#: src/gtk/main.cpp src/tui/devices.cpp
 msgid "Devices"
 msgstr "设备"
 
@@ -2417,28 +2356,7 @@ msgstr "在此标签页中打开"
 msgid "Open the messages tab on this conversation"
 msgstr "在此会话中打开信息标签页"
 
-#: src/gtk/message_format.cpp
-msgid "Yesterday"
-msgstr "昨天"
-
-#. TRANSLATORS: strftime short date for older conversations; reorder to the local
-#. convention, e.g. "%-d %b".
-#: src/gtk/message_format.cpp
-#, no-c-format
-msgid "%b %-d"
-msgstr "%-m月%-d日"
-
-#: src/gtk/message_format.cpp
-msgid "Today"
-msgstr "今天"
-
-#. TRANSLATORS: strftime date heading above older messages, e.g. "%A %-d %B".
-#: src/gtk/message_format.cpp
-#, no-c-format
-msgid "%A, %b %-d"
-msgstr "%-m月%-d日 %A"
-
-#: src/gtk/messages_view.cpp src/gtk/tray.cpp
+#: src/gtk/messages_view.cpp src/gtk/tray.cpp src/tui/main.cpp
 #, c++-format
 msgid "{} unread message"
 msgid_plural "{} unread messages"
@@ -2456,43 +2374,43 @@ msgstr "已发送：{}"
 msgid "Received: {}"
 msgstr "已收到：{}"
 
-#: src/gtk/messages_view.cpp
+#: src/gtk/messages_view.cpp src/tui/messages.cpp
 msgid "Bluetooth connection needed to sync messages."
 msgstr "需要蓝牙连接才能同步消息。"
 
-#: src/gtk/messages_view.cpp
+#: src/gtk/messages_view.cpp src/tui/messages.cpp
 msgid "Select a conversation"
 msgstr "选择一个会话"
 
-#: src/gtk/messages_view.cpp
+#: src/gtk/messages_view.cpp src/tui/messages.cpp
 msgid "Sending…"
 msgstr "正在发送……"
 
-#: src/gtk/messages_view.cpp
+#: src/gtk/messages_view.cpp src/tui/messages.cpp
 msgid "Enter a recipient."
 msgstr "请输入收件人。"
 
-#: src/gtk/messages_view.cpp
+#: src/gtk/messages_view.cpp src/tui/messages.cpp
 msgid "Select a conversation first."
 msgstr "请先选择一个会话。"
 
-#: src/gtk/messages_view.cpp
+#: src/gtk/messages_view.cpp src/tui/messages.cpp
 msgid "Replying to this conversation is not available."
 msgstr "无法在此会话中回复。"
 
-#: src/gtk/messages_view.cpp
+#: src/gtk/messages_view.cpp src/tui/messages.cpp
 msgid "No answer about that message; it may still have been sent."
 msgstr "没有关于该信息的回应；它仍有可能已被发送。"
 
-#: src/gtk/messages_view.cpp
+#: src/gtk/messages_view.cpp src/tui/messages.cpp
 msgid "Could not reach the Tether daemon; the message was not sent."
 msgstr "无法连接到 Tether 守护进程；信息未发送。"
 
-#: src/gtk/messages_view.cpp
+#: src/gtk/messages_view.cpp src/tui/messages.cpp
 msgid "Sent"
 msgstr "已发送"
 
-#: src/gtk/messages_view.cpp
+#: src/gtk/messages_view.cpp src/tui/messages.cpp
 msgid "New Message"
 msgstr "新信息"
 
@@ -2500,7 +2418,7 @@ msgstr "新信息"
 msgid "Search conversations"
 msgstr "搜索会话"
 
-#: src/gtk/messages_view.cpp
+#: src/gtk/messages_view.cpp src/tui/messages.cpp
 msgid "To:"
 msgstr "收件人："
 
@@ -2516,7 +2434,7 @@ msgstr "发送"
 msgid "Retry"
 msgstr "重试"
 
-#: src/gtk/notifications_view.cpp
+#: src/gtk/notifications_view.cpp src/tui/notifications.cpp
 msgid "Dismiss on the iPhone"
 msgstr "在 iPhone 上清除"
 
@@ -2526,23 +2444,23 @@ msgstr "在 iPhone 上清除"
 msgid "Dismiss {} notification"
 msgstr "关闭 {} 的通知"
 
-#: src/gtk/notifications_view.cpp
+#: src/gtk/notifications_view.cpp src/tui/notifications.cpp
 msgid "New notification"
 msgstr "新通知"
 
-#: src/gtk/notifications_view.cpp
+#: src/gtk/notifications_view.cpp src/tui/notifications.cpp
 msgid "The iPhone would not take the dismissal."
 msgstr "iPhone 未接受此清除操作。"
 
-#: src/gtk/notifications_view.cpp
+#: src/gtk/notifications_view.cpp src/tui/notifications.cpp
 msgid "No notifications yet."
 msgstr "暂无通知。"
 
-#: src/gtk/notifications_view.cpp
+#: src/gtk/notifications_view.cpp src/tui/notifications.cpp
 msgid "Notification mirroring is unavailable."
 msgstr "通知镜像不可用。"
 
-#: src/gtk/settings_view.cpp
+#: src/gtk/settings_view.cpp src/tui/settings.cpp
 msgid ""
 "No iPhone is paired over Bluetooth, so the Bluetooth settings below cannot "
 "be changed yet."
@@ -2577,7 +2495,7 @@ msgid ""
 "Symbolic follows the panel's color. Takes effect the next time Tether starts."
 msgstr "符号图标跟随面板颜色。下次启动 Tether 时生效。"
 
-#: src/gtk/settings_view.cpp
+#: src/gtk/settings_view.cpp src/tui/settings.cpp
 msgid "iPhone notifications"
 msgstr "iPhone 通知"
 
@@ -2585,23 +2503,23 @@ msgstr "iPhone 通知"
 msgid "Alerts your iPhone forwards to this computer over Bluetooth."
 msgstr "iPhone 通过蓝牙转发到本机的提醒。"
 
-#: src/gtk/settings_view.cpp
+#: src/gtk/settings_view.cpp src/tui/settings.cpp
 msgid "Mirror iPhone notifications"
 msgstr "镜像 iPhone 通知"
 
-#: src/gtk/settings_view.cpp
+#: src/gtk/settings_view.cpp src/tui/settings.cpp
 msgid "Disabled when pairing cannot support LE."
 msgstr "配对不支持 LE 时会被禁用。"
 
-#: src/gtk/settings_view.cpp
+#: src/gtk/settings_view.cpp src/tui/settings.cpp
 msgid "Include the notification text"
 msgstr "包含通知正文"
 
-#: src/gtk/settings_view.cpp
+#: src/gtk/settings_view.cpp src/tui/settings.cpp
 msgid "Title and message content are shown, not just which app sent it."
 msgstr "显示标题和正文，而不只是发送它的应用。"
 
-#: src/gtk/settings_view.cpp
+#: src/gtk/settings_view.cpp src/tui/settings.cpp
 msgid "Desktop popups"
 msgstr "桌面弹窗"
 
@@ -2609,23 +2527,23 @@ msgstr "桌面弹窗"
 msgid "What Tether shows in your notification area."
 msgstr "Tether 在通知区域中显示的内容。"
 
-#: src/gtk/settings_view.cpp
+#: src/gtk/settings_view.cpp src/tui/settings.cpp
 msgid "Show desktop popups"
 msgstr "显示桌面弹窗"
 
-#: src/gtk/settings_view.cpp
+#: src/gtk/settings_view.cpp src/tui/settings.cpp
 msgid "Off silences iPhone alerts, new messages and arriving files."
 msgstr "关闭后将不显示 iPhone 提醒、新消息和收到的文件。"
 
-#: src/gtk/settings_view.cpp
+#: src/gtk/settings_view.cpp src/tui/settings.cpp
 msgid "Show message previews"
 msgstr "显示消息预览"
 
-#: src/gtk/settings_view.cpp
+#: src/gtk/settings_view.cpp src/tui/settings.cpp
 msgid "Off shows only the sender."
 msgstr "关闭后仅显示发件人。"
 
-#: src/gtk/settings_view.cpp
+#: src/gtk/settings_view.cpp src/tui/settings.cpp
 msgid "Security"
 msgstr "安全"
 
@@ -2633,11 +2551,11 @@ msgstr "安全"
 msgid "What Tether does when the iPhone leaves."
 msgstr "iPhone 离开时 Tether 的行为。"
 
-#: src/gtk/settings_view.cpp
+#: src/gtk/settings_view.cpp src/tui/settings.cpp
 msgid "Lock the session when the iPhone goes out of range"
 msgstr "当 iPhone 超出范围时锁定会话"
 
-#: src/gtk/settings_view.cpp
+#: src/gtk/settings_view.cpp src/tui/settings.cpp
 msgid ""
 "Locks about half a minute after the link times out. Switching Bluetooth off "
 "on the iPhone does not lock, and neither does suspending this machine."
@@ -2648,34 +2566,34 @@ msgstr ""
 msgid "SMS and iMessage conversations synced over Bluetooth."
 msgstr "通过蓝牙同步的短信和 iMessage 会话。"
 
-#: src/gtk/settings_view.cpp
+#: src/gtk/settings_view.cpp src/tui/settings.cpp
 msgid "Encrypted"
 msgstr "加密"
 
-#: src/gtk/settings_view.cpp
+#: src/gtk/settings_view.cpp src/tui/settings.cpp
 msgid "Unencrypted"
 msgstr "不加密"
 
-#: src/gtk/settings_view.cpp
+#: src/gtk/settings_view.cpp src/tui/settings.cpp
 msgid "Do not keep"
 msgstr "不保留"
 
-#: src/gtk/settings_view.cpp
+#: src/gtk/settings_view.cpp src/tui/settings.cpp
 msgid "Keep message history"
 msgstr "保留信息历史"
 
-#: src/gtk/settings_view.cpp
+#: src/gtk/settings_view.cpp src/tui/settings.cpp
 msgid ""
 "Encrypted uses a key from your desktop keyring. Do not keep deletes what is "
 "stored."
 msgstr "加密使用桌面密钥环中的密钥。不保留会删除已存储的内容。"
 
-#: src/gtk/settings_view.cpp
+#: src/gtk/settings_view.cpp src/tui/settings.cpp
 msgid ""
 "Paused: no key from the desktop keyring. Unlock it, or choose Unencrypted."
 msgstr "已暂停：桌面密钥环未提供密钥。请解锁密钥环，或选择“不加密”。"
 
-#: src/gtk/settings_view.cpp
+#: src/gtk/settings_view.cpp src/tui/settings.cpp
 msgid "Experimental"
 msgstr "实验性"
 
@@ -2683,36 +2601,266 @@ msgstr "实验性"
 msgid "Unfinished features. These can stop working at any time."
 msgstr "未完成的功能。随时可能停止工作。"
 
-#: src/gtk/settings_view.cpp
+#: src/gtk/settings_view.cpp src/tui/settings.cpp
 msgid "Call control over Bluetooth"
 msgstr "通过蓝牙控制通话"
 
-#: src/gtk/settings_view.cpp
+#: src/gtk/settings_view.cpp src/tui/settings.cpp
 msgid "Answer and place calls from the Calls tab."
 msgstr "在“通话”标签页接听和拨打电话。"
 
-#: src/gtk/tray.cpp src/gtk/ui_util.cpp
+#: src/gtk/tray.cpp src/gtk/ui_util.cpp src/tui/main.cpp
 msgid "connected"
 msgstr "已连接"
 
-#: src/gtk/tray.cpp src/gtk/ui_util.cpp
+#: src/gtk/tray.cpp src/gtk/ui_util.cpp src/tui/main.cpp
 msgid "not connected"
 msgstr "未连接"
 
 #. TRANSLATORS: {} is a transport name, "Wi-Fi" or "Bluetooth", or a device name.
 #. TRANSLATORS: {} is a transport name, "Wi-Fi" or "Bluetooth".
-#: src/gtk/tray.cpp src/gtk/ui_util.cpp
+#: src/gtk/tray.cpp src/gtk/ui_util.cpp src/tui/main.cpp
 #, c++-format
 msgid "{}: {}"
 msgstr "{}: {}"
 
-#: src/gtk/tray.cpp
+#: src/gtk/tray.cpp src/tui/main.cpp
 msgid "Daemon: not running"
 msgstr "守护进程：未在运行"
 
-#: src/gtk/ui_util.cpp
+#: src/gtk/ui_util.cpp src/tui/main.cpp
 msgid "Waiting for the Tether daemon."
 msgstr "正在等待 Tether 守护进程。"
+
+#: src/tui/devices.cpp
+msgid "Overview"
+msgstr "概览"
+
+#: src/tui/devices.cpp
+msgid "Select a device first."
+msgstr "请先选择一个设备。"
+
+#: src/tui/devices.cpp
+msgid "Modes: off, transparency, adaptive, anc"
+msgstr "模式：off、transparency、adaptive、anc"
+
+#: src/tui/devices.cpp
+#, c++-format
+msgid "Found {}. Select it under BLUETOOTH to pair."
+msgstr "已找到 {}。请在 BLUETOOTH 下选择它进行配对。"
+
+#: src/tui/devices.cpp
+msgid "Usage: :send FILE…"
+msgstr "用法：:send 文件…"
+
+#: src/tui/main.cpp
+msgid "-- INSERT --"
+msgstr "-- 插入 --"
+
+#: src/tui/main.cpp
+msgid "Move down / up"
+msgstr "向下 / 向上"
+
+#: src/tui/main.cpp
+msgid "First / last"
+msgstr "第一个 / 最后一个"
+
+#: src/tui/main.cpp
+msgid "Half a page down / up"
+msgstr "向下 / 向上半页"
+
+#: src/tui/main.cpp
+msgid "Focus the list / the detail pane"
+msgstr "聚焦列表 / 详情面板"
+
+#: src/tui/main.cpp
+msgid "Open, or run the highlighted action"
+msgstr "打开，或执行高亮的操作"
+
+#: src/tui/main.cpp
+msgid "Toggle the highlighted setting"
+msgstr "切换高亮的设置"
+
+#: src/tui/main.cpp
+msgid "Switch tab"
+msgstr "切换标签页"
+
+#: src/tui/main.cpp
+msgid "Filter the list"
+msgstr "筛选列表"
+
+#: src/tui/main.cpp
+msgid "Clear the filter, leave insert mode"
+msgstr "清除筛选，退出插入模式"
+
+#: src/tui/main.cpp
+msgid "Write in the open conversation"
+msgstr "在打开的会话中输入"
+
+#: src/tui/main.cpp
+msgid "Send / new line (insert mode)"
+msgstr "发送 / 换行（插入模式）"
+
+#: src/tui/main.cpp
+msgid "New message, or dial on Calls"
+msgstr "新消息，在通话页中为拨号"
+
+#: src/tui/main.cpp
+msgid "Dismiss, forget, unpair, or hang up"
+msgstr "忽略、忘记、取消配对或挂断"
+
+#: src/tui/main.cpp
+msgid "Copy the highlighted address or text"
+msgstr "复制高亮的地址或文本"
+
+#: src/tui/main.cpp
+msgid "Refresh, or scan for devices"
+msgstr "刷新，或搜索设备"
+
+#: src/tui/main.cpp
+msgid "Send files to the selected device"
+msgstr "向所选设备发送文件"
+
+#: src/tui/main.cpp
+msgid "Send the clipboard"
+msgstr "发送剪贴板"
+
+#: src/tui/main.cpp
+msgid "Place a call"
+msgstr "拨打电话"
+
+#: src/tui/main.cpp
+msgid "Message someone"
+msgstr "给某人发消息"
+
+#: src/tui/main.cpp
+msgid "Keys"
+msgstr "按键"
+
+#: src/tui/main.cpp
+msgid "Terminal too small"
+msgstr "终端太小"
+
+#: src/tui/main.cpp
+msgid "Press i to write a message"
+msgstr "按 i 输入消息"
+
+#: src/tui/main.cpp
+#, c++-format
+msgid "Not a command: {}"
+msgstr "不是命令：{}"
+
+#: src/tui/main.cpp
+msgid "Type :q and press Enter to quit"
+msgstr "输入 :q 并按 Enter 退出"
+
+#: src/tui/main.cpp
+msgid ""
+"Usage: tether-tui [--devices|--messages|--notifications|--contacts|--calls|--"
+"settings] [--thread KEY]"
+msgstr ""
+"用法：tether-tui [--devices|--messages|--notifications|--contacts|--calls|--"
+"settings] [--thread 键]"
+
+#: src/tui/main.cpp
+msgid "tether-tui needs a terminal."
+msgstr "tether-tui 需要在终端中运行。"
+
+#: src/tui/settings.cpp
+#, c++-format
+msgid "Settings: {}"
+msgstr "设置：{}"
+
+#. TRANSLATORS: strftime clock time on today's conversations, e.g. "%I:%M %p" for 12-hour.
+#: src/ui_common/message_format.cpp src/ui_common/ui_text.cpp
+#, no-c-format
+msgid "%H:%M"
+msgstr "%H:%M"
+
+#: src/ui_common/message_format.cpp
+msgid "Yesterday"
+msgstr "昨天"
+
+#. TRANSLATORS: strftime short date for older conversations; reorder to the local
+#. convention, e.g. "%-d %b".
+#: src/ui_common/message_format.cpp
+#, no-c-format
+msgid "%b %-d"
+msgstr "%-m月%-d日"
+
+#: src/ui_common/message_format.cpp
+msgid "Today"
+msgstr "今天"
+
+#. TRANSLATORS: strftime date heading above older messages, e.g. "%A %-d %B".
+#: src/ui_common/message_format.cpp
+#, no-c-format
+msgid "%A, %b %-d"
+msgstr "%-m月%-d日 %A"
+
+#. TRANSLATORS: Left earbud, read aloud by screen readers before its battery level.
+#: src/ui_common/ui_text.cpp
+msgid "Left earbud"
+msgstr "左耳机"
+
+#. TRANSLATORS: Left earbud, abbreviated to fit the device row. One or two letters.
+#: src/ui_common/ui_text.cpp
+msgid "L"
+msgstr "左"
+
+#. TRANSLATORS: Right earbud, read aloud by screen readers before its battery level.
+#: src/ui_common/ui_text.cpp
+msgid "Right earbud"
+msgstr "右耳机"
+
+#. TRANSLATORS: Right earbud, abbreviated to fit the device row. One or two letters.
+#: src/ui_common/ui_text.cpp
+msgid "R"
+msgstr "右"
+
+#: src/ui_common/ui_text.cpp
+msgid "Call waiting"
+msgstr "呼叫等待"
+
+#: src/ui_common/ui_text.cpp
+msgid "Dialing"
+msgstr "拨号中"
+
+#: src/ui_common/ui_text.cpp
+msgid "Ringing"
+msgstr "正在响铃"
+
+#: src/ui_common/ui_text.cpp
+msgid "On call"
+msgstr "通话中"
+
+#: src/ui_common/ui_text.cpp
+msgid "On hold"
+msgstr "已保持"
+
+#: src/ui_common/ui_text.cpp
+msgid "Ended"
+msgstr "已结束"
+
+#: src/ui_common/ui_text.cpp
+msgid "No service"
+msgstr "无服务"
+
+#. TRANSLATORS: Cellular signal strength read aloud, {} is 0 to 5.
+#: src/ui_common/ui_text.cpp
+#, c++-format
+msgid "signal {} of 5"
+msgstr "信号 {}/5"
+
+#. TRANSLATORS: The iPhone's battery level read aloud, {} is like "80%".
+#: src/ui_common/ui_text.cpp
+#, c++-format
+msgid "battery {}"
+msgstr "电池 {}"
+
+#: src/ui_common/ui_text.cpp
+msgid "%b %d, %H:%M"
+msgstr "%m月%d日 %H:%M"
 
 #: src/gtk/tether-gtk.desktop.in
 msgid "Device Synchronization"
