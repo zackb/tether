@@ -49,6 +49,7 @@
           default = app "tether-gtk";
           tether = app "tether";
           tether-gtk = app "tether-gtk";
+          tether-tui = app "tether-tui";
           tetherd = app "tetherd";
           tether-dialog = app "tether-dialog";
         }

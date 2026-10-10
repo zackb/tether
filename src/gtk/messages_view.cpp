@@ -170,19 +170,6 @@ namespace tether::ui {
             set_composer_text(draft == g_messages.drafts.end() ? "" : draft->second);
         }
 
-        std::string format_timestamp(int64_t epoch) {
-            if (epoch <= 0)
-                return "";
-            std::time_t t = static_cast<std::time_t>(epoch);
-            std::tm tm{};
-            localtime_r(&t, &tm);
-
-            char buffer[64];
-            // xgettext:no-c-format
-            std::strftime(buffer, sizeof(buffer), _("%H:%M"), &tm);
-            return buffer;
-        }
-
         void request_threads() {
             nlohmann::json j;
             j["command"] = "bt_list_threads";
@@ -295,7 +282,7 @@ namespace tether::ui {
             const bool outgoing = message.value("outgoing", false);
             const std::string body = message.value("body", "");
             const std::string stamp =
-                show_stamp ? format_timestamp(message.value("timestamp", static_cast<int64_t>(0))) : "";
+                show_stamp ? format_clock(message.value("timestamp", static_cast<int64_t>(0))) : "";
 
             GtkWidget* row = gtk_list_box_row_new();
             gtk_list_box_row_set_selectable(GTK_LIST_BOX_ROW(row), FALSE);

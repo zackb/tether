@@ -3,6 +3,8 @@
 #include <gtk/gtk.h>
 #include <string>
 
+#include "ui_text.hpp"
+
 namespace tether::ui {
 
     // App-owned line icons avoid missing glyphs in third-party desktop themes.
@@ -22,8 +24,6 @@ namespace tether::ui {
 
     std::string escape_markup(const std::string& text);
 
-    // Normalized case- and accent-insensitive form of a string.
-    std::string fold(const std::string& text);
     void set_markup(GtkWidget* label, const std::string& text);
     void set_text(GtkWidget* label, const std::string& text);
     void clear_list_box(GtkWidget* list_box);

@@ -1,4 +1,4 @@
-#include "../src/gtk/message_format.hpp"
+#include "../src/ui_common/message_format.hpp"
 
 #include <glib.h>
 #include <gtest/gtest.h>

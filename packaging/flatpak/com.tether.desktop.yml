@@ -68,6 +68,7 @@ modules:
     config-opts:
       - -DCMAKE_BUILD_TYPE=Release
       - -DTETHER_BUILD_EXTENSIONS=OFF
+      - -DTETHER_BUILD_TUI=OFF
     build-options:
       build-args:
         - --share=network

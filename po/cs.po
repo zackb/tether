@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: tether\n"
 "Report-Msgid-Bugs-To: zack@bartel.com\n"
-"POT-Creation-Date: 2026-10-08 20:06-0700\n"
+"POT-Creation-Date: 2026-10-09 20:09-0700\n"
 "PO-Revision-Date: 2026-08-23\n"
 "Last-Translator: Tether project\n"
 "Language-Team: Czech\n"
@@ -423,6 +423,7 @@ msgid "BR/EDR, notifications live"
 msgstr "BR/EDR, oznámení aktivní"
 
 #: src/cli/main.cpp src/gtk/devices_view.cpp src/gtk/main.cpp
+#: src/tui/devices.cpp src/tui/notifications.cpp
 msgid "Notifications"
 msgstr "Oznámení"
 
@@ -516,7 +517,7 @@ msgid "Right"
 msgstr "Pravé"
 
 #. TRANSLATORS: The AirPods charging case, on the device row beside the two earbuds.
-#: src/cli/main.cpp src/gtk/devices_view.cpp
+#: src/cli/main.cpp src/ui_common/ui_text.cpp
 msgid "Case"
 msgstr "Pouzdro"
 
@@ -644,7 +645,7 @@ msgstr "žádný operátor"
 msgid " signal {0}/5 battery {1}/5"
 msgstr " signál {0}/5 baterie {1}/5"
 
-#: src/cli/main.cpp src/gtk/calls_view.cpp
+#: src/cli/main.cpp src/ui_common/ui_text.cpp
 msgid "roaming"
 msgstr "roaming"
 
@@ -656,7 +657,7 @@ msgstr "Hovory (HFP)"
 msgid "Could not read Bluetooth diagnostics from the daemon.\n"
 msgstr "Nepodařilo se načíst diagnostiku Bluetooth od démona.\n"
 
-#: src/cli/main.cpp src/gtk/calls_view.cpp
+#: src/cli/main.cpp src/gtk/calls_view.cpp src/tui/calls.cpp
 msgid "The call could not be placed."
 msgstr "Hovor se nepodařilo uskutečnit."
 
@@ -699,7 +700,7 @@ msgstr[0] "({} nepřečtená)"
 msgstr[1] "({} nepřečtené)"
 msgstr[2] "({} nepřečtených)"
 
-#: src/cli/main.cpp src/gtk/devices_view.cpp
+#: src/cli/main.cpp src/gtk/devices_view.cpp src/tui/devices.cpp
 #, c++-format
 msgid ""
 "The running tetherd is {}, but this is tether {}. Stop it and it\n"
@@ -710,7 +711,7 @@ msgstr ""
 "podle potřeby:\n"
 "    pkill tetherd\n"
 
-#: src/cli/main.cpp src/gtk/devices_view.cpp
+#: src/cli/main.cpp src/gtk/devices_view.cpp src/tui/devices.cpp
 msgid "an older build"
 msgstr "starší sestavení"
 
@@ -754,7 +755,7 @@ msgstr "Démon uzavřel spojení dříve, než byla zpráva odeslána.\n"
 msgid "Sent to %s\n"
 msgstr "Odesláno na %s\n"
 
-#: src/cli/main.cpp src/gtk/messages_view.cpp
+#: src/cli/main.cpp src/gtk/messages_view.cpp src/tui/messages.cpp
 msgid "The message was not sent."
 msgstr "Zpráva nebyla odeslána."
 
@@ -1209,6 +1210,7 @@ msgid "Nothing to send."
 msgstr "Není co odeslat."
 
 #: src/core/src/bluetooth/connection.cpp src/gtk/messages_view.cpp
+#: src/tui/messages.cpp
 msgid "Messages are not connected."
 msgstr "Zprávy nejsou připojeny."
 
@@ -1514,12 +1516,13 @@ msgstr ""
 #. TRANSLATORS: the feature name Tether shows for this profile.
 #: src/core/src/bluetooth/profile_supervisor.cpp src/daemon/main.cpp
 #: src/gtk/devices_view.cpp src/gtk/main.cpp src/gtk/messages_view.cpp
-#: src/gtk/settings_view.cpp
+#: src/gtk/settings_view.cpp src/tui/devices.cpp src/tui/messages.cpp
+#: src/tui/settings.cpp
 msgid "Messages"
 msgstr "Zprávy"
 
 #: src/core/src/bluetooth/profile_supervisor.cpp src/gtk/devices_view.cpp
-#: src/gtk/main.cpp
+#: src/gtk/main.cpp src/tui/contacts.cpp src/tui/devices.cpp
 msgid "Contacts"
 msgstr "Kontakty"
 
@@ -1587,7 +1590,7 @@ msgid "{} could not be opened."
 msgstr "{} se nepodařilo otevřít."
 
 #: src/core/src/bluetooth/profile_supervisor.cpp src/gtk/calls_view.cpp
-#: src/gtk/notifications_view.cpp
+#: src/gtk/notifications_view.cpp src/tui/notifications.cpp
 msgid "Waiting for the iPhone."
 msgstr "Čeká se na iPhone."
 
@@ -1654,7 +1657,7 @@ msgstr "Vyhledávání Bluetooth dokončeno."
 msgid "Another pairing attempt is already in progress."
 msgstr "Už probíhá jiný pokus o párování."
 
-#: src/core/src/net.cpp src/gtk/devices_view.cpp
+#: src/core/src/net.cpp src/gtk/devices_view.cpp src/tui/devices.cpp
 msgid "Bluetooth is unavailable on this machine."
 msgstr "Bluetooth není na tomto stroji dostupné."
 
@@ -1666,7 +1669,7 @@ msgstr "Není to zařízení AirPods."
 msgid "Unknown listening mode."
 msgstr "Neznámý režim poslechu."
 
-#: src/core/src/net.cpp src/gtk/devices_view.cpp
+#: src/core/src/net.cpp src/gtk/devices_view.cpp src/tui/devices.cpp
 msgid "No AirPods are connected."
 msgstr "Nejsou připojena žádná AirPods."
 
@@ -1703,6 +1706,7 @@ msgid "unknown error"
 msgstr "neznámá chyba"
 
 #: src/core/src/net.cpp src/gtk/devices_view.cpp src/gtk/messages_view.cpp
+#: src/tui/devices.cpp src/tui/messages.cpp
 msgid "Could not reach the Tether daemon."
 msgstr "Nepodařilo se spojit s démonem Tether."
 
@@ -1761,99 +1765,49 @@ msgstr "Kopírovat kód"
 msgid "Open in {}"
 msgstr "Otevřít v {}"
 
-#: src/gtk/calls_view.cpp
-msgid "Incoming"
-msgstr "Příchozí"
-
-#: src/gtk/calls_view.cpp
-msgid "Call waiting"
-msgstr "Čekající hovor"
-
-#: src/gtk/calls_view.cpp
-msgid "Dialing"
-msgstr "Vytáčení"
-
-#: src/gtk/calls_view.cpp
-msgid "Ringing"
-msgstr "Vyzvání"
-
-#: src/gtk/calls_view.cpp
-msgid "On call"
-msgstr "Probíhá hovor"
-
-#: src/gtk/calls_view.cpp
-msgid "On hold"
-msgstr "Přidržený"
-
-#: src/gtk/calls_view.cpp
-msgid "Ended"
-msgstr "Ukončeno"
-
-#: src/gtk/calls_view.cpp
-msgid "No service"
-msgstr "Bez signálu"
-
-#. TRANSLATORS: Cellular signal strength read aloud, {} is 0 to 5.
-#: src/gtk/calls_view.cpp
-#, c++-format
-msgid "signal {} of 5"
-msgstr "signál {} z 5"
-
-#. TRANSLATORS: The iPhone's battery level read aloud, {} is like "80%".
-#: src/gtk/calls_view.cpp
-#, c++-format
-msgid "battery {}"
-msgstr "baterie {}"
-
-#: src/gtk/calls_view.cpp
+#: src/gtk/calls_view.cpp src/tui/calls.cpp
 msgid "Unknown caller"
 msgstr "Neznámý volající"
 
-#: src/gtk/calls_view.cpp
+#: src/gtk/calls_view.cpp src/tui/calls.cpp
 msgid "Answer"
 msgstr "Přijmout"
 
-#: src/gtk/calls_view.cpp
+#: src/gtk/calls_view.cpp src/tui/calls.cpp
 msgid "Audio here"
 msgstr "Přesunout zvuk sem"
 
-#: src/gtk/calls_view.cpp
+#: src/gtk/calls_view.cpp src/tui/calls.cpp
 msgid "Decline"
 msgstr "Odmítnout"
 
-#: src/gtk/calls_view.cpp
+#: src/gtk/calls_view.cpp src/tui/calls.cpp
 msgid "Hang up"
 msgstr "Zavěsit"
 
-#. TRANSLATORS: strftime clock time on today's conversations, e.g. "%I:%M %p" for 12-hour.
-#: src/gtk/calls_view.cpp src/gtk/message_format.cpp src/gtk/messages_view.cpp
-#, no-c-format
-msgid "%H:%M"
-msgstr "%H:%M"
+#: src/gtk/calls_view.cpp src/tui/calls.cpp src/ui_common/ui_text.cpp
+msgid "Incoming"
+msgstr "Příchozí"
 
-#: src/gtk/calls_view.cpp
-msgid "%b %d, %H:%M"
-msgstr "%d. %b, %H:%M"
-
-#: src/gtk/calls_view.cpp
+#: src/gtk/calls_view.cpp src/tui/calls.cpp
 msgid "Missed"
 msgstr "Zmeškaný"
 
-#: src/gtk/calls_view.cpp
+#: src/gtk/calls_view.cpp src/tui/calls.cpp
 msgid "Outgoing"
 msgstr "Odchozí"
 
 #. TRANSLATORS: Button that calls a recent caller back, {} is their name or number.
-#: src/gtk/calls_view.cpp
+#: src/gtk/calls_view.cpp src/tui/calls.cpp
 #, c++-format
 msgid "Call {}"
 msgstr "Volat {}"
 
-#: src/gtk/calls_view.cpp
+#: src/gtk/calls_view.cpp src/tui/calls.cpp
 msgid "No calls."
 msgstr "Žádné hovory."
 
-#: src/gtk/calls_view.cpp
+#: src/gtk/calls_view.cpp src/tui/calls.cpp
 msgid "Call control is off. Turn it on with 'tether --bt-calls-enable on'."
 msgstr ""
 "Ovládání hovorů je vypnuté. Zapněte je příkazem 'tether --bt-calls-enable "
@@ -1863,7 +1817,7 @@ msgstr ""
 msgid "Number to call"
 msgstr "Číslo k volání"
 
-#: src/gtk/calls_view.cpp
+#: src/gtk/calls_view.cpp src/tui/calls.cpp
 msgid "Call"
 msgstr "Volat"
 
@@ -1871,7 +1825,7 @@ msgstr "Volat"
 msgid "The iPhone's carrier, signal, and battery."
 msgstr "Operátor, signál a baterie iPhonu."
 
-#: src/gtk/calls_view.cpp
+#: src/gtk/calls_view.cpp src/tui/calls.cpp
 msgid "Recent calls"
 msgstr "Nedávné hovory"
 
@@ -1885,7 +1839,7 @@ msgstr "Kopírovat"
 msgid "Copy {}"
 msgstr "Kopírovat {}"
 
-#: src/gtk/contacts_view.cpp
+#: src/gtk/contacts_view.cpp src/tui/main.cpp
 msgid "Copied to the clipboard."
 msgstr "Zkopírováno do schránky."
 
@@ -1900,11 +1854,11 @@ msgstr "Napsat zprávu"
 msgid "Message {}"
 msgstr "Napsat zprávu {}"
 
-#: src/gtk/contacts_view.cpp
+#: src/gtk/contacts_view.cpp src/tui/contacts.cpp
 msgid "Favorite"
 msgstr "Oblíbený"
 
-#: src/gtk/contacts_view.cpp
+#: src/gtk/contacts_view.cpp src/tui/contacts.cpp
 msgid "No contacts yet. Check the Bluetooth link on the Devices page."
 msgstr ""
 "Zatím žádné kontakty. Zkontrolujte spojení Bluetooth na stránce Zařízení."
@@ -1913,107 +1867,88 @@ msgstr ""
 msgid "Search contacts"
 msgstr "Hledat kontakty"
 
-#: src/gtk/daemon_client.cpp
+#: src/gtk/daemon_client.cpp src/tui/main.cpp
 msgid "Daemon Offline"
 msgstr "Démon je offline"
 
-#: src/gtk/daemon_client.cpp src/gtk/messages_view.cpp
+#: src/gtk/daemon_client.cpp src/gtk/messages_view.cpp src/tui/main.cpp
+#: src/tui/messages.cpp
 msgid "The Tether daemon is not running."
 msgstr "Démon Tether neběží."
 
-#: src/gtk/daemon_client.cpp
+#: src/gtk/daemon_client.cpp src/tui/main.cpp
 msgid "Daemon Online"
 msgstr "Démon je online"
 
-#. TRANSLATORS: Left earbud, read aloud by screen readers before its battery level.
-#: src/gtk/devices_view.cpp
-msgid "Left earbud"
-msgstr "Levé sluchátko"
-
-#. TRANSLATORS: Left earbud, abbreviated to fit the device row. One or two letters.
-#: src/gtk/devices_view.cpp
-msgid "L"
-msgstr "L"
-
-#. TRANSLATORS: Right earbud, read aloud by screen readers before its battery level.
-#: src/gtk/devices_view.cpp
-msgid "Right earbud"
-msgstr "Pravé sluchátko"
-
-#. TRANSLATORS: Right earbud, abbreviated to fit the device row. One or two letters.
-#: src/gtk/devices_view.cpp
-msgid "R"
-msgstr "P"
-
-#: src/gtk/devices_view.cpp
+#: src/gtk/devices_view.cpp src/tui/devices.cpp
 msgid "Reading battery…"
 msgstr "Načítání baterie…"
 
-#: src/gtk/devices_view.cpp
+#: src/gtk/devices_view.cpp src/tui/devices.cpp
 msgid "Not connected yet."
 msgstr "Zatím nepřipojeno."
 
-#: src/gtk/devices_view.cpp
+#: src/gtk/devices_view.cpp src/tui/devices.cpp
 msgid "Connected."
 msgstr "Připojeno."
 
-#: src/gtk/devices_view.cpp
+#: src/gtk/devices_view.cpp src/tui/devices.cpp
 msgid "Scanning for nearby devices..."
 msgstr "Hledání zařízení v okolí..."
 
-#: src/gtk/devices_view.cpp
+#: src/gtk/devices_view.cpp src/tui/devices.cpp
 msgid "Off"
 msgstr "Vypnuto"
 
-#: src/gtk/devices_view.cpp
+#: src/gtk/devices_view.cpp src/tui/devices.cpp
 msgid "Transparency"
 msgstr "Propustnost"
 
-#: src/gtk/devices_view.cpp
+#: src/gtk/devices_view.cpp src/tui/devices.cpp
 msgid "Adaptive"
 msgstr "Adaptivní"
 
-#: src/gtk/devices_view.cpp
+#: src/gtk/devices_view.cpp src/tui/devices.cpp
 msgid "Noise Cancellation"
 msgstr "Potlačení hluku"
 
-#: src/gtk/devices_view.cpp
+#: src/gtk/devices_view.cpp src/tui/devices.cpp
 msgid "Disconnect"
 msgstr "Odpojit"
 
-#: src/gtk/devices_view.cpp
+#: src/gtk/devices_view.cpp src/tui/devices.cpp
 msgid "Connect"
 msgstr "Připojit"
 
-#: src/gtk/devices_view.cpp
+#: src/gtk/devices_view.cpp src/tui/devices.cpp
 msgid "Tether is not managing the AirPods, so another program can use them."
 msgstr "Tether AirPods nespravuje, může je používat jiný program."
 
-#: src/gtk/devices_view.cpp
+#: src/gtk/devices_view.cpp src/tui/devices.cpp
 msgid "These AirPods do not report a listening mode."
 msgstr "Tato AirPods nehlásí režim poslechu."
 
-#: src/gtk/devices_view.cpp
+#: src/gtk/devices_view.cpp src/tui/devices.cpp
 msgid "These AirPods do not report whether they are being worn."
 msgstr "Tato AirPods nehlásí, zda jsou nasazena."
 
-#: src/gtk/devices_view.cpp
+#: src/gtk/devices_view.cpp src/tui/devices.cpp
 msgid "Both buds are in."
 msgstr "Obě sluchátka jsou v uších."
 
-#: src/gtk/devices_view.cpp
+#: src/gtk/devices_view.cpp src/tui/devices.cpp
 msgid "One bud is in."
 msgstr "Jedno sluchátko je v uchu."
 
-#: src/gtk/devices_view.cpp
+#: src/gtk/devices_view.cpp src/tui/devices.cpp
 msgid "Neither bud is in."
 msgstr "Žádné sluchátko není v uchu."
 
-#: src/gtk/devices_view.cpp
+#: src/gtk/devices_view.cpp src/tui/devices.cpp
 msgid "The buds are handed over with Apple's own handoff."
 msgstr "AirPods se předávají vlastním předáním od Applu."
 
-#: src/gtk/devices_view.cpp
+#: src/gtk/devices_view.cpp src/tui/devices.cpp
 msgid ""
 "The buds are handed over by disconnecting them. For Apple's own handoff, put "
 "DeviceID = bluetooth:004C:0000:0000 under [General] in /etc/bluetooth/"
@@ -2023,65 +1958,66 @@ msgstr ""
 "DeviceID = bluetooth:004C:0000:0000 do sekce [General] v /etc/bluetooth/"
 "main.conf a restartujte bluetooth."
 
-#: src/gtk/devices_view.cpp
+#: src/gtk/devices_view.cpp src/tui/devices.cpp
 msgid "Full mode — messages, contacts, and notifications."
 msgstr "Plný režim — zprávy, kontakty a oznámení."
 
-#: src/gtk/devices_view.cpp
+#: src/gtk/devices_view.cpp src/tui/devices.cpp
 msgid "Compatibility mode — messages and contacts, no notification mirroring."
 msgstr "Režim kompatibility — zprávy a kontakty, bez zrcadlení oznámení."
 
-#: src/gtk/devices_view.cpp
+#: src/gtk/devices_view.cpp src/tui/devices.cpp
 msgid "This machine cannot carry the Bluetooth features."
 msgstr "Tento stroj nezvládne funkce Bluetooth."
 
-#: src/gtk/devices_view.cpp
+#: src/gtk/devices_view.cpp src/tui/devices.cpp
 msgid "Link"
 msgstr "Spojení"
 
-#: src/gtk/devices_view.cpp
+#: src/gtk/devices_view.cpp src/tui/devices.cpp
 msgid "Not paired over Bluetooth yet."
 msgstr "Zatím nespárováno přes Bluetooth."
 
-#: src/gtk/devices_view.cpp
+#: src/gtk/devices_view.cpp src/tui/devices.cpp
 msgid "Tether is not using this device. Pair it to select it."
 msgstr "Tether toto zařízení nepoužívá. Spárujte jej, abyste jej vybrali."
 
-#: src/gtk/devices_view.cpp
+#: src/gtk/devices_view.cpp src/tui/devices.cpp
 msgid "Bluetooth is switched off for this iPhone."
 msgstr "Bluetooth je pro tento iPhone vypnuté."
 
-#: src/gtk/devices_view.cpp
+#: src/gtk/devices_view.cpp src/tui/devices.cpp
 msgid "Connected and ready."
 msgstr "Připojeno a připraveno."
 
-#: src/gtk/devices_view.cpp
+#: src/gtk/devices_view.cpp src/tui/devices.cpp
 msgid "Device is offline. Make sure it is switched on and on the same network."
 msgstr "Zařízení je offline. Zkontrolujte, že je zapnuté a ve stejné síti."
 
-#: src/gtk/devices_view.cpp
+#. TRANSLATORS: {0} is an IP address, {1} a port number.
+#: src/gtk/devices_view.cpp src/tui/devices.cpp
 #, c++-format
 msgid "Found at {0}:{1}"
 msgstr "Nalezeno na {0}:{1}"
 
-#: src/gtk/devices_view.cpp
+#: src/gtk/devices_view.cpp src/tui/devices.cpp
 msgid "Sending pair request..."
 msgstr "Odesílání žádosti o spárování..."
 
-#: src/gtk/devices_view.cpp
+#: src/gtk/devices_view.cpp src/tui/devices.cpp
 msgid "Pair request sent. Approve on remote device!"
 msgstr "Žádost o spárování odeslána. Schvalte ji na vzdáleném zařízení!"
 
-#: src/gtk/devices_view.cpp
+#: src/gtk/devices_view.cpp src/tui/devices.cpp
 msgid "Pairing… confirm the prompt on the iPhone."
 msgstr "Párování… potvrďte výzvu na iPhonu."
 
-#: src/gtk/devices_view.cpp
+#: src/gtk/devices_view.cpp src/tui/devices.cpp
 #, c-format
 msgid "Remove the Bluetooth pairing with %s?"
 msgstr "Odstranit Bluetooth párování s %s?"
 
-#: src/gtk/devices_view.cpp
+#: src/gtk/devices_view.cpp src/tui/devices.cpp
 msgid ""
 "Also delete this computer from the iPhone's Bluetooth settings before "
 "pairing again, or the phone will keep the stale bond."
@@ -2089,16 +2025,16 @@ msgstr ""
 "Před opětovným párováním smažte tento počítač také z nastavení Bluetooth na "
 "iPhonu, jinak si telefon ponechá zastaralou vazbu."
 
-#: src/gtk/devices_view.cpp
+#: src/gtk/devices_view.cpp src/tui/devices.cpp
 msgid "Removing the pairing…"
 msgstr "Odstraňování párování…"
 
-#: src/gtk/devices_view.cpp
+#: src/gtk/devices_view.cpp src/tui/devices.cpp
 #, c-format
 msgid "Forget %s?"
 msgstr "Zapomenout %s?"
 
-#: src/gtk/devices_view.cpp
+#: src/gtk/devices_view.cpp src/tui/devices.cpp
 msgid ""
 "Tether will stop connecting to it. Forget this computer on the other device "
 "too, then pair again to reconnect."
@@ -2110,27 +2046,28 @@ msgstr ""
 msgid "Setup commands copied to the clipboard."
 msgstr "Příkazy pro nastavení zkopírovány do schránky."
 
-#: src/gtk/devices_view.cpp src/gtk/messages_view.cpp
+#: src/gtk/devices_view.cpp src/gtk/messages_view.cpp src/tui/devices.cpp
+#: src/tui/messages.cpp
 msgid "Asking the iPhone to show its Bluetooth permissions…"
 msgstr "Žádáme iPhone, aby zobrazil svá Bluetooth oprávnění…"
 
 #. TRANSLATORS: {} is a file name.
-#: src/gtk/devices_view.cpp
+#: src/gtk/devices_view.cpp src/tui/devices.cpp
 #, c++-format
 msgid "Sending {}…"
 msgstr "Odesílání {}…"
 
 #. TRANSLATORS: {0} is the current file's position, {1} the batch size.
-#: src/gtk/devices_view.cpp
+#: src/gtk/devices_view.cpp src/tui/devices.cpp
 #, c++-format
 msgid "({0} of {1})"
 msgstr "({0} z {1})"
 
-#: src/gtk/devices_view.cpp
+#: src/gtk/devices_view.cpp src/tui/devices.cpp
 msgid "Daemon unavailable."
 msgstr "Démon není dostupný."
 
-#: src/gtk/devices_view.cpp
+#: src/gtk/devices_view.cpp src/tui/devices.cpp
 msgid "Send File"
 msgstr "Odeslat soubor"
 
@@ -2142,15 +2079,15 @@ msgstr "_Zrušit"
 msgid "_Send"
 msgstr "_Odeslat"
 
-#: src/gtk/devices_view.cpp
+#: src/gtk/devices_view.cpp src/tui/devices.cpp
 msgid "Folders can't be sent — drop files instead."
 msgstr "Složky nelze odeslat — přetáhněte místo nich soubory."
 
-#: src/gtk/devices_view.cpp
+#: src/gtk/devices_view.cpp src/tui/devices.cpp
 msgid "Clipboard, files, and OTP are connected."
 msgstr "Schránka, soubory a OTP jsou připojeny."
 
-#: src/gtk/devices_view.cpp
+#: src/gtk/devices_view.cpp src/tui/devices.cpp
 msgid ""
 "Files and OTP are connected. This compositor does not give Tether clipboard "
 "access, so clipboard sync is off."
@@ -2158,7 +2095,7 @@ msgstr ""
 "Soubory a OTP jsou připojeny. Tento kompozitor nedává Tetheru přístup ke "
 "schránce, takže synchronizace schránky je vypnutá."
 
-#: src/gtk/devices_view.cpp
+#: src/gtk/devices_view.cpp src/tui/devices.cpp
 msgid ""
 "avahi-daemon isn't running, so other devices can't find this PC. Start it "
 "with: sudo systemctl enable --now avahi-daemon"
@@ -2166,7 +2103,7 @@ msgstr ""
 "avahi-daemon neběží, takže tento počítač jiná zařízení nenajdou. Spusťte jej "
 "příkazem: sudo systemctl enable --now avahi-daemon"
 
-#: src/gtk/devices_view.cpp
+#: src/gtk/devices_view.cpp src/tui/devices.cpp
 msgid ""
 "A device is on the network but cannot reach this PC. A firewall is running; "
 "Tether needs inbound TCP 5134. Allow it with: sudo ufw allow 5134/tcp"
@@ -2175,42 +2112,43 @@ msgstr ""
 "Tether potřebuje příchozí TCP 5134. Povolte jej příkazem: sudo ufw allow "
 "5134/tcp"
 
-#: src/gtk/devices_view.cpp
+#: src/gtk/devices_view.cpp src/tui/devices.cpp
 msgid "No paired device is connected. Switch it on and join the same network."
 msgstr ""
 "Není připojeno žádné spárované zařízení. Zapněte je a připojte do stejné "
 "sítě."
 
-#: src/gtk/devices_view.cpp
+#: src/gtk/devices_view.cpp src/tui/devices.cpp
 msgid "Unknown Device"
 msgstr "Neznámé zařízení"
 
-#: src/gtk/devices_view.cpp
+#: src/gtk/devices_view.cpp src/tui/devices.cpp
 msgid "Connected"
 msgstr "Připojeno"
 
-#: src/gtk/devices_view.cpp
+#: src/gtk/devices_view.cpp src/tui/devices.cpp
 msgid "Offline"
 msgstr "Offline"
 
-#: src/gtk/devices_view.cpp
+#: src/gtk/devices_view.cpp src/tui/devices.cpp
 msgid "Nearby (Tap to Pair)"
 msgstr "V okolí (klepnutím spárujete)"
 
-#: src/gtk/devices_view.cpp
+#: src/gtk/devices_view.cpp src/tui/devices.cpp
 msgid "Partially connected"
 msgstr "Částečně připojeno"
 
-#: src/gtk/devices_view.cpp
+#: src/gtk/devices_view.cpp src/tui/devices.cpp
 msgid "Paired"
 msgstr "Spárováno"
 
-#: src/gtk/devices_view.cpp
+#. TRANSLATORS: {0} is the name of the device being paired with.
+#: src/gtk/devices_view.cpp src/tui/devices.cpp
 #, c++-format
 msgid "Waiting for approval on {0}..."
 msgstr "Čeká se na schválení na {0}…"
 
-#: src/gtk/devices_view.cpp
+#: src/gtk/devices_view.cpp src/tui/devices.cpp
 msgid ""
 "Could not reach that device. If a firewall is running, Tether needs inbound "
 "TCP 5134 on the other machine."
@@ -2218,27 +2156,27 @@ msgstr ""
 "Toto zařízení není dostupné. Pokud běží firewall, Tether potřebuje na druhém "
 "počítači příchozí TCP 5134."
 
-#: src/gtk/devices_view.cpp
+#: src/gtk/devices_view.cpp src/tui/devices.cpp
 msgid "That device refused the connection. Is Tether running on it?"
 msgstr "Toto zařízení odmítlo připojení. Běží na něm Tether?"
 
-#: src/gtk/devices_view.cpp
+#: src/gtk/devices_view.cpp src/tui/devices.cpp
 msgid "That address could not be resolved."
 msgstr "Tuto adresu se nepodařilo přeložit."
 
-#: src/gtk/devices_view.cpp
+#: src/gtk/devices_view.cpp src/tui/devices.cpp
 msgid "Could not connect to that device."
 msgstr "K tomuto zařízení se nepodařilo připojit."
 
-#: src/gtk/devices_view.cpp
+#: src/gtk/devices_view.cpp src/tui/devices.cpp
 msgid "Pair request was rejected."
 msgstr "Žádost o spárování byla odmítnuta."
 
-#: src/gtk/devices_view.cpp
+#: src/gtk/devices_view.cpp src/tui/devices.cpp
 msgid "Ready"
 msgstr "Připraveno"
 
-#: src/gtk/devices_view.cpp
+#: src/gtk/devices_view.cpp src/tui/devices.cpp
 #, c++-format
 msgid "Sent {0} of {1} file."
 msgid_plural "Sent {0} of {1} files."
@@ -2246,7 +2184,7 @@ msgstr[0] "Odeslán {0} z {1} souboru."
 msgstr[1] "Odeslány {0} z {1} souborů."
 msgstr[2] "Odesláno {0} z {1} souborů."
 
-#: src/gtk/devices_view.cpp
+#: src/gtk/devices_view.cpp src/tui/devices.cpp
 #, c++-format
 msgid "Skipped {} non-file item."
 msgid_plural "Skipped {} non-file items."
@@ -2254,19 +2192,19 @@ msgstr[0] "Přeskočena {} položka, která není soubor."
 msgstr[1] "Přeskočeny {} položky, které nejsou soubor."
 msgstr[2] "Přeskočeno {} položek, které nejsou soubor."
 
-#: src/gtk/devices_view.cpp
+#: src/gtk/devices_view.cpp src/tui/devices.cpp
 msgid "Clipboard is empty."
 msgstr "Schránka je prázdná."
 
-#: src/gtk/devices_view.cpp
+#: src/gtk/devices_view.cpp src/tui/devices.cpp
 msgid "Desktop Clipboard Sync triggered."
 msgstr "Synchronizace schránky plochy spuštěna."
 
-#: src/gtk/devices_view.cpp
+#: src/gtk/devices_view.cpp src/tui/devices.cpp
 msgid "Messages and notifications are connected."
 msgstr "Zprávy a oznámení jsou připojeny."
 
-#: src/gtk/devices_view.cpp
+#: src/gtk/devices_view.cpp src/tui/devices.cpp
 msgid ""
 "No iPhone found. Unlock the phone and open Settings > Bluetooth so it "
 "advertises, then scan again."
@@ -2274,7 +2212,7 @@ msgstr ""
 "Nenalezen žádný iPhone. Odemkněte telefon a otevřete Nastavení > Bluetooth, "
 "aby se ohlašoval, a hledejte znovu."
 
-#: src/gtk/devices_view.cpp
+#: src/gtk/devices_view.cpp src/tui/devices.cpp
 #, c-format
 msgid ""
 "Does the iPhone show this code?\n"
@@ -2317,11 +2255,11 @@ msgstr ""
 "2.  Stiskněte Spárovat přes Bluetooth\n"
 "3.  Udělte v telefonu obě oprávnění"
 
-#: src/gtk/devices_view.cpp
+#: src/gtk/devices_view.cpp src/tui/devices.cpp
 msgid "Scan for devices"
 msgstr "Hledat zařízení"
 
-#: src/gtk/devices_view.cpp
+#: src/gtk/devices_view.cpp src/tui/devices.cpp
 msgid "Manage AirPods from Tether"
 msgstr "Spravovat AirPods z Tetheru"
 
@@ -2333,7 +2271,7 @@ msgstr ""
 "Kanál AirPods přijme jeden program na počítač. Vypnutím se uvolní, aby ho "
 "mohl použít jiný program pro AirPods."
 
-#: src/gtk/devices_view.cpp
+#: src/gtk/devices_view.cpp src/tui/devices.cpp
 msgid "Listening mode"
 msgstr "Režim poslechu"
 
@@ -2341,19 +2279,19 @@ msgstr "Režim poslechu"
 msgid "In-ear detection"
 msgstr "Detekce v uchu"
 
-#: src/gtk/devices_view.cpp
+#: src/gtk/devices_view.cpp src/tui/devices.cpp
 msgid "Pause playback when:"
 msgstr "Pozastavit přehrávání, když:"
 
-#: src/gtk/devices_view.cpp
+#: src/gtk/devices_view.cpp src/tui/devices.cpp
 msgid "Never"
 msgstr "Nikdy"
 
-#: src/gtk/devices_view.cpp
+#: src/gtk/devices_view.cpp src/tui/devices.cpp
 msgid "One bud is removed"
 msgstr "Je vyjmuto jedno sluchátko"
 
-#: src/gtk/devices_view.cpp
+#: src/gtk/devices_view.cpp src/tui/devices.cpp
 msgid "Both buds are removed"
 msgstr "Jsou vyjmuta obě sluchátka"
 
@@ -2365,11 +2303,11 @@ msgstr ""
 "Pozastaví vše, co se na tomto počítači přehrává, a znovu to spustí, jakmile "
 "si sluchátka nasadíte. Obnoví se pouze přehrávání, které pozastavil Tether."
 
-#: src/gtk/devices_view.cpp src/gtk/main.cpp
+#: src/gtk/devices_view.cpp src/gtk/main.cpp src/tui/calls.cpp
 msgid "Calls"
 msgstr "Hovory"
 
-#: src/gtk/devices_view.cpp
+#: src/gtk/devices_view.cpp src/tui/devices.cpp
 msgid "Hand the AirPods to the iPhone during a call"
 msgstr "Předat AirPods iPhonu během hovoru"
 
@@ -2399,7 +2337,7 @@ msgstr ""
 "Spusťte je v terminálu. Tether sám o sobě nemění váš Bluetooth adaptér ani "
 "bluetoothd."
 
-#: src/gtk/devices_view.cpp
+#: src/gtk/devices_view.cpp src/tui/devices.cpp
 msgid "Connect to this iPhone over Bluetooth"
 msgstr "Připojit se k tomuto iPhonu přes Bluetooth"
 
@@ -2413,11 +2351,12 @@ msgstr ""
 "Vypnutím Tether přestane obnovovat spojení; spojení, které už běží, zůstane "
 "až do jeho odpojení."
 
-#: src/gtk/devices_view.cpp
+#: src/gtk/devices_view.cpp src/tui/devices.cpp
 msgid "Pair over Bluetooth"
 msgstr "Spárovat přes Bluetooth"
 
-#: src/gtk/devices_view.cpp src/gtk/messages_view.cpp
+#: src/gtk/devices_view.cpp src/gtk/messages_view.cpp src/tui/devices.cpp
+#: src/tui/messages.cpp
 msgid "Show iPhone Permissions"
 msgstr "Zobrazit oprávnění iPhonu"
 
@@ -2429,15 +2368,15 @@ msgstr ""
 "Znovu se ohlásí, aby iPhone zobrazil volby „Zobrazovat oznámení zpráv“ a "
 "„Synchronizovat kontakty“ v Nastavení > Bluetooth > (i)."
 
-#: src/gtk/devices_view.cpp
+#: src/gtk/devices_view.cpp src/tui/devices.cpp
 msgid "Unpair"
 msgstr "Zrušit spárování"
 
-#: src/gtk/devices_view.cpp
+#: src/gtk/devices_view.cpp src/tui/devices.cpp
 msgid "Pair Device"
 msgstr "Spárovat zařízení"
 
-#: src/gtk/devices_view.cpp
+#: src/gtk/devices_view.cpp src/tui/devices.cpp
 msgid "Force Trust (Accept Pending)"
 msgstr "Vynutit důvěru (přijmout čekající)"
 
@@ -2445,15 +2384,15 @@ msgstr "Vynutit důvěru (přijmout čekající)"
 msgid "Drop files here to send"
 msgstr "Sem přetáhněte soubory k odeslání"
 
-#: src/gtk/devices_view.cpp
+#: src/gtk/devices_view.cpp src/tui/devices.cpp
 msgid "Send Clipboard"
 msgstr "Odeslat schránku"
 
-#: src/gtk/devices_view.cpp
+#: src/gtk/devices_view.cpp src/tui/devices.cpp
 msgid "Clipboard sync requested..."
 msgstr "Vyžádána synchronizace schránky..."
 
-#: src/gtk/devices_view.cpp
+#: src/gtk/devices_view.cpp src/tui/devices.cpp
 msgid "Forget"
 msgstr "Zapomenout"
 
@@ -2465,11 +2404,11 @@ msgstr "Rozbalit postranní panel"
 msgid "Collapse sidebar"
 msgstr "Sbalit postranní panel"
 
-#: src/gtk/main.cpp src/gtk/settings_view.cpp
+#: src/gtk/main.cpp src/gtk/settings_view.cpp src/tui/settings.cpp
 msgid "Settings"
 msgstr "Nastavení"
 
-#: src/gtk/main.cpp
+#: src/gtk/main.cpp src/tui/main.cpp
 msgid "Quit"
 msgstr "Ukončit"
 
@@ -2481,7 +2420,7 @@ msgstr "Hlavní nabídka"
 msgid "Look for devices"
 msgstr "Hledat zařízení"
 
-#: src/gtk/main.cpp
+#: src/gtk/main.cpp src/tui/devices.cpp
 msgid "Devices"
 msgstr "Zařízení"
 
@@ -2501,28 +2440,7 @@ msgstr "Otevřít na této kartě"
 msgid "Open the messages tab on this conversation"
 msgstr "Otevřít kartu zpráv na této konverzaci"
 
-#: src/gtk/message_format.cpp
-msgid "Yesterday"
-msgstr "Včera"
-
-#. TRANSLATORS: strftime short date for older conversations; reorder to the local
-#. convention, e.g. "%-d %b".
-#: src/gtk/message_format.cpp
-#, no-c-format
-msgid "%b %-d"
-msgstr "%-d. %b"
-
-#: src/gtk/message_format.cpp
-msgid "Today"
-msgstr "Dnes"
-
-#. TRANSLATORS: strftime date heading above older messages, e.g. "%A %-d %B".
-#: src/gtk/message_format.cpp
-#, no-c-format
-msgid "%A, %b %-d"
-msgstr "%A %-d. %b"
-
-#: src/gtk/messages_view.cpp src/gtk/tray.cpp
+#: src/gtk/messages_view.cpp src/gtk/tray.cpp src/tui/main.cpp
 #, c++-format
 msgid "{} unread message"
 msgid_plural "{} unread messages"
@@ -2542,43 +2460,43 @@ msgstr "Odesláno: {}"
 msgid "Received: {}"
 msgstr "Přijato: {}"
 
-#: src/gtk/messages_view.cpp
+#: src/gtk/messages_view.cpp src/tui/messages.cpp
 msgid "Bluetooth connection needed to sync messages."
 msgstr "Pro synchronizaci zpráv je potřeba připojení Bluetooth."
 
-#: src/gtk/messages_view.cpp
+#: src/gtk/messages_view.cpp src/tui/messages.cpp
 msgid "Select a conversation"
 msgstr "Vyberte konverzaci"
 
-#: src/gtk/messages_view.cpp
+#: src/gtk/messages_view.cpp src/tui/messages.cpp
 msgid "Sending…"
 msgstr "Odesílání…"
 
-#: src/gtk/messages_view.cpp
+#: src/gtk/messages_view.cpp src/tui/messages.cpp
 msgid "Enter a recipient."
 msgstr "Zadejte příjemce."
 
-#: src/gtk/messages_view.cpp
+#: src/gtk/messages_view.cpp src/tui/messages.cpp
 msgid "Select a conversation first."
 msgstr "Nejprve vyberte konverzaci."
 
-#: src/gtk/messages_view.cpp
+#: src/gtk/messages_view.cpp src/tui/messages.cpp
 msgid "Replying to this conversation is not available."
 msgstr "Odpovídat v této konverzaci není možné."
 
-#: src/gtk/messages_view.cpp
+#: src/gtk/messages_view.cpp src/tui/messages.cpp
 msgid "No answer about that message; it may still have been sent."
 msgstr "Žádná odpověď ohledně té zprávy; přesto mohla být odeslána."
 
-#: src/gtk/messages_view.cpp
+#: src/gtk/messages_view.cpp src/tui/messages.cpp
 msgid "Could not reach the Tether daemon; the message was not sent."
 msgstr "Nepodařilo se spojit s démonem Tether; zpráva nebyla odeslána."
 
-#: src/gtk/messages_view.cpp
+#: src/gtk/messages_view.cpp src/tui/messages.cpp
 msgid "Sent"
 msgstr "Odesláno"
 
-#: src/gtk/messages_view.cpp
+#: src/gtk/messages_view.cpp src/tui/messages.cpp
 msgid "New Message"
 msgstr "Nová zpráva"
 
@@ -2586,7 +2504,7 @@ msgstr "Nová zpráva"
 msgid "Search conversations"
 msgstr "Hledat konverzace"
 
-#: src/gtk/messages_view.cpp
+#: src/gtk/messages_view.cpp src/tui/messages.cpp
 msgid "To:"
 msgstr "Komu:"
 
@@ -2602,7 +2520,7 @@ msgstr "Odeslat"
 msgid "Retry"
 msgstr "Zkusit znovu"
 
-#: src/gtk/notifications_view.cpp
+#: src/gtk/notifications_view.cpp src/tui/notifications.cpp
 msgid "Dismiss on the iPhone"
 msgstr "Zavřít na iPhonu"
 
@@ -2612,23 +2530,23 @@ msgstr "Zavřít na iPhonu"
 msgid "Dismiss {} notification"
 msgstr "Zavřít oznámení aplikace {}"
 
-#: src/gtk/notifications_view.cpp
+#: src/gtk/notifications_view.cpp src/tui/notifications.cpp
 msgid "New notification"
 msgstr "Nové oznámení"
 
-#: src/gtk/notifications_view.cpp
+#: src/gtk/notifications_view.cpp src/tui/notifications.cpp
 msgid "The iPhone would not take the dismissal."
 msgstr "iPhone zavření nepřijal."
 
-#: src/gtk/notifications_view.cpp
+#: src/gtk/notifications_view.cpp src/tui/notifications.cpp
 msgid "No notifications yet."
 msgstr "Zatím žádná oznámení."
 
-#: src/gtk/notifications_view.cpp
+#: src/gtk/notifications_view.cpp src/tui/notifications.cpp
 msgid "Notification mirroring is unavailable."
 msgstr "Zrcadlení oznámení není dostupné."
 
-#: src/gtk/settings_view.cpp
+#: src/gtk/settings_view.cpp src/tui/settings.cpp
 msgid ""
 "No iPhone is paired over Bluetooth, so the Bluetooth settings below cannot "
 "be changed yet."
@@ -2667,7 +2585,7 @@ msgstr ""
 "Symbolická přebírá barvu panelu. Projeví se při příštím spuštění aplikace "
 "Tether."
 
-#: src/gtk/settings_view.cpp
+#: src/gtk/settings_view.cpp src/tui/settings.cpp
 msgid "iPhone notifications"
 msgstr "Oznámení z iPhonu"
 
@@ -2675,23 +2593,23 @@ msgstr "Oznámení z iPhonu"
 msgid "Alerts your iPhone forwards to this computer over Bluetooth."
 msgstr "Upozornění, která iPhone přeposílá do tohoto počítače přes Bluetooth."
 
-#: src/gtk/settings_view.cpp
+#: src/gtk/settings_view.cpp src/tui/settings.cpp
 msgid "Mirror iPhone notifications"
 msgstr "Zrcadlit oznámení z iPhonu"
 
-#: src/gtk/settings_view.cpp
+#: src/gtk/settings_view.cpp src/tui/settings.cpp
 msgid "Disabled when pairing cannot support LE."
 msgstr "Vypne se, když párování nezvládne LE."
 
-#: src/gtk/settings_view.cpp
+#: src/gtk/settings_view.cpp src/tui/settings.cpp
 msgid "Include the notification text"
 msgstr "Zahrnout text oznámení"
 
-#: src/gtk/settings_view.cpp
+#: src/gtk/settings_view.cpp src/tui/settings.cpp
 msgid "Title and message content are shown, not just which app sent it."
 msgstr "Zobrazí se nadpis a text, nejen odesílající aplikace."
 
-#: src/gtk/settings_view.cpp
+#: src/gtk/settings_view.cpp src/tui/settings.cpp
 msgid "Desktop popups"
 msgstr "Vyskakovací oznámení"
 
@@ -2699,23 +2617,23 @@ msgstr "Vyskakovací oznámení"
 msgid "What Tether shows in your notification area."
 msgstr "Co Tether zobrazuje v oznamovací oblasti."
 
-#: src/gtk/settings_view.cpp
+#: src/gtk/settings_view.cpp src/tui/settings.cpp
 msgid "Show desktop popups"
 msgstr "Zobrazovat vyskakovací oznámení"
 
-#: src/gtk/settings_view.cpp
+#: src/gtk/settings_view.cpp src/tui/settings.cpp
 msgid "Off silences iPhone alerts, new messages and arriving files."
 msgstr "Vypnuto ztlumí oznámení z iPhonu, nové zprávy i příchozí soubory."
 
-#: src/gtk/settings_view.cpp
+#: src/gtk/settings_view.cpp src/tui/settings.cpp
 msgid "Show message previews"
 msgstr "Zobrazovat náhledy zpráv"
 
-#: src/gtk/settings_view.cpp
+#: src/gtk/settings_view.cpp src/tui/settings.cpp
 msgid "Off shows only the sender."
 msgstr "Vypnuto zobrazí jen odesílatele."
 
-#: src/gtk/settings_view.cpp
+#: src/gtk/settings_view.cpp src/tui/settings.cpp
 msgid "Security"
 msgstr "Zabezpečení"
 
@@ -2723,11 +2641,11 @@ msgstr "Zabezpečení"
 msgid "What Tether does when the iPhone leaves."
 msgstr "Co Tether udělá, když iPhone odejde."
 
-#: src/gtk/settings_view.cpp
+#: src/gtk/settings_view.cpp src/tui/settings.cpp
 msgid "Lock the session when the iPhone goes out of range"
 msgstr "Zamknout relaci, když iPhone opustí dosah"
 
-#: src/gtk/settings_view.cpp
+#: src/gtk/settings_view.cpp src/tui/settings.cpp
 msgid ""
 "Locks about half a minute after the link times out. Switching Bluetooth off "
 "on the iPhone does not lock, and neither does suspending this machine."
@@ -2739,35 +2657,35 @@ msgstr ""
 msgid "SMS and iMessage conversations synced over Bluetooth."
 msgstr "SMS a konverzace iMessage synchronizované přes Bluetooth."
 
-#: src/gtk/settings_view.cpp
+#: src/gtk/settings_view.cpp src/tui/settings.cpp
 msgid "Encrypted"
 msgstr "Šifrovaně"
 
-#: src/gtk/settings_view.cpp
+#: src/gtk/settings_view.cpp src/tui/settings.cpp
 msgid "Unencrypted"
 msgstr "Nešifrovaně"
 
-#: src/gtk/settings_view.cpp
+#: src/gtk/settings_view.cpp src/tui/settings.cpp
 msgid "Do not keep"
 msgstr "Neuchovávat"
 
-#: src/gtk/settings_view.cpp
+#: src/gtk/settings_view.cpp src/tui/settings.cpp
 msgid "Keep message history"
 msgstr "Uchovávat historii zpráv"
 
-#: src/gtk/settings_view.cpp
+#: src/gtk/settings_view.cpp src/tui/settings.cpp
 msgid ""
 "Encrypted uses a key from your desktop keyring. Do not keep deletes what is "
 "stored."
 msgstr "Šifrovaně používá klíč z klíčenky. Neuchovávat smaže, co je uloženo."
 
-#: src/gtk/settings_view.cpp
+#: src/gtk/settings_view.cpp src/tui/settings.cpp
 msgid ""
 "Paused: no key from the desktop keyring. Unlock it, or choose Unencrypted."
 msgstr ""
 "Pozastaveno: klíčenka nenabízí klíč. Odemkněte ji, nebo zvolte Nešifrovaně."
 
-#: src/gtk/settings_view.cpp
+#: src/gtk/settings_view.cpp src/tui/settings.cpp
 msgid "Experimental"
 msgstr "Experimentální"
 
@@ -2775,36 +2693,264 @@ msgstr "Experimentální"
 msgid "Unfinished features. These can stop working at any time."
 msgstr "Nedokončené funkce. Mohou kdykoli přestat fungovat."
 
-#: src/gtk/settings_view.cpp
+#: src/gtk/settings_view.cpp src/tui/settings.cpp
 msgid "Call control over Bluetooth"
 msgstr "Ovládání hovorů přes Bluetooth"
 
-#: src/gtk/settings_view.cpp
+#: src/gtk/settings_view.cpp src/tui/settings.cpp
 msgid "Answer and place calls from the Calls tab."
 msgstr "Přijímejte a uskutečňujte hovory na kartě Hovory."
 
-#: src/gtk/tray.cpp src/gtk/ui_util.cpp
+#: src/gtk/tray.cpp src/gtk/ui_util.cpp src/tui/main.cpp
 msgid "connected"
 msgstr "připojeno"
 
-#: src/gtk/tray.cpp src/gtk/ui_util.cpp
+#: src/gtk/tray.cpp src/gtk/ui_util.cpp src/tui/main.cpp
 msgid "not connected"
 msgstr "nepřipojeno"
 
 #. TRANSLATORS: {} is a transport name, "Wi-Fi" or "Bluetooth", or a device name.
 #. TRANSLATORS: {} is a transport name, "Wi-Fi" or "Bluetooth".
-#: src/gtk/tray.cpp src/gtk/ui_util.cpp
+#: src/gtk/tray.cpp src/gtk/ui_util.cpp src/tui/main.cpp
 #, c++-format
 msgid "{}: {}"
 msgstr "{}: {}"
 
-#: src/gtk/tray.cpp
+#: src/gtk/tray.cpp src/tui/main.cpp
 msgid "Daemon: not running"
 msgstr "Démon: neběží"
 
-#: src/gtk/ui_util.cpp
+#: src/gtk/ui_util.cpp src/tui/main.cpp
 msgid "Waiting for the Tether daemon."
 msgstr "Čeká se na démona Tether."
+
+#: src/tui/devices.cpp
+msgid "Overview"
+msgstr "Přehled"
+
+#: src/tui/devices.cpp
+msgid "Select a device first."
+msgstr "Nejprve vyberte zařízení."
+
+#: src/tui/devices.cpp
+msgid "Modes: off, transparency, adaptive, anc"
+msgstr "Režimy: off, transparency, adaptive, anc"
+
+#: src/tui/devices.cpp
+#, c++-format
+msgid "Found {}. Select it under BLUETOOTH to pair."
+msgstr "Nalezeno: {}. Vyberte jej v části BLUETOOTH a spárujte."
+
+#: src/tui/devices.cpp
+msgid "Usage: :send FILE…"
+msgstr "Použití: :send SOUBOR…"
+
+#: src/tui/main.cpp
+msgid "-- INSERT --"
+msgstr "-- VLOŽIT --"
+
+#: src/tui/main.cpp
+msgid "Move down / up"
+msgstr "Posun dolů / nahoru"
+
+#: src/tui/main.cpp
+msgid "First / last"
+msgstr "První / poslední"
+
+#: src/tui/main.cpp
+msgid "Half a page down / up"
+msgstr "Půl stránky dolů / nahoru"
+
+#: src/tui/main.cpp
+msgid "Focus the list / the detail pane"
+msgstr "Přejít na seznam / na podrobnosti"
+
+#: src/tui/main.cpp
+msgid "Open, or run the highlighted action"
+msgstr "Otevřít nebo spustit zvýrazněnou akci"
+
+#: src/tui/main.cpp
+msgid "Toggle the highlighted setting"
+msgstr "Přepnout zvýrazněné nastavení"
+
+#: src/tui/main.cpp
+msgid "Switch tab"
+msgstr "Přepnout kartu"
+
+#: src/tui/main.cpp
+msgid "Filter the list"
+msgstr "Filtrovat seznam"
+
+#: src/tui/main.cpp
+msgid "Clear the filter, leave insert mode"
+msgstr "Zrušit filtr, opustit režim vkládání"
+
+#: src/tui/main.cpp
+msgid "Write in the open conversation"
+msgstr "Psát do otevřené konverzace"
+
+#: src/tui/main.cpp
+msgid "Send / new line (insert mode)"
+msgstr "Odeslat / nový řádek (režim vkládání)"
+
+#: src/tui/main.cpp
+msgid "New message, or dial on Calls"
+msgstr "Nová zpráva, na kartě Hovory vytočit číslo"
+
+#: src/tui/main.cpp
+msgid "Dismiss, forget, unpair, or hang up"
+msgstr "Zavřít, zapomenout, zrušit spárování nebo zavěsit"
+
+#: src/tui/main.cpp
+msgid "Copy the highlighted address or text"
+msgstr "Kopírovat zvýrazněnou adresu nebo text"
+
+#: src/tui/main.cpp
+msgid "Refresh, or scan for devices"
+msgstr "Obnovit nebo hledat zařízení"
+
+#: src/tui/main.cpp
+msgid "Send files to the selected device"
+msgstr "Odeslat soubory do vybraného zařízení"
+
+#: src/tui/main.cpp
+msgid "Send the clipboard"
+msgstr "Odeslat schránku"
+
+#: src/tui/main.cpp
+msgid "Place a call"
+msgstr "Zavolat"
+
+#: src/tui/main.cpp
+msgid "Message someone"
+msgstr "Napsat zprávu"
+
+#: src/tui/main.cpp
+msgid "Keys"
+msgstr "Klávesy"
+
+#: src/tui/main.cpp
+msgid "Terminal too small"
+msgstr "Terminál je příliš malý"
+
+#: src/tui/main.cpp
+msgid "Press i to write a message"
+msgstr "Stisknutím i napíšete zprávu"
+
+#: src/tui/main.cpp
+#, c++-format
+msgid "Not a command: {}"
+msgstr "Neznámý příkaz: {}"
+
+#: src/tui/main.cpp
+msgid "Type :q and press Enter to quit"
+msgstr "Pro ukončení napište :q a stiskněte Enter"
+
+#: src/tui/main.cpp
+msgid ""
+"Usage: tether-tui [--devices|--messages|--notifications|--contacts|--calls|--"
+"settings] [--thread KEY]"
+msgstr "Použití: tether-tui [--devices|--messages|--notifications|--contacts|--calls|--settings] [--thread KLÍČ]"
+
+#: src/tui/main.cpp
+msgid "tether-tui needs a terminal."
+msgstr "tether-tui potřebuje terminál."
+
+#: src/tui/settings.cpp
+#, c++-format
+msgid "Settings: {}"
+msgstr "Nastavení: {}"
+
+#. TRANSLATORS: strftime clock time on today's conversations, e.g. "%I:%M %p" for 12-hour.
+#: src/ui_common/message_format.cpp src/ui_common/ui_text.cpp
+#, no-c-format
+msgid "%H:%M"
+msgstr "%H:%M"
+
+#: src/ui_common/message_format.cpp
+msgid "Yesterday"
+msgstr "Včera"
+
+#. TRANSLATORS: strftime short date for older conversations; reorder to the local
+#. convention, e.g. "%-d %b".
+#: src/ui_common/message_format.cpp
+#, no-c-format
+msgid "%b %-d"
+msgstr "%-d. %b"
+
+#: src/ui_common/message_format.cpp
+msgid "Today"
+msgstr "Dnes"
+
+#. TRANSLATORS: strftime date heading above older messages, e.g. "%A %-d %B".
+#: src/ui_common/message_format.cpp
+#, no-c-format
+msgid "%A, %b %-d"
+msgstr "%A %-d. %b"
+
+#. TRANSLATORS: Left earbud, read aloud by screen readers before its battery level.
+#: src/ui_common/ui_text.cpp
+msgid "Left earbud"
+msgstr "Levé sluchátko"
+
+#. TRANSLATORS: Left earbud, abbreviated to fit the device row. One or two letters.
+#: src/ui_common/ui_text.cpp
+msgid "L"
+msgstr "L"
+
+#. TRANSLATORS: Right earbud, read aloud by screen readers before its battery level.
+#: src/ui_common/ui_text.cpp
+msgid "Right earbud"
+msgstr "Pravé sluchátko"
+
+#. TRANSLATORS: Right earbud, abbreviated to fit the device row. One or two letters.
+#: src/ui_common/ui_text.cpp
+msgid "R"
+msgstr "P"
+
+#: src/ui_common/ui_text.cpp
+msgid "Call waiting"
+msgstr "Čekající hovor"
+
+#: src/ui_common/ui_text.cpp
+msgid "Dialing"
+msgstr "Vytáčení"
+
+#: src/ui_common/ui_text.cpp
+msgid "Ringing"
+msgstr "Vyzvání"
+
+#: src/ui_common/ui_text.cpp
+msgid "On call"
+msgstr "Probíhá hovor"
+
+#: src/ui_common/ui_text.cpp
+msgid "On hold"
+msgstr "Přidržený"
+
+#: src/ui_common/ui_text.cpp
+msgid "Ended"
+msgstr "Ukončeno"
+
+#: src/ui_common/ui_text.cpp
+msgid "No service"
+msgstr "Bez signálu"
+
+#. TRANSLATORS: Cellular signal strength read aloud, {} is 0 to 5.
+#: src/ui_common/ui_text.cpp
+#, c++-format
+msgid "signal {} of 5"
+msgstr "signál {} z 5"
+
+#. TRANSLATORS: The iPhone's battery level read aloud, {} is like "80%".
+#: src/ui_common/ui_text.cpp
+#, c++-format
+msgid "battery {}"
+msgstr "baterie {}"
+
+#: src/ui_common/ui_text.cpp
+msgid "%b %d, %H:%M"
+msgstr "%d. %b, %H:%M"
 
 #: src/gtk/tether-gtk.desktop.in
 msgid "Device Synchronization"

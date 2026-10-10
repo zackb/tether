@@ -44,14 +44,6 @@ namespace tether::ui {
             gtk_list_box_invalidate_filter(GTK_LIST_BOX(g_contacts.list));
         }
 
-        // Addresses arrive namespaced the way thread keys are. The prefix is
-        // what makes them sendable, so it is kept on the button and stripped
-        // only for display.
-        std::string display_address(const std::string& key) {
-            const size_t colon = key.find(':');
-            return colon == std::string::npos ? key : key.substr(colon + 1);
-        }
-
         const char* stashed(GtkWidget* widget) {
             const char* value = static_cast<const char*>(g_object_get_data(G_OBJECT(widget), "address"));
             return value ? value : "";

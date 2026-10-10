@@ -89,58 +89,6 @@ namespace tether::ui {
             g_object_set_data_full(G_OBJECT(button), "call-path", g_strdup(path.c_str()), g_free);
         }
 
-        // The phone's own words for a state, kept short enough for a row.
-        const char* state_text(const std::string& state) {
-            if (state == "incoming")
-                return _("Incoming");
-            if (state == "waiting")
-                return _("Call waiting");
-            if (state == "dialing")
-                return _("Dialing");
-            if (state == "alerting")
-                return _("Ringing");
-            if (state == "active")
-                return _("On call");
-            if (state == "held")
-                return _("On hold");
-            if (state == "disconnected")
-                return _("Ended");
-            return "";
-        }
-
-        // What HFP reports about the phone's cellular link. "spoken" replaces the
-        // bar glyphs and bare percentage with words for screen readers.
-        std::string network_text(const nlohmann::json& calls, bool spoken = false) {
-            if (!calls.is_object())
-                return {};
-            if (!calls.value("indicators", true))
-                return {};
-            const std::string gap = spoken ? ", " : "  ";
-            std::string out = calls.value("operator", "");
-            if (!calls.value("service", false))
-                out = out.empty() ? _("No service") : out + (spoken ? gap : "  -  ") + _("No service");
-            const int signal = calls.value("signal", 0);
-            if (calls.value("service", false)) {
-                std::string bars;
-                if (spoken) {
-                    // TRANSLATORS: Cellular signal strength read aloud, {} is 0 to 5.
-                    bars = tether::tr_format(_("signal {} of 5"), signal);
-                } else {
-                    for (int i = 0; i < 5; ++i)
-                        bars += i < signal ? "\u2586" : "\u2581";
-                }
-                out += out.empty() ? bars : gap + bars;
-            }
-            if (calls.value("roaming", false))
-                out += gap + _("roaming");
-            if (const int battery = calls.value("battery", 0); battery > 0) {
-                const std::string level = std::to_string(battery * 20) + "%";
-                // TRANSLATORS: The iPhone's battery level read aloud, {} is like "80%".
-                out += gap + (spoken ? tether::tr_format(_("battery {}"), level) : level);
-            }
-            return out;
-        }
-
         GtkWidget* build_row(const nlohmann::json& call) {
             const std::string number = call.value("number", "");
             const std::string name = call.value("name", "");
@@ -168,7 +116,7 @@ namespace tether::ui {
             gtk_label_set_xalign(GTK_LABEL(primary_label), 0.0);
             gtk_box_pack_start(GTK_BOX(text), primary_label, FALSE, FALSE, 0);
 
-            std::string secondary = state_text(state);
+            std::string secondary = call_state_text(state);
             if (!name.empty() && !number.empty())
                 secondary += secondary.empty() ? number : "  -  " + number;
 
@@ -205,23 +153,6 @@ namespace tether::ui {
 
             gtk_container_add(GTK_CONTAINER(row), box);
             return row;
-        }
-
-        // Time of day for today's calls, the date as well for older ones.
-        std::string format_call_time(int64_t epoch) {
-            if (epoch <= 0)
-                return "";
-            const std::time_t t = static_cast<std::time_t>(epoch);
-            const std::time_t now = std::time(nullptr);
-            std::tm tm{}, today{};
-            localtime_r(&t, &tm);
-            localtime_r(&now, &today);
-            const bool same_day = tm.tm_year == today.tm_year && tm.tm_yday == today.tm_yday;
-
-            char buffer[64];
-            // xgettext:no-c-format
-            std::strftime(buffer, sizeof(buffer), same_day ? _("%H:%M") : _("%b %d, %H:%M"), &tm);
-            return buffer;
         }
 
         GtkWidget* build_history_row(const nlohmann::json& entry) {
