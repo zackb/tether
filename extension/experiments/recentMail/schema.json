@@ -1,0 +1,16 @@
+[
+  {
+    "namespace": "recentMail",
+    "functions": [
+      {
+        "name": "queryRecent",
+        "type": "function",
+        "async": true,
+        "parameters": [
+          { "name": "folderId", "type": "string" },
+          { "name": "fromTime", "type": "number", "minimum": 0 }
+        ]
+      }
+    ]
+  }
+]

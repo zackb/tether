@@ -43,6 +43,7 @@ make_archive "$BROWSER_DIR" ../tether-browser-extension.zip
 echo "Bundling mail extension..."
 "$ESBUILD" extension/src/mail/extractor.js --bundle --outfile="$MAIL_DIR/src/mail/extractor.js"
 cp extension/manifest-mail.json "$MAIL_DIR/manifest.json"
+cp -R extension/experiments "$MAIL_DIR/"
 if [ -d "extension/icons" ]; then cp -R extension/icons "$MAIL_DIR/"; fi
 make_archive "$MAIL_DIR" ../tether-mail-extension.xpi
 

@@ -23,29 +23,7 @@ const OTP_SUBJECT_PATTERNS = [
   /\bOTP\b/i, /security code/i, /\d{4,8} is your/i
 ];
 
-const POLL_INTERVAL_MS = 15000;    // 15 seconds between polls
 const OTP_TTL_MS = 10 * 60 * 1000; // only look at emails from the last 10 minutes
-
-// Use a Map instead of Set so we can prune by timestamp
-const seenMessages = new Map(); // message.id -> timestamp
-
-function markSeen(id) {
-  seenMessages.set(id, Date.now());
-}
-
-function hasSeen(id) {
-  return seenMessages.has(id);
-}
-
-function pruneOldSeen() {
-  const cutoff = Date.now() - OTP_TTL_MS;
-  for (const [id, ts] of seenMessages) {
-    if (ts < cutoff) seenMessages.delete(id);
-  }
-}
-
-// Run pruning every minute so the Map doesn't grow forever
-setInterval(pruneOldSeen, 60_000);
 
 // distance from `target` to the closest occurrence of `needle` in `haystack`.
 function nearestDistance(haystack, needle, target) {
@@ -361,89 +339,129 @@ export async function processMessage(message) {
   }
 }
 
-if (typeof messenger !== 'undefined') {
-  console.log("Tether Mail Extractor loaded in Thunderbird/Betterbird");
+// One worker handles event pages, body reads and folder fallback queries.
+// Claim IDs before awaiting so overlapping event sources cannot extract twice.
+export function createMailMonitor(api, process, now = Date.now) {
+  const seen = new Map();
+  let work = Promise.resolve();
+  const pendingFolders = new Map();
+  let folderTimer;
+  let recoveryTimer;
+  let recoveryStopped = true;
+  let recoveryGeneration = 0;
+  let recoveryFolders = [];
+  let recoveryIndex = 0;
 
-  // ---------------------------------------------------------------------------
-  // PRIMARY: Poll via messages.query() — the only reliable method for IMAP.
-  //
-  // onNewMailReceived only fires for POP3/local delivery, never for IMAP.
-  // onFolderInfoChanged fires for metadata changes and is unreliable for timing.
-  // Polling with a fromDate filter is what production Thunderbird extensions use.
-  // ---------------------------------------------------------------------------
-  async function pollForNewOtpEmails() {
-    const since = new Date(Date.now() - OTP_TTL_MS);
+  function enqueue(task) {
+    work = work.then(task).catch(error => console.error('Tether mail monitor:', error));
+    return work;
+  }
 
-    try {
-      let page = await messenger.messages.query({ fromDate: since });
-
-      while (page && Array.isArray(page.messages)) {
-        for (const message of page.messages) {
-          if (hasSeen(message.id)) continue;
-          markSeen(message.id);
-
-          // Pre-filter by subject or sender before fetching the full body,
-          // so we don't pay the getEmailText() cost on every single email.
-          const subjectMatches = OTP_SUBJECT_PATTERNS.some(p => p.test(message.subject));
-          const fromMatches = /noreply|no-reply|security|verify|auth|account/i.test(message.author);
-
-          if (subjectMatches || fromMatches) {
-            processMessage(message);
+  async function consume(page, displayed = false) {
+    const cutoff = now() - OTP_TTL_MS;
+    for (const [id, timestamp] of seen) {
+      if (timestamp < cutoff) seen.delete(id);
+    }
+    while (page && Array.isArray(page.messages)) {
+      for (const message of page.messages) {
+        if (seen.has(message.id)) continue;
+        // Opening old mail must not resurrect expired login codes.
+        const date = new Date(message.date).getTime();
+        if (!Number.isFinite(date) || date < now() - OTP_TTL_MS) continue;
+        seen.set(message.id, now());
+        const candidate = displayed || OTP_SUBJECT_PATTERNS.some(p => p.test(message.subject || '')) ||
+          /noreply|no-reply|security|verify|auth|account/i.test(message.author || '');
+        if (candidate) {
+          try { await process(message); }
+          catch (error) {
+            seen.delete(message.id);
+            console.error('Tether mail extraction:', error);
           }
         }
-
-        // messages.query() returns paginated results — walk all pages
-        page = page.id ? await messenger.messages.continueList(page.id) : null;
       }
-    } catch (e) {
-      console.error("pollForNewOtpEmails error:", e);
+      page = page.id ? await api.messages.continueList(page.id) : null;
     }
   }
 
-  // Run immediately on load, then on a regular interval
-  pollForNewOtpEmails();
-  setInterval(pollForNewOtpEmails, POLL_INTERVAL_MS);
-
-  // ---------------------------------------------------------------------------
-  // SECONDARY: onNewMailReceived — fires instantly for POP3 and local delivery.
-  // Messages are handed to us directly here so we process them inline rather
-  // than re-querying. hasSeen() prevents the poller from double-processing them.
-  // ---------------------------------------------------------------------------
-  if (messenger.messages?.onNewMailReceived) {
-    messenger.messages.onNewMailReceived.addListener(async (folder, messages) => {
-      console.log("onNewMailReceived fired for folder:", folder.name);
-      for (const message of messages.messages) {
-        if (hasSeen(message.id)) continue;
-        markSeen(message.id);
-        const subjectMatches = OTP_SUBJECT_PATTERNS.some(p => p.test(message.subject));
-        const fromMatches = /noreply|no-reply|security|verify|auth|account/i.test(message.author);
-        if (subjectMatches || fromMatches) processMessage(message);
-      }
-    });
+  function received(folder, page) {
+    return enqueue(() => consume(page));
   }
 
-  // ---------------------------------------------------------------------------
-  // TERTIARY: onFolderInfoChanged — used only as a hint to poll early for IMAP.
-  // This event doesn't give us the messages directly, so we just trigger a poll
-  // immediately rather than waiting for the next interval. hasSeen() ensures
-  // nothing gets processed twice.
-  // ---------------------------------------------------------------------------
-  if (messenger.folders?.onFolderInfoChanged) {
-    messenger.folders.onFolderInfoChanged.addListener((folder, folderInfo) => {
-      if (folder.type === 'inbox' || folder.type === 'other') {
-        console.log("onFolderInfoChanged hint — polling now for folder:", folder.name);
-        pollForNewOtpEmails();
-      }
-    });
+  function displayed(tabId, message) {
+    return enqueue(() => consume({ messages: [message] }, true));
   }
 
-  // ---------------------------------------------------------------------------
-  // QUATERNARY: onMessageDisplayed — fires instantly when the user opens an
-  // email manually. Zero-latency fallback that works for all account types.
-  // ---------------------------------------------------------------------------
-  messenger.messageDisplay.onMessageDisplayed.addListener(async (tabId, message) => {
-    if (hasSeen(message.id)) return;
-    markSeen(message.id);
-    processMessage(message);
-  });
+  function folderChanged(folder, info) {
+    // Unread/total counts also change on ordinary UI actions. Only new mail
+    // warrants a fallback, and it must never turn into an all-account search.
+    if (!(info.newMessageCount > 0) || !folder.id) return;
+    pendingFolders.set(folder.id, folder);
+    if (folderTimer) return;
+    folderTimer = setTimeout(() => {
+      folderTimer = undefined;
+      const ids = [...pendingFolders.keys()];
+      pendingFolders.clear();
+      enqueue(async () => {
+        for (const folderId of ids) {
+          await consume(await api.recentMail.queryRecent(folderId, now() - OTP_TTL_MS));
+        }
+      });
+    }, 1000);
+  }
+
+  // Date filters do not avoid Thunderbird's header enumeration. Spread recovery
+  // across folders instead of starting an all-account query every 15 seconds.
+  // Do not gate on counts: replacement/moves can leave folder counts unchanged.
+  function startRecovery() {
+    if (!recoveryStopped) return;
+    recoveryStopped = false;
+    const generation = ++recoveryGeneration;
+    const schedule = delay => {
+      if (!recoveryStopped && generation === recoveryGeneration) recoveryTimer = setTimeout(tick, delay);
+    };
+    async function tick() {
+      recoveryTimer = undefined;
+      const started = now();
+      await enqueue(async () => {
+        if (recoveryStopped || generation !== recoveryGeneration) return;
+        if (recoveryIndex >= recoveryFolders.length) {
+          // Folder discovery excludes virtual views (duplicate messages) and
+          // empty folders without opening every folder's message database.
+          recoveryFolders = await api.folders.query({
+            isRoot: false, isVirtual: false, isUnified: false,
+            hasMessages: true
+          });
+          recoveryIndex = 0;
+        }
+        const folder = recoveryFolders[recoveryIndex++];
+        if (folder && !recoveryStopped) {
+          await consume(await api.recentMail.queryRecent(folder.id, now() - OTP_TTL_MS));
+        }
+      });
+      // At least one second idle after each folder, and target a minute per
+      // sweep for small profiles. No interval can queue overlapping sweeps.
+      schedule(Math.max(1000, 60000 / Math.max(1, recoveryFolders.length) - (now() - started)));
+    }
+    schedule(30000);
+  }
+
+  function stop() {
+    recoveryStopped = true;
+    recoveryGeneration++;
+    clearTimeout(recoveryTimer);
+    clearTimeout(folderTimer);
+    pendingFolders.clear();
+  }
+
+  return { received, displayed, folderChanged, startRecovery, stop, idle: () => work };
+}
+
+if (typeof messenger !== 'undefined') {
+  const monitor = createMailMonitor(messenger, processMessage);
+  // Thunderbird delivers this event for IMAP too, after filters and junk
+  // classification. Monitor all folders for OTPs moved by server-side rules.
+  messenger.messages.onNewMailReceived.addListener(monitor.received, true);
+  messenger.folders?.onFolderInfoChanged?.addListener(monitor.folderChanged);
+  messenger.messageDisplay.onMessageDisplayed.addListener(monitor.displayed);
+  monitor.startRecovery();
 }
