@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: tether 0.2.36\n"
 "Report-Msgid-Bugs-To: zack@bartel.com\n"
-"POT-Creation-Date: 2026-10-09 20:09-0700\n"
+"POT-Creation-Date: 2026-10-09 20:43-0700\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -1812,7 +1812,6 @@ msgstr ""
 msgid "Device is offline. Make sure it is switched on and on the same network."
 msgstr ""
 
-#. TRANSLATORS: {0} is an IP address, {1} a port number.
 #: src/gtk/devices_view.cpp src/tui/devices.cpp
 #, c++-format
 msgid "Found at {0}:{1}"
@@ -1979,6 +1978,7 @@ msgstr ""
 msgid "Ready"
 msgstr ""
 
+#. TRANSLATORS: {0} is how many were sent, {1} the batch size.
 #: src/gtk/devices_view.cpp src/tui/devices.cpp
 #, c++-format
 msgid "Sent {0} of {1} file."

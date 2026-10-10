@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: tether\n"
 "Report-Msgid-Bugs-To: zack@bartel.com\n"
-"POT-Creation-Date: 2026-10-09 20:09-0700\n"
+"POT-Creation-Date: 2026-10-09 20:43-0700\n"
 "PO-Revision-Date: 2026-08-23\n"
 "Last-Translator: Tether project\n"
 "Language-Team: Korean\n"
@@ -1966,7 +1966,6 @@ msgid "Device is offline. Make sure it is switched on and on the same network."
 msgstr ""
 "기기가 오프라인입니다. 전원이 켜져 있고 같은 네트워크에 있는지 확인하십시오."
 
-#. TRANSLATORS: {0} is an IP address, {1} a port number.
 #: src/gtk/devices_view.cpp src/tui/devices.cpp
 #, c++-format
 msgid "Found at {0}:{1}"
@@ -2147,6 +2146,7 @@ msgstr "페어링 요청이 거부되었습니다."
 msgid "Ready"
 msgstr "준비됨"
 
+#. TRANSLATORS: {0} is how many were sent, {1} the batch size.
 #: src/gtk/devices_view.cpp src/tui/devices.cpp
 #, c++-format
 msgid "Sent {0} of {1} file."
@@ -2815,7 +2815,9 @@ msgstr "종료하려면 :q를 입력하고 Enter를 누르십시오"
 msgid ""
 "Usage: tether-tui [--devices|--messages|--notifications|--contacts|--calls|--"
 "settings] [--thread KEY]"
-msgstr "사용법: tether-tui [--devices|--messages|--notifications|--contacts|--calls|--settings] [--thread 키]"
+msgstr ""
+"사용법: tether-tui [--devices|--messages|--notifications|--contacts|--"
+"calls|--settings] [--thread 키]"
 
 #: src/tui/main.cpp
 msgid "tether-tui needs a terminal."

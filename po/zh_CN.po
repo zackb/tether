@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: tether\n"
 "Report-Msgid-Bugs-To: zack@bartel.com\n"
-"POT-Creation-Date: 2026-10-09 20:09-0700\n"
+"POT-Creation-Date: 2026-10-09 20:43-0700\n"
 "PO-Revision-Date: 2026-08-23\n"
 "Last-Translator: Tether project\n"
 "Language-Team: Simplified Chinese\n"
@@ -1922,7 +1922,6 @@ msgstr "已连接并就绪。"
 msgid "Device is offline. Make sure it is switched on and on the same network."
 msgstr "设备离线。请确认设备已开机并处于同一网络。"
 
-#. TRANSLATORS: {0} is an IP address, {1} a port number.
 #: src/gtk/devices_view.cpp src/tui/devices.cpp
 #, c++-format
 msgid "Found at {0}:{1}"
@@ -2100,6 +2099,7 @@ msgstr "配对请求被拒绝。"
 msgid "Ready"
 msgstr "就绪"
 
+#. TRANSLATORS: {0} is how many were sent, {1} the batch size.
 #: src/gtk/devices_view.cpp src/tui/devices.cpp
 #, c++-format
 msgid "Sent {0} of {1} file."
@@ -2758,7 +2758,9 @@ msgstr "输入 :q 并按 Enter 退出"
 msgid ""
 "Usage: tether-tui [--devices|--messages|--notifications|--contacts|--calls|--"
 "settings] [--thread KEY]"
-msgstr "用法：tether-tui [--devices|--messages|--notifications|--contacts|--calls|--settings] [--thread 键]"
+msgstr ""
+"用法：tether-tui [--devices|--messages|--notifications|--contacts|--calls|--"
+"settings] [--thread 键]"
 
 #: src/tui/main.cpp
 msgid "tether-tui needs a terminal."

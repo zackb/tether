@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: tether\n"
 "Report-Msgid-Bugs-To: zack@bartel.com\n"
-"POT-Creation-Date: 2026-10-09 20:09-0700\n"
+"POT-Creation-Date: 2026-10-09 20:43-0700\n"
 "PO-Revision-Date: 2026-08-23\n"
 "Last-Translator: Tether project\n"
 "Language-Team: Japanese\n"
@@ -1991,7 +1991,6 @@ msgstr ""
 "デバイスはオフラインです。電源が入っていて同じネットワーク上にあることを確認"
 "してください。"
 
-#. TRANSLATORS: {0} is an IP address, {1} a port number.
 #: src/gtk/devices_view.cpp src/tui/devices.cpp
 #, c++-format
 msgid "Found at {0}:{1}"
@@ -2174,6 +2173,7 @@ msgstr "ペアリング要求は拒否されました。"
 msgid "Ready"
 msgstr "準備完了"
 
+#. TRANSLATORS: {0} is how many were sent, {1} the batch size.
 #: src/gtk/devices_view.cpp src/tui/devices.cpp
 #, c++-format
 msgid "Sent {0} of {1} file."
@@ -2848,7 +2848,9 @@ msgstr ":q と入力して Enter で終了"
 msgid ""
 "Usage: tether-tui [--devices|--messages|--notifications|--contacts|--calls|--"
 "settings] [--thread KEY]"
-msgstr "使い方: tether-tui [--devices|--messages|--notifications|--contacts|--calls|--settings] [--thread キー]"
+msgstr ""
+"使い方: tether-tui [--devices|--messages|--notifications|--contacts|--"
+"calls|--settings] [--thread キー]"
 
 #: src/tui/main.cpp
 msgid "tether-tui needs a terminal."
