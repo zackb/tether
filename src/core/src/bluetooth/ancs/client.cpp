@@ -541,11 +541,12 @@ namespace tether::bluetooth::ancs {
             parse_map_timestamp(response.attribute(static_cast<uint8_t>(NotificationAttributeId::Date)));
         notification.received = delivered ? delivered : now;
 
+        bool should_deliver = false;
         {
             std::lock_guard<std::mutex> lock(registry_mutex);
-            registry.store(notification);
+            should_deliver = registry.store(notification);
         }
-        if (on_notification)
+        if (should_deliver && on_notification)
             on_notification(notification);
     }
 

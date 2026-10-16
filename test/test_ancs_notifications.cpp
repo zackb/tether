@@ -187,17 +187,17 @@ TEST(AncsRegistry, AReplayUnderANewSessionReplacesTheStaleCopy) {
     Notification raid = make(9, "com.nianticlabs.pokemongo");
     raid.title = "Raid Invitation";
     raid.received = 100;
-    registry.store(raid);
+    EXPECT_TRUE(registry.store(raid));
     Notification card = make(3, "com.apple.Passbook");
     card.title = "Apple Card";
     card.received = 100;
-    registry.store(card);
+    EXPECT_TRUE(registry.store(card));
 
     registry.begin_session();
 
     Notification replay = raid;
     replay.uid = 29;
-    registry.store(replay);
+    EXPECT_FALSE(registry.store(replay)) << "a retained notification replay must not be delivered again";
 
     EXPECT_EQ(registry.size(), 2u) << "the replay was listed twice";
     EXPECT_EQ(registry.find(9), nullptr) << "the copy kept must carry the live uid";
@@ -206,7 +206,7 @@ TEST(AncsRegistry, AReplayUnderANewSessionReplacesTheStaleCopy) {
 
     Notification twin = replay;
     twin.uid = 30;
-    registry.store(twin);
+    EXPECT_TRUE(registry.store(twin)) << "an identical notification first seen in this session is new";
     EXPECT_EQ(registry.size(), 3u) << "identical notifications within one session are both real";
 }
 
