@@ -54,7 +54,9 @@ namespace tether::bluetooth::ancs {
         void begin_session();
         uint64_t session() const { return session_; }
 
-        void store(const Notification& notification);
+        // Store the latest live UID, returning false when it is a replay of a
+        // notification retained from an earlier ANCS session.
+        bool store(const Notification& notification);
         // Applies a display name resolved after the notifications were stored.
         void rename_app(const std::string& app_id, const std::string& name);
         const Notification* find(uint32_t uid) const;
