@@ -76,3 +76,24 @@ its current path, rebuild after updating it, then click **Reload** in the
 extensions page. This is an unpacked local installation, not a signed CRX or
 Chrome Web Store release. The extension ID can change if its path changes;
 rerun the helper with the new ID when necessary.
+
+### Mail event recovery
+
+New-mail events remain the immediate path. A serialized recovery worker begins
+30 seconds after startup and checks one nonempty physical folder at a time,
+targeting a minute per sweep with at least a second between folders. It refreshes
+the folder list each sweep and searches the last ten minutes even when counts
+have not changed, covering missed events and recent mail present at startup.
+
+The mail build includes the `recentMail` Thunderbird experiment API. It uses
+Thunderbird's folder and message managers to return ordinary message headers,
+iterates headers lazily, and yields to the parent event loop after five
+milliseconds. This avoids `messages.query()` copying every header into an array
+before applying its date filter. The experiment reads mail and does not modify
+messages, preferences, or account settings. Browser builds do not include it.
+Its internal Thunderbird API dependency is checked in an isolated stock
+Thunderbird runtime as well as iterator and monitor regression tests.
+
+A cold folder database is still opened synchronously by Thunderbird before
+iteration begins. Cooperative iteration does not make that native operation
+asynchronous; cold-start cost must be measured separately from repeat sweeps.
