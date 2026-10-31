@@ -1,5 +1,6 @@
 #pragma once
 
+#include <cstdint>
 #include <filesystem>
 #include <functional>
 #include <memory>
@@ -25,6 +26,8 @@ namespace tether {
         // MAP handle to mark read when the code is copied. Empty for
         // notifications with no message behind them.
         std::string read_handle;
+        // iPhone notification UID, or -1. Set, the popup closes on withdraw().
+        int64_t ancs_uid = -1;
     };
 
     class DesktopNotifier {
@@ -51,6 +54,9 @@ namespace tether {
         void notify_file_arrived(const std::filesystem::path& path);
 
         void notify(const NotificationSpec& spec);
+
+        // Closes the popup shown for this iPhone notification UID, if any.
+        void withdraw(uint32_t ancs_uid);
 
     private:
         struct Impl;

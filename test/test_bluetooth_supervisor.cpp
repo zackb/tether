@@ -730,12 +730,8 @@ TEST(ProfileSupervisor, BusySessionKeepsPollingWithoutRetryBurst) {
     EXPECT_EQ(sup.status().map_error, ObexError::Busy);
 }
 
-// A phone that walked out of the room answers with a page timeout, not a
-// refusal. Escalating those to the five-minute ceiling leaves the link down long
-// after the phone is back on the desk.
 TEST(BearerSupervisor, TransientFailuresDoNotEscalateTheBackoff) {
     for (const char* message : {"org.bluez.Error.NotReady: Resource Not Ready",
-                                "org.bluez.Error.Failed: br-connection-page-timeout",
                                 "org.bluez.Error.Failed: Software caused connection abort",
                                 "org.bluez.Error.Failed: le-connection-abort-by-local",
                                 "org.bluez.Error.Failed: br-connection-refused"}) {
@@ -750,6 +746,30 @@ TEST(BearerSupervisor, TransientFailuresDoNotEscalateTheBackoff) {
             EXPECT_EQ(sup.status().classic_backoff, BEARER_BACKOFF_MIN_SECONDS) << message;
             now += sup.status().classic_backoff;
         }
+    }
+}
+
+// A phone that walked out of the room, or has Bluetooth off, answers with a page
+// timeout. Paging it every 5s forever is what wedges bluetoothd; the five-minute
+// ceiling would leave the link down long after it is back on the desk.
+TEST(BearerSupervisor, AbsentPhoneBacksOffToTheAbsentCeiling) {
+    for (const char* message : {"org.bluez.Error.Failed: br-connection-page-timeout",
+                                "org.bluez.Error.Failed: Host is down",
+                                "org.bluez.Error.Failed: Connection timed out"}) {
+        FakeBearer ops;
+        ops.classic_succeeds = false;
+        ops.classic_error = message;
+        BearerSupervisor sup(ops, true);
+
+        int64_t now = 0;
+        sup.tick(now);
+        const int first = sup.status().classic_backoff;
+        for (int attempt = 0; attempt < 10; ++attempt) {
+            now += sup.status().classic_backoff;
+            sup.tick(now);
+        }
+        EXPECT_GT(sup.status().classic_backoff, first) << message;
+        EXPECT_EQ(sup.status().classic_backoff, ABSENT_CLASSIC_BACKOFF_MAX_SECONDS) << message;
     }
 }
 

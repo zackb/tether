@@ -39,9 +39,12 @@ namespace tether::bluetooth {
         // Pulls the selected phonebook and parses it.
         //
         // Uses PullAll's MaxCount filter. MaxListCount is MAP's option and makes a
-        // PBAP transfer fail or return nothing at all.
-        std::vector<VCard>
-            pull_all(std::string& err, int max = PBAP_MAX_CONTACTS, const char* fields = PBAP_CONTACT_FIELDS);
+        // PBAP transfer fail or return nothing at all. `offset` 1 skips the main
+        // phonebook's owner card (0.vcf); other phonebooks have none.
+        std::vector<VCard> pull_all(std::string& err,
+                                    int max = PBAP_MAX_CONTACTS,
+                                    const char* fields = PBAP_CONTACT_FIELDS,
+                                    int offset = 0);
 
         const std::string& path() const;
 

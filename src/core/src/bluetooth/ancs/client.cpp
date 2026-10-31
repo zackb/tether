@@ -429,6 +429,11 @@ namespace tether::bluetooth::ancs {
         set_status(false, "Subscribing to the iPhone's notifications...");
         sequencer->reset();
         in_progress.clear();
+        // Buffered packets carry the old session's UIDs.
+        std::lock_guard<std::mutex> lock(inbox);
+        pending_source.clear();
+        pending_data.clear();
+        pending_actions.clear();
     }
 
     bool AncsClientState::link_alive() const {
@@ -454,6 +459,8 @@ namespace tether::bluetooth::ancs {
         case Decision::Ignore:
             return;
         case Decision::Withdraw:
+            // A fetch still queued or in flight must not bring it back.
+            in_progress.erase(event.uid);
             if (on_withdraw)
                 on_withdraw(event.uid);
             return;

@@ -18,12 +18,8 @@ namespace tether::bluetooth {
         bool is_transient(const std::string& err) {
             static const char* const transient[] = {
                 "org.bluez.Error.NotReady",
-                "page-timeout",
-                "page timeout",
                 "connection-abort",
                 "Software caused connection abort",
-                "Host is down",
-                "Connection timed out",
                 "br-connection-canceled",
                 "le-connection-abort-by-local",
                 "br-connection-refused",
@@ -51,8 +47,27 @@ namespace tether::bluetooth {
             return reported == ConnectResult::Failed && is_already_running(err) ? ConnectResult::Busy : reported;
         }
 
+        // The phone did not answer the page: out of range or Bluetooth off.
+        bool is_absent(const std::string& err) {
+            static const char* const absent[] = {
+                "page-timeout",
+                "page timeout",
+                "Host is down",
+                "Connection timed out",
+            };
+            for (const char* needle : absent) {
+                if (err.find(needle) != std::string::npos)
+                    return true;
+            }
+            return false;
+        }
+
         int next_backoff(int current, const std::string& err, int ceiling = BEARER_BACKOFF_MAX_SECONDS) {
-            return is_transient(err) ? BEARER_BACKOFF_MIN_SECONDS : grow_backoff(current, ceiling);
+            if (is_transient(err))
+                return BEARER_BACKOFF_MIN_SECONDS;
+            if (is_absent(err))
+                return grow_backoff(current, std::min(ceiling, ABSENT_CLASSIC_BACKOFF_MAX_SECONDS));
+            return grow_backoff(current, ceiling);
         }
 
         // Marked here, translated where it is read: gettext cannot run at namespace scope.

@@ -55,7 +55,7 @@ sudo systemctl enable --now tether-btclass@hci0
 ```
 
 `PartOf=bluetooth.service` re-runs it on every `bluetooth.service` restart. It writes the
-class, reads it back, and retries for ten seconds.
+class, reads it back, and retries for 30 seconds.
 
 **A portable build has no unit on disk to enable**, since neither the AppImage nor the Flatpak
 can write a system directory. That command fails there with `Unit tether-btclass@hci0.service
@@ -3884,3 +3884,32 @@ Open: a call that rang while Linux played media (20:38:09, `YES 501`) never got 
 phone. iOS put it on this computer's hands-free link until the user picked AirPods on the phone
 19 s later. This change does not touch that path. Whether it happened before this change is not
 yet known.
+
+### 2026-10-31 - Paging an absent phone every five seconds, and four smaller gaps
+
+**An iPhone with Bluetooth off was paged every 5s forever.** `is_transient` listed
+`page-timeout`, `Host is down` and `Connection timed out`, so `next_backoff` reset each to the
+5s minimum. Those are what an absent phone answers. 
+
+**A removal that beat its fetch brought the notification back.** Removed arrived while the fetch
+for the same UID was queued: the registry forgot it and the clients were told, then the
+response found `in_progress[uid]` and stored and popped it up again. Withdraw now drops the
+`in_progress` entry.
+
+**`rebuild()` kept the old session's buffered packets.** Only `set_device()` cleared the inbox,
+so packets buffered before an LE drop were drained after the resubscribe and fetched in the new
+UID space. `rebuild()` clears it.
+
+**A Classic connect could abort the LE dial.** `connect_classic()` wrote `PreferredBearer=bredr`
+with the async LE dial in flight, which cancels it as `le-connection-abort-by-local`, and the
+dial is one-shot. It now skips the write while the dial is outstanding.
+
+**The PBAP owner card was read as a contact.** `pb` index 0 is the owner card (iOS: "My
+Number"), and the first card per number wins the lookup, so self-threads took its name. The
+main phonebook is pulled with `Offset=1`; `fav` and `cch` have no owner card.
+
+**A popup outlived its dismissal on the iPhone.** Removal reached GTK and the TUI only. The
+notifier now keeps UID -> popup and closes it on withdraw.
+
+Not settled: all of it on hardware. iPhone Bluetooth off for ten minutes should show the backoff
+stop at 60s; a notification dismissed on the phone should close its popup.
