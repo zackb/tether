@@ -426,7 +426,8 @@ namespace tether::bluetooth {
                     }
                 }
 
-                if (!link_up(*device))
+                // Never over an LE dial in flight: the write aborts it.
+                if (!link_up(*device) && !le_connect_outstanding())
                     set_preferred_bearer("bredr");
                 if (call(device->path, IFACE_DEVICE, "Connect", err))
                     return ConnectResult::Requested;
@@ -1125,7 +1126,7 @@ namespace tether::bluetooth {
             return;
         }
 
-        auto contacts = session.pull_all(err);
+        auto contacts = session.pull_all(err, PBAP_MAX_CONTACTS, PBAP_CONTACT_FIELDS, 1);
         if (!err.empty()) {
             debug::log(WARN, "bluetooth: PBAP PullAll failed: {}", err);
             return;

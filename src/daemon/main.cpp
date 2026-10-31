@@ -730,9 +730,12 @@ int main(int argc, char** argv) {
                                      notification.silent,
                                      "",
                                      otp,
-                                     notification.app_id});
+                                     notification.app_id,
+                                     "",
+                                     notification.uid});
                 },
-                [](uint32_t uid) {
+                [&notifier](uint32_t uid) {
+                    notifier.withdraw(uid);
                     nlohmann::json event;
                     event["command"] = "bt_notification_removed";
                     event["uid"] = uid;

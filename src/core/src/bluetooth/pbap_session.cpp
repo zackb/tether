@@ -74,7 +74,7 @@ namespace tether::bluetooth {
         return true;
     }
 
-    std::vector<VCard> PbapSession::pull_all(std::string& err, int max, const char* fields) {
+    std::vector<VCard> PbapSession::pull_all(std::string& err, int max, const char* fields, int offset) {
         std::vector<VCard> contacts;
 
         const std::filesystem::path target = staging_file();
@@ -90,6 +90,8 @@ namespace tether::bluetooth {
         g_variant_builder_add(&filter, "{sv}", "Format", g_variant_new_string("vcard30"));
         // MaxCount, not MAP's MaxListCount.
         g_variant_builder_add(&filter, "{sv}", "MaxCount", g_variant_new_uint16(static_cast<guint16>(max)));
+        if (offset > 0)
+            g_variant_builder_add(&filter, "{sv}", "Offset", g_variant_new_uint16(static_cast<guint16>(offset)));
         // only what parse_vcards reads. kill PHOTO
         g_variant_builder_add(&filter, "{sv}", "Fields", g_variant_new_parsed(fields));
 

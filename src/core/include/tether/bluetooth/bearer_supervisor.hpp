@@ -10,6 +10,11 @@ namespace tether::bluetooth {
     inline constexpr int BEARER_BACKOFF_MIN_SECONDS = 5;
     inline constexpr int BEARER_BACKOFF_MAX_SECONDS = 300;
 
+    // Ceiling for the BR/EDR backoff while the phone does not answer pages.
+    // Paging an absent phone every 5s can wedge bluetoothd in the kernel's
+    // l2cap connect; a minute still finds it soon after it returns without LE.
+    inline constexpr int ABSENT_CLASSIC_BACKOFF_MAX_SECONDS = 60;
+
     // Ceiling for the BR/EDR backoff while LE is connected.
     inline constexpr int LE_UP_CLASSIC_BACKOFF_MAX_SECONDS = 30;
 

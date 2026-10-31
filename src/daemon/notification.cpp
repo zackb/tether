@@ -113,6 +113,9 @@ namespace tether {
         // inline reply field. Touched only on the notifier's thread.
         std::unordered_map<guint32, std::string> g_reply_threads;
 
+        // iPhone notification UID -> its open popup
+        std::unordered_map<uint32_t, NotifyNotification*> g_ancs_popups;
+
         guint32 notification_id(NotifyNotification* notification) {
             gint id = 0;
             g_object_get(notification, "id", &id, nullptr);
@@ -275,7 +278,18 @@ namespace tether {
 
         void on_notification_closed(NotifyNotification* notification, gpointer) {
             g_reply_threads.erase(notification_id(notification));
+            std::erase_if(g_ancs_popups, [notification](const auto& entry) { return entry.second == notification; });
             g_object_unref(notification);
+        }
+
+        gboolean withdraw_on_main(gpointer user_data) {
+            const auto uid = static_cast<uint32_t>(GPOINTER_TO_UINT(user_data));
+            const auto it = g_ancs_popups.find(uid);
+            if (it == g_ancs_popups.end())
+                return G_SOURCE_REMOVE;
+            // The "closed" signal that follows drops the entry and the reference.
+            notify_notification_close(it->second, nullptr);
+            return G_SOURCE_REMOVE;
         }
 
         gboolean show_notification_on_main(gpointer user_data) {
@@ -343,8 +357,8 @@ namespace tether {
             notify_notification_set_urgency(notification, spec->quiet ? NOTIFY_URGENCY_LOW : NOTIFY_URGENCY_NORMAL);
 
             const AppLauncher launcher = spec->app_id.empty() ? AppLauncher{} : resolve_launcher(spec->app_id);
-            const bool has_actions =
-                !spec->reply_thread.empty() || !spec->otp_code.empty() || !launcher.payload.empty();
+            const bool has_actions = !spec->reply_thread.empty() || !spec->otp_code.empty() ||
+                                     !launcher.payload.empty() || spec->ancs_uid >= 0;
             if (has_actions)
                 g_signal_connect(notification, "closed", G_CALLBACK(on_notification_closed), nullptr);
 
@@ -408,6 +422,8 @@ namespace tether {
             }
             if (inline_reply)
                 g_reply_threads[notification_id(notification)] = spec->reply_thread;
+            if (spec->ancs_uid >= 0)
+                g_ancs_popups[static_cast<uint32_t>(spec->ancs_uid)] = notification;
             if (!has_actions)
                 g_object_unref(notification);
             return G_SOURCE_REMOVE;
@@ -515,6 +531,13 @@ namespace tether {
         // notifier's loop.
         auto* copy = new NotificationSpec(spec);
         g_main_context_invoke_full(impl_->context, G_PRIORITY_DEFAULT, show_spec_on_main, copy, nullptr);
+    }
+
+    void DesktopNotifier::withdraw(uint32_t ancs_uid) {
+        if (!impl_ || !impl_->initialized)
+            return;
+        g_main_context_invoke_full(
+            impl_->context, G_PRIORITY_DEFAULT, withdraw_on_main, GUINT_TO_POINTER(ancs_uid), nullptr);
     }
 
     void DesktopNotifier::notify_file_arrived(const std::filesystem::path& path) {
