@@ -333,6 +333,13 @@ namespace tether::bluetooth {
 
     bool Adapter::presents_as_apple() const { return lowered(modalias).rfind(MODALIAS_APPLE, 0) == 0; }
 
+    bool Adapter::lacks_bredr_secure_connections() const {
+        const std::string chip = lowered(controller);
+        return std::any_of(std::begin(CONTROLLERS_WITHOUT_BREDR_SC),
+                           std::end(CONTROLLERS_WITHOUT_BREDR_SC),
+                           [&](const char* prefix) { return chip.rfind(prefix, 0) == 0; });
+    }
+
     bool Device::looks_like_airpods() const {
         // An iPhone carries the same vendor id, so the audio profile is what separates them.
         if (looks_like_iphone() || !has_uuid(UUID_A2DP_SINK))
@@ -658,6 +665,17 @@ namespace tether::bluetooth {
             cap.reasons.emplace_back(_("Bearer API support is unconfirmed until a device is bonded."));
         }
 
+        const bool known_without_sc = adapter->lacks_bredr_secure_connections();
+        const std::string known_without_sc_reason =
+            tr_format(_("This Bluetooth adapter is known to pair without Secure Connections, so iPhone "
+                        "notifications cannot work on it and re-pairing will not change that. Messages and contacts "
+                        "still work. See {}"),
+                      ADAPTER_DOC_URL);
+
+        // Warn before anyone pairs on it.
+        if (known_without_sc && !cap.bonded_device_present)
+            cap.reasons.push_back(known_without_sc_reason);
+
         if (cap.bonded_device_present && !cap.bond_has_le && !cap.bond_carries_ancs) {
             std::string reason = _("A device is bonded, but the bond covers BR/EDR only -- no LE keys were derived, "
                                    "so notification mirroring cannot work on it.");
@@ -666,15 +684,22 @@ namespace tether::bluetooth {
                 reason += std::string(" ") +
                           _("This adapter cannot solicit ANCS, so notification mirroring is unavailable on it and "
                             "re-pairing will not change that.");
+            else if (known_without_sc)
+                reason += std::string(" ") + known_without_sc_reason;
             else if (cap.secure_connections_known && !cap.secure_connections)
                 reason += std::string(" ") +
                           _("Secure Connections is off on this controller, which is what blocks the derivation; "
                             "re-pairing will not help until it is on.");
-            else {
-                reason +=
-                    std::string(" ") + _("Delete this computer on the iPhone (Forget This Device) and pair again.");
-                // secure-conn reads on for any LE controller, so it cannot rule out a
-                // controller without BR/EDR Secure Connections; another adapter can
+            else
+                reason += std::string(" ") +
+                          tr_format(_("Delete this computer on the iPhone (Forget This Device) and pair again. If "
+                                      "it is still BR/EDR only, this adapter cannot do Secure Connections and needs "
+                                      "replacing. See {}"),
+                                    ADAPTER_DOC_URL);
+
+            // secure-conn reads on for any LE controller, so it cannot rule out a
+            // controller without BR/EDR Secure Connections; another adapter can
+            if (cap.advertising && cap.le_peripheral && !(cap.secure_connections_known && !cap.secure_connections)) {
                 const auto other =
                     std::find_if(objects.adapters.begin(), objects.adapters.end(), [&](const Adapter& a) {
                         return adapter_id_of(a.path) != cap.adapter_id;

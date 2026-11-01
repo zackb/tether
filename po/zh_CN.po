@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: tether\n"
 "Report-Msgid-Bugs-To: zack@bartel.com\n"
-"POT-Creation-Date: 2026-10-27 21:04-0700\n"
+"POT-Creation-Date: 2026-11-01 09:56-0800\n"
 "PO-Revision-Date: 2026-08-23\n"
 "Last-Translator: Tether project\n"
 "Language-Team: Simplified Chinese\n"
@@ -1258,10 +1258,14 @@ msgid "Connected. Notification mirroring is disabled."
 msgstr "已连接。通知镜像已停用。"
 
 #: src/core/src/bluetooth/bearer_supervisor.cpp
+#, c++-format
 msgid ""
-"Connected. BlueZ is not exposing an LE bearer, so notifications are "
-"unavailable."
-msgstr "已连接。BlueZ 未提供 LE bearer，因此通知不可用。"
+"Connected, but this pairing has no LE keys, so notifications are "
+"unavailable. This is usually the Bluetooth adapter. Run tether --bt-status "
+"or see {}"
+msgstr ""
+"已连接，但此配对没有 LE 密钥，因此通知不可用。通常是蓝牙适配器的原因。请运行 "
+"tether --bt-status 或参阅 {}"
 
 #: src/core/src/bluetooth/bearer_supervisor.cpp
 msgid ""
@@ -1399,6 +1403,16 @@ msgid "Bearer API support is unconfirmed until a device is bonded."
 msgstr "在与设备建立绑定之前，bearer API 的支持情况无法确认。"
 
 #: src/core/src/bluetooth/objects.cpp
+#, c++-format
+msgid ""
+"This Bluetooth adapter is known to pair without Secure Connections, so "
+"iPhone notifications cannot work on it and re-pairing will not change that. "
+"Messages and contacts still work. See {}"
+msgstr ""
+"已知此蓝牙适配器在配对时不使用 Secure Connections，因此 iPhone 通知无法在其上"
+"工作，重新配对也无济于事。信息和联系人仍可正常使用。请参阅 {}"
+
+#: src/core/src/bluetooth/objects.cpp
 msgid ""
 "A device is bonded, but the bond covers BR/EDR only -- no LE keys were "
 "derived, so notification mirroring cannot work on it."
@@ -1422,8 +1436,14 @@ msgstr ""
 "新配对无济于事。"
 
 #: src/core/src/bluetooth/objects.cpp
-msgid "Delete this computer on the iPhone (Forget This Device) and pair again."
-msgstr "请在 iPhone 上删除这台电脑（忽略此设备），然后重新配对。"
+#, c++-format
+msgid ""
+"Delete this computer on the iPhone (Forget This Device) and pair again. If "
+"it is still BR/EDR only, this adapter cannot do Secure Connections and needs "
+"replacing. See {}"
+msgstr ""
+"请在 iPhone 上删除这台电脑（忽略此设备），然后重新配对。如果仍然只有 BR/EDR，"
+"说明此适配器不支持 Secure Connections，需要更换。请参阅 {}"
 
 #: src/core/src/bluetooth/objects.cpp
 #, c++-format
@@ -3141,6 +3161,15 @@ msgstr "配对设备并通过网络同步剪贴板"
 #: src/gtk/tether-gtk.desktop.in
 msgid "iPhone;iOS;SMS;Messages;Clipboard;Files;Notifications;Calls;AirPods;"
 msgstr "iPhone;iOS;SMS;信息;剪贴板;文件;通知;通话;AirPods;"
+
+#~ msgid ""
+#~ "Connected. BlueZ is not exposing an LE bearer, so notifications are "
+#~ "unavailable."
+#~ msgstr "已连接。BlueZ 未提供 LE bearer，因此通知不可用。"
+
+#~ msgid ""
+#~ "Delete this computer on the iPhone (Forget This Device) and pair again."
+#~ msgstr "请在 iPhone 上删除这台电脑（忽略此设备），然后重新配对。"
 
 #, c++-format
 #~ msgid " signal {0}/5 battery {1}/5"

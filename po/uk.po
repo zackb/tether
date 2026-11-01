@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: tether\n"
 "Report-Msgid-Bugs-To: zack@bartel.com\n"
-"POT-Creation-Date: 2026-10-27 21:04-0700\n"
+"POT-Creation-Date: 2026-11-01 09:56-0800\n"
 "PO-Revision-Date: 2026-08-23\n"
 "Last-Translator: Tether project\n"
 "Language-Team: Ukrainian\n"
@@ -1329,10 +1329,15 @@ msgid "Connected. Notification mirroring is disabled."
 msgstr "Під'єднано. Дублювання сповіщень вимкнено."
 
 #: src/core/src/bluetooth/bearer_supervisor.cpp
+#, c++-format
 msgid ""
-"Connected. BlueZ is not exposing an LE bearer, so notifications are "
-"unavailable."
-msgstr "Під'єднано. BlueZ не надає bearer LE, тож сповіщення недоступні."
+"Connected, but this pairing has no LE keys, so notifications are "
+"unavailable. This is usually the Bluetooth adapter. Run tether --bt-status "
+"or see {}"
+msgstr ""
+"Підключено, але ця пара не має ключів LE, тому сповіщення недоступні. "
+"Зазвичай причина в Bluetooth-адаптері. Виконайте tether --bt-status або див. "
+"{}"
 
 #: src/core/src/bluetooth/bearer_supervisor.cpp
 msgid ""
@@ -1482,6 +1487,17 @@ msgstr ""
 "пристроєм."
 
 #: src/core/src/bluetooth/objects.cpp
+#, c++-format
+msgid ""
+"This Bluetooth adapter is known to pair without Secure Connections, so "
+"iPhone notifications cannot work on it and re-pairing will not change that. "
+"Messages and contacts still work. See {}"
+msgstr ""
+"Відомо, що цей Bluetooth-адаптер створює пару без Secure Connections, тому "
+"сповіщення iPhone на ньому працювати не можуть, і повторне створення пари "
+"цього не змінить. Повідомлення й контакти працюють і далі. Див. {}"
+
+#: src/core/src/bluetooth/objects.cpp
 msgid ""
 "A device is bonded, but the bond covers BR/EDR only -- no LE keys were "
 "derived, so notification mirroring cannot work on it."
@@ -1506,10 +1522,15 @@ msgstr ""
 "ключів; повторне створення пари не допоможе, доки його не буде ввімкнено."
 
 #: src/core/src/bluetooth/objects.cpp
-msgid "Delete this computer on the iPhone (Forget This Device) and pair again."
+#, c++-format
+msgid ""
+"Delete this computer on the iPhone (Forget This Device) and pair again. If "
+"it is still BR/EDR only, this adapter cannot do Secure Connections and needs "
+"replacing. See {}"
 msgstr ""
 "Вилучіть цей комп'ютер на iPhone («Забути цей пристрій») і створіть пару "
-"знову."
+"знову. Якщо пара досі лише BR/EDR, цей адаптер не підтримує Secure "
+"Connections і його треба замінити. Див. {}"
 
 #: src/core/src/bluetooth/objects.cpp
 #, c++-format
@@ -3285,6 +3306,17 @@ msgstr "Створюйте пари пристроїв і синхронізуй
 msgid "iPhone;iOS;SMS;Messages;Clipboard;Files;Notifications;Calls;AirPods;"
 msgstr ""
 "iPhone;iOS;SMS;Повідомлення;Буфер обміну;Файли;Сповіщення;Дзвінки;AirPods;"
+
+#~ msgid ""
+#~ "Connected. BlueZ is not exposing an LE bearer, so notifications are "
+#~ "unavailable."
+#~ msgstr "Під'єднано. BlueZ не надає bearer LE, тож сповіщення недоступні."
+
+#~ msgid ""
+#~ "Delete this computer on the iPhone (Forget This Device) and pair again."
+#~ msgstr ""
+#~ "Вилучіть цей комп'ютер на iPhone («Забути цей пристрій») і створіть пару "
+#~ "знову."
 
 #, c++-format
 #~ msgid " signal {0}/5 battery {1}/5"

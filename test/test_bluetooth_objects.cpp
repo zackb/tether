@@ -568,6 +568,38 @@ TEST(Capability, NoRepairAdviceWhenTheAdapterCannotAdvertise) {
 
 // Headsets and controllers bond over BR/EDR alone by design. Reading one of
 // those as a broken bond fires on nearly every machine.
+// #255, #301: an RTL8761BU pairs P-192 on BR/EDR, so it is named before
+// pairing, and a bond on it is not sent round the forget-and-re-pair loop.
+TEST(Capability, KnownControllerWithoutBredrScIsNamed) {
+    auto objects = parse_managed_objects(Payload(ADAPTER_FULL).v);
+    ASSERT_EQ(objects.adapters.size(), 1u);
+    objects.adapters[0].controller = "usb:v0BDAp8771d0200dcE0dsc01dp01icE0isc01ip01in00";
+    objects.experimental_api = true;
+
+    auto warned = [](const Capability& cap) {
+        for (const auto& reason : cap.reasons)
+            if (reason.find("known to pair without Secure Connections") != std::string::npos)
+                return reason;
+        return std::string{};
+    };
+
+    const auto unpaired = warned(resolve_capability(objects));
+    EXPECT_NE(unpaired.find(ADAPTER_DOC_URL), std::string::npos) << "no warning before pairing";
+
+    Device phone;
+    phone.path = "/org/bluez/hci0/dev_02_00_00_00_00_01";
+    phone.adapter_path = "/org/bluez/hci0";
+    phone.paired = phone.bonded = true;
+    phone.uuids = {UUID_MAP_MAS, UUID_PBAP_PSE};
+    objects.devices.push_back(phone);
+    const auto bonded = warned(resolve_capability(objects));
+    EXPECT_NE(bonded.find("BR/EDR only"), std::string::npos) << bonded;
+    EXPECT_EQ(bonded.find("Forget This Device"), std::string::npos) << "sent round the re-pair loop";
+
+    objects.adapters[0].controller = "usb:v8087p0026d0002dcE0dsc01dp01icE0isc01ip01in00";
+    EXPECT_TRUE(warned(resolve_capability(objects)).empty()) << "flagged an unlisted controller";
+}
+
 TEST(Capability, ClassicOnlyBondOnANonPhoneIsNotReported) {
     Payload p(join(ADAPTER_FULL, R"({
       '/org/bluez/hci0/dev_02_00_00_00_00_03': {

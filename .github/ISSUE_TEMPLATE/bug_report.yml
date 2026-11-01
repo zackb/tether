@@ -2,6 +2,10 @@ name: Bug report
 description: Something in Tether does not work
 labels: ["bug"]
 body:
+  - type: markdown
+    attributes:
+      value: |
+        **No iPhone notifications, and `tether --bt-status` says `Bond: BR/EDR only`?** That is almost always the Bluetooth adapter, not a bug. Check [Bluetooth adapters](https://github.com/zackb/tether#bluetooth-adapters) first.
   - type: textarea
     id: what
     attributes:

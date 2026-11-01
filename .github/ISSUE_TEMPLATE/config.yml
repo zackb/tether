@@ -3,3 +3,6 @@ contact_links:
   - name: Security vulnerability
     url: https://github.com/zackb/tether/security/policy
     about: Report privately, not as a public issue.
+  - name: No notifications, "Bond: BR/EDR only"
+    url: https://github.com/zackb/tether#bluetooth-adapters
+    about: Usually the Bluetooth adapter. Check this before filing.

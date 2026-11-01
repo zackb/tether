@@ -23,6 +23,14 @@ namespace tether::bluetooth {
     // Modalias prefix for Apple's Bluetooth vendor id, shared by every Apple device.
     inline constexpr const char* MODALIAS_APPLE = "bluetooth:v004c";
 
+    // Where the adapter requirement for notifications is explained.
+    inline constexpr const char* ADAPTER_DOC_URL = "https://github.com/zackb/tether#bluetooth-adapters";
+
+    // Controllers confirmed to pair without BR/EDR Secure Connections.
+    inline constexpr const char* CONTROLLERS_WITHOUT_BREDR_SC[] = {
+        "usb:v0bdap8771", // Realtek RTL8761BU, e.g. TP-Link UB500 (#255, #301)
+    };
+
     inline constexpr uint32_t COD_TARGET = 0x0408;
     inline constexpr uint32_t COD_MASK = 0x1fff;
 
@@ -50,6 +58,7 @@ namespace tether::bluetooth {
         bool has_role(const std::string& role) const;
         bool class_is_handsfree() const { return (device_class & COD_MASK) == COD_TARGET; }
         bool presents_as_apple() const;
+        bool lacks_bredr_secure_connections() const;
 
         bool operator==(const Adapter&) const = default;
     };

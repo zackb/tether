@@ -416,6 +416,21 @@ flowchart LR
 - Build tools: cmake, ninja, pkg-config
 - x86_64 or aarch64 (Asahi, Raspberry Pi OS Trixie+). 32-bit ARM is not supported.
 
+### Bluetooth adapters
+
+iPhone notifications need an adapter that supports BR/EDR Secure Connections. Messages, contacts, and calls work on any adapter. Many cheap USB dongles lack it, and `tether --bt-status` then reports `Bond: BR/EDR only`. Re-pairing cannot fix that.
+
+To check, look at the bond's link key type:
+
+```bash
+sudo grep -A3 '\[LinkKey\]' /var/lib/bluetooth/<adapter address>/<iPhone address>/info
+```
+
+- `Type=4` or `Type=5`: the adapter can't do it. Use another adapter (`tether --bt-adapter <hciN>`) or replace it.
+- `Type=7` or `Type=8`: the adapter is fine. Forget this computer on the iPhone and pair again. It can take more than one try.
+
+Known not to work: Realtek RTL8761BU dongles such as the TP-Link UB500 ([#255](https://github.com/zackb/tether/issues/255), [#301](https://github.com/zackb/tether/issues/301)), CSR clones ([#69](https://github.com/zackb/tether/issues/69)), and Barrot dongles ([#128](https://github.com/zackb/tether/issues/128)). Reported working: ASUS USB-BT600 ([#255](https://github.com/zackb/tether/issues/255)).
+
 ### Dependencies
 - `wayland-client`
 - `openssl`

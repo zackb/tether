@@ -1,4 +1,5 @@
 #include "tether/bluetooth/bearer_supervisor.hpp"
+#include "tether/bluetooth/objects.hpp"
 #include "tether/log.hpp"
 #include <tether/i18n.hpp>
 
@@ -234,7 +235,11 @@ namespace tether::bluetooth {
         }
 
         if (!status_.le_available) {
-            status_.reason = _("Connected. BlueZ is not exposing an LE bearer, so notifications are unavailable.");
+            // No populated Bearer.LE1: the bond has no LE half, whatever the cause.
+            status_.reason = tr_format(_("Connected, but this pairing has no LE keys, so notifications are "
+                                         "unavailable. This is usually the Bluetooth adapter. Run tether --bt-status "
+                                         "or see {}"),
+                                       ADAPTER_DOC_URL);
             return !(status_ == previous);
         }
 

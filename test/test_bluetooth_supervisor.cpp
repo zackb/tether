@@ -1,5 +1,6 @@
 #include <gtest/gtest.h>
 #include <tether/bluetooth/bearer_supervisor.hpp>
+#include <tether/bluetooth/objects.hpp>
 #include <tether/bluetooth/profile_supervisor.hpp>
 
 #include <string>
@@ -134,6 +135,19 @@ TEST(BearerSupervisor, ConnectsClassicThenLeAfterSettling) {
     // Only an observed Connected is one.
     sup.tick(2 + BEARER_SETTLE_SECONDS);
     EXPECT_TRUE(sup.status().le_connected);
+}
+
+// #301: the old wording blamed BlueZ, which sent reporters into bluetoothd config.
+TEST(BearerSupervisor, ClassicOnlyBondPointsAtTheAdapter) {
+    FakeBearer ops;
+    ops.classic = true;
+    ops.le_available = false;
+    BearerSupervisor sup(ops, true);
+
+    sup.tick(0);
+    const auto& reason = sup.status().reason;
+    EXPECT_NE(reason.find("no LE keys"), std::string::npos) << reason;
+    EXPECT_NE(reason.find(ADAPTER_DOC_URL), std::string::npos) << reason;
 }
 
 TEST(BearerSupervisor, ClassicBackoffGrowsAndCaps) {
