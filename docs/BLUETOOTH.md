@@ -3913,3 +3913,30 @@ notifier now keeps UID -> popup and closes it on withdraw.
 
 Not settled: all of it on hardware. iPhone Bluetooth off for ten minutes should show the backoff
 stop at 60s; a notification dismissed on the phone should close its popup.
+
+### 2026-11-01 - The same dongle again, and the status line blamed BlueZ (#301)
+
+| | |
+|---|---|
+| Controller | TP-Link UB500 (Realtek RTL8761BU, `0bda:8771`), the only adapter |
+| BlueZ | 5.87 (NixOS, `Experimental = true`) |
+| Phone | iPhone 14 Pro, iOS 27.2 |
+| Tether | 0.2.18 |
+
+Same chip and the same `Bond: BR/EDR only` as #255. This is the fourth report of this shape,
+after #69 (CSR clone), #128 (Barrot) and #255. Each reporter passed every check that
+`--bt-status` runs.
+
+The supervisor's headline read "BlueZ is not exposing an LE bearer". That points at BlueZ
+configuration, which these reporters had already set right. A paired iPhone with no populated
+`Bearer.LE1` is a bond with no LE half, whatever caused it, so the headline now says that and
+points at the adapter. With a single adapter, the BR/EDR-only advice said "forget and pair
+again" and nothing more, which loops forever on these chips. It now says to replace the adapter
+if a second attempt is still BR/EDR only.
+
+`Adapter::controller` is already read from sysfs. `CONTROLLERS_WITHOUT_BREDR_SC` matches it
+against chips confirmed to pair P-192, so `--bt-status`, the Devices page and the TUI warn
+before pairing. Only `0bda:8771` is listed, since it has two reports. CSR clones and Barrot have
+no USB ID that tells them apart from working parts.
+
+Not verified: the reporter's `LinkKey Type`.

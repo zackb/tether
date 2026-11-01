@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: tether\n"
 "Report-Msgid-Bugs-To: zack@bartel.com\n"
-"POT-Creation-Date: 2026-10-27 21:04-0700\n"
+"POT-Creation-Date: 2026-11-01 09:56-0800\n"
 "PO-Revision-Date: 2026-08-23\n"
 "Last-Translator: Tether project\n"
 "Language-Team: Korean\n"
@@ -1291,11 +1291,14 @@ msgid "Connected. Notification mirroring is disabled."
 msgstr "연결되었습니다. 알림 미러링이 꺼져 있습니다."
 
 #: src/core/src/bluetooth/bearer_supervisor.cpp
+#, c++-format
 msgid ""
-"Connected. BlueZ is not exposing an LE bearer, so notifications are "
-"unavailable."
+"Connected, but this pairing has no LE keys, so notifications are "
+"unavailable. This is usually the Bluetooth adapter. Run tether --bt-status "
+"or see {}"
 msgstr ""
-"연결되었습니다. BlueZ가 LE bearer를 제공하지 않아 알림을 사용할 수 없습니다."
+"연결되었지만 이 페어링에는 LE 키가 없어 알림을 사용할 수 없습니다. 대개 블루"
+"투스 어댑터 때문입니다. tether --bt-status를 실행하거나 {}을(를) 참조하십시오"
 
 #: src/core/src/bluetooth/bearer_supervisor.cpp
 msgid ""
@@ -1441,6 +1444,17 @@ msgid "Bearer API support is unconfirmed until a device is bonded."
 msgstr "기기와 본드를 맺기 전까지 bearer API 지원 여부는 확인되지 않습니다."
 
 #: src/core/src/bluetooth/objects.cpp
+#, c++-format
+msgid ""
+"This Bluetooth adapter is known to pair without Secure Connections, so "
+"iPhone notifications cannot work on it and re-pairing will not change that. "
+"Messages and contacts still work. See {}"
+msgstr ""
+"이 블루투스 어댑터는 Secure Connections 없이 페어링하는 것으로 알려져 있어 "
+"iPhone 알림이 작동할 수 없으며, 다시 페어링해도 달라지지 않습니다. 메시지와 "
+"연락처는 계속 작동합니다. {}을(를) 참조하십시오"
+
+#: src/core/src/bluetooth/objects.cpp
 msgid ""
 "A device is bonded, but the bond covers BR/EDR only -- no LE keys were "
 "derived, so notification mirroring cannot work on it."
@@ -1465,8 +1479,15 @@ msgstr ""
 "있습니다. 켜기 전까지는 다시 페어링해도 소용이 없습니다."
 
 #: src/core/src/bluetooth/objects.cpp
-msgid "Delete this computer on the iPhone (Forget This Device) and pair again."
-msgstr "iPhone에서 이 컴퓨터를 삭제하고(이 기기 지우기) 다시 페어링하십시오."
+#, c++-format
+msgid ""
+"Delete this computer on the iPhone (Forget This Device) and pair again. If "
+"it is still BR/EDR only, this adapter cannot do Secure Connections and needs "
+"replacing. See {}"
+msgstr ""
+"iPhone에서 이 컴퓨터를 삭제하고(이 기기 지우기) 다시 페어링하십시오. 여전히 "
+"BR/EDR 전용이면 이 어댑터는 Secure Connections를 지원하지 않으므로 교체해야 "
+"합니다. {}을(를) 참조하십시오"
 
 #: src/core/src/bluetooth/objects.cpp
 #, c++-format
@@ -3217,6 +3238,18 @@ msgstr "기기를 페어링하고 네트워크를 통해 클립보드를 동기�
 #: src/gtk/tether-gtk.desktop.in
 msgid "iPhone;iOS;SMS;Messages;Clipboard;Files;Notifications;Calls;AirPods;"
 msgstr "iPhone;iOS;SMS;메시지;클립보드;파일;알림;통화;AirPods;"
+
+#~ msgid ""
+#~ "Connected. BlueZ is not exposing an LE bearer, so notifications are "
+#~ "unavailable."
+#~ msgstr ""
+#~ "연결되었습니다. BlueZ가 LE bearer를 제공하지 않아 알림을 사용할 수 없습니"
+#~ "다."
+
+#~ msgid ""
+#~ "Delete this computer on the iPhone (Forget This Device) and pair again."
+#~ msgstr ""
+#~ "iPhone에서 이 컴퓨터를 삭제하고(이 기기 지우기) 다시 페어링하십시오."
 
 #, c++-format
 #~ msgid " signal {0}/5 battery {1}/5"
