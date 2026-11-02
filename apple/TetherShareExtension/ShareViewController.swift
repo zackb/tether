@@ -34,14 +34,20 @@ final class ShareViewController: UIViewController {
         super.viewDidAppear(animated)
         loadPayload { [weak self] payload in
             guard let self else { return }
+            let appearance = AppearancePreference.current
             let hostingVC = UIHostingController(
                 rootView: ShareSheetView(
                     payload: payload,
                     onComplete: { [weak self] in self?.completeRequest() },
                     onCancel: { [weak self] in self?.cancelRequest() }
                 )
-                .preferredColorScheme(.dark)
+                .preferredColorScheme(appearance.colorScheme)
             )
+            hostingVC.overrideUserInterfaceStyle = switch appearance {
+            case .system: .unspecified
+            case .light: .light
+            case .dark: .dark
+            }
             hostingVC.modalPresentationStyle = .pageSheet
             if let sheet = hostingVC.sheetPresentationController {
                 sheet.detents = [.medium()]
@@ -290,16 +296,21 @@ private struct ShareSheetView: View {
     @State private var didFail = false
     @State private var progress: (completed: Int, total: Int)?
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
+    @Environment(\.colorScheme) private var colorScheme
 
     var body: some View {
         NavigationStack {
             ZStack {
-                // Dark gradient background
                 LinearGradient(
-                    colors: [
-                        Color(hue: 0.6, saturation: 0.3, brightness: 0.12),
-                        Color(hue: 0.62, saturation: 0.4, brightness: 0.08),
-                    ],
+                    colors: colorScheme == .dark
+                        ? [
+                            Color(hue: 0.6, saturation: 0.3, brightness: 0.12),
+                            Color(hue: 0.62, saturation: 0.4, brightness: 0.08),
+                        ]
+                        : [
+                            Color(hue: 0.6, saturation: 0.06, brightness: 0.98),
+                            Color(hue: 0.62, saturation: 0.1, brightness: 0.93),
+                        ],
                     startPoint: .topLeading,
                     endPoint: .bottomTrailing
                 )
@@ -326,7 +337,7 @@ private struct ShareSheetView: View {
                             .accessibilityHidden(true)
                         Text("Tether")
                             .font(.headline)
-                            .foregroundStyle(.white)
+                            .foregroundStyle(.primary)
                     }
                 }
             }
@@ -342,7 +353,7 @@ private struct ShareSheetView: View {
             contentPreview
                 .padding(.top, 8)
 
-            Divider().background(.white.opacity(0.15))
+            Divider().background(.primary.opacity(0.15))
 
             // Route buttons — only show relevant ones
             VStack(spacing: 12) {
@@ -399,7 +410,7 @@ private struct ShareSheetView: View {
                 icon: "key.fill",
                 label: "Send as OTP",
                 subtitle: "Stores in the Tether OTP vault",
-                color: Color(hue: 0.15, saturation: 0.8, brightness: 0.9)
+                color: Color(hue: 0.15, saturation: 0.8, brightness: colorScheme == .dark ? 0.9 : 0.7)
             ) {
                 perform(.otp(text, source: "iPhone Share"))
             }
@@ -460,7 +471,7 @@ private struct ShareSheetView: View {
                     .accessibilityHidden(true)
                 Text("\(items.count) items")
                     .font(.subheadline)
-                    .foregroundStyle(.white)
+                    .foregroundStyle(.primary)
                 Text(multiItemSummary(items))
                     .font(.caption)
                     .foregroundStyle(.secondary)
@@ -486,10 +497,10 @@ private struct ShareSheetView: View {
                 Text(text)
                     .lineLimit(3)
                     .font(.body)
-                    .foregroundStyle(.white)
+                    .foregroundStyle(.primary)
                     .padding(10)
                     .frame(maxWidth: .infinity, alignment: .leading)
-                    .background(.white.opacity(0.07))
+                    .background(.primary.opacity(0.06))
                     .clipShape(RoundedRectangle(cornerRadius: 10))
             }
             .padding(.horizontal)
@@ -502,7 +513,7 @@ private struct ShareSheetView: View {
                     .accessibilityHidden(true)
                 Text(filename)
                     .font(.subheadline)
-                    .foregroundStyle(.white)
+                    .foregroundStyle(.primary)
             }
             .padding()
         }
@@ -551,7 +562,7 @@ private struct ShareSheetView: View {
                 .accessibilityHidden(true)
             Text(message)
                 .multilineTextAlignment(.center)
-                .foregroundStyle(.white)
+                .foregroundStyle(.primary)
                 .padding(.horizontal)
             if failed {
                 Button("Close") { onCancel() }
@@ -676,7 +687,7 @@ private struct ActionButton: View {
                 VStack(alignment: .leading, spacing: 2) {
                     Text(label)
                         .font(.body.weight(.semibold))
-                        .foregroundStyle(.white)
+                        .foregroundStyle(.primary)
                     Text(subtitle)
                         .font(.caption)
                         .foregroundStyle(.secondary)
@@ -690,11 +701,11 @@ private struct ActionButton: View {
             }
             .padding(.horizontal, 14)
             .padding(.vertical, 12)
-            .background(.white.opacity(0.06))
+            .background(.primary.opacity(0.05))
             .clipShape(RoundedRectangle(cornerRadius: 14))
             .overlay(
                 RoundedRectangle(cornerRadius: 14)
-                    .stroke(.white.opacity(0.08), lineWidth: 1)
+                    .stroke(.primary.opacity(0.08), lineWidth: 1)
             )
         }
         .buttonStyle(.plain)

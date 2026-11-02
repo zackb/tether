@@ -11,6 +11,9 @@ import TetherFramework
 struct SettingsView: View {
     @Environment(TetherViewModel.self) private var viewModel
 
+    @AppStorage(AppearancePreference.storageKey, store: AppearancePreference.sharedDefaults)
+    private var appearance: AppearancePreference = .system
+
     @State private var showDeleteConfirm = false
     @State private var fingerprintToDelete: String?
 
@@ -150,6 +153,30 @@ struct SettingsView: View {
                     Text("When enabled, the iPhone's clipboard will be updated immediately when a connected desktop clipboard changes.")
                 }
 
+                // Appearance
+                Section {
+                    Picker(selection: $appearance) {
+                        ForEach(AppearancePreference.allCases) { option in
+                            Text(option.label).tag(option)
+                        }
+                    } label: {
+                        HStack(spacing: 14) {
+                            Image(systemName: "circle.lefthalf.filled")
+                                .font(.title3)
+                                .foregroundStyle(.teal)
+                                .frame(width: 32)
+                                .accessibilityHidden(true)
+
+                            Text("Appearance")
+                                .font(.body.weight(.medium))
+                        }
+                    }
+                } header: {
+                    Text("Appearance")
+                } footer: {
+                    Text("Also applies to the Share extension.")
+                }
+
                 // Connection
                 Section {
                     HStack {
@@ -236,6 +263,16 @@ struct SettingsView: View {
             result.append(char)
         }
         return result
+    }
+}
+
+private extension AppearancePreference {
+    var label: LocalizedStringKey {
+        switch self {
+        case .system: "System"
+        case .light: "Light"
+        case .dark: "Dark"
+        }
     }
 }
 

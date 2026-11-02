@@ -6,17 +6,20 @@
 //
 
 import SwiftUI
+import TetherFramework
 
 @main
 struct TetherApp: App {
     @State private var viewModel = TetherViewModel()
     @Environment(\.scenePhase) private var scenePhase
+    @AppStorage(AppearancePreference.storageKey, store: AppearancePreference.sharedDefaults)
+    private var appearance: AppearancePreference = .system
 
     var body: some Scene {
         WindowGroup {
             ContentView()
                 .environment(viewModel)
-                .preferredColorScheme(.dark)
+                .preferredColorScheme(appearance.colorScheme)
                 .onAppear {
                     viewModel.initialize()
                 }
