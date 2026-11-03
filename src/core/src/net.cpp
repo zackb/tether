@@ -2471,11 +2471,13 @@ namespace tether {
                             robust_ssl_write(ssl, payload.c_str(), payload.size());
                             continue;
                         }
-                        if (g_file_manager && g_file_manager->handle_end(j["transfer_id"])) {
+                        if (g_file_manager) {
+                            // Report failures too, or the sender waits on the transfer forever.
+                            const bool saved = g_file_manager->handle_end(j["transfer_id"]);
                             nlohmann::json resp;
                             resp["command"] = "file_status";
                             resp["transfer_id"] = j["transfer_id"];
-                            resp["status"] = "success";
+                            resp["status"] = saved ? "success" : "error";
                             std::string payload = resp.dump() + "\n";
                             robust_ssl_write(ssl, payload.c_str(), payload.size());
                             continue;

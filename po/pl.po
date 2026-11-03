@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: tether\n"
 "Report-Msgid-Bugs-To: zack@bartel.com\n"
-"POT-Creation-Date: 2026-11-01 09:56-0800\n"
+"POT-Creation-Date: 2026-11-02 18:54-0800\n"
 "PO-Revision-Date: 2026-08-23\n"
 "Last-Translator: Tether project\n"
 "Language-Team: Polish\n"
@@ -1967,16 +1967,28 @@ msgstr ""
 "go poleceniem: sudo systemctl enable --now avahi-daemon"
 
 #: src/daemon/notification.cpp
+#, c++-format
+msgid "{} file arrived"
+msgid_plural "{} files arrived"
+msgstr[0] "Odebrano {} plik"
+msgstr[1] "Odebrano {} pliki"
+msgstr[2] "Odebrano {} plików"
+
+#: src/daemon/notification.cpp
+msgid "Files arrived"
+msgstr "Odebrano pliki"
+
+#: src/daemon/notification.cpp
+msgid "Open Folder"
+msgstr "Otwórz folder"
+
+#: src/daemon/notification.cpp
 msgid "File arrived"
 msgstr "Plik dotarł"
 
 #: src/daemon/notification.cpp
 msgid "Open File"
 msgstr "Otwórz plik"
-
-#: src/daemon/notification.cpp
-msgid "Open Folder"
-msgstr "Otwórz folder"
 
 #: src/daemon/notification.cpp
 msgid "Reply"

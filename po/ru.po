@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: tether\n"
 "Report-Msgid-Bugs-To: zack@bartel.com\n"
-"POT-Creation-Date: 2026-11-01 09:56-0800\n"
+"POT-Creation-Date: 2026-11-02 18:54-0800\n"
 "PO-Revision-Date: 2026-08-23\n"
 "Last-Translator: Tether project\n"
 "Language-Team: Russian\n"
@@ -1964,16 +1964,28 @@ msgstr ""
 "Запустите его командой: sudo systemctl enable --now avahi-daemon"
 
 #: src/daemon/notification.cpp
+#, c++-format
+msgid "{} file arrived"
+msgid_plural "{} files arrived"
+msgstr[0] "Получен {} файл"
+msgstr[1] "Получено {} файла"
+msgstr[2] "Получено {} файлов"
+
+#: src/daemon/notification.cpp
+msgid "Files arrived"
+msgstr "Файлы получены"
+
+#: src/daemon/notification.cpp
+msgid "Open Folder"
+msgstr "Открыть папку"
+
+#: src/daemon/notification.cpp
 msgid "File arrived"
 msgstr "Файл получен"
 
 #: src/daemon/notification.cpp
 msgid "Open File"
 msgstr "Открыть файл"
-
-#: src/daemon/notification.cpp
-msgid "Open Folder"
-msgstr "Открыть папку"
 
 #: src/daemon/notification.cpp
 msgid "Reply"

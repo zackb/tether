@@ -7,6 +7,7 @@
 #include <glib.h>
 #include <libnotify/notify.h>
 
+#include <chrono>
 #include <functional>
 #include <mutex>
 #include <string>
@@ -115,6 +116,12 @@ namespace tether {
 
         // iPhone notification UID -> its open popup
         std::unordered_map<uint32_t, NotifyNotification*> g_ancs_popups;
+
+        // Open "File arrived" popup that a burst of transfers folds into.
+        constexpr auto FILE_BATCH_WINDOW = std::chrono::seconds(10);
+        NotifyNotification* g_file_popup = nullptr;
+        int g_file_count = 0;
+        std::chrono::steady_clock::time_point g_last_file_arrival;
 
         guint32 notification_id(NotifyNotification* notification) {
             gint id = 0;
@@ -279,6 +286,8 @@ namespace tether {
         void on_notification_closed(NotifyNotification* notification, gpointer) {
             g_reply_threads.erase(notification_id(notification));
             std::erase_if(g_ancs_popups, [notification](const auto& entry) { return entry.second == notification; });
+            if (notification == g_file_popup)
+                g_file_popup = nullptr;
             g_object_unref(notification);
         }
 
@@ -310,6 +319,27 @@ namespace tether {
                 return G_SOURCE_REMOVE;
             }
 
+            const auto now = std::chrono::steady_clock::now();
+            if (g_file_popup && now - g_last_file_arrival < FILE_BATCH_WINDOW) {
+                g_last_file_arrival = now;
+                ++g_file_count;
+                const std::string body =
+                    tr_format(P_("{} file arrived", "{} files arrived", g_file_count), g_file_count);
+                notify_notification_update(g_file_popup, _("Files arrived"), body.c_str(), "document-save");
+                notify_notification_clear_actions(g_file_popup);
+                notify_notification_add_action(g_file_popup,
+                                               "open-folder",
+                                               _("Open Folder"),
+                                               on_notification_action,
+                                               new NotificationActionData{folder_uri},
+                                               free_action_data);
+                if (!notify_notification_show(g_file_popup, nullptr))
+                    debug::log(ERR, "Failed to update file notification");
+                g_free(file_uri);
+                g_free(folder_uri);
+                return G_SOURCE_REMOVE;
+            }
+
             NotifyNotification* notification =
                 notify_notification_new(_("File arrived"), file.filename().c_str(), "document-save");
 
@@ -336,6 +366,10 @@ namespace tether {
                 }
                 debug::log(ERR, "");
                 g_object_unref(notification);
+            } else {
+                g_file_popup = notification;
+                g_file_count = 1;
+                g_last_file_arrival = now;
             }
             g_free(file_uri);
             g_free(folder_uri);

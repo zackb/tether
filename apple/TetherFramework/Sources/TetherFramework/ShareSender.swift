@@ -267,9 +267,12 @@ public actor ShareSender {
                 guard !resumed else { return }
                 switch message.parsedCommand {
                 case .fileStatus:
-                    if message.transferId == transferId, message.status == "success" {
-                        resumed = true
+                    guard message.transferId == transferId else { break }
+                    resumed = true
+                    if message.status == "success" {
                         continuation.resume(returning: .success(()))
+                    } else {
+                        continuation.resume(returning: .failure(ShareSenderError.fileTransferFailed("Your computer could not save \(filename).")))
                     }
                 case .error:
                     resumed = true
