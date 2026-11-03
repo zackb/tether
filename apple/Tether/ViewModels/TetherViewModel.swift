@@ -11,6 +11,7 @@ import SwiftUI
 import UniformTypeIdentifiers
 import AVFoundation
 import UIKit
+import PhotosUI
 import TetherFramework
 internal import Network
 
@@ -67,7 +68,7 @@ struct FileTransfer: Identifiable {
 
     let id: String // transfer_id
     var filename: String
-    let totalSize: Int64
+    var totalSize: Int64
     var direction: Direction
     var bytesTransferred: Int64 = 0
     var isComplete = false
@@ -381,97 +382,159 @@ final class TetherViewModel {
 
     // MARK: - File Transfer
 
-    // Send a file to the daemon using its URL.
-    func sendFile(url: URL) {
-        let isSecurityScoped = url.startAccessingSecurityScopedResource()
-        let filename = url.lastPathComponent
+    // A file in a batch: its name and how to read it when its turn comes.
+    private typealias BatchItem = (filename: String, load: @Sendable () async throws -> Data)
 
-        Task.detached { [weak self] in
-            guard let self else { return }
-            defer { if isSecurityScoped { url.stopAccessingSecurityScopedResource() } }
+    // Send files picked in the document picker.
+    func sendFiles(urls: [URL]) {
+        sendBatch(urls.map { url -> BatchItem in
+            (url.lastPathComponent, {
+                let isSecurityScoped = url.startAccessingSecurityScopedResource()
+                defer { if isSecurityScoped { url.stopAccessingSecurityScopedResource() } }
+                return try Data(contentsOf: url)
+            })
+        })
+    }
 
-            do {
-                let fileData = try Data(contentsOf: url)
-                await self.sendFile(data: fileData, filename: filename)
-            } catch {
-                await MainActor.run {
-                    self.errorMessage = "File transfer failed: \(error.localizedDescription)"
+    // Send photos picked in the photo library, as their original encoding.
+    func sendPhotos(_ items: [PhotosPickerItem]) {
+        sendBatch(items.map { item -> BatchItem in
+            let ext = item.supportedContentTypes.first?.preferredFilenameExtension ?? "jpg"
+            return ("Image_\(UUID().uuidString.prefix(6)).\(ext)", {
+                guard let data = try await item.loadTransferable(type: Data.self) else {
+                    throw CocoaError(.fileReadUnknown)
                 }
-            }
-        }
+                return data
+            })
+        })
     }
 
     // Send raw data to the daemon. A clipboard transfer stays out of the Files tab.
     func sendFile(data fileData: Data, filename: String, clipboard: String? = nil) {
         let transferId = UUID().uuidString
-        let totalSize = Int64(fileData.count)
+        if clipboard == nil {
+            activeTransfers.append(FileTransfer(
+                id: transferId,
+                filename: filename,
+                totalSize: Int64(fileData.count),
+                direction: .outgoing
+            ))
+        }
 
         Task.detached { [weak self] in
             guard let self else { return }
 
             do {
-                if clipboard == nil {
-                    await MainActor.run {
-                        let transfer = FileTransfer(
-                            id: transferId,
-                            filename: filename,
-                            totalSize: totalSize,
-                            direction: .outgoing
-                        )
-                        self.activeTransfers.append(transfer)
-                    }
-                }
-
-                // Send file_start
-                await MainActor.run {
-                    self.connection.send(.fileStart(
-                        filename: filename,
-                        size: totalSize,
-                        transferId: transferId,
-                        clipboard: clipboard
-                    ))
-                }
-
-                // Send chunks
-                var offset = 0
-                var chunkIndex = 0
-                while offset < fileData.count {
-                    let end = min(offset + self.fileChunkSize, fileData.count)
-                    let chunk = fileData[offset..<end]
-                    let base64 = chunk.base64EncodedString()
-                    let index = chunkIndex
-
-                    await MainActor.run {
-                        self.connection.send(.fileChunk(
-                            transferId: transferId,
-                            chunkIndex: index,
-                            data: base64
-                        ))
-
-                        if let idx = self.activeTransfers.firstIndex(where: { $0.id == transferId }) {
-                            self.activeTransfers[idx].bytesTransferred = Int64(end)
-                        }
-                    }
-
-                    offset = end
-                    chunkIndex += 1
-
-                    // Small delay to avoid overwhelming the connection
-                    try await Task.sleep(for: .milliseconds(10))
-                }
-
-                // Send file_end
-                await MainActor.run {
-                    self.connection.send(.fileEnd(transferId: transferId))
-                }
+                try await self.streamFile(fileData, filename: filename, transferId: transferId, clipboard: clipboard)
             } catch {
                 await MainActor.run {
-                    if let idx = self.activeTransfers.firstIndex(where: { $0.id == transferId }) {
-                        self.activeTransfers[idx].failed = true
-                    }
+                    self.markTransferFailed(transferId)
                     self.errorMessage = "File transfer error from daemon: \(error.localizedDescription)"
                 }
             }
+        }
+    }
+
+    // Send files one after another so only one is in memory at a time.
+    // Every row shows up right away; a file that can't be read fails alone.
+    private func sendBatch(_ items: [BatchItem]) {
+        guard !items.isEmpty else { return }
+        let transferIds = items.map { item in
+            let transferId = UUID().uuidString
+            activeTransfers.append(FileTransfer(
+                id: transferId,
+                filename: item.filename,
+                totalSize: 0,
+                direction: .outgoing
+            ))
+            return transferId
+        }
+
+        Task.detached { [weak self] in
+            guard let self else { return }
+
+            var failures = 0
+            for (index, (item, transferId)) in zip(items, transferIds).enumerated() {
+                // The connection drops sends silently once it's gone, so stop here.
+                guard await MainActor.run(body: { self.appState == .connected }) else {
+                    await MainActor.run { transferIds[index...].forEach(self.markTransferFailed) }
+                    failures += transferIds.count - index
+                    break
+                }
+
+                do {
+                    let fileData = try await item.load()
+                    await MainActor.run {
+                        if let idx = self.activeTransfers.firstIndex(where: { $0.id == transferId }) {
+                            self.activeTransfers[idx].totalSize = Int64(fileData.count)
+                        }
+                    }
+                    try await self.streamFile(fileData, filename: item.filename, transferId: transferId, clipboard: nil)
+                } catch {
+                    await MainActor.run { self.markTransferFailed(transferId) }
+                    failures += 1
+                }
+            }
+
+            if failures > 0 {
+                let message = items.count == 1
+                    ? "Could not send \(items[0].filename)."
+                    : "\(failures) of \(items.count) files could not be sent."
+                await MainActor.run { self.errorMessage = message }
+            }
+        }
+    }
+
+    // Stream one file to the daemon as file_start, paced file_chunks, file_end.
+    private nonisolated func streamFile(
+        _ fileData: Data,
+        filename: String,
+        transferId: String,
+        clipboard: String?
+    ) async throws {
+        await MainActor.run {
+            self.connection.send(.fileStart(
+                filename: filename,
+                size: Int64(fileData.count),
+                transferId: transferId,
+                clipboard: clipboard
+            ))
+        }
+
+        var offset = 0
+        var chunkIndex = 0
+        while offset < fileData.count {
+            let end = min(offset + fileChunkSize, fileData.count)
+            let base64 = fileData[offset..<end].base64EncodedString()
+            let index = chunkIndex
+
+            await MainActor.run {
+                self.connection.send(.fileChunk(
+                    transferId: transferId,
+                    chunkIndex: index,
+                    data: base64
+                ))
+
+                if let idx = self.activeTransfers.firstIndex(where: { $0.id == transferId }) {
+                    self.activeTransfers[idx].bytesTransferred = Int64(end)
+                }
+            }
+
+            offset = end
+            chunkIndex += 1
+
+            // Small delay to avoid overwhelming the connection
+            try await Task.sleep(for: .milliseconds(10))
+        }
+
+        await MainActor.run {
+            self.connection.send(.fileEnd(transferId: transferId))
+        }
+    }
+
+    private func markTransferFailed(_ transferId: String) {
+        if let idx = activeTransfers.firstIndex(where: { $0.id == transferId }) {
+            activeTransfers[idx].failed = true
         }
     }
 
@@ -750,11 +813,15 @@ final class TetherViewModel {
             daemonCameraPort = message.features?.contains("camera") == true ? message.port : nil
 
         case .fileStatus:
-            if let transferId = message.transferId, message.status == "success" {
-                if let idx = activeTransfers.firstIndex(where: { $0.id == transferId }) {
+            if let transferId = message.transferId,
+               let idx = activeTransfers.firstIndex(where: { $0.id == transferId }) {
+                if message.status == "success" {
                     var transfer = activeTransfers.remove(at: idx)
                     transfer.isComplete = true
                     completedTransfers.insert(transfer, at: 0)
+                } else {
+                    activeTransfers[idx].failed = true
+                    errorMessage = "Your computer could not save \(activeTransfers[idx].filename)."
                 }
             }
 

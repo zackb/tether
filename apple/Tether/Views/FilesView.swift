@@ -14,7 +14,7 @@ struct FilesView: View {
     @Environment(\.openURL) private var openURL
 
     @State private var showDocumentPicker = false
-    @State private var selectedPhotoItem: PhotosPickerItem? = nil
+    @State private var selectedPhotoItems: [PhotosPickerItem] = []
 
     var body: some View {
         NavigationStack {
@@ -39,11 +39,11 @@ struct FilesView: View {
                         .accessibilityLabel("Open Received Files")
 
                         if viewModel.appState == .connected {
-                            PhotosPicker(selection: $selectedPhotoItem, matching: .images, preferredItemEncoding: .current) {
+                            PhotosPicker(selection: $selectedPhotoItems, maxSelectionCount: 50, selectionBehavior: .ordered, matching: .images, preferredItemEncoding: .current) {
                                 Image(systemName: "photo.on.rectangle")
                                     .foregroundStyle(.teal)
                             }
-                            .accessibilityLabel("Send a Photo")
+                            .accessibilityLabel("Send Photos")
                             Button {
                                 showDocumentPicker = true
                             } label: {
@@ -58,30 +58,20 @@ struct FilesView: View {
             .fileImporter(
                 isPresented: $showDocumentPicker,
                 allowedContentTypes: [.data],
-                allowsMultipleSelection: false
+                allowsMultipleSelection: true
             ) { result in
                 switch result {
                 case .success(let urls):
-                    if let url = urls.first {
-                        viewModel.sendFile(url: url)
-                    }
+                    viewModel.sendFiles(urls: urls)
                 case .failure(let error):
                     viewModel.errorMessage = "File selection failed: \(error.localizedDescription)"
                 }
             }
-            .onChange(of: selectedPhotoItem) { _, newItem in
-                guard let newItem else { return }
-                
-                Task {
-                    if let data = try? await newItem.loadTransferable(type: Data.self) {
-                        let ext = newItem.supportedContentTypes.first?.preferredFilenameExtension ?? "jpg"
-                        let defaultName = "Image_\(UUID().uuidString.prefix(6)).\(ext)"
-                        viewModel.sendFile(data: data, filename: defaultName)
-                    } else {
-                        viewModel.errorMessage = "Could not read photo data."
-                    }
-                    selectedPhotoItem = nil
-                }
+            .onChange(of: selectedPhotoItems) { _, items in
+                // Clearing the selection fires this again with an empty array.
+                guard !items.isEmpty else { return }
+                selectedPhotoItems = []
+                viewModel.sendPhotos(items)
             }
         }
     }
@@ -158,7 +148,7 @@ struct FilesView: View {
                     .buttonStyle(.plain)
 
                     // Send Photo Button
-                    PhotosPicker(selection: $selectedPhotoItem, matching: .images, preferredItemEncoding: .current, photoLibrary: .shared()) {
+                    PhotosPicker(selection: $selectedPhotoItems, maxSelectionCount: 50, selectionBehavior: .ordered, matching: .images, preferredItemEncoding: .current, photoLibrary: .shared()) {
                         HStack(spacing: 14) {
                             ZStack {
                                 Circle()
@@ -178,7 +168,7 @@ struct FilesView: View {
                             .accessibilityHidden(true)
 
                             VStack(alignment: .leading, spacing: 2) {
-                                Text("Send a Photo")
+                                Text("Send Photos")
                                     .font(.body.weight(.semibold))
                                     .foregroundStyle(.primary)
 

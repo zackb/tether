@@ -179,6 +179,8 @@ Tether supports streaming large binary files seamlessly through JSON using Base6
 }
 ```
 
+If the file could not be saved (for example it arrived short of the size given in `file_start`), `status` is `"error"` and the partial file is discarded.
+
 For local Unix clients, `tetherd` returns `file_status` once the stream has been forwarded to at least one connected TCP client. If no mobile client is connected, the daemon returns:
 
 ```json
