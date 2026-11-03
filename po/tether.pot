@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: tether 0.3.2\n"
 "Report-Msgid-Bugs-To: zack@bartel.com\n"
-"POT-Creation-Date: 2026-11-01 09:56-0800\n"
+"POT-Creation-Date: 2026-11-02 18:54-0800\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -1739,15 +1739,26 @@ msgid ""
 msgstr ""
 
 #: src/daemon/notification.cpp
+#, c++-format
+msgid "{} file arrived"
+msgid_plural "{} files arrived"
+msgstr[0] ""
+msgstr[1] ""
+
+#: src/daemon/notification.cpp
+msgid "Files arrived"
+msgstr ""
+
+#: src/daemon/notification.cpp
+msgid "Open Folder"
+msgstr ""
+
+#: src/daemon/notification.cpp
 msgid "File arrived"
 msgstr ""
 
 #: src/daemon/notification.cpp
 msgid "Open File"
-msgstr ""
-
-#: src/daemon/notification.cpp
-msgid "Open Folder"
 msgstr ""
 
 #: src/daemon/notification.cpp
