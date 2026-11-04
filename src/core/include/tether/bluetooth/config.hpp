@@ -61,6 +61,8 @@ namespace tether::bluetooth {
         bool desktop_popups_enabled = true;
         // Whether popups include the message text. Off shows only the sender.
         bool popup_previews_enabled = true;
+        // Whether a local copy is pushed to paired devices. Off shares only on clipboard_send.
+        bool clipboard_auto_share = true;
         // Whether threads from senders who are not contacts are hidden. Codes still pop up and autofill.
         bool hide_unknown_senders = false;
         // Whether Tether manages AirPods at all. Off until asked.

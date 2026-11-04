@@ -184,6 +184,7 @@ static const Opt kOptions[] = {
     {"-v, --version", N_("Print the tether version.")},
     {"-g, --get-clipboard", N_("Retrieve the current Wayland clipboard text.")},
     {"-s, --set-clipboard", N_("Take string input and copy it to the local Wayland clipboard.")},
+    {"--share-clipboard", N_("Send the current Wayland clipboard to connected devices.")},
     {"-f, --send-file", N_("Send a file through tether.")},
     {"--to <name>", N_("With --send-file, send to one connected device (name or fingerprint).")},
     {"-n, --native-host", N_("Start the browser Native Messaging Host proxy loop.")},
@@ -1380,6 +1381,8 @@ int main(int argc, char* argv[]) {
             return 0;
         } else if (arg == "-g" || arg == "--get-clipboard") {
             action = "get";
+        } else if (arg == "--share-clipboard") {
+            action = "share";
         } else if (arg == "-d" || arg == "--discover") {
             action = "discover";
         } else if (arg == "--list-devices") {
@@ -1675,6 +1678,9 @@ int main(int argc, char* argv[]) {
             return 1;
         }
         debug::log(INFO, "{}", clip);
+    } else if (action == "share") {
+        // clipboard_send is local-socket only
+        client.send_and_wait("{\"command\":\"clipboard_send\"}\n");
     } else if (action == "set") {
         if (!client.set_clipboard(arg_val, err)) {
             debug::log(ERR, "{}", err);

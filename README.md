@@ -41,6 +41,8 @@
 ### Clipboard Sync
 Text copied on your Linux desktop appears instantly on your iPhone, and vice versa.
 
+To share only on demand, turn off **Share the clipboard automatically** in Settings and bind `tether share` to a key, e.g. Hyprland: `bind = SUPER SHIFT, C, exec, tether share`.
+
 ### File Transfer
 Drag and drop files from Linux directly into the iPhone app, or receive files automatically to your `$XDG_DOWNLOAD_DIR` (~/Downloads).
 

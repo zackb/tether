@@ -185,6 +185,8 @@ int main(int argc, char** argv) {
     tether::WaylandContext wayland_srv(loop);
     tether::g_wayland = &wayland_srv;
     wayland_srv.set_clipboard_callback([](const std::string& text) {
+        if (!tether::clipboard_auto_share())
+            return;
         nlohmann::json j;
         j["command"] = "clipboard_updated";
         j["content"] = text;
@@ -192,7 +194,10 @@ int main(int argc, char** argv) {
         // app can still mislabel binary as text/plain. Don't abort the daemon.
         tether::broadcast_message(j.dump(-1, ' ', false, nlohmann::json::error_handler_t::replace));
     });
-    wayland_srv.set_clipboard_image_callback([](const std::string& png) { tether::broadcast_clipboard_image(png); });
+    wayland_srv.set_clipboard_image_callback([](const std::string& png) {
+        if (tether::clipboard_auto_share())
+            tether::broadcast_clipboard_image(png);
+    });
     wayland_srv.init();
 
     tether::FileReceiveManager file_mgr;
@@ -323,6 +328,7 @@ int main(int argc, char** argv) {
     tether::secret::set_retention(bt_config.retention);
     tether::set_desktop_popups_enabled(bt_config.desktop_popups_enabled);
     tether::set_popup_previews_enabled(bt_config.popup_previews_enabled);
+    tether::set_clipboard_auto_share(bt_config.clipboard_auto_share);
 
     // Pick the controller before the first capability, a second adapter never comes up bound to the wrong one.
     bluez.set_preferred_adapter(bt_config.adapter);

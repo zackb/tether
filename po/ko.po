@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: tether\n"
 "Report-Msgid-Bugs-To: zack@bartel.com\n"
-"POT-Creation-Date: 2026-11-02 18:54-0800\n"
+"POT-Creation-Date: 2026-11-03 18:33-0800\n"
 "PO-Revision-Date: 2026-08-23\n"
 "Last-Translator: Tether project\n"
 "Language-Team: Korean\n"
@@ -41,6 +41,10 @@ msgstr "Wayland 클립보드의 현재 텍스트를 가져옵니다."
 #: src/cli/main.cpp
 msgid "Take string input and copy it to the local Wayland clipboard."
 msgstr "입력에서 텍스트를 읽어 로컬 Wayland 클립보드에 복사합니다."
+
+#: src/cli/main.cpp
+msgid "Send the current Wayland clipboard to connected devices."
+msgstr "현재 Wayland 클립보드를 연결된 기기로 보냅니다."
 
 #: src/cli/main.cpp
 msgid "Send a file through tether."
@@ -2899,6 +2903,14 @@ msgid ""
 msgstr ""
 "링크가 시간 초과된 뒤 약 30초 후에 잠급니다. iPhone에서 Bluetooth를 꺼도 잠기"
 "지 않으며, 이 기기를 절전 모드로 두어도 잠기지 않습니다."
+
+#: src/gtk/settings_view.cpp src/tui/settings.cpp
+msgid "Share the clipboard automatically"
+msgstr "클립보드 자동 공유"
+
+#: src/gtk/settings_view.cpp src/tui/settings.cpp
+msgid "Off sends it only from Send Clipboard or tether share."
+msgstr "끄면 클립보드 보내기 또는 tether share로만 보냅니다."
 
 #: src/gtk/settings_view.cpp
 msgid "SMS and iMessage conversations synced over Bluetooth."

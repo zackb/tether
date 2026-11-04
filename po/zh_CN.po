@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: tether\n"
 "Report-Msgid-Bugs-To: zack@bartel.com\n"
-"POT-Creation-Date: 2026-11-02 18:54-0800\n"
+"POT-Creation-Date: 2026-11-03 18:33-0800\n"
 "PO-Revision-Date: 2026-08-23\n"
 "Last-Translator: Tether project\n"
 "Language-Team: Simplified Chinese\n"
@@ -41,6 +41,10 @@ msgstr "获取 Wayland 剪贴板中的当前文本。"
 #: src/cli/main.cpp
 msgid "Take string input and copy it to the local Wayland clipboard."
 msgstr "从输入读取文本并复制到本地 Wayland 剪贴板。"
+
+#: src/cli/main.cpp
+msgid "Send the current Wayland clipboard to connected devices."
+msgstr "将当前 Wayland 剪贴板发送到已连接的设备。"
 
 #: src/cli/main.cpp
 msgid "Send a file through tether."
@@ -2830,6 +2834,14 @@ msgid ""
 "on the iPhone does not lock, and neither does suspending this machine."
 msgstr ""
 "在链路超时约半分钟后锁定。在 iPhone 上关闭蓝牙不会锁定，将本机挂起也不会。"
+
+#: src/gtk/settings_view.cpp src/tui/settings.cpp
+msgid "Share the clipboard automatically"
+msgstr "自动共享剪贴板"
+
+#: src/gtk/settings_view.cpp src/tui/settings.cpp
+msgid "Off sends it only from Send Clipboard or tether share."
+msgstr "关闭后仅通过“发送剪贴板”或 tether share 发送。"
 
 #: src/gtk/settings_view.cpp
 msgid "SMS and iMessage conversations synced over Bluetooth."

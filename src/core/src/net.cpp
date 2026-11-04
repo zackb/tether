@@ -430,6 +430,7 @@ namespace tether {
         status["retention_ready"] = secret::have_key();
         status["desktop_popups_enabled"] = config.desktop_popups_enabled;
         status["popup_previews_enabled"] = config.popup_previews_enabled;
+        status["clipboard_auto_share"] = config.clipboard_auto_share;
         status["hide_unknown_senders"] = config.hide_unknown_senders;
         status["airpods_enabled"] = config.airpods_enabled;
         status["airpods_pause"] = to_string(config.airpods_pause);
@@ -475,6 +476,12 @@ namespace tether {
     bool popup_previews_enabled() { return g_popup_previews_enabled.load(); }
 
     void set_popup_previews_enabled(bool enabled) { g_popup_previews_enabled.store(enabled); }
+
+    static std::atomic<bool> g_clipboard_auto_share{true};
+
+    bool clipboard_auto_share() { return g_clipboard_auto_share.load(); }
+
+    void set_clipboard_auto_share(bool enabled) { g_clipboard_auto_share.store(enabled); }
 
     static std::atomic<bool> g_mdns_available{false};
 
@@ -1563,6 +1570,12 @@ namespace tether {
                         config.popup_previews_enabled = j.value("enabled", true);
                         bluetooth::save_config(config);
                         set_popup_previews_enabled(config.popup_previews_enabled);
+                        broadcast_local_event(build_bt_status().dump());
+                    } else if (j.contains("command") && j["command"] == "set_clipboard_auto_share") {
+                        auto config = bluetooth::load_config();
+                        config.clipboard_auto_share = j.value("enabled", true);
+                        bluetooth::save_config(config);
+                        set_clipboard_auto_share(config.clipboard_auto_share);
                         broadcast_local_event(build_bt_status().dump());
                     } else if (j.contains("command") && j["command"] == "set_hide_unknown_senders") {
                         auto config = bluetooth::load_config();

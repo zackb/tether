@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: tether\n"
 "Report-Msgid-Bugs-To: zack@bartel.com\n"
-"POT-Creation-Date: 2026-11-02 18:54-0800\n"
+"POT-Creation-Date: 2026-11-03 18:33-0800\n"
 "PO-Revision-Date: 2026-08-23\n"
 "Last-Translator: Tether project\n"
 "Language-Team: Czech\n"
@@ -41,6 +41,10 @@ msgstr "Získat aktuální text ze schránky Waylandu."
 #: src/cli/main.cpp
 msgid "Take string input and copy it to the local Wayland clipboard."
 msgstr "Načíst text ze vstupu a zkopírovat jej do místní schránky Waylandu."
+
+#: src/cli/main.cpp
+msgid "Send the current Wayland clipboard to connected devices."
+msgstr "Odeslat aktuální obsah schránky Wayland do připojených zařízení."
 
 #: src/cli/main.cpp
 msgid "Send a file through tether."
@@ -2941,6 +2945,14 @@ msgid ""
 msgstr ""
 "Zamkne asi půl minuty po vypršení spojení. Vypnutí Bluetooth na iPhonu "
 "nezamkne, stejně jako uspání tohoto počítače."
+
+#: src/gtk/settings_view.cpp src/tui/settings.cpp
+msgid "Share the clipboard automatically"
+msgstr "Sdílet schránku automaticky"
+
+#: src/gtk/settings_view.cpp src/tui/settings.cpp
+msgid "Off sends it only from Send Clipboard or tether share."
+msgstr "Vypnuto ji odesílá jen přes Odeslat schránku nebo tether share."
 
 #: src/gtk/settings_view.cpp
 msgid "SMS and iMessage conversations synced over Bluetooth."

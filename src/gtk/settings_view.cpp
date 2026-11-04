@@ -42,6 +42,7 @@ namespace tether::ui {
             GtkWidget* sw_phone_audio = nullptr;
 
             GtkWidget* sw_lock_away = nullptr;
+            GtkWidget* sw_clipboard_share = nullptr;
 
             nlohmann::json bt_status = nlohmann::json::object();
         };
@@ -143,6 +144,10 @@ namespace tether::ui {
             daemon_send({{"command", "set_popup_previews"}, {"enabled", gtk_switch_get_active(widget) == TRUE}});
         }
 
+        void on_clipboard_share_toggled(GtkSwitch* widget, GParamSpec*, gpointer) {
+            daemon_send({{"command", "set_clipboard_auto_share"}, {"enabled", gtk_switch_get_active(widget) == TRUE}});
+        }
+
         void on_hide_unknown_toggled(GtkSwitch* widget, GParamSpec*, gpointer) {
             daemon_send({{"command", "set_hide_unknown_senders"}, {"enabled", gtk_switch_get_active(widget) == TRUE}});
         }
@@ -224,6 +229,9 @@ namespace tether::ui {
             set_switch(g_settings.sw_lock_away,
                        reinterpret_cast<gpointer>(on_lock_away_toggled),
                        status.value("lock_on_away", false));
+            set_switch(g_settings.sw_clipboard_share,
+                       reinterpret_cast<gpointer>(on_clipboard_share_toggled),
+                       status.value("clipboard_auto_share", true));
 
             set_switch(g_settings.sw_hide_unknown,
                        reinterpret_cast<gpointer>(on_hide_unknown_toggled),
@@ -355,6 +363,14 @@ namespace tether::ui {
                     _("Locks about half a minute after the link times out. Switching Bluetooth off on the "
                       "iPhone does not lock, and neither does suspending this machine."),
                     g_settings.sw_lock_away);
+
+            g_settings.sw_clipboard_share = new_switch();
+            g_signal_connect(
+                g_settings.sw_clipboard_share, "notify::active", G_CALLBACK(on_clipboard_share_toggled), nullptr);
+            add_row(security,
+                    _("Share the clipboard automatically"),
+                    _("Off sends it only from Send Clipboard or tether share."),
+                    g_settings.sw_clipboard_share);
 
             // Messages
             GtkWidget* messages =
