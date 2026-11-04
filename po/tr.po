@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: tether\n"
 "Report-Msgid-Bugs-To: zack@bartel.com\n"
-"POT-Creation-Date: 2026-11-02 18:54-0800\n"
+"POT-Creation-Date: 2026-11-03 18:33-0800\n"
 "PO-Revision-Date: 2026-08-23\n"
 "Last-Translator: Tether project\n"
 "Language-Team: Turkish\n"
@@ -41,6 +41,10 @@ msgstr "Wayland panosundaki güncel metni al."
 #: src/cli/main.cpp
 msgid "Take string input and copy it to the local Wayland clipboard."
 msgstr "Girişten metin oku ve yerel Wayland panosuna kopyala."
+
+#: src/cli/main.cpp
+msgid "Send the current Wayland clipboard to connected devices."
+msgstr "Geçerli Wayland panosunu bağlı cihazlara gönder."
 
 #: src/cli/main.cpp
 msgid "Send a file through tether."
@@ -2937,6 +2941,14 @@ msgstr ""
 "Bağlantı zaman aşımına uğradıktan yaklaşık yarım dakika sonra kilitler. "
 "iPhone'da Bluetooth'u kapatmak kilitlemez, bu makineyi uyku moduna almak da "
 "kilitlemez."
+
+#: src/gtk/settings_view.cpp src/tui/settings.cpp
+msgid "Share the clipboard automatically"
+msgstr "Panoyu otomatik paylaş"
+
+#: src/gtk/settings_view.cpp src/tui/settings.cpp
+msgid "Off sends it only from Send Clipboard or tether share."
+msgstr "Kapalıyken yalnızca Panoyu gönder veya tether share ile gönderilir."
 
 #: src/gtk/settings_view.cpp
 msgid "SMS and iMessage conversations synced over Bluetooth."

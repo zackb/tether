@@ -13,6 +13,7 @@ namespace tether::cli {
         {"send", "--send-file", "tether send <path>"},
         {"copy", "--set-clipboard", "tether copy [text]"},
         {"paste", "--get-clipboard", "tether paste"},
+        {"share", "--share-clipboard", "tether share"},
         {"service", "--install-service", "tether service"},
         {"version", "--version", "tether version"},
         {"help", "--help", "tether help"},

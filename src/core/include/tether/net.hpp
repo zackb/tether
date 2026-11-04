@@ -108,6 +108,10 @@ namespace tether {
     void set_popup_previews_enabled(bool enabled);
     bool popup_previews_enabled();
 
+    // Whether a local copy is pushed to paired devices. Off shares only on clipboard_send.
+    void set_clipboard_auto_share(bool enabled);
+    bool clipboard_auto_share();
+
     void set_mdns_available(bool available);
     bool mdns_available();
     nlohmann::json build_mdns_status();

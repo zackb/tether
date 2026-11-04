@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: tether\n"
 "Report-Msgid-Bugs-To: zack@bartel.com\n"
-"POT-Creation-Date: 2026-11-02 18:54-0800\n"
+"POT-Creation-Date: 2026-11-03 18:33-0800\n"
 "PO-Revision-Date: 2026-08-22\n"
 "Last-Translator: Tether project\n"
 "Language-Team: German\n"
@@ -42,6 +42,10 @@ msgstr "Den aktuellen Text der Wayland-Zwischenablage abrufen."
 msgid "Take string input and copy it to the local Wayland clipboard."
 msgstr ""
 "Text von der Eingabe lesen und in die lokale Wayland-Zwischenablage kopieren."
+
+#: src/cli/main.cpp
+msgid "Send the current Wayland clipboard to connected devices."
+msgstr "Die aktuelle Wayland-Zwischenablage an verbundene Geräte senden."
 
 #: src/cli/main.cpp
 msgid "Send a file through tether."
@@ -3007,6 +3011,14 @@ msgstr ""
 "Sperrt etwa eine halbe Minute nachdem die Verbindung abgelaufen ist. "
 "Bluetooth am iPhone auszuschalten sperrt nicht, und diese Maschine in den "
 "Ruhezustand zu versetzen ebenso wenig."
+
+#: src/gtk/settings_view.cpp src/tui/settings.cpp
+msgid "Share the clipboard automatically"
+msgstr "Zwischenablage automatisch teilen"
+
+#: src/gtk/settings_view.cpp src/tui/settings.cpp
+msgid "Off sends it only from Send Clipboard or tether share."
+msgstr "Aus sendet sie nur über „Zwischenablage senden“ oder tether share."
 
 #: src/gtk/settings_view.cpp
 msgid "SMS and iMessage conversations synced over Bluetooth."

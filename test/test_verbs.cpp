@@ -15,6 +15,7 @@ TEST(Verbs, RewritesASubcommandIntoItsFlag) {
     EXPECT_EQ(expand({"tether", "devices"}), (std::vector<std::string>{"tether", "--list-devices"}));
     EXPECT_EQ(expand({"tether", "paste"}), (std::vector<std::string>{"tether", "--get-clipboard"}));
     EXPECT_EQ(expand({"tether", "discover"}), (std::vector<std::string>{"tether", "--discover"}));
+    EXPECT_EQ(expand({"tether", "share"}), (std::vector<std::string>{"tether", "--share-clipboard"}));
 }
 
 TEST(Verbs, KeepsTheArgumentsThatFollow) {

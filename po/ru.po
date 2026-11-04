@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: tether\n"
 "Report-Msgid-Bugs-To: zack@bartel.com\n"
-"POT-Creation-Date: 2026-11-02 18:54-0800\n"
+"POT-Creation-Date: 2026-11-03 18:33-0800\n"
 "PO-Revision-Date: 2026-08-23\n"
 "Last-Translator: Tether project\n"
 "Language-Team: Russian\n"
@@ -43,6 +43,10 @@ msgstr "Получить текущий текст из буфера обмен�
 msgid "Take string input and copy it to the local Wayland clipboard."
 msgstr ""
 "Прочитать текст со входа и скопировать его в локальный буфер обмена Wayland."
+
+#: src/cli/main.cpp
+msgid "Send the current Wayland clipboard to connected devices."
+msgstr "Отправить текущий буфер обмена Wayland на подключённые устройства."
 
 #: src/cli/main.cpp
 msgid "Send a file through tether."
@@ -2970,6 +2974,14 @@ msgstr ""
 "Блокирует примерно через полминуты после истечения времени соединения. "
 "Выключение Bluetooth на iPhone не блокирует, как и переход этой машины в "
 "спящий режим."
+
+#: src/gtk/settings_view.cpp src/tui/settings.cpp
+msgid "Share the clipboard automatically"
+msgstr "Автоматически делиться буфером обмена"
+
+#: src/gtk/settings_view.cpp src/tui/settings.cpp
+msgid "Off sends it only from Send Clipboard or tether share."
+msgstr "Если выключено, буфер отправляется только кнопкой «Отправить буфер обмена» или командой tether share."
 
 #: src/gtk/settings_view.cpp
 msgid "SMS and iMessage conversations synced over Bluetooth."

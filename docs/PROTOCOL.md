@@ -92,13 +92,17 @@ The clipboard capabilities allow seamless copying and pasting between the Host (
 }
 ```
 
-**Daemon Behavior**: Fired asynchronously whenever the `wlr_data_control_device` `setDataOffer` informs the daemon that the primary clipboard selection has rotated.
+**Daemon Behavior**: Fired asynchronously whenever the `wlr_data_control_device` `setDataOffer` informs the daemon that the primary clipboard selection has rotated. Not sent when `clipboard_auto_share` is off; then only `clipboard_send` shares the Host clipboard.
 
 ---
 
 ### `clipboard_send` (Local client -> Daemon)
 
 **Description**: Local socket only. Broadcasts the current Host clipboard to clients as `clipboard_updated`, and replies with `clipboard_content`. Nothing is broadcast when the clipboard is empty.
+
+### `set_clipboard_auto_share` (Local client -> Daemon)
+
+**Description**: Local socket only. `{"enabled": false}` stops pushing local copies to clients. Saved to the config and reported as `clipboard_auto_share` in `bt_status`.
 
 ---
 

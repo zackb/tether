@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: tether\n"
 "Report-Msgid-Bugs-To: zack@bartel.com\n"
-"POT-Creation-Date: 2026-11-02 18:54-0800\n"
+"POT-Creation-Date: 2026-11-03 18:33-0800\n"
 "PO-Revision-Date: 2026-08-23\n"
 "Last-Translator: Tether project\n"
 "Language-Team: Japanese\n"
@@ -42,6 +42,10 @@ msgstr "Wayland のクリップボードの現在のテキストを取得しま�
 msgid "Take string input and copy it to the local Wayland clipboard."
 msgstr ""
 "入力からテキストを読み取り、ローカルの Wayland クリップボードにコピーします。"
+
+#: src/cli/main.cpp
+msgid "Send the current Wayland clipboard to connected devices."
+msgstr "現在の Wayland クリップボードを接続中のデバイスに送信します。"
 
 #: src/cli/main.cpp
 msgid "Send a file through tether."
@@ -2942,6 +2946,14 @@ msgid ""
 msgstr ""
 "リンクがタイムアウトしてから約 30 秒後にロックします。iPhone 側で Bluetooth "
 "を切ってもロックせず、このマシンをサスペンドしてもロックしません。"
+
+#: src/gtk/settings_view.cpp src/tui/settings.cpp
+msgid "Share the clipboard automatically"
+msgstr "クリップボードを自動的に共有"
+
+#: src/gtk/settings_view.cpp src/tui/settings.cpp
+msgid "Off sends it only from Send Clipboard or tether share."
+msgstr "オフにすると「クリップボードを送信」または tether share でのみ送信します。"
 
 #: src/gtk/settings_view.cpp
 msgid "SMS and iMessage conversations synced over Bluetooth."

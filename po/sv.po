@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: tether\n"
 "Report-Msgid-Bugs-To: zack@bartel.com\n"
-"POT-Creation-Date: 2026-11-02 18:54-0800\n"
+"POT-Creation-Date: 2026-11-03 18:33-0800\n"
 "PO-Revision-Date: 2026-08-23\n"
 "Last-Translator: Tether project\n"
 "Language-Team: Swedish\n"
@@ -42,6 +42,10 @@ msgstr "Hämta den aktuella texten i Waylands urklipp."
 msgid "Take string input and copy it to the local Wayland clipboard."
 msgstr ""
 "Läs text från indata och kopiera den till det lokala Wayland-urklippet."
+
+#: src/cli/main.cpp
+msgid "Send the current Wayland clipboard to connected devices."
+msgstr "Skicka aktuellt Wayland-urklipp till anslutna enheter."
 
 #: src/cli/main.cpp
 msgid "Send a file through tether."
@@ -2943,6 +2947,14 @@ msgstr ""
 "Låser ungefär en halv minut efter att länken gått ut. Att stänga av "
 "Bluetooth på iPhonen låser inte, och inte heller att försätta den här "
 "maskinen i vila."
+
+#: src/gtk/settings_view.cpp src/tui/settings.cpp
+msgid "Share the clipboard automatically"
+msgstr "Dela urklipp automatiskt"
+
+#: src/gtk/settings_view.cpp src/tui/settings.cpp
+msgid "Off sends it only from Send Clipboard or tether share."
+msgstr "Av skickar det bara via Skicka urklipp eller tether share."
 
 #: src/gtk/settings_view.cpp
 msgid "SMS and iMessage conversations synced over Bluetooth."
