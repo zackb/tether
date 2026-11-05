@@ -302,6 +302,12 @@ struct DashboardView: View {
                     }
                     .disabled(manualHost.isEmpty)
                 }
+
+                #if DEBUG
+                Section {
+                    NavigationLink("Bluetooth discovery spike") { BTSpikeView() }
+                }
+                #endif
             }
             .navigationTitle("Manual Connection")
             .navigationBarTitleDisplayMode(.inline)

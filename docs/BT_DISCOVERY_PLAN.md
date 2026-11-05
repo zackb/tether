@@ -24,15 +24,27 @@ supplies an address.
 
 ## Phase 0: feasibility spike (go/no-go)
 
-- [ ] Linux: throwaway GATT app via `bluetoothctl` `menu gatt` with the UUIDs above and a static value
+- [x] Linux: throwaway GATT app: `scripts/bt-discovery-spike.py` (logs every read with its `link`)
 - [ ] Linux: confirm the service is reachable over BR/EDR ATT as well as LE (`btmon`, `sdptool browse local`)
-- [ ] iOS: throwaway button, `retrieveConnectedPeripherals(withServices:)`, then connect, discover, read
+- [x] iOS: throwaway probe written: `apple/Tether/Views/BTSpikeView.swift`, under Manual Connection, DEBUG only (never compiled yet)
 - [ ] Test: LE + BR/EDR up
 - [ ] Test: BR/EDR-only bond (Type=5, #303)
 - [ ] Test: phone just back in range
 - [ ] Test: after `bluetoothd` restart
 - [ ] Go/no-go recorded in BLUETOOTH.md (dated entry). If no-go, the fallback is an advert with the
       service UUID plus `scanForPeripherals`.
+
+### Running the spike
+
+1. Linux: `scripts/bt-discovery-spike.py` (leave it running). For the bearer trace, also run
+   `sudo btmon -w /tmp/spike.btsnoop`.
+2. iPhone (DEBUG build from the Mac): Dashboard, then Manual Connection, then
+   "Bluetooth discovery spike", then Run. Allow the Bluetooth prompt the first time.
+3. Success means both of these happen:
+   - the phone logs `read N bytes: {"v":1,...}`
+   - the Linux script logs `ReadValue ... link=...`
+4. If `retrieve(tether service): 0` but the control finds the computer, check the logged
+   service list: it tells you whether iOS lacks the service or only had not cached it.
 
 ## Phase 1: tetherd (Linux)
 
@@ -68,3 +80,9 @@ supplies an address.
 ## Findings
 
 <!-- YYYY-MM-DD (machine): what was tried, what was seen -->
+
+- 2026-11-05 (Linux): BlueZ 5.87 `--experimental`, hci0. `RegisterApplication` worked from an
+  unprivileged user, no polkit or dbus policy change needed. The value was 193 bytes with 2
+  IPv4 and 1 IPv6 address. The iPhone was connected on both bearers at the time. Not checked:
+  whether BlueZ exposes app services over BR/EDR ATT (`sdptool` is not installed); the btmon
+  trace from the phone run will show it.

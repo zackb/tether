@@ -525,6 +525,7 @@
 				INFOPLIST_FILE = Info.plist;
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.productivity";
 				INFOPLIST_KEY_LSSupportsOpeningDocumentsInPlace = YES;
+				INFOPLIST_KEY_NSBluetoothAlwaysUsageDescription = "Used to find your computer over Bluetooth when the local network hides it.";
 				INFOPLIST_KEY_NSCameraUsageDescription = "Used to stream the camera to your desktop as a webcam.";
 				INFOPLIST_KEY_NSLocalNetworkUsageDescription = "Used to discover and connect to Tether services on your local network.";
 				INFOPLIST_KEY_NSPhotoLibraryUsageDescription = "Used to send photos from your library to your desktop.";
@@ -597,6 +598,7 @@
 				INFOPLIST_FILE = Info.plist;
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.productivity";
 				INFOPLIST_KEY_LSSupportsOpeningDocumentsInPlace = YES;
+				INFOPLIST_KEY_NSBluetoothAlwaysUsageDescription = "Used to find your computer over Bluetooth when the local network hides it.";
 				INFOPLIST_KEY_NSCameraUsageDescription = "Used to stream the camera to your desktop as a webcam.";
 				INFOPLIST_KEY_NSLocalNetworkUsageDescription = "Used to discover and connect to Tether services on your local network.";
 				INFOPLIST_KEY_NSPhotoLibraryUsageDescription = "Used to send photos from your library to your desktop.";
