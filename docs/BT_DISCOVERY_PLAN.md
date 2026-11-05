@@ -25,13 +25,13 @@ supplies an address.
 ## Phase 0: feasibility spike (go/no-go)
 
 - [x] Linux: throwaway GATT app: `scripts/bt-discovery-spike.py` (logs every read with its `link`)
-- [ ] Linux: confirm the service is reachable over BR/EDR ATT as well as LE (`btmon`, `sdptool browse local`)
+- [x] Linux: reachable over BR/EDR ATT? Moot: iOS central does not list the computer without LE, see Findings
 - [x] iOS: throwaway probe written: `apple/Tether/Views/BTSpikeView.swift`, under Manual Connection, DEBUG only (compiles; not run on a phone yet)
-- [ ] Test: LE + BR/EDR up
-- [ ] Test: BR/EDR-only bond (Type=5, #303)
-- [ ] Test: phone just back in range
-- [ ] Test: after `bluetoothd` restart
-- [ ] Go/no-go recorded in BLUETOOTH.md (dated entry). If no-go, the fallback is an advert with the
+- [x] Test: LE + BR/EDR up: read OK over LE, see Findings
+- [x] Test: BR/EDR only (LE held down, tetherd stopped): `retrieve` returns 0 for the service and for 1800/1801. Needs LE
+- [ ] Test: phone just back in range (moved to Phase 3 hardware run, against real tetherd)
+- [x] Test: after `bluetoothd` restart: re-registers (Phase 1 build)
+- [x] Go/no-go recorded in BLUETOOTH.md (dated entry): **go**, LE required. If no-go, the fallback is an advert with the
       service UUID plus `scanForPeripherals`.
 
 ### Running the spike
@@ -48,15 +48,15 @@ supplies an address.
 
 ## Phase 1: tetherd (Linux)
 
-- [ ] `src/core/{include/tether,src}/bluetooth/lan_info.{hpp,cpp}`: `LanInfoService`, two-phase like
+- [x] `src/core/{include/tether,src}/bluetooth/lan_info.{hpp,cpp}`: `LanInfoService`, two-phase like
       `AncsAdvertisement` (export on the monitor thread, `RegisterApplication` off it)
-- [ ] Objects: `/org/tether/lan` (ObjectManager), `service0` (GattService1), `service0/char0`
+- [x] Objects: `/org/tether/lan` (ObjectManager), `service0` (GattService1), `service0/char0`
       (GattCharacteristic1, `ReadValue` honours `offset`)
-- [ ] Pure `encode_lan_info(name, port, fp, addrs)` with filtering, ordering, and the 512-byte cap
-- [ ] Owned in `src/daemon/main.cpp`, re-registered on adapter change or `bluetoothd` restart,
+- [x] Pure `encode_lan_info(name, port, fp, addrs)` with filtering, ordering, and the 512-byte cap
+- [x] Owned in `src/daemon/main.cpp`, re-registered on adapter change or `bluetoothd` restart,
       `AlreadyExists` counts as OK, silent no-op when there is no adapter or `GattManager1`
-- [ ] `test/test_lan_info.cpp`
-- [ ] BLUETOOTH.md section
+- [x] `test/test_lan_info.cpp`
+- [x] BLUETOOTH.md section ("Discovery fallback")
 
 ## Phase 2: iOS (Mac)
 
@@ -92,3 +92,39 @@ supplies an address.
   `retrieveConnectedPeripherals` list the computer?). Auto-reconnect only does the Bluetooth
   lookup once Bluetooth permission is already granted, so updating users are never prompted out
   of nowhere; the "Find over Bluetooth" button is what asks.
+
+- 2026-11-05 (Linux + iPhone 15 Pro): first spike run, both bearers up. iOS listed the computer and
+  found the service. Advertised services: `180A, 184D, 1844, 1849, 184F, 185B, 03B80E5A-...
+  (MIDI), BA7A69F7-...`. BlueZ logged one `ReadValue link=LE mtu=517 offset=0 len=193`, so the
+  whole value fit in one read and no blob read was needed. The value carried `172.17.0.1/16`
+  (docker0) next to the wifi `192.168.1.28/24`, so the same-subnet ordering is needed in practice.
+  `retrieveConnectedPeripherals(withServices: [tether])` returned 1 straight away, with no
+  fallback to the 1800/1801 control. Reported states: central 5 (poweredOn), authorization 3
+  (allowedAlways). Four reads in total, all `link=LE`.
+
+- 2026-11-05 (Linux + iPhone): BR/EDR-only test. `tetherd` was stopped and LE was held down with
+  `Bearer.LE1.Disconnect`, while BR/EDR stayed connected. The phone logged
+  `retrieve(tether service): 0` and `retrieve(1800/1801 control): 0`, and no read reached
+  BlueZ. So the app only finds the computer while LE is up. Unknown whether that is a
+  CoreBluetooth rule or only because no BR/EDR ATT channel (PSM 31) was open; there was no btmon
+  capture.
+  - What this means: Bluetooth discovery works for dual (LE) bonds, which `tetherd`'s bearer
+    supervision normally keeps up. It does not work for Type=5 / BR/EDR-only bonds. The advert
+    plus scan fallback would not help there, because `encrypt-read` needs LE keys. Document
+    this as a known limit; it is not a blocker.
+  - Also seen: with the app open, LE came back every 3-9s even with `tetherd` stopped, and it
+    stopped after the app was force-quit. CoreBluetooth `connect()` stays pending and re-dials
+    LE. `BluetoothDiscovery.swift` already cancels in both
+    `finishRead` and `complete()`; the spike does not.
+
+- 2026-11-05 (Linux): Phase 1 landed (uncommitted). `LanInfoService` exports `/org/tether/lan`,
+  watches the `org.bluez` name, and re-registers whenever bluetoothd reappears or the preferred
+  adapter changes. Every call runs async on the monitor thread. A debug `tetherd` logged
+  `LAN info service registered on /org/bluez/hci0`, and `ctest` passed 639 of 639.
+  - Differences from the plan: the service object is listed only in `GetManagedObjects`, which
+    the spike showed is enough. There is no `--bt-status` line.
+  - Hardware check: the phone's spike read returned the real fingerprint from the daemon.
+    `systemctl restart bluetooth` showed one bug: the new bluetoothd took the `org.bluez` name
+    about 20 ms before it exported hci0, so `RegisterApplication` failed with `UnknownObject`
+    and was never retried. The fix is to retry on `InterfacesAdded` carrying `GattManager1`. With
+    it, the second restart logged `adapter added` at 14:07:52.648 and `registered` at .655.

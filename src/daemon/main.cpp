@@ -10,6 +10,7 @@
 #include <ctime>
 #include <mutex>
 #include <nlohmann/json.hpp>
+#include <optional>
 #include <string_view>
 #include <sys/timerfd.h>
 #include <tether/audio.hpp>
@@ -17,6 +18,7 @@
 #include <tether/bluetooth/config.hpp>
 #include <tether/bluetooth/connection.hpp>
 #include <tether/bluetooth/contacts.hpp>
+#include <tether/bluetooth/lan_info.hpp>
 #include <tether/bluetooth/monitor.hpp>
 #include <tether/bluetooth/pairing.hpp>
 #include <tether/bluetooth/phone_audio.hpp>
@@ -132,11 +134,12 @@ int main(int argc, char** argv) {
         return 1;
     }
 
+    char hostname[256] = {};
+    gethostname(hostname, sizeof(hostname) - 1);
+
     // Advertise this daemon on the local network via mDNS
     tether::Discovery discovery;
     {
-        char hostname[256] = {};
-        gethostname(hostname, sizeof(hostname) - 1);
         std::string my_fp = tether::Crypto::instance().get_my_fingerprint();
 
         discovery.set_state_callback([](bool available) { tether::set_mdns_available(available); });
@@ -668,15 +671,26 @@ int main(int argc, char** argv) {
     };
     airpods.set_enabled(bt_config.airpods_enabled);
 
+    // Tells a bonded phone where to dial when mDNS is blocked.
+    std::optional<tether::bluetooth::LanInfoService> lan_info;
+    const auto place_lan_info = [&bluez, &lan_info]() {
+        const auto snapshot = bluez.snapshot();
+        const auto* adapter = tether::bluetooth::preferred_adapter(snapshot, bluez.preferred_adapter_id());
+        lan_info->set_adapter(adapter ? adapter->path : std::string{});
+    };
+
     if (bluez.start()) {
         tether::bluetooth::g_bluez = &bluez;
+        lan_info.emplace(bluez, hostname, port, tether::Crypto::instance().get_my_fingerprint());
+        place_lan_info();
         tether::bluetooth::g_airpods = &airpods;
         tether::g_media = &media;
         media.watch(on_local_play);
         phone_audio.configure(tether::bluetooth::supervised_address(bt_config), bt_config.phone_audio);
         tether::bluetooth::g_phone_audio = &phone_audio;
-        loop.addFd(bluez.event_fd(), [&bluez, &follow_airpods, &phone_audio](int) {
+        loop.addFd(bluez.event_fd(), [&bluez, &follow_airpods, &phone_audio, &place_lan_info](int) {
             bluez.drain();
+            place_lan_info();
             tether::broadcast_local_event(tether::build_bt_devices().dump());
             tether::broadcast_local_event(tether::build_bt_status().dump());
             follow_airpods();
@@ -781,6 +795,7 @@ int main(int argc, char** argv) {
     connections.stop();
     tether::bluetooth::g_bluez = nullptr;
     tether::bluetooth::g_phone_audio = nullptr;
+    lan_info.reset();
     bluez.stop();
     tether::g_wayland = nullptr;
     tether::g_file_manager = nullptr;

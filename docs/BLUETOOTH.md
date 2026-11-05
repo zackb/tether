@@ -903,6 +903,17 @@ nothing in the log would otherwise say so.
 Anything else on the machine speaking AAP is such a program: LibrePods, AC,
 a status-bar widget that reads battery itself. Only one of them can hold the channel.
 
+## Discovery fallback
+
+`tetherd` registers one GATT service of its own: `ba7a69f7-bf0f-4c09-8c73-cf4ee9afb5b5`, with a
+single `encrypt-read` characteristic (`...b6`). Its value lists the daemon's name, port,
+fingerprint and interface addresses. On networks that block mDNS, the Tether app reads it over
+the existing bond and dials one of the addresses over TCP. mTLS still decides trust.
+
+Only bonded devices can read it. The app finds the computer only while an LE link is up (see
+2026-11-05 below), so a BR/EDR-only bond has no fallback. Without `GattManager1` the service is
+skipped and mDNS works as before.
+
 ## Conflicts
 
 The iPhone serves one MAP session at a time. Any other program on any machine holding it will block Tether.
@@ -3996,3 +4007,36 @@ ANCS on their BR/EDR-only bonds is open: iOS version, chip, or the phone not ope
 
 Not settled: whether the iPhone reopens PSM 31 by itself after a supervision timeout and
 reconnect, or whether the host has to connect ATT over BR/EDR.
+
+### 2026-11-05 - The app can read a host GATT service, but only with LE up (#287)
+
+| | |
+|---|---|
+| BlueZ | 5.87 `--experimental`, hci0 |
+| Phone | iPhone 15 Pro, dual bond (BR/EDR + LE) |
+| Probe | `scripts/bt-discovery-spike.py` (host) and `BTSpikeView` (app, DEBUG) |
+
+This was a feasibility check for Bluetooth discovery. The host registers a GATT service with
+`GattManager1.RegisterApplication`, and the Tether app reads it with CoreBluetooth to learn the
+daemon's IPs when mDNS is blocked. Registration works as an unprivileged user, with no D-Bus
+policy change.
+
+With both bearers up, `retrieveConnectedPeripherals(withServices: [tether])` returned the
+computer at once, with no scan and no new pairing. Service discovery listed it next to `180A`,
+`184D`, `1844`, `1849`, `184F`, `185B` and MIDI. The read reached BlueZ as
+`ReadValue link=LE mtu=517 offset=0 len=193`, so a single read covered the whole value. This
+happened 4 times out of 4.
+
+With BR/EDR connected and LE held down (`tetherd` stopped, `Bearer.LE1.Disconnect` repeated),
+`retrieveConnectedPeripherals` returned 0 for the service, and 0 for `1800`/`1801` as well. No
+read reached BlueZ. So the app only finds the host while LE is up. Not settled: whether that is a
+CoreBluetooth rule, or only because no BR/EDR ATT channel (PSM 31) was open on this dual bond.
+There was no btmon capture, and on the Type=5 bond of 2026-11-05 above it was the iPhone that
+opened PSM 31.
+
+While the app was open, LE came back every 3-9 s even with `tetherd` stopped, and stopped coming
+back once the app was force-quit. A `CBCentralManager.connect` that is never cancelled keeps
+re-dialling LE, so the app has to cancel once its read is done.
+
+Decision: go. A dual bond has LE up whenever `tetherd`'s bearer supervision has it up, which
+covers the common case. Bluetooth discovery is not expected to work on BR/EDR-only bonds.
