@@ -70,11 +70,11 @@ supplies an address.
 
 ## Phase 3: wrap-up
 
-- [ ] PROTOCOL.md "Bluetooth discovery" section (the contract above)
-- [ ] README line
+- [x] PROTOCOL.md "Bluetooth discovery" section (the contract above)
+- [x] README: troubleshooting "The network blocks mDNS"
 - [ ] Hardware run: avahi stopped, auto-connect over the same-subnet IP; BR/EDR-only bond;
       wifi + docker0 picks wifi; unbonded phone refused
-- [ ] Draft #287 reply (not posted)
+- [x] Draft #287 reply (not posted; Linux box scratchpad)
 - [ ] Delete this file
 
 ## Findings
@@ -128,3 +128,17 @@ supplies an address.
     about 20 ms before it exported hci0, so `RegisterApplication` failed with `UnknownObject`
     and was never retried. The fix is to retry on `InterfacesAdded` carrying `GattManager1`. With
     it, the second restart logged `adapter added` at 14:07:52.648 and `registered` at .655.
+
+- 2026-11-05 (Linux + iPhone): Phase 3 run with avahi stopped. Auto-reconnect worked, but probably
+  through iOS's Bonjour cache. "Find over Bluetooth" and the spike both failed with `The handle is
+  invalid`.
+  - btmon showed `ATT: Read Request Handle 0x009d` answered with `Error: Invalid Handle`, and no
+    rediscovery beforehand. iOS read a handle it had cached before `tetherd`'s re-registration
+    moved the service; auto-allocated handles follow registration order, and PipeWire's LE
+    Audio and MIDI services register too.
+  - Fix: the service `Handle` is pinned at 0xf000, so the value is at 0xf002 (BlueZ uses a nonzero
+    `Handle` as given and does not write it back). After one Bluetooth off/on on the phone to
+    refresh its cache, the spike and "Find over Bluetooth" both work.
+  - Stability: after another `tetherd` restart, "Find over Bluetooth" still worked with no toggle.
+  - `bluetoothd` restart with the pinned handle: re-registered 6 ms after hci0 came back. The first Find
+    landed in the ~9 s before LE reconnected and found nothing; every Find after that worked.

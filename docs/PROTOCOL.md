@@ -227,6 +227,31 @@ The iPhone app dials on launch and is therefore reachable either way.
 
 mDNS is multicast, so it resolves nothing across a VPN such as Tailscale, or on Wi-Fi with AP isolation. When discovery returns no match, the iPhone app dials the address its last session resolved to, provided that peer's fingerprint is still in `known_hosts.json`. A handshake fingerprint that does not match the expected one means the address has moved to another machine; the session is dropped without a pairing prompt.
 
+### Bluetooth discovery
+
+When mDNS finds nothing, the iPhone app can read the daemon's addresses over the phone's existing
+Bluetooth bond. `tetherd` registers a GATT service with BlueZ:
+
+| | |
+|---|---|
+| Service | `ba7a69f7-bf0f-4c09-8c73-cf4ee9afb5b5`, pinned at handle `0xf000` |
+| Characteristic | `ba7a69f7-bf0f-4c09-8c73-cf4ee9afb5b6`, `encrypt-read`, value at `0xf002` |
+
+The value is compact UTF-8 JSON of at most 512 bytes, built fresh on every read:
+
+```json
+{"v":1,"name":"btw","port":5134,"fp":"<sha256 hex>","addrs":["192.168.1.28/24","fd12::5/64"]}
+```
+
+- `addrs` lists the up interfaces as `ip/prefix`, without loopback or IPv6 link-local, IPv4 first.
+  Entries are dropped from the end until the value fits.
+- The app dials an address on its own subnet first.
+- `fp` matches the TXT record's `fp=`. Trust is still decided by the TLS handshake, never by the
+  value read.
+- Readers ignore unknown keys. A new `v` means an incompatible change.
+- The handle is pinned because iOS reads from its cached handle table without rediscovering it,
+  and auto-allocated handles move whenever other GATT services register in a different order.
+
 ### `pair_request` (Untrusted Client -> Daemon)
 
 **Description**: Emitted natively by a new client over standard TLS to gracefully present its identity and X.509 fingerprint. The Daemon immediately intercepts the payload, extracts the fingerprint natively from the `SSL*` pipe, and flags it locally as "Pending Authentication". Anything other than `pair_request` results in the TLS socket securely disconnecting.

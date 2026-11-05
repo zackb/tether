@@ -905,8 +905,8 @@ a status-bar widget that reads battery itself. Only one of them can hold the cha
 
 ## Discovery fallback
 
-`tetherd` registers one GATT service of its own: `ba7a69f7-bf0f-4c09-8c73-cf4ee9afb5b5`, with a
-single `encrypt-read` characteristic (`...b6`). Its value lists the daemon's name, port,
+`tetherd` registers one GATT service of its own: `ba7a69f7-bf0f-4c09-8c73-cf4ee9afb5b5`, at a
+fixed handle `0xf000`, with a single `encrypt-read` characteristic (`...b6`). Its value lists the daemon's name, port,
 fingerprint and interface addresses. On networks that block mDNS, the Tether app reads it over
 the existing bond and dials one of the addresses over TCP. mTLS still decides trust.
 
@@ -4040,3 +4040,29 @@ re-dialling LE, so the app has to cancel once its read is done.
 
 Decision: go. A dual bond has LE up whenever `tetherd`'s bearer supervision has it up, which
 covers the common case. Bluetooth discovery is not expected to work on BR/EDR-only bonds.
+
+### 2026-11-05 - iOS read a stale GATT handle after re-registration (#287)
+
+Same setup as above, with the real `LanInfoService` in `tetherd` and avahi stopped. After
+`tetherd` was reinstalled, "Find over Bluetooth" reported nothing and the probe failed with `The
+handle is invalid`. btmon:
+
+```
+> ATT: Read Request (0x0a)   Handle: 0x009d
+< ATT: Error Response (0x01) Read Request (0x0a) Handle: 0x009d Error: Invalid Handle (0x01)
+```
+
+There was no service discovery before the read. iOS used its cached handle table, and the
+characteristic had moved when the service registered again. BlueZ allocates application handles
+from the bottom in registration order, and PipeWire's LE Audio (`184x`) and MIDI services
+register on this host as well. BlueZ does send Service Changed when an application is added, but
+only to clients with the CCC enabled, and here it did not refresh the phone's cache.
+
+Fixed by pinning the service's `Handle` at `0xf000` in `GetManagedObjects`. `database_add_service`
+uses a nonzero handle as given and writes it back only when it allocated the handle itself. The
+value sits at `0xf002`. One Bluetooth off/on on the phone refreshed its cache. After that, reads
+worked, and kept working across a `tetherd` restart with no toggle. After a `bluetoothd`
+restart the service registered again 6 ms after hci0 came back (14:32:03.942), but LE only
+returned with ANCS at 14:32:13. A tap in between found nothing, as expected with LE down, and every
+tap after that worked.
+

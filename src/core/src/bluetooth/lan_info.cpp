@@ -88,6 +88,12 @@ namespace tether::bluetooth {
         constexpr const char* SERVICE_PATH = "/org/tether/lan/service0";
         constexpr const char* CHAR_PATH = "/org/tether/lan/service0/char0";
 
+        // iOS caches the host's GATT handles and reads the cached one without rediscovering.
+        // Auto-allocated handles shift with registration order (PipeWire's LE Audio and MIDI
+        // services register too), so the service sits at a fixed handle high above them.
+        // The characteristic value lands at SERVICE_HANDLE + 2.
+        constexpr guint16 SERVICE_HANDLE = 0xf000;
+
         constexpr const char* LAN_XML = R"XML(
 <node>
   <interface name='org.freedesktop.DBus.ObjectManager'>
@@ -120,6 +126,7 @@ namespace tether::bluetooth {
             g_variant_builder_init(&props, G_VARIANT_TYPE("a{sv}"));
             g_variant_builder_add(&props, "{sv}", "UUID", g_variant_new_string(UUID_TETHER_LAN_SERVICE));
             g_variant_builder_add(&props, "{sv}", "Primary", g_variant_new_boolean(TRUE));
+            g_variant_builder_add(&props, "{sv}", "Handle", g_variant_new_uint16(SERVICE_HANDLE));
             g_variant_builder_add(&objects, "{o@a{sa{sv}}}", SERVICE_PATH,
                                   interfaces("org.bluez.GattService1", g_variant_builder_end(&props)));
 

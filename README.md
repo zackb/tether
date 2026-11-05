@@ -491,6 +491,13 @@ On NixOS, set `programs.tether.wifi.openFirewall = true;` instead (see the [NixO
 sudo systemctl enable --now avahi-daemon
 ```
 
+### The network blocks mDNS
+
+Some public and corporate networks block multicast, so the app never sees this machine even when
+both are on the same network. If the iPhone is paired with this machine over Bluetooth with LE
+(the setup notifications need), tap **Find over Bluetooth** in the app. It reads this machine's
+addresses over Bluetooth, and connects on its own from then on.
+
 ### Bluetooth
 
 Messages and notifications need one-time system setup. See [docs/BLUETOOTH.md](docs/BLUETOOTH.md), or run:
