@@ -562,7 +562,8 @@ final class TetherViewModel {
                 self.reconnectAttempts = 0
                 self.certificateManager.lastConnectedFingerprint = self.connection.serverFingerprint
                 if let endpoint = self.connection.resolvedEndpoint {
-                    ShareSender.persistLastEndpoint(host: endpoint.host, port: endpoint.port)
+                    // inbound remote port is tetherd's ephemeral source port, assume default 5134. TETHER_PORT users need the daemon to advertise its port in hello.
+                    ShareSender.persistLastEndpoint(host: endpoint.host, port: isInbound ? 5134 : endpoint.port)
                 }
                 self.handleConnected(isInbound: isInbound)
             case .disconnected:
