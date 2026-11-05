@@ -4014,7 +4014,7 @@ reconnect, or whether the host has to connect ATT over BR/EDR.
 |---|---|
 | BlueZ | 5.87 `--experimental`, hci0 |
 | Phone | iPhone 15 Pro, dual bond (BR/EDR + LE) |
-| Probe | `scripts/bt-discovery-spike.py` (host) and `BTSpikeView` (app, DEBUG) |
+| Probe | Throwaway GATT script (host) and a DEBUG app view, removed after this run |
 
 This was a feasibility check for Bluetooth discovery. The host registers a GATT service with
 `GattManager1.RegisterApplication`, and the Tether app reads it with CoreBluetooth to learn the

@@ -307,12 +307,6 @@ struct DashboardView: View {
                 }
 
                 bluetoothSection
-
-                #if DEBUG
-                Section {
-                    NavigationLink("Bluetooth discovery spike") { BTSpikeView() }
-                }
-                #endif
             }
             .navigationTitle("Manual Connection")
             .navigationBarTitleDisplayMode(.inline)
