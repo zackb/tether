@@ -3940,3 +3940,31 @@ before pairing. Only `0bda:8771` is listed, since it has two reports. CSR clones
 no USB ID that tells them apart from working parts.
 
 Not verified: the reporter's `LinkKey Type`.
+
+### 2026-11-04 - ANCS on a Type=5 bond, and no retry after a walk (#303)
+
+| | |
+|---|---|
+| Controller | Mac mini built-in Broadcom BCM20702 (`usb:v05ACp8289`); TP-Link UB500 also tried |
+| BlueZ | 5.87 (Linux Mint 22.3) |
+| Phone | iPhone 16, iOS 26.5 |
+| Tether | 0.3.2 |
+
+The bond's `LinkKey` was `Type=5` (P-192), and `--bt-status` showed `Bearer API: unknown`. No
+`Bearer.LE1` line appears anywhere in the log. Even so, after a re-pair ANCS reached
+`Notification mirroring is active.` That status is only set when the phone answers
+`GetAppAttributes`, so iOS had authorized access. The session dropped at the same moment as the
+`BREDR1` supervision timeout during a walk out of range.
+
+When the phone came back, BR/EDR reconnected and MAP and PBAP worked, but ANCS was never tried
+again. `sync_ancs` kept the device path only while LE read up or within
+`ANCS_BEARER_GRACE_SECONDS` of the drop. LE can never read up without a populated `Bearer.LE1`,
+so once the grace window had passed the path stayed empty. `should_hold_ancs` now also keeps
+the path while the classic link is up and there is no LE bearer, and discovery decides whether
+ANCS answers. The same gap applies on BlueZ without the bearer API (#226).
+
+Not settled: which transport carried ANCS on a bond with no LE keys from CTKD. It could be a
+separate LE pairing that BlueZ never surfaced as `Bearer.LE1`, or ATT over BR/EDR. Apple's ANCS
+spec only describes LE. The bond's `info` sections and a `btmon` capture would settle it. Also
+not verified: whether the phone offers ANCS again after a walk on the fixed build, and that an
+idle phone does not loop on rebuilds.

@@ -1224,3 +1224,25 @@ TEST(AwayLock, NeverLocksBeforeAnythingHasGoneDown) {
     const BearerStatus gone = gone_bearer();
     EXPECT_FALSE(should_lock_on_away(true, gone, false, REASON_TIMEOUT, 300, -1, 30));
 }
+
+// No Bearer.LE1, so LE never reads up; the phone walked out past the
+// grace window and came back over BR/EDR. ANCS must be tried again.
+TEST(HoldAncs, ClassicReturningHoldsWhenLeIsInvisible) {
+    BearerStatus bearer = gone_bearer();
+    const int64_t past_grace = ANCS_BEARER_GRACE_SECONDS + 60;
+    EXPECT_FALSE(should_hold_ancs(false, bearer, past_grace, 0)) << "phone still away";
+
+    bearer.classic_connected = true;
+    EXPECT_TRUE(should_hold_ancs(false, bearer, past_grace, 0));
+}
+
+// With a populated LE bearer its state is known, so classic alone does not hold.
+TEST(HoldAncs, ClassicAloneDoesNotHoldWhenLeIsVisible) {
+    BearerStatus bearer = gone_bearer();
+    bearer.classic_connected = true;
+    bearer.le_available = true;
+    const int64_t past_grace = ANCS_BEARER_GRACE_SECONDS + 60;
+    EXPECT_FALSE(should_hold_ancs(false, bearer, past_grace, 0));
+    EXPECT_TRUE(should_hold_ancs(false, bearer, ANCS_BEARER_GRACE_SECONDS - 1, 0)) << "inside the grace window";
+    EXPECT_TRUE(should_hold_ancs(true, bearer, past_grace, 0)) << "a live session holds";
+}

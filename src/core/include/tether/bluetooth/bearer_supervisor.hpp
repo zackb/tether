@@ -113,6 +113,14 @@ namespace tether::bluetooth {
         return ancs_enabled && bearer.le_available && !bearer.le_dialling && (!bearer.le_connected || link_dead);
     }
 
+    // Whether the ANCS client keeps its device path. Without a populated
+    // Bearer.LE1 the LE state is invisible, so the classic link being up is the
+    // only sign the phone is back. Discovery decides whether ANCS answers.
+    inline bool should_hold_ancs(bool ready, const BearerStatus& bearer, int64_t now, int64_t le_down_since) {
+        return ready || bearer.le_connected || (bearer.classic_connected && !bearer.le_available) ||
+               now - le_down_since < ANCS_BEARER_GRACE_SECONDS;
+    }
+
     // Whether the phone has been gone long enough, and for the right reason, to
     // lock the session.
     inline bool should_lock_on_away(bool enabled,

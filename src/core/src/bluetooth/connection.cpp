@@ -1232,7 +1232,7 @@ namespace tether::bluetooth {
         }
         // ponytail: one fixed grace window rather than per-phase tuning. Widen it
         // if a controller is seen flapping slower than this.
-        const bool hold = ready || le_up || now - le_down_since < ANCS_BEARER_GRACE_SECONDS;
+        const bool hold = should_hold_ancs(ready, bearers->status(), now, le_down_since);
 
         std::string device_path;
         bool offers_ancs = false;
