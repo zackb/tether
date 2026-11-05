@@ -26,7 +26,7 @@ supplies an address.
 
 - [x] Linux: throwaway GATT app: `scripts/bt-discovery-spike.py` (logs every read with its `link`)
 - [ ] Linux: confirm the service is reachable over BR/EDR ATT as well as LE (`btmon`, `sdptool browse local`)
-- [x] iOS: throwaway probe written: `apple/Tether/Views/BTSpikeView.swift`, under Manual Connection, DEBUG only (never compiled yet)
+- [x] iOS: throwaway probe written: `apple/Tether/Views/BTSpikeView.swift`, under Manual Connection, DEBUG only (compiles; not run on a phone yet)
 - [ ] Test: LE + BR/EDR up
 - [ ] Test: BR/EDR-only bond (Type=5, #303)
 - [ ] Test: phone just back in range
@@ -60,13 +60,13 @@ supplies an address.
 
 ## Phase 2: iOS (Mac)
 
-- [ ] `TetherFramework/BluetoothDiscovery.swift`: lazy `CBCentralManager`, `lookup() async -> [DiscoveredHost]`, 5s timeout
-- [ ] Pure `orderAddresses(addrs, phone:)`: same subnet first
-- [ ] `attemptAutoReconnect()`: Bluetooth lookup when Bonjour has no match, before the `lastEndpoint` fallback
-- [ ] "Find over Bluetooth" button in the manual-connect sheet for first-time setup
-- [ ] `.hostPort` hosts persist through `ShareSender.persistLastEndpoint` (check whether line 566 already covers this)
-- [ ] `NSBluetoothAlwaysUsageDescription` in `apple/Info.plist`, link CoreBluetooth
-- [ ] `BluetoothDiscoveryTests.swift`: address ordering and JSON decode
+- [x] `TetherFramework/BluetoothDiscovery.swift`: lazy `CBCentralManager`, `lookup() async -> [DiscoveredHost]`, 5s timeout
+- [x] Pure `orderAddresses(addrs, phone:)`: same subnet first
+- [x] `attemptAutoReconnect()`: Bluetooth lookup when Bonjour has no match, before the `lastEndpoint` fallback
+- [x] "Find over Bluetooth" button in the manual-connect sheet for first-time setup
+- [x] `.hostPort` hosts persist through `ShareSender.persistLastEndpoint` (line 566 covers it: `resolvedEndpoint` reads the path's remote endpoint for any endpoint type)
+- [x] `NSBluetoothAlwaysUsageDescription` in `apple/Info.plist` and the pbxproj `INFOPLIST_KEY_`s, CoreBluetooth auto-linked by the import
+- [x] `BluetoothDiscoveryTests.swift`: address ordering and JSON decode
 
 ## Phase 3: wrap-up
 
@@ -86,3 +86,9 @@ supplies an address.
   IPv4 and 1 IPv6 address. The iPhone was connected on both bearers at the time. Not checked:
   whether BlueZ exposes app services over BR/EDR ATT (`sdptool` is not installed); the btmon
   trace from the phone run will show it.
+
+- 2026-11-05 (Mac): Phase 2 written against the wire contract. `swift test` and the iOS app build
+  pass; not run on hardware yet, and it depends on the Phase 0 phone run (does
+  `retrieveConnectedPeripherals` list the computer?). Auto-reconnect only does the Bluetooth
+  lookup once Bluetooth permission is already granted, so updating users are never prompted out
+  of nowhere; the "Find over Bluetooth" button is what asks.

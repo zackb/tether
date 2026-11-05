@@ -14,6 +14,9 @@ struct DashboardView: View {
     @State private var manualHost = ""
     @State private var manualPort = "5134"
     @State private var showManualConnect = false
+    @State private var bluetoothHosts: [DiscoveredHost] = []
+    @State private var bluetoothSearching = false
+    @State private var bluetoothSearched = false
 
     var body: some View {
         NavigationStack {
@@ -303,6 +306,8 @@ struct DashboardView: View {
                     .disabled(manualHost.isEmpty)
                 }
 
+                bluetoothSection
+
                 #if DEBUG
                 Section {
                     NavigationLink("Bluetooth discovery spike") { BTSpikeView() }
@@ -320,11 +325,54 @@ struct DashboardView: View {
         .presentationDetents([.medium])
     }
 
+    // For networks that block mDNS: the computer reports its address over the Bluetooth bond.
+    private var bluetoothSection: some View {
+        Section {
+            Button(action: findOverBluetooth) {
+                HStack {
+                    Label("Find over Bluetooth", systemImage: "antenna.radiowaves.left.and.right")
+                    Spacer()
+                    if bluetoothSearching {
+                        ProgressView()
+                    }
+                }
+            }
+            .disabled(bluetoothSearching)
+
+            ForEach(bluetoothHosts) { host in
+                Button(host.name) {
+                    viewModel.connectTo(host: host)
+                    showManualConnect = false
+                }
+            }
+        } footer: {
+            if bluetoothSearched && !bluetoothSearching && bluetoothHosts.isEmpty {
+                Text("No computer found. Pair this iPhone with your computer in Bluetooth settings and make sure tetherd is running.")
+            }
+        }
+    }
+
     // MARK: - Helpers
+
+    private func findOverBluetooth() {
+        bluetoothSearching = true
+        Task {
+            let hosts = await viewModel.bluetooth.lookup()
+            bluetoothSearching = false
+            bluetoothSearched = true
+            bluetoothHosts = hosts
+            if hosts.count == 1 {
+                viewModel.connectTo(host: hosts[0])
+                showManualConnect = false
+            }
+        }
+    }
 
     // Seed the sheet with the address that last worked, so recovering a connection
     // discovery cannot make is a tap rather than a retype.
     private func prefillManualConnect() {
+        bluetoothHosts = []
+        bluetoothSearched = false
         guard manualHost.isEmpty, let endpoint = ShareSender.lastEndpoint() else { return }
         manualHost = endpoint.host
         manualPort = String(endpoint.port)
