@@ -56,7 +56,7 @@ TEST(ExtensionHost, WritesOutsideTheFlatpakPrivateHome) {
     fs::remove_all(real);
     fs::create_directories(real / ".mozilla");
 
-    const fs::path sandboxed = real / ".var/app/com.tether.desktop";
+    const fs::path sandboxed = real / ".var/app/io.github.zackb.tether";
     fs::create_directories(sandboxed);
 
     const auto result = tether::install_extension_host(sandboxed);

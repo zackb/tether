@@ -118,7 +118,10 @@ namespace tether {
         ExtensionHostInstall result;
         const fs::path home = host_home(requested_home);
 
-        const fs::path wrapper = home / ".local/bin/tether-native-host";
+        // A Flatpak can always write its own ~/.var/app dir, which browsers on the host can exec.
+        const std::string app_id = flatpak_app_id();
+        const fs::path wrapper = app_id.empty() ? home / ".local/bin/tether-native-host"
+                                                : home / ".var/app" / app_id / "tether-native-host";
         result.wrapper = wrapper.string();
 
         const std::string script = "#!/bin/sh\n"

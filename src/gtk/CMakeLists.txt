@@ -56,7 +56,7 @@ install(FILES tether-send.desktop
         DESTINATION ${CMAKE_INSTALL_DATADIR}/kio/servicemenus)
 
 # Software centers (GNOME Software, Discover, Flathub) read this listing.
-install(FILES com.tether.desktop.metainfo.xml
+install(FILES io.github.zackb.tether.metainfo.xml
         DESTINATION ${CMAKE_INSTALL_DATADIR}/metainfo)
 
 foreach(SIZE 16 32 48 64 128 256 512 1024)

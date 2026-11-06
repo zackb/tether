@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <component type="desktop-application">
-  <id>com.tether.desktop</id>
+  <id>io.github.zackb.tether</id>
   <metadata_license>CC0-1.0</metadata_license>
   <project_license>MIT</project_license>
   <name>Tether</name>
   <summary>Bridge your iPhone to the Linux desktop</summary>
-  <developer id="com.tether">
+  <developer id="io.github.zackb">
     <name>Zack Bartel</name>
   </developer>
   <description>
@@ -21,7 +21,7 @@
   <screenshots>
     <screenshot type="default">
       <caption>A conversation in the Messages view, with the conversation list beside it</caption>
-      <image>https://raw.githubusercontent.com/zackb/tether/main/docs/img/messages.webp</image>
+      <image>https://raw.githubusercontent.com/zackb/tether/v0.3.4/docs/img/messages.webp</image>
     </screenshot>
   </screenshots>
   <supports>
@@ -31,6 +31,13 @@
   <content_rating type="oars-1.1">
     <content_attribute id="social-chat">intense</content_attribute>
   </content_rating>
+  <branding>
+    <color type="primary" scheme_preference="light">#eaeef2</color>
+    <color type="primary" scheme_preference="dark">#21262d</color>
+  </branding>
+  <releases>
+    <release version="0.3.4" date="2026-11-05"/>
+  </releases>
   <provides>
     <binary>tether-gtk</binary>
   </provides>

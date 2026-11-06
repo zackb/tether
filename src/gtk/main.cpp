@@ -474,7 +474,7 @@ namespace {
 int main(int argc, char** argv) {
     tether::init_locale();
 
-    GtkApplication* app = gtk_application_new("com.tether.desktop", G_APPLICATION_HANDLES_COMMAND_LINE);
+    GtkApplication* app = gtk_application_new("io.github.zackb.tether", G_APPLICATION_HANDLES_COMMAND_LINE);
     g_application_add_main_option(G_APPLICATION(app),
                                   "tray",
                                   0,
