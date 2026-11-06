@@ -1,8 +1,8 @@
 # Flatpak manifest for tether.
 
-app-id: com.tether.desktop
+app-id: io.github.zackb.tether
 runtime: org.gnome.Platform
-runtime-version: "49"
+runtime-version: "51"
 sdk: org.gnome.Sdk
 command: tether-gtk
 rename-desktop-file: tether-gtk.desktop
@@ -29,7 +29,6 @@ finish-args:
   - --filesystem=~/.var/app/eu.betterbird.Betterbird/.betterbird/native-messaging-hosts:create
   - --filesystem=~/.var/app/org.chromium.Chromium/config/chromium/NativeMessagingHosts:create
   - --filesystem=~/.var/app/com.google.Chrome/config/google-chrome/NativeMessagingHosts:create
-  - --filesystem=~/.local/bin:create
 
 modules:
   - name: gtk-layer-shell
@@ -70,11 +69,20 @@ modules:
       - -DTETHER_BUILD_EXTENSIONS=OFF
       - -DTETHER_BUILD_TUI=OFF
       - -DTETHER_CAMERA=OFF
-    build-options:
-      build-args:
-        - --share=network
+      - -DFETCHCONTENT_FULLY_DISCONNECTED=ON
+      - -DFETCHCONTENT_SOURCE_DIR_JSON=/run/build/tether/_deps/json
+      - -DFETCHCONTENT_SOURCE_DIR_GOOGLETEST=/run/build/tether/_deps/googletest
     post-install:
       - rm -rf /app/share/icons/hicolor/1024x1024
     sources:
       - type: dir
         path: ../..
+      # FetchContent dependencies, since Flathub builds have no network
+      - type: archive
+        url: https://github.com/nlohmann/json/archive/refs/tags/v3.12.0.tar.gz
+        sha256: 4b92eb0c06d10683f7447ce9406cb97cd4b453be18d7279320f7b2f025c10187
+        dest: _deps/json
+      - type: archive
+        url: https://github.com/google/googletest/archive/refs/tags/v1.17.0.tar.gz
+        sha256: 65fab701d9829d38cb77c14acdc431d2108bfdbf8979e40eb8ae567edf10b27c
+        dest: _deps/googletest

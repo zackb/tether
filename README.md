@@ -159,9 +159,9 @@ Download `tether-<version>-<arch>.flatpak` from the
 
 ```bash
 flatpak install ./tether-*.flatpak
-flatpak run com.tether.desktop                                          # the GTK app
-flatpak run --command=tether com.tether.desktop --bt-setup              # the CLI
-flatpak run --command=tether com.tether.desktop --install-extension-host
+flatpak run io.github.zackb.tether                                          # the GTK app
+flatpak run --command=tether io.github.zackb.tether --bt-setup              # the CLI
+flatpak run --command=tether io.github.zackb.tether --install-extension-host
 ```
 
 Clipboard sync will most likely not work as it is a privileged protocol (`data-control`).

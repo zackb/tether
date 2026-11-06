@@ -1,15 +1,15 @@
 #!/bin/bash
 # Build a single-file Flatpak bundle of tether.
 # Needs flatpak-builder or org.flatpak.Builder,
-# and the org.gnome.Platform//49 runtime and matching SDK.
+# and the org.gnome.Platform//51 runtime and matching SDK.
 
 set -euo pipefail
 
 ROOT=$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)
-MANIFEST=$ROOT/packaging/flatpak/com.tether.desktop.yml
+MANIFEST=$ROOT/packaging/flatpak/io.github.zackb.tether.yml
 BUILD_DIR=${BUILD_DIR:-$ROOT/build/flatpak}
-APP_ID=com.tether.desktop
-RUNTIME_VERSION=49
+APP_ID=io.github.zackb.tether
+RUNTIME_VERSION=51
 
 flatpak remote-add --user --if-not-exists flathub https://flathub.org/repo/flathub.flatpakrepo
 flatpak install -y --user --noninteractive flathub \

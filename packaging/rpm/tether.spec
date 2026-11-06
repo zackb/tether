@@ -69,7 +69,7 @@ messages, calls, and notifications.
 %{_datadir}/applications/tether-gtk.desktop
 %{_datadir}/icons/hicolor/*/apps/tether*
 %{_datadir}/kio/servicemenus/tether-send.desktop
-%{_metainfodir}/com.tether.desktop.metainfo.xml
+%{_metainfodir}/io.github.zackb.tether.metainfo.xml
 %{_datadir}/tether/
 %{_mandir}/man1/tether.1*
 %{_mandir}/man1/tether-gtk.1*
