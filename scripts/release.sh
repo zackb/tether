@@ -40,7 +40,12 @@ echo "🚀 Starting release process for $TAG..."
 
 # 2. Update CMakeLists.txt version (optional but recommended)
 sed -i "s/project(tether VERSION [0-9.]*/project(tether VERSION $VERSION/" "$REPO_ROOT/CMakeLists.txt"
-git add "$REPO_ROOT/CMakeLists.txt"
+# Software centers and Flathub show the newest <release> from the metainfo
+METAINFO="$REPO_ROOT/src/gtk/io.github.zackb.tether.metainfo.xml"
+if ! grep -q "<release version=\"$VERSION\"" "$METAINFO"; then
+    sed -i "s|<releases>|<releases>\n    <release version=\"$VERSION\" date=\"$(date +%F)\"/>|" "$METAINFO"
+fi
+git add "$REPO_ROOT/CMakeLists.txt" "$METAINFO"
 git commit -m "chore: bump version to $VERSION" || true
 
 # 3. Tag and Push
@@ -115,5 +120,8 @@ if [ -d "$AUR_BIN_DIR" ]; then
 else
     echo "⚠️  Warning: $AUR_BIN_DIR not found, skipping."
 fi
+
+# 8. Flathub: its bot reads x-checker-data and opens the update PR on flathub/io.github.zackb.tether
+echo "📦 Flathub: commit for $TAG is $(git rev-parse "$TAG^{commit}")"
 
 echo "✅ Full release $VERSION successfully deployed to GitHub and AUR!"
