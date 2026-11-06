@@ -23,6 +23,7 @@ add_executable(tether_test
     test_secret_store.cpp
     secret_test_env.cpp
     test_discovery.cpp
+    test_lan_info.cpp
     test_event_loop.cpp
     test_display_width.cpp
     test_extension_host.cpp

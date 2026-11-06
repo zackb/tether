@@ -502,7 +502,7 @@
 				AUTOMATION_APPLE_EVENTS = NO;
 				CODE_SIGN_ENTITLEMENTS = Tether/Tether.entitlements;
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 18;
+				CURRENT_PROJECT_VERSION = 19;
 				DEVELOPMENT_TEAM = BN376Y4X83;
 				ENABLE_APP_SANDBOX = YES;
 				ENABLE_FILE_ACCESS_DOWNLOADS_FOLDER = readwrite;
@@ -525,6 +525,7 @@
 				INFOPLIST_FILE = Info.plist;
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.productivity";
 				INFOPLIST_KEY_LSSupportsOpeningDocumentsInPlace = YES;
+				INFOPLIST_KEY_NSBluetoothAlwaysUsageDescription = "Used to find your computer over Bluetooth when the local network hides it.";
 				INFOPLIST_KEY_NSCameraUsageDescription = "Used to stream the camera to your desktop as a webcam.";
 				INFOPLIST_KEY_NSLocalNetworkUsageDescription = "Used to discover and connect to Tether services on your local network.";
 				INFOPLIST_KEY_NSPhotoLibraryUsageDescription = "Used to send photos from your library to your desktop.";
@@ -542,7 +543,7 @@
 				LD_RUNPATH_SEARCH_PATHS = "@executable_path/Frameworks";
 				"LD_RUNPATH_SEARCH_PATHS[sdk=macosx*]" = "@executable_path/../Frameworks";
 				MACOSX_DEPLOYMENT_TARGET = 26.3;
-				MARKETING_VERSION = 1.5.1;
+				MARKETING_VERSION = 1.5.2;
 				PRODUCT_BUNDLE_IDENTIFIER = net.jeedup.Tether;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				REGISTER_APP_GROUPS = YES;
@@ -574,7 +575,7 @@
 				AUTOMATION_APPLE_EVENTS = NO;
 				CODE_SIGN_ENTITLEMENTS = Tether/Tether.entitlements;
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 18;
+				CURRENT_PROJECT_VERSION = 19;
 				DEVELOPMENT_TEAM = BN376Y4X83;
 				ENABLE_APP_SANDBOX = YES;
 				ENABLE_FILE_ACCESS_DOWNLOADS_FOLDER = readwrite;
@@ -597,6 +598,7 @@
 				INFOPLIST_FILE = Info.plist;
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.productivity";
 				INFOPLIST_KEY_LSSupportsOpeningDocumentsInPlace = YES;
+				INFOPLIST_KEY_NSBluetoothAlwaysUsageDescription = "Used to find your computer over Bluetooth when the local network hides it.";
 				INFOPLIST_KEY_NSCameraUsageDescription = "Used to stream the camera to your desktop as a webcam.";
 				INFOPLIST_KEY_NSLocalNetworkUsageDescription = "Used to discover and connect to Tether services on your local network.";
 				INFOPLIST_KEY_NSPhotoLibraryUsageDescription = "Used to send photos from your library to your desktop.";
@@ -614,7 +616,7 @@
 				LD_RUNPATH_SEARCH_PATHS = "@executable_path/Frameworks";
 				"LD_RUNPATH_SEARCH_PATHS[sdk=macosx*]" = "@executable_path/../Frameworks";
 				MACOSX_DEPLOYMENT_TARGET = 26.3;
-				MARKETING_VERSION = 1.5.1;
+				MARKETING_VERSION = 1.5.2;
 				PRODUCT_BUNDLE_IDENTIFIER = net.jeedup.Tether;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				REGISTER_APP_GROUPS = YES;
@@ -745,13 +747,13 @@
 			buildSettings = {
 				CODE_SIGN_ENTITLEMENTS = TetherShareExtension/TetherShareExtension.entitlements;
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 18;
+				CURRENT_PROJECT_VERSION = 19;
 				DEVELOPMENT_TEAM = BN376Y4X83;
 				GENERATE_INFOPLIST_FILE = NO;
 				INFOPLIST_FILE = TetherShareExtension/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
 				LD_RUNPATH_SEARCH_PATHS = "@executable_path/../../Frameworks";
-				MARKETING_VERSION = 1.5.1;
+				MARKETING_VERSION = 1.5.2;
 				PRODUCT_BUNDLE_IDENTIFIER = net.jeedup.Tether.ShareExtension;
 				PRODUCT_NAME = TetherShareExtension;
 				SDKROOT = iphoneos;
@@ -770,13 +772,13 @@
 			buildSettings = {
 				CODE_SIGN_ENTITLEMENTS = TetherShareExtension/TetherShareExtension.entitlements;
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 18;
+				CURRENT_PROJECT_VERSION = 19;
 				DEVELOPMENT_TEAM = BN376Y4X83;
 				GENERATE_INFOPLIST_FILE = NO;
 				INFOPLIST_FILE = TetherShareExtension/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
 				LD_RUNPATH_SEARCH_PATHS = "@executable_path/../../Frameworks";
-				MARKETING_VERSION = 1.5.1;
+				MARKETING_VERSION = 1.5.2;
 				PRODUCT_BUNDLE_IDENTIFIER = net.jeedup.Tether.ShareExtension;
 				PRODUCT_NAME = TetherShareExtension;
 				SDKROOT = iphoneos;

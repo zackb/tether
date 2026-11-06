@@ -139,6 +139,7 @@ final class TetherViewModel {
 
     let certificateManager = CertificateManager()
     let discovery = BonjourDiscovery()
+    let bluetooth = BluetoothDiscovery()
     let connection = TetherConnection()
     let server = TetherServer()
     let camera = CameraStreamer()
@@ -148,6 +149,7 @@ final class TetherViewModel {
     private var hasInitialized = false
     private var pendingReconnectTask: Task<Void, Never>?
     private var connectTimeoutTask: Task<Void, Never>?
+    private var bluetoothLookupTask: Task<Void, Never>?
     private var autoConnectingFingerprint: String?
 
     // Direction of the current transport, set only from the connection state.
@@ -231,6 +233,8 @@ final class TetherViewModel {
             pendingReconnectTask = nil
             connectTimeoutTask?.cancel()
             connectTimeoutTask = nil
+            bluetoothLookupTask?.cancel()
+            bluetoothLookupTask = nil
             // iOS takes the camera from background apps
             camera.stop()
             suspendForBackground()
@@ -260,7 +264,10 @@ final class TetherViewModel {
         appState = .connecting
         connectedDeviceName = host.name
         // Persist the service name so the Share Extension can connect without discovery.
-        ShareSender.persistLastServiceName(host.name)
+        // A Bluetooth-found host's name is not a Bonjour service name.
+        if case .service = host.endpoint {
+            ShareSender.persistLastServiceName(host.name)
+        }
         connection.connect(to: host.endpoint, identity: identity)
         startConnectTimeout()
     }
@@ -286,6 +293,8 @@ final class TetherViewModel {
         pendingReconnectTask = nil
         connectTimeoutTask?.cancel()
         connectTimeoutTask = nil
+        bluetoothLookupTask?.cancel()
+        bluetoothLookupTask = nil
         reconnectAttempts = 0
         autoConnectingFingerprint = nil
         certificateManager.lastConnectedFingerprint = nil // Also clear last connection
@@ -716,11 +725,41 @@ final class TetherViewModel {
         }
 
         // discovery found nothing.
-        guard let targetFingerprint, certificateManager.isHostKnown(targetFingerprint),
-              let endpoint = ShareSender.lastEndpoint() else { return }
+        guard let targetFingerprint, certificateManager.isHostKnown(targetFingerprint) else { return }
 
+        // mDNS may be blocked: ask the daemon for its addresses over the Bluetooth bond.
+        // Only once permission is granted, so a reconnect never raises the prompt.
+        guard BluetoothDiscovery.isAuthorized else {
+            dialKnownHost(targetFingerprint, bluetoothHosts: [])
+            return
+        }
+        guard bluetoothLookupTask == nil else { return }
+        bluetoothLookupTask = Task { [weak self] in
+            guard let bluetooth = self?.bluetooth else { return }
+            let hosts = await bluetooth.lookup()
+            await MainActor.run {
+                guard let self, !Task.isCancelled else { return }
+                self.bluetoothLookupTask = nil
+                self.dialKnownHost(targetFingerprint, bluetoothHosts: hosts)
+            }
+        }
+    }
+
+    // Dial a pinned host Bonjour did not find: its Bluetooth-reported address, else the last
+    // endpoint that worked.
+    private func dialKnownHost(_ fingerprint: String, bluetoothHosts: [DiscoveredHost]) {
+        guard shouldAutoReconnect, certificateManager.lastConnectedFingerprint == fingerprint else { return }
+
+        if let host = bluetoothHosts.first(where: { $0.fingerprint == fingerprint }) {
+            reconnectAttempts += 1
+            autoConnectingFingerprint = fingerprint
+            connectTo(host: host)
+            return
+        }
+
+        guard let endpoint = ShareSender.lastEndpoint() else { return }
         reconnectAttempts += 1
-        autoConnectingFingerprint = targetFingerprint
+        autoConnectingFingerprint = fingerprint
         connectTo(host: endpoint.host, port: endpoint.port)
     }
 

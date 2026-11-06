@@ -8,6 +8,8 @@
 	<array>
 		<string>_tether._tcp</string>
 	</array>
+	<key>NSBluetoothAlwaysUsageDescription</key>
+	<string>Used to find your computer over Bluetooth when the local network hides it.</string>
 	<key>NSCameraUsageDescription</key>
 	<string>Used to stream the camera to your desktop as a webcam.</string>
 	<key>NSLocalNetworkUsageDescription</key>

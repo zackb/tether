@@ -903,6 +903,17 @@ nothing in the log would otherwise say so.
 Anything else on the machine speaking AAP is such a program: LibrePods, AC,
 a status-bar widget that reads battery itself. Only one of them can hold the channel.
 
+## Discovery fallback
+
+`tetherd` registers one GATT service of its own: `ba7a69f7-bf0f-4c09-8c73-cf4ee9afb5b5`, at a
+fixed handle `0xf000`, with a single `encrypt-read` characteristic (`...b6`). Its value lists the daemon's name, port,
+fingerprint and interface addresses. On networks that block mDNS, the Tether app reads it over
+the existing bond and dials one of the addresses over TCP. mTLS still decides trust.
+
+Only bonded devices can read it. The app finds the computer only while an LE link is up (see
+2026-11-05 below), so a BR/EDR-only bond has no fallback. Without `GattManager1` the service is
+skipped and mDNS works as before.
+
 ## Conflicts
 
 The iPhone serves one MAP session at a time. Any other program on any machine holding it will block Tether.
@@ -972,8 +983,8 @@ checks the daemon does not make.
 | LE never connects and the log repeats `le-connection-abort-by-local` | Something on this side is cancelling the connection. Tether's own cause was a `PreferredBearer` write racing the async connect, fixed; anything else writing that property during a connect will do the same | Check no other Bluetooth tool is driving the same device. The phone is not the cause: `abort-by-local` means the local host cancelled |
 | Messages stopped after turning notification mirroring off | Fixed. The toggle used to restart supervision, which abandoned the MAP and PBAP sessions at obexd instead of removing them, and the iPhone serves one MAP session at a time | Nothing. Mirroring is switched in place now, and a dropped profile supervisor releases its sessions. On an older build, restart `tetherd` |
 | Notifications stopped and never came back, while messages and contacts kept working | Fixed. The bearer supervisor used to stop retrying LE after six attempts, and only a Classic drop or a daemon restart re-armed it | Nothing. The solicitation is kept on air whenever LE is down, which is what the iPhone answers -- see 2026-08-22 |
-| `tether --bt-status` reports `Bond: BR/EDR only` | The bond was made without cross-transport key derivation, so it has no LE half and can never carry ANCS | Forget this computer on the iPhone and pair again -- it can take more than one attempt, the derivation is flaky on identical inputs (2026-08-25). Check `secure-connections` in the same output first: re-pairing cannot help while it is off. `on` does not prove BR/EDR Secure Connections, though: a `LinkKey` `Type` of 4 or 5 in the bond's info file under `/var/lib/bluetooth` means the controller paired without it, and re-pairing on that controller cannot help -- use another with `tether --bt-adapter <hciN>`, see 2026-10-17 |
-| `tether --bt-status` reports `Bond: BR/EDR, notifications live` | BlueZ is too old for the bearer API (5.72 in #226), so it cannot show an LE half, but ANCS is subscribed and delivering | Nothing. The BR/EDR-only warning is held back while ANCS is live, and comes back while the phone is away |
+| `tether --bt-status` reports `Bond: BR/EDR only` | The bond was made without cross-transport key derivation, so it has no LE half. ANCS can still run over BR/EDR if the iPhone opens ATT there (2026-11-05), but it did not for #255 or #301 | Forget this computer on the iPhone and pair again -- it can take more than one attempt, the derivation is flaky on identical inputs (2026-08-25). Check `secure-connections` in the same output first: re-pairing cannot help while it is off. `on` does not prove BR/EDR Secure Connections, though: a `LinkKey` `Type` of 4 or 5 in the bond's info file under `/var/lib/bluetooth` means the controller paired without it, and re-pairing on that controller cannot help -- use another with `tether --bt-adapter <hciN>`, see 2026-10-17 |
+| `tether --bt-status` reports `Bond: BR/EDR, notifications live` | The bond has no visible LE half (no bearer API on 5.72 in #226, or none at all in #303), but ANCS is subscribed and delivering, over BR/EDR ATT in #303 | Nothing. The BR/EDR-only warning is held back while ANCS is live, and comes back while the phone is away |
 | Walked back into range and nothing reconnected for minutes | Fixed. The ANCS advert was gated on the Classic link, and the Classic backoff had no event that ended the absence | Nothing. The advert stays on air whenever LE is down, and an LE link coming up clears the Classic backoff -- see 2026-08-22 |
 | Startup logs `StartNotify not ready yet (InProgress)` for up to a minute | GATT discovery is still running on the new LE link | Nothing. It subscribes on its own. Only treat it as the 2026-08-19 hang if the LE link never comes up |
 | `tether --bt-connection` reports LE and messages up but `Notifications: no`, for hours | Fixed. The LE link was opened by the dial and carries no ANCS. A connected link used to take the solicitation off air, so the phone was never asked for the service | Nothing. The advert goes back on air over a link that has stayed up without ANCS -- see 2026-08-23. To clear it by hand on an older build, `tether --bt-solicit`; do not re-pair, and do not cycle the phone's Bluetooth |
@@ -3965,6 +3976,93 @@ ANCS answers. The same gap applies on BlueZ without the bearer API (#226).
 
 Not settled: which transport carried ANCS on a bond with no LE keys from CTKD. It could be a
 separate LE pairing that BlueZ never surfaced as `Bearer.LE1`, or ATT over BR/EDR. Apple's ANCS
-spec only describes LE. The bond's `info` sections and a `btmon` capture would settle it. Also
+spec only describes LE. Settled 2026-11-05: ATT over BR/EDR, see below. Also
 not verified: whether the phone offers ANCS again after a walk on the fixed build, and that an
 idle phone does not loop on rebuilds.
+
+### 2026-11-05 - The iPhone ran ANCS over BR/EDR ATT (#303)
+
+Same setup as 2026-11-04. The bond `info` file has `SupportedTechnologies=BR/EDR;`, a
+`[LinkKey]` of `Type=5`, no `[LongTermKey]`, and `[ServiceChanged] CCC_BR/EDR=2`.
+
+The reporter's btmon capture of a re-pair through to live notifications has 26,670 lines and
+contains no `LE-ACL` frame and no LE Meta event at all. Sequence on `BR-ACL` handle 12:
+
+- The link key is `Authenticated Combination key from P-192 (0x05)` and encryption is E0.
+- 4 s after Connect Complete, the **iPhone** sends an L2CAP Connection Request for PSM 31 (ATT).
+- GATT discovery runs over that channel in both directions. It finds the ANCS service
+  `7905f431-…` with Control Point `69d1d8f3-…`, Notification Source `9fbf120d-…` and Data
+  Source `22eac6e9-…`.
+- Tether writes the CCCs (0x0029, 0x002c) and sends Control Point `GetAppAttributes` /
+  `GetNotificationAttributes` writes. The phone sends 49 Notification Source `Handle Value
+  Notification`s and the Data Source answers. All of it is on PSM 31 over BR/EDR.
+
+The reporter confirms the popups arrived on the desktop.
+
+So iOS (26.5 here) offers ANCS over BR/EDR ATT, and a bond with no LE keys can still carry
+notifications. The BR/EDR-only warnings, the README adapter section and
+`CONTROLLERS_WITHOUT_BREDR_SC` all assume the opposite. Why #255 and #301 (iOS 27.2) never got
+ANCS on their BR/EDR-only bonds is open: iOS version, chip, or the phone not opening PSM 31.
+`05ac:8289` stays off the known-bad list.
+
+Not settled: whether the iPhone reopens PSM 31 by itself after a supervision timeout and
+reconnect, or whether the host has to connect ATT over BR/EDR.
+
+### 2026-11-05 - The app can read a host GATT service, but only with LE up (#287)
+
+| | |
+|---|---|
+| BlueZ | 5.87 `--experimental`, hci0 |
+| Phone | iPhone 15 Pro, dual bond (BR/EDR + LE) |
+| Probe | Throwaway GATT script (host) and a DEBUG app view, removed after this run |
+
+This was a feasibility check for Bluetooth discovery. The host registers a GATT service with
+`GattManager1.RegisterApplication`, and the Tether app reads it with CoreBluetooth to learn the
+daemon's IPs when mDNS is blocked. Registration works as an unprivileged user, with no D-Bus
+policy change.
+
+With both bearers up, `retrieveConnectedPeripherals(withServices: [tether])` returned the
+computer at once, with no scan and no new pairing. Service discovery listed it next to `180A`,
+`184D`, `1844`, `1849`, `184F`, `185B` and MIDI. The read reached BlueZ as
+`ReadValue link=LE mtu=517 offset=0 len=193`, so a single read covered the whole value. This
+happened 4 times out of 4.
+
+With BR/EDR connected and LE held down (`tetherd` stopped, `Bearer.LE1.Disconnect` repeated),
+`retrieveConnectedPeripherals` returned 0 for the service, and 0 for `1800`/`1801` as well. No
+read reached BlueZ. So the app only finds the host while LE is up. Not settled: whether that is a
+CoreBluetooth rule, or only because no BR/EDR ATT channel (PSM 31) was open on this dual bond.
+There was no btmon capture, and on the Type=5 bond of 2026-11-05 above it was the iPhone that
+opened PSM 31.
+
+While the app was open, LE came back every 3-9 s even with `tetherd` stopped, and stopped coming
+back once the app was force-quit. A `CBCentralManager.connect` that is never cancelled keeps
+re-dialling LE, so the app has to cancel once its read is done.
+
+Decision: go. A dual bond has LE up whenever `tetherd`'s bearer supervision has it up, which
+covers the common case. Bluetooth discovery is not expected to work on BR/EDR-only bonds.
+
+### 2026-11-05 - iOS read a stale GATT handle after re-registration (#287)
+
+Same setup as above, with the real `LanInfoService` in `tetherd` and avahi stopped. After
+`tetherd` was reinstalled, "Find over Bluetooth" reported nothing and the probe failed with `The
+handle is invalid`. btmon:
+
+```
+> ATT: Read Request (0x0a)   Handle: 0x009d
+< ATT: Error Response (0x01) Read Request (0x0a) Handle: 0x009d Error: Invalid Handle (0x01)
+```
+
+There was no service discovery before the read. iOS used its cached handle table, and the
+characteristic had moved when the service registered again. BlueZ allocates application handles
+from the bottom in registration order, and PipeWire's LE Audio (`184x`) and MIDI services
+register on this host as well. BlueZ does send Service Changed when an application is added, but
+only to clients with the CCC enabled, and here it did not refresh the phone's cache.
+
+Fixed by pinning the service's `Handle` at `0xf000` in `GetManagedObjects`. `database_add_service`
+uses a nonzero handle as given and writes it back only when it allocated the handle itself. The
+value sits at `0xf002`. One Bluetooth off/on on the phone refreshed its cache. After that, reads
+worked, and kept working across a `tetherd` restart with no toggle. After a `bluetoothd`
+restart the service registered again 6 ms after hci0 came back (14:32:03.942), but LE only
+returned with ANCS at 14:32:13. A tap in between found nothing, as expected with LE down, and every
+tap after that worked.
+

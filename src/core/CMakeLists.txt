@@ -20,6 +20,7 @@ add_library(tether STATIC
     src/bluetooth/config.cpp
     src/bluetooth/agent.cpp
     src/bluetooth/advert.cpp
+    src/bluetooth/lan_info.cpp
     src/bluetooth/pairing.cpp
     src/bluetooth/bearer_supervisor.cpp
     src/bluetooth/profile_supervisor.cpp
