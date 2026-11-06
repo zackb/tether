@@ -17,6 +17,7 @@ TAG="v$VERSION"
 REPO_ROOT=$(git rev-parse --show-toplevel)
 AUR_GIT_DIR="$REPO_ROOT/../tether-git"
 AUR_BIN_DIR="$REPO_ROOT/../tether-bin"
+DEPENDS=$(grep '^depends=' "$REPO_ROOT/PKGBUILD")
 
 # 1. Validation
 if ! command -v gh &> /dev/null; then
@@ -79,6 +80,8 @@ gh release download "$TAG" --pattern "tether-$VERSION.tar.gz" --dir "$ASSET_DIR"
 if [ -d "$AUR_GIT_DIR" ]; then
     echo "🧬 Updating tether-git AUR..."
     sed -i "s/^pkgver=.*/pkgver=$VERSION/" "$AUR_GIT_DIR/PKGBUILD"
+    sed -i "s/^pkgrel=.*/pkgrel=1/" "$AUR_GIT_DIR/PKGBUILD"
+    sed -i "s/^depends=.*/$DEPENDS/" "$AUR_GIT_DIR/PKGBUILD"
     cp "$REPO_ROOT/packaging/tether.install" "$AUR_GIT_DIR/tether.install"
     (
         cd "$AUR_GIT_DIR"
@@ -97,6 +100,8 @@ if [ -d "$AUR_BIN_DIR" ]; then
     echo "🏗️  Updating tether-bin AUR..."
     SHA256=$(sha256sum "$TARBALL" | cut -d' ' -f1)
     sed -i "s/^pkgver=.*/pkgver=$VERSION/" "$AUR_BIN_DIR/PKGBUILD"
+    sed -i "s/^pkgrel=.*/pkgrel=1/" "$AUR_BIN_DIR/PKGBUILD"
+    sed -i "s/^depends=.*/$DEPENDS/" "$AUR_BIN_DIR/PKGBUILD"
     sed -i "s/^sha256sums=.*/sha256sums=('$SHA256')/" "$AUR_BIN_DIR/PKGBUILD"
     cp "$REPO_ROOT/packaging/tether.install" "$AUR_BIN_DIR/tether.install"
     (
