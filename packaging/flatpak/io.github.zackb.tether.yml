@@ -17,9 +17,7 @@ finish-args:
   - --system-talk-name=org.freedesktop.Avahi # Bonjour, so the iPhone finds this PC
   - --talk-name=org.bluez.obex # MAP messages and PBAP contacts
   - --talk-name=org.freedesktop.Notifications
-  - --talk-name=org.freedesktop.secrets # the key for the encrypted message store
   - --filesystem=xdg-download # where received files go
-  - --filesystem=xdg-run/tether:create
   - --allow=bluetooth
 
 modules:

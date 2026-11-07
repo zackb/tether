@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: tether\n"
 "Report-Msgid-Bugs-To: zack@bartel.com\n"
-"POT-Creation-Date: 2026-11-03 18:33-0800\n"
+"POT-Creation-Date: 2026-11-06 17:42-0800\n"
 "PO-Revision-Date: 2026-08-23\n"
 "Last-Translator: Tether project\n"
 "Language-Team: Korean\n"
@@ -336,6 +336,14 @@ msgstr "예제:"
 #, c-format
 msgid "Installed %s\n"
 msgstr "%s 설치됨\n"
+
+#: src/cli/main.cpp
+#, c-format
+msgid ""
+"The Flatpak cannot see any browser or mail client yet. For each one you use, "
+"run its line, then run this again:\n"
+"\n"
+msgstr "Flatpak에서 아직 브라우저나 메일 클라이언트를 볼 수 없습니다. 사용하는 각 프로그램의 줄을 실행한 다음 이 명령을 다시 실행하세요:\n\n"
 
 #: src/cli/main.cpp
 #, c-format

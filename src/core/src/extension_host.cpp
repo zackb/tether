@@ -168,6 +168,17 @@ namespace tether {
         return result;
     }
 
+    std::vector<std::string> extension_host_overrides() {
+        std::vector<std::string> commands;
+        const std::string app_id = flatpak_app_id();
+        if (app_id.empty())
+            return commands;
+        for (const auto& target : kTargets)
+            commands.push_back("flatpak override --user --filesystem=~/" + std::string(target.dir) + ":create " +
+                               app_id);
+        return commands;
+    }
+
     ExtensionHostInstall install_extension_host() {
         const char* home = std::getenv("HOME");
         if (!home || !*home) {

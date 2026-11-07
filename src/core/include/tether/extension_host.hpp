@@ -18,4 +18,8 @@ namespace tether {
     ExtensionHostInstall install_extension_host(const std::filesystem::path& home);
     ExtensionHostInstall install_extension_host();
 
+    // Inside a Flatpak, one `flatpak override` command per browser directory
+    // the sandbox needs before the manifests can be written. Empty outside one.
+    std::vector<std::string> extension_host_overrides();
+
 } // namespace tether

@@ -32,6 +32,7 @@
 #include "tether/file_transfer.hpp"
 #include "tether/otp.hpp"
 #include "tether/paths.hpp"
+#include "tether/service.hpp"
 #include "tether/wayland.hpp"
 #include <algorithm>
 #include <atomic>
@@ -1128,6 +1129,10 @@ namespace tether {
                 throw std::runtime_error("XDG_RUNTIME_DIR is not set");
             base = fallback;
         }
+        // each flatpak instance gets a private runtime dir, app/<id> is one shared by all of them
+        // the host obexd sees it at the same path.
+        if (const std::string app_id = flatpak_app_id(); !app_id.empty())
+            base /= std::filesystem::path("app") / app_id;
         std::filesystem::path tether_dir = base / "tether";
         if (!std::filesystem::exists(tether_dir)) {
             std::filesystem::create_directories(tether_dir);

@@ -2,6 +2,7 @@
 #include "tether/base64.hpp"
 #include "tether/log.hpp"
 #include "tether/paths.hpp"
+#include "tether/service.hpp"
 
 #include <chrono>
 #include <cstdlib>
@@ -91,8 +92,34 @@ namespace tether {
                 NoService,   // nothing on the bus
             };
 
+            // inside a flatpak libsecret keeps items in an app private keyring file sealed by the secret portal
+            KeyLookup key_from_portal(std::vector<unsigned char>& out) {
+                GError* err = nullptr;
+                gchar* text =
+                    secret_password_lookup_sync(store_schema(), nullptr, &err, "application", "tether", nullptr);
+                if (err) {
+                    debug::log(WARN, "secret: portal lookup failed: {}", err->message);
+                    g_error_free(err);
+                    // keyring file on disk, key might be in it, do not replace
+                    std::error_code ec;
+                    const auto keyring = std::filesystem::path(g_get_user_data_dir()) / "keyrings" / "default.keyring";
+                    return std::filesystem::exists(keyring, ec) ? KeyLookup::Locked : KeyLookup::NoService;
+                }
+                if (!text)
+                    return KeyLookup::Absent;
+                auto decoded = base64_decode(text);
+                secret_password_free(text);
+                if (decoded.size() != KEY_BYTES)
+                    return KeyLookup::Locked;
+                out = std::move(decoded);
+                return KeyLookup::Found;
+            }
+
             // Reads the key out of the desktop secret service without unlocking it.
             KeyLookup key_from_service(std::vector<unsigned char>& out) {
+                if (!flatpak_app_id().empty())
+                    return key_from_portal(out);
+
                 GError* err = nullptr;
                 SecretService* service = secret_service_get_sync(SECRET_SERVICE_OPEN_SESSION, nullptr, &err);
                 if (!service) {
