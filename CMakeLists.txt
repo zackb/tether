@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.19)
+cmake_minimum_required(VERSION 3.24)
 project(tether VERSION 0.3.5 LANGUAGES CXX C)
 
 set(CMAKE_CXX_STANDARD 20)
@@ -38,27 +38,30 @@ pkg_check_modules(SECRET REQUIRED IMPORTED_TARGET libsecret-1)
 include(FetchContent)
 
 FetchContent_Declare(
-  json
+  nlohmann_json
   GIT_REPOSITORY https://github.com/nlohmann/json.git
   GIT_TAG v3.12.0
   GIT_SHALLOW ON
+  FIND_PACKAGE_ARGS 3.12
 )
 set(JSON_Install OFF CACHE BOOL "" FORCE)
-FetchContent_MakeAvailable(json)
+FetchContent_MakeAvailable(nlohmann_json)
 
-FetchContent_Declare(
-  googletest
-  GIT_REPOSITORY https://github.com/google/googletest.git
-  GIT_TAG v1.17.0
-  GIT_SHALLOW ON
-)
-set(gtest_force_shared_crt ON CACHE BOOL "" FORCE)
-set(INSTALL_GTEST OFF CACHE BOOL "" FORCE)
-set(CMAKE_WARN_DEPRECATED OFF CACHE BOOL "" FORCE)
-FetchContent_MakeAvailable(googletest)
-set(CMAKE_WARN_DEPRECATED ON CACHE BOOL "" FORCE)
-
-enable_testing()
+option(BUILD_TESTING "Build the unit tests (fetches googletest)" ON)
+if(BUILD_TESTING)
+    FetchContent_Declare(
+      googletest
+      GIT_REPOSITORY https://github.com/google/googletest.git
+      GIT_TAG v1.17.0
+      GIT_SHALLOW ON
+    )
+    set(gtest_force_shared_crt ON CACHE BOOL "" FORCE)
+    set(INSTALL_GTEST OFF CACHE BOOL "" FORCE)
+    set(CMAKE_WARN_DEPRECATED OFF CACHE BOOL "" FORCE)
+    FetchContent_MakeAvailable(googletest)
+    set(CMAKE_WARN_DEPRECATED ON CACHE BOOL "" FORCE)
+    enable_testing()
+endif()
 
 option(TETHER_BUILD_TUI "Build the tether-tui terminal front end (needs ncursesw)" ON)
 option(TETHER_CAMERA "Publish the iPhone camera as a PipeWire video source (needs libavcodec, libpipewire)" ON)
@@ -66,7 +69,9 @@ option(TETHER_CAMERA "Publish the iPhone camera as a PipeWire video source (need
 # subdirectories for the targets
 add_subdirectory(src)
 add_subdirectory(po)
-add_subdirectory(test)
+if(BUILD_TESTING)
+    add_subdirectory(test)
+endif()
 
 # Add uninstall target
 if(NOT TARGET uninstall)
