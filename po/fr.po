@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: tether\n"
 "Report-Msgid-Bugs-To: zack@bartel.com\n"
-"POT-Creation-Date: 2026-11-03 18:33-0800\n"
+"POT-Creation-Date: 2026-11-06 17:42-0800\n"
 "PO-Revision-Date: 2026-08-22\n"
 "Last-Translator: Tether project\n"
 "Language-Team: French\n"
@@ -350,6 +350,14 @@ msgstr "Exemples :"
 #, c-format
 msgid "Installed %s\n"
 msgstr "%s installé\n"
+
+#: src/cli/main.cpp
+#, c-format
+msgid ""
+"The Flatpak cannot see any browser or mail client yet. For each one you use, "
+"run its line, then run this again:\n"
+"\n"
+msgstr "Le Flatpak ne voit encore aucun navigateur ni client de messagerie. Pour chacun de ceux que vous utilisez, exécutez sa ligne, puis relancez cette commande :\n\n"
 
 #: src/cli/main.cpp
 #, c-format
@@ -3005,7 +3013,8 @@ msgstr "Partager le presse-papiers automatiquement"
 
 #: src/gtk/settings_view.cpp src/tui/settings.cpp
 msgid "Off sends it only from Send Clipboard or tether share."
-msgstr "Désactivé, il n’est envoyé que via Envoyer le presse-papiers ou tether share."
+msgstr ""
+"Désactivé, il n’est envoyé que via Envoyer le presse-papiers ou tether share."
 
 #: src/gtk/settings_view.cpp
 msgid "SMS and iMessage conversations synced over Bluetooth."

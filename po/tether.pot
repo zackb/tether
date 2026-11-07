@@ -6,9 +6,9 @@
 #, fuzzy
 msgid ""
 msgstr ""
-"Project-Id-Version: tether 0.3.2\n"
+"Project-Id-Version: tether 0.3.5\n"
 "Report-Msgid-Bugs-To: zack@bartel.com\n"
-"POT-Creation-Date: 2026-11-03 18:33-0800\n"
+"POT-Creation-Date: 2026-11-06 17:42-0800\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -308,6 +308,14 @@ msgstr ""
 #: src/cli/main.cpp
 #, c-format
 msgid "Installed %s\n"
+msgstr ""
+
+#: src/cli/main.cpp
+#, c-format
+msgid ""
+"The Flatpak cannot see any browser or mail client yet. For each one you use, "
+"run its line, then run this again:\n"
+"\n"
 msgstr ""
 
 #: src/cli/main.cpp

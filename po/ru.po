@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: tether\n"
 "Report-Msgid-Bugs-To: zack@bartel.com\n"
-"POT-Creation-Date: 2026-11-03 18:33-0800\n"
+"POT-Creation-Date: 2026-11-06 17:42-0800\n"
 "PO-Revision-Date: 2026-08-23\n"
 "Last-Translator: Tether project\n"
 "Language-Team: Russian\n"
@@ -345,6 +345,14 @@ msgstr "Примеры:"
 #, c-format
 msgid "Installed %s\n"
 msgstr "Установлено %s\n"
+
+#: src/cli/main.cpp
+#, c-format
+msgid ""
+"The Flatpak cannot see any browser or mail client yet. For each one you use, "
+"run its line, then run this again:\n"
+"\n"
+msgstr "Flatpak пока не видит ни одного браузера или почтового клиента. Для каждого, которым вы пользуетесь, выполните его строку, а затем запустите эту команду снова:\n\n"
 
 #: src/cli/main.cpp
 #, c-format
@@ -2981,7 +2989,9 @@ msgstr "Автоматически делиться буфером обмена"
 
 #: src/gtk/settings_view.cpp src/tui/settings.cpp
 msgid "Off sends it only from Send Clipboard or tether share."
-msgstr "Если выключено, буфер отправляется только кнопкой «Отправить буфер обмена» или командой tether share."
+msgstr ""
+"Если выключено, буфер отправляется только кнопкой «Отправить буфер обмена» "
+"или командой tether share."
 
 #: src/gtk/settings_view.cpp
 msgid "SMS and iMessage conversations synced over Bluetooth."

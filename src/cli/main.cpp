@@ -345,6 +345,14 @@ static int print_extension_host_install() {
         return 1;
 
     if (result.written.empty()) {
+        if (const auto overrides = tether::extension_host_overrides(); !overrides.empty()) {
+            fprintf(stdout,
+                    _("The Flatpak cannot see any browser or mail client yet. For each one you use, run its line, then "
+                      "run this again:\n\n"));
+            for (const auto& command : overrides)
+                fprintf(stdout, "  %s\n", command.c_str());
+            return 1;
+        }
         fprintf(stdout,
                 _("No browser or mail client profile was found for this user, so nothing was installed. Start "
                   "Firefox, Thunderbird, or Chromium once and run this again.\n"));

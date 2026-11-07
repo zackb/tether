@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: tether\n"
 "Report-Msgid-Bugs-To: zack@bartel.com\n"
-"POT-Creation-Date: 2026-11-03 18:33-0800\n"
+"POT-Creation-Date: 2026-11-06 17:42-0800\n"
 "PO-Revision-Date: 2026-08-22\n"
 "Last-Translator: Tether project\n"
 "Language-Team: Spanish\n"
@@ -44,7 +44,8 @@ msgstr "Leer texto de la entrada y copiarlo al portapapeles local de Wayland."
 
 #: src/cli/main.cpp
 msgid "Send the current Wayland clipboard to connected devices."
-msgstr "Enviar el portapapeles actual de Wayland a los dispositivos conectados."
+msgstr ""
+"Enviar el portapapeles actual de Wayland a los dispositivos conectados."
 
 #: src/cli/main.cpp
 msgid "Send a file through tether."
@@ -348,6 +349,14 @@ msgstr "Ejemplos:"
 #, c-format
 msgid "Installed %s\n"
 msgstr "Instalado %s\n"
+
+#: src/cli/main.cpp
+#, c-format
+msgid ""
+"The Flatpak cannot see any browser or mail client yet. For each one you use, "
+"run its line, then run this again:\n"
+"\n"
+msgstr "El Flatpak aún no ve ningún navegador ni cliente de correo. Para cada uno que uses, ejecuta su línea y luego vuelve a ejecutar esto:\n\n"
 
 #: src/cli/main.cpp
 #, c-format

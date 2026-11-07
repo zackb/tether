@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: tether\n"
 "Report-Msgid-Bugs-To: zack@bartel.com\n"
-"POT-Creation-Date: 2026-11-03 18:33-0800\n"
+"POT-Creation-Date: 2026-11-06 17:42-0800\n"
 "PO-Revision-Date: 2026-08-23\n"
 "Last-Translator: Tether project\n"
 "Language-Team: Swedish\n"
@@ -345,6 +345,14 @@ msgstr "Exempel:"
 #, c-format
 msgid "Installed %s\n"
 msgstr "%s installerad\n"
+
+#: src/cli/main.cpp
+#, c-format
+msgid ""
+"The Flatpak cannot see any browser or mail client yet. For each one you use, "
+"run its line, then run this again:\n"
+"\n"
+msgstr "Flatpaken ser ännu ingen webbläsare eller e-postklient. Kör raden för varje program du använder och kör sedan detta igen:\n\n"
 
 #: src/cli/main.cpp
 #, c-format

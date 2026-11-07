@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: tether\n"
 "Report-Msgid-Bugs-To: zack@bartel.com\n"
-"POT-Creation-Date: 2026-11-03 18:33-0800\n"
+"POT-Creation-Date: 2026-11-06 17:42-0800\n"
 "PO-Revision-Date: 2026-08-23\n"
 "Last-Translator: Tether project\n"
 "Language-Team: Japanese\n"
@@ -345,6 +345,14 @@ msgstr "例:"
 #, c-format
 msgid "Installed %s\n"
 msgstr "%s をインストールしました\n"
+
+#: src/cli/main.cpp
+#, c-format
+msgid ""
+"The Flatpak cannot see any browser or mail client yet. For each one you use, "
+"run its line, then run this again:\n"
+"\n"
+msgstr "Flatpak からはまだブラウザーやメールクライアントが見えません。使用しているものごとに該当する行を実行してから、もう一度これを実行してください:\n\n"
 
 #: src/cli/main.cpp
 #, c-format
@@ -2953,7 +2961,8 @@ msgstr "クリップボードを自動的に共有"
 
 #: src/gtk/settings_view.cpp src/tui/settings.cpp
 msgid "Off sends it only from Send Clipboard or tether share."
-msgstr "オフにすると「クリップボードを送信」または tether share でのみ送信します。"
+msgstr ""
+"オフにすると「クリップボードを送信」または tether share でのみ送信します。"
 
 #: src/gtk/settings_view.cpp
 msgid "SMS and iMessage conversations synced over Bluetooth."
