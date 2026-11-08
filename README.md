@@ -154,11 +154,9 @@ Requires glibc 2.38 and libstdc++ from GCC 13 (Fedora 39+, Ubuntu 23.10+, Debian
 
 ### Flatpak
 
-Download `tether-<version>-<arch>.flatpak` from the
-[releases page](https://github.com/zackb/tether/releases) if you're into that, then:
-
 ```bash
-flatpak install ./tether-*.flatpak
+flatpak install --user https://zackb.github.io/tether/tether.flatpakref
+flatpak update                                                              # new releases, or use your software center
 flatpak run io.github.zackb.tether                                          # the GTK app
 flatpak run --command=tether io.github.zackb.tether --bt-setup              # the CLI
 flatpak run --command=tether io.github.zackb.tether --install-extension-host
@@ -166,6 +164,11 @@ flatpak run --command=tether io.github.zackb.tether --install-extension-host
 
 Clipboard sync will most likely not work as it is a privileged protocol (`data-control`).
 Use the AppImage instead if you want clipboard sync.
+
+Installed from a `.flatpak` bundle before? Run `flatpak uninstall io.github.zackb.tether` first.
+
+For offline installs, the [releases page](https://github.com/zackb/tether/releases) has
+`tether-<version>-<arch>.flatpak` bundles. They don't update.
 
 ### Nix
 
