@@ -156,6 +156,61 @@ jobs:
           path: build/flatpak/*.flatpak
           if-no-files-found: error
 
+      - name: archive repo
+        run: tar -C build/flatpak -cf "build/flatpak/flatpak-repo-$(uname -m).tar" repo
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: flatpak-repo-${{ matrix.runner }}
+          path: build/flatpak/flatpak-repo-*.tar
+          if-no-files-found: error
+
+  flatpak-repo:
+    needs: [flatpak]
+    if: github.ref_type == 'tag'
+    continue-on-error: true
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      pages: write
+      id-token: write
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y flatpak ostree gnupg
+
+      - uses: actions/download-artifact@v4
+        with:
+          pattern: flatpak-repo-*
+          path: dist
+          merge-multiple: true
+
+      - name: merge and sign
+        env:
+          FLATPAK_GPG_KEY: ${{ secrets.FLATPAK_GPG_KEY }}
+        run: |
+          repos=()
+          for tar in dist/flatpak-repo-*.tar; do
+            dir=${tar%.tar}
+            mkdir "$dir"
+            tar -xf "$tar" -C "$dir"
+            repos+=("$dir/repo")
+          done
+          ./packaging/flatpak/publish-repo.sh https://zackb.github.io/tether site "${repos[@]}"
+
+      - uses: actions/upload-pages-artifact@v4
+        with:
+          path: site
+
+      - id: deployment
+        uses: actions/deploy-pages@v4
+
   copr:
     needs: [package]
     if: github.ref_type == 'tag'
@@ -189,6 +244,7 @@ jobs:
           GH_TOKEN: ${{ github.token }}
           TAG: ${{ github.ref_name }}
         run: |
+          rm -f dist/flatpak-repo-*.tar
           ls -l dist
           if gh release view "$TAG" --repo "$GITHUB_REPOSITORY" >/dev/null 2>&1; then
             gh release upload "$TAG" dist/* --repo "$GITHUB_REPOSITORY" --clobber
