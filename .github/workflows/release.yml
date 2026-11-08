@@ -167,7 +167,7 @@ jobs:
 
   flatpak-repo:
     needs: [flatpak]
-    if: github.ref_type == 'tag'
+    if: github.ref_type == 'tag' || github.event_name == 'workflow_dispatch'
     continue-on-error: true
     runs-on: ubuntu-latest
     permissions:
