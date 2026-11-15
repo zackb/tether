@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: tether\n"
 "Report-Msgid-Bugs-To: zack@bartel.com\n"
-"POT-Creation-Date: 2026-11-06 17:42-0800\n"
+"POT-Creation-Date: 2026-11-15 11:58-0800\n"
 "PO-Revision-Date: 2026-08-23\n"
 "Last-Translator: Tether project\n"
 "Language-Team: Japanese\n"
@@ -204,6 +204,19 @@ msgstr "アプリ名だけでなく、通知のタイトルと本文もミラー
 
 #: src/cli/main.cpp
 msgid ""
+"Stop desktop popups from an iPhone app, by name or bundle id. It still lists "
+"in --bt-notifications."
+msgstr ""
+"iPhone アプリのデスクトップのポップアップを止めます（名前またはバンドル ID で"
+"指定）。--bt-notifications には引き続き表示されます。"
+
+#: src/cli/main.cpp
+msgid "Show desktop popups from a muted iPhone app again."
+msgstr ""
+"ミュートした iPhone アプリのデスクトップのポップアップを再び表示します。"
+
+#: src/cli/main.cpp
+msgid ""
 "How message history and contacts are kept on disk. Encrypted uses a key from "
 "the desktop keyring; none deletes what is stored and keeps nothing further."
 msgstr ""
@@ -352,7 +365,10 @@ msgid ""
 "The Flatpak cannot see any browser or mail client yet. For each one you use, "
 "run its line, then run this again:\n"
 "\n"
-msgstr "Flatpak からはまだブラウザーやメールクライアントが見えません。使用しているものごとに該当する行を実行してから、もう一度これを実行してください:\n\n"
+msgstr ""
+"Flatpak からはまだブラウザーやメールクライアントが見えません。使用しているも"
+"のごとに該当する行を実行してから、もう一度これを実行してください:\n"
+"\n"
 
 #: src/cli/main.cpp
 #, c-format
@@ -483,6 +499,10 @@ msgstr "ミラーリング有効"
 #: src/cli/main.cpp
 msgid "mirroring off (tether --bt-ancs on)"
 msgstr "ミラーリング無効 (tether --bt-ancs on)"
+
+#: src/cli/main.cpp
+msgid "Muted"
+msgstr "ミュート中"
 
 #: src/cli/main.cpp src/daemon/main.cpp src/gtk/main.cpp
 #: src/gtk/tether-gtk.desktop.in
@@ -760,6 +780,35 @@ msgstr "デーモンから通知を読み取れませんでした。\n"
 #, c-format
 msgid "No notifications yet. Check 'tether --bt-connection'.\n"
 msgstr "まだ通知はありません。'tether --bt-connection' を確認してください。\n"
+
+#: src/cli/main.cpp
+#, c++-format
+msgid "Expected an app, e.g. {} Signal\n"
+msgstr "アプリを指定してください。例: {} Signal\n"
+
+#: src/cli/main.cpp
+#, c++-format
+msgid ""
+"No mirrored notification from '{}'. Use its bundle id, e.g. "
+"org.whispersystems.signal\n"
+msgstr ""
+"'{}' からのミラー通知がありません。バンドル ID を使ってください。例: "
+"org.whispersystems.signal\n"
+
+#: src/cli/main.cpp
+#, c++-format
+msgid "'{}' is not muted.\n"
+msgstr "'{}' はミュートされていません。\n"
+
+#: src/cli/main.cpp src/tui/notifications.cpp
+#, c++-format
+msgid "Popups from {} muted."
+msgstr "{} のポップアップをミュートしました。"
+
+#: src/cli/main.cpp
+#, c++-format
+msgid "Popups from {} unmuted."
+msgstr "{} のポップアップのミュートを解除しました。"
 
 #: src/cli/main.cpp
 msgid "Could not read conversations from the daemon.\n"
@@ -1999,6 +2048,11 @@ msgstr "コードをコピー"
 msgid "Open in {}"
 msgstr "{} で開く"
 
+#: src/daemon/notification.cpp
+#, c++-format
+msgid "Mute {}"
+msgstr "{} をミュート"
+
 #: src/gtk/calls_view.cpp src/tui/calls.cpp
 msgid "Unknown caller"
 msgstr "不明な発信者"
@@ -2821,6 +2875,16 @@ msgstr "送信"
 msgid "Retry"
 msgstr "再試行"
 
+#: src/gtk/notifications_view.cpp
+msgid "Stop popups from this app. Undo in Settings."
+msgstr "このアプリのポップアップを止めます。設定で元に戻せます。"
+
+#. TRANSLATORS: Spoken name of the button that stops desktop popups from the named app.
+#: src/gtk/notifications_view.cpp src/tui/notifications.cpp
+#, c++-format
+msgid "Mute {} popups"
+msgstr "{} のポップアップをミュート"
+
 #: src/gtk/notifications_view.cpp src/tui/notifications.cpp
 msgid "Dismiss on the iPhone"
 msgstr "iPhone で消去"
@@ -2846,6 +2910,14 @@ msgstr "まだ通知はありません。"
 #: src/gtk/notifications_view.cpp src/tui/notifications.cpp
 msgid "Notification mirroring is unavailable."
 msgstr "通知のミラーリングは利用できません。"
+
+#: src/gtk/settings_view.cpp
+msgid "Unmute"
+msgstr "ミュート解除"
+
+#: src/gtk/settings_view.cpp
+msgid "Popups muted"
+msgstr "ポップアップをミュート中"
 
 #: src/gtk/settings_view.cpp src/tui/settings.cpp
 msgid ""
@@ -3204,6 +3276,15 @@ msgstr ""
 #: src/tui/main.cpp
 msgid "tether-tui needs a terminal."
 msgstr "tether-tui には端末が必要です。"
+
+#: src/tui/settings.cpp
+msgid "Muted apps"
+msgstr "ミュート中のアプリ"
+
+#: src/tui/settings.cpp
+#, c++-format
+msgid "Unmute {}"
+msgstr "{} のミュートを解除"
 
 #: src/tui/settings.cpp
 #, c++-format

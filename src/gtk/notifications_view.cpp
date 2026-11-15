@@ -53,6 +53,13 @@ namespace tether::ui {
             gtk_widget_set_sensitive(GTK_WIDGET(button), FALSE);
         }
 
+        void on_mute_clicked(GtkButton* button, gpointer) {
+            const auto* app_id = static_cast<const char*>(g_object_get_data(G_OBJECT(button), "app_id"));
+            const auto* app_name = static_cast<const char*>(g_object_get_data(G_OBJECT(button), "app_name"));
+            daemon_send({{"command", "bt_mute_app"}, {"app_id", app_id}, {"app_name", app_name}, {"muted", true}});
+            gtk_widget_set_sensitive(GTK_WIDGET(button), FALSE);
+        }
+
         GtkWidget* build_row(const nlohmann::json& notification) {
             const std::string app = notification.value("app_name", notification.value("app_id", ""));
             const std::string title = notification.value("title", "");
@@ -79,6 +86,20 @@ namespace tether::ui {
                 GtkWidget* time_label = gtk_label_new(stamp.c_str());
                 gtk_style_context_add_class(gtk_widget_get_style_context(time_label), "muted");
                 gtk_box_pack_start(GTK_BOX(header), time_label, FALSE, FALSE, 0);
+            }
+
+            const std::string app_id = notification.value("app_id", "");
+            if (!app_id.empty() && app_id != bluetooth::ancs::APP_ID_MESSAGES) {
+                GtkWidget* mute =
+                    gtk_button_new_from_icon_name("notifications-disabled-symbolic", GTK_ICON_SIZE_BUTTON);
+                gtk_button_set_relief(GTK_BUTTON(mute), GTK_RELIEF_NONE);
+                gtk_widget_set_tooltip_text(mute, _("Stop popups from this app. Undo in Settings."));
+                // TRANSLATORS: Spoken name of the button that stops desktop popups from the named app.
+                set_accessible_name(mute, tether::tr_format(_("Mute {} popups"), app));
+                g_object_set_data_full(G_OBJECT(mute), "app_id", g_strdup(app_id.c_str()), g_free);
+                g_object_set_data_full(G_OBJECT(mute), "app_name", g_strdup(app.c_str()), g_free);
+                g_signal_connect(mute, "clicked", G_CALLBACK(on_mute_clicked), nullptr);
+                gtk_box_pack_start(GTK_BOX(header), mute, FALSE, FALSE, 0);
             }
 
             if (notification.value("negative_action", false)) {

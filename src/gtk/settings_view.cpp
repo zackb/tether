@@ -6,6 +6,7 @@
 #include "ui_util.hpp"
 
 #include <string>
+#include <vector>
 #include <tether/i18n.hpp>
 
 namespace tether::ui {
@@ -29,6 +30,9 @@ namespace tether::ui {
             GtkWidget* sw_popups = nullptr;
             GtkWidget* row_previews = nullptr;
             GtkWidget* sw_previews = nullptr;
+            GtkWidget* list_popups = nullptr;
+            std::vector<GtkWidget*> muted_rows;
+            nlohmann::json muted_apps = nlohmann::json::array();
 
             GtkWidget* row_retention = nullptr;
             GtkWidget* cmb_retention = nullptr;
@@ -152,6 +156,32 @@ namespace tether::ui {
             daemon_send({{"command", "set_hide_unknown_senders"}, {"enabled", gtk_switch_get_active(widget) == TRUE}});
         }
 
+        void on_unmute_clicked(GtkButton* button, gpointer) {
+            const auto* app_id = static_cast<const char*>(g_object_get_data(G_OBJECT(button), "app_id"));
+            daemon_send({{"command", "bt_mute_app"}, {"app_id", app_id}, {"muted", false}});
+            gtk_widget_set_sensitive(GTK_WIDGET(button), FALSE);
+        }
+
+        // One row per muted iPhone app, below the popup switches.
+        void update_muted_rows(const nlohmann::json& muted) {
+            if (muted == g_settings.muted_apps)
+                return;
+            g_settings.muted_apps = muted;
+            for (GtkWidget* row : g_settings.muted_rows)
+                gtk_widget_destroy(row);
+            g_settings.muted_rows.clear();
+            for (const auto& app : muted) {
+                const std::string app_id = app.value("app_id", "");
+                const std::string name = app.value("app_name", app_id);
+                GtkWidget* unmute = gtk_button_new_with_label(_("Unmute"));
+                g_object_set_data_full(G_OBJECT(unmute), "app_id", g_strdup(app_id.c_str()), g_free);
+                g_signal_connect(unmute, "clicked", G_CALLBACK(on_unmute_clicked), nullptr);
+                GtkWidget* row = add_row(g_settings.list_popups, name, _("Popups muted"), unmute);
+                gtk_widget_show_all(row);
+                g_settings.muted_rows.push_back(row);
+            }
+        }
+
         void on_last_name_toggled(GtkSwitch* widget, GParamSpec*, gpointer) {
             daemon_send(
                 {{"command", "bt_set_contacts_by_last_name"}, {"enabled", gtk_switch_get_active(widget) == TRUE}});
@@ -225,6 +255,7 @@ namespace tether::ui {
             set_switch(g_settings.sw_previews,
                        reinterpret_cast<gpointer>(on_previews_toggled),
                        status.value("popup_previews_enabled", true));
+            update_muted_rows(status.value("muted_apps", nlohmann::json::array()));
 
             set_switch(g_settings.sw_lock_away,
                        reinterpret_cast<gpointer>(on_lock_away_toggled),
@@ -274,8 +305,14 @@ namespace tether::ui {
                                        return TRUE;
                                    }),
                                    nullptr);
-            g_signal_connect(
-                window, "destroy", G_CALLBACK(+[](GtkWidget*, gpointer) { g_settings.window = nullptr; }), nullptr);
+            g_signal_connect(window,
+                             "destroy",
+                             G_CALLBACK(+[](GtkWidget*, gpointer) {
+                                 g_settings.window = nullptr;
+                                 g_settings.muted_rows.clear();
+                                 g_settings.muted_apps = nlohmann::json::array();
+                             }),
+                             nullptr);
 
             GtkWidget* scroll = gtk_scrolled_window_new(nullptr, nullptr);
             gtk_scrolled_window_set_policy(GTK_SCROLLED_WINDOW(scroll), GTK_POLICY_NEVER, GTK_POLICY_AUTOMATIC);
@@ -352,6 +389,7 @@ namespace tether::ui {
             g_signal_connect(g_settings.sw_previews, "notify::active", G_CALLBACK(on_previews_toggled), nullptr);
             g_settings.row_previews =
                 add_row(popups, _("Show message previews"), _("Off shows only the sender."), g_settings.sw_previews);
+            g_settings.list_popups = popups;
 
             // Security
             GtkWidget* security = add_group(column, _("Security"), _("What Tether does when the iPhone leaves."));

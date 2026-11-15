@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: tether\n"
 "Report-Msgid-Bugs-To: zack@bartel.com\n"
-"POT-Creation-Date: 2026-11-06 17:42-0800\n"
+"POT-Creation-Date: 2026-11-15 11:58-0800\n"
 "PO-Revision-Date: 2026-08-23\n"
 "Last-Translator: Tether project\n"
 "Language-Team: Polish\n"
@@ -203,6 +203,20 @@ msgstr "Kopiuj tytuły i treść powiadomień, nie tylko aplikację."
 
 #: src/cli/main.cpp
 msgid ""
+"Stop desktop popups from an iPhone app, by name or bundle id. It still lists "
+"in --bt-notifications."
+msgstr ""
+"Wyłącza wyskakujące powiadomienia z aplikacji na iPhonie, według nazwy lub "
+"bundle id. Nadal widać ją w --bt-notifications."
+
+#: src/cli/main.cpp
+msgid "Show desktop popups from a muted iPhone app again."
+msgstr ""
+"Ponownie pokazuje wyskakujące powiadomienia z wyciszonej aplikacji na "
+"iPhonie."
+
+#: src/cli/main.cpp
+msgid ""
 "How message history and contacts are kept on disk. Encrypted uses a key from "
 "the desktop keyring; none deletes what is stored and keeps nothing further."
 msgstr ""
@@ -351,7 +365,11 @@ msgid ""
 "The Flatpak cannot see any browser or mail client yet. For each one you use, "
 "run its line, then run this again:\n"
 "\n"
-msgstr "Flatpak nie widzi jeszcze żadnej przeglądarki ani klienta poczty. Dla każdego, którego używasz, uruchom jego wiersz, a następnie uruchom to polecenie ponownie:\n\n"
+msgstr ""
+"Flatpak nie widzi jeszcze żadnej przeglądarki ani klienta poczty. Dla "
+"każdego, którego używasz, uruchom jego wiersz, a następnie uruchom to "
+"polecenie ponownie:\n"
+"\n"
 
 #: src/cli/main.cpp
 #, c-format
@@ -488,6 +506,10 @@ msgstr "kopiowanie włączone"
 #: src/cli/main.cpp
 msgid "mirroring off (tether --bt-ancs on)"
 msgstr "kopiowanie wyłączone (tether --bt-ancs on)"
+
+#: src/cli/main.cpp
+msgid "Muted"
+msgstr "Wyciszone"
 
 #: src/cli/main.cpp src/daemon/main.cpp src/gtk/main.cpp
 #: src/gtk/tether-gtk.desktop.in
@@ -772,6 +794,35 @@ msgstr "Nie udało się odczytać powiadomień od demona.\n"
 #, c-format
 msgid "No notifications yet. Check 'tether --bt-connection'.\n"
 msgstr "Nie ma jeszcze powiadomień. Sprawdź 'tether --bt-connection'.\n"
+
+#: src/cli/main.cpp
+#, c++-format
+msgid "Expected an app, e.g. {} Signal\n"
+msgstr "Oczekiwano aplikacji, np. {} Signal\n"
+
+#: src/cli/main.cpp
+#, c++-format
+msgid ""
+"No mirrored notification from '{}'. Use its bundle id, e.g. "
+"org.whispersystems.signal\n"
+msgstr ""
+"Brak powielonego powiadomienia z '{}'. Użyj jej bundle id, np. "
+"org.whispersystems.signal\n"
+
+#: src/cli/main.cpp
+#, c++-format
+msgid "'{}' is not muted.\n"
+msgstr "'{}' nie jest wyciszona.\n"
+
+#: src/cli/main.cpp src/tui/notifications.cpp
+#, c++-format
+msgid "Popups from {} muted."
+msgstr "Wyciszono powiadomienia z {}."
+
+#: src/cli/main.cpp
+#, c++-format
+msgid "Popups from {} unmuted."
+msgstr "Przywrócono powiadomienia z {}."
 
 #: src/cli/main.cpp
 msgid "Could not read conversations from the daemon.\n"
@@ -2019,6 +2070,11 @@ msgstr "Kopiuj kod"
 msgid "Open in {}"
 msgstr "Otwórz w {}"
 
+#: src/daemon/notification.cpp
+#, c++-format
+msgid "Mute {}"
+msgstr "Wycisz {}"
+
 #: src/gtk/calls_view.cpp src/tui/calls.cpp
 msgid "Unknown caller"
 msgstr "Nieznany numer"
@@ -2847,6 +2903,18 @@ msgstr "Wyślij"
 msgid "Retry"
 msgstr "Ponów"
 
+#: src/gtk/notifications_view.cpp
+msgid "Stop popups from this app. Undo in Settings."
+msgstr ""
+"Wyłącza wyskakujące powiadomienia z tej aplikacji. Można cofnąć w "
+"Ustawieniach."
+
+#. TRANSLATORS: Spoken name of the button that stops desktop popups from the named app.
+#: src/gtk/notifications_view.cpp src/tui/notifications.cpp
+#, c++-format
+msgid "Mute {} popups"
+msgstr "Wycisz powiadomienia z {}"
+
 #: src/gtk/notifications_view.cpp src/tui/notifications.cpp
 msgid "Dismiss on the iPhone"
 msgstr "Zamknij na iPhonie"
@@ -2872,6 +2940,14 @@ msgstr "Nie ma jeszcze powiadomień."
 #: src/gtk/notifications_view.cpp src/tui/notifications.cpp
 msgid "Notification mirroring is unavailable."
 msgstr "Kopiowanie powiadomień jest niedostępne."
+
+#: src/gtk/settings_view.cpp
+msgid "Unmute"
+msgstr "Wyłącz wyciszenie"
+
+#: src/gtk/settings_view.cpp
+msgid "Popups muted"
+msgstr "Powiadomienia wyciszone"
 
 #: src/gtk/settings_view.cpp src/tui/settings.cpp
 msgid ""
@@ -3230,6 +3306,15 @@ msgstr ""
 #: src/tui/main.cpp
 msgid "tether-tui needs a terminal."
 msgstr "tether-tui wymaga terminala."
+
+#: src/tui/settings.cpp
+msgid "Muted apps"
+msgstr "Wyciszone aplikacje"
+
+#: src/tui/settings.cpp
+#, c++-format
+msgid "Unmute {}"
+msgstr "Wyłącz wyciszenie {}"
 
 #: src/tui/settings.cpp
 #, c++-format

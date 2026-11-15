@@ -51,6 +51,10 @@ namespace tether {
         // Reply action. Called on the notifier's own thread.
         void set_reply_handler(std::function<void(const std::string& thread, const std::string& body)> handler);
 
+        // Where the "Mute" action on a mirrored iPhone popup sends the app. Called
+        // on the notifier's own thread.
+        void set_mute_handler(std::function<void(const std::string& app_id, const std::string& app_name)> handler);
+
         void notify_file_arrived(const std::filesystem::path& path);
 
         void notify(const NotificationSpec& spec);

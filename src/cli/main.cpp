@@ -222,6 +222,9 @@ static const Opt kOptions[] = {
     {"--bt-enable <on|off>", N_("Connect to the iPhone over Bluetooth, or stop.")},
     {"--bt-ancs <on|off>", N_("Turn notification mirroring on or off.")},
     {"--bt-ancs-content <on|off>", N_("Mirror notification titles and bodies, not just the app.")},
+    {"--bt-ancs-mute <app>",
+     N_("Stop desktop popups from an iPhone app, by name or bundle id. It still lists in --bt-notifications.")},
+    {"--bt-ancs-unmute <app>", N_("Show desktop popups from a muted iPhone app again.")},
     {"--bt-retention <encrypted|plaintext|none>",
      N_("How message history and contacts are kept on disk. Encrypted uses a key from the desktop keyring; "
         "none deletes what is stored and keeps nothing further.")},
@@ -489,6 +492,11 @@ static int print_bt_status(tether::Client& client) {
     fields.emplace_back(_("Notifications"),
                         resp.value("ancs_enabled", true) ? _("mirroring on")
                                                          : _("mirroring off (tether --bt-ancs on)"));
+    std::string muted;
+    for (const auto& app : resp.value("muted_apps", nlohmann::json::array()))
+        muted += (muted.empty() ? "" : "\n") + app.value("app_name", "") + " (" + app.value("app_id", "") + ")";
+    if (!muted.empty())
+        fields.emplace_back(_("Muted"), muted);
     fields.emplace_back(_("Tether"), resp.value("enabled", true) ? _("connecting") : _("off (--bt-enable on)"));
 
     if (resp.value("retention", "encrypted") == "encrypted" && !resp.value("retention_ready", true))
@@ -995,6 +1003,56 @@ static int print_bt_notifications(tether::Client& client) {
     return 0;
 }
 
+// Matches an app by bundle id or display name, from the muted list when
+// unmuting and from mirrored notifications when muting.
+static int set_app_muted(tether::Client& client, const std::string& wanted, bool muted) {
+    if (wanted.empty()) {
+        debug::log(ERR, _("Expected an app, e.g. {} Signal\n"), muted ? "--bt-ancs-mute" : "--bt-ancs-unmute");
+        return 1;
+    }
+    nlohmann::json resp;
+    try {
+        resp = nlohmann::json::parse(client.send_and_wait(
+            muted ? "{\"command\":\"bt_list_notifications\"}\n" : "{\"command\":\"bt_status\"}\n"));
+    } catch (const std::exception&) {
+        debug::log(ERR, _("Could not reach the daemon.\n"));
+        return 1;
+    }
+
+    std::string app_id;
+    std::string app_name;
+    for (const auto& app : resp.value(muted ? "notifications" : "muted_apps", nlohmann::json::array())) {
+        const std::string id = app.value("app_id", "");
+        const std::string name = app.value("app_name", "");
+        if (id == wanted || strcasecmp(name.c_str(), wanted.c_str()) == 0) {
+            app_id = id;
+            app_name = name;
+            break;
+        }
+    }
+    // A bundle id can be muted before the app has sent anything.
+    if (app_id.empty() && muted && wanted.find('.') != std::string::npos)
+        app_id = wanted;
+    if (app_id.empty()) {
+        debug::log(ERR,
+                   muted ? _("No mirrored notification from '{}'. Use its bundle id, e.g. org.whispersystems.signal\n")
+                         : _("'{}' is not muted.\n"),
+                   wanted);
+        return 1;
+    }
+
+    nlohmann::json request{{"command", "bt_mute_app"}, {"app_id", app_id}, {"app_name", app_name}, {"muted", muted}};
+    if (!client.send(request.dump() + "\n")) {
+        debug::log(ERR, _("Could not reach the daemon.\n"));
+        return 1;
+    }
+    const std::string label = app_name.empty() ? app_id : app_name;
+    fprintf(stdout,
+            "%s\n",
+            tether::tr_format(muted ? _("Popups from {} muted.") : _("Popups from {} unmuted."), label).c_str());
+    return 0;
+}
+
 static int print_bt_threads(tether::Client& client) {
     nlohmann::json resp;
     try {
@@ -1477,6 +1535,10 @@ int main(int argc, char* argv[]) {
             action = "bt_ancs_content";
             if (i + 1 < argc && argv[i + 1][0] != '-')
                 arg_val = argv[++i];
+        } else if (arg == "--bt-ancs-mute" || arg == "--bt-ancs-unmute") {
+            action = arg == "--bt-ancs-mute" ? "bt_ancs_mute" : "bt_ancs_unmute";
+            if (i + 1 < argc)
+                arg_val = argv[++i];
         } else if (arg == "--bt-retention") {
             action = "bt_retention";
             if (i + 1 < argc && argv[i + 1][0] != '-')
@@ -1887,6 +1949,8 @@ int main(int argc, char* argv[]) {
                 "%s\n",
                 content ? (on ? _("Notification contents enabled.") : _("Notification contents disabled."))
                         : (on ? _("Notification mirroring enabled.") : _("Notification mirroring disabled.")));
+    } else if (action == "bt_ancs_mute" || action == "bt_ancs_unmute") {
+        return set_app_muted(client, arg_val, action == "bt_ancs_mute");
     } else if (action == "bt_retention") {
         if (arg_val != "encrypted" && arg_val != "plaintext" && arg_val != "none") {
             debug::log(ERR, _("Expected encrypted, plaintext or none, e.g. --bt-retention encrypted\n"));

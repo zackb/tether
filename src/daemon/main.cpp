@@ -228,6 +228,10 @@ int main(int argc, char** argv) {
             tether::bluetooth::mark_messages_read_async({handle}, true);
     });
 
+    notifier.set_mute_handler([&loop](const std::string& app_id, const std::string& app_name) {
+        loop.post([app_id, app_name] { tether::set_app_muted(app_id, app_name, true); });
+    });
+
     notifier.set_reply_handler([&notifier](const std::string& thread, const std::string& body) {
         tether::send_bt_message_async(thread, body, {}, [&notifier](bool sent, const std::string& error) {
             if (!sent)
@@ -737,7 +741,8 @@ int main(int argc, char** argv) {
 
                     // Messages already arrive over MAP with read state that stays
                     // in sync, so a popup here would be the second copy.
-                    if (!tether::bluetooth::ancs::should_show_desktop_popup(notification))
+                    if (!tether::bluetooth::ancs::should_show_desktop_popup(notification) ||
+                        tether::bluetooth::load_config().muted_apps.contains(notification.app_id))
                         return;
 
                     const std::string title = notification.title.empty() ? notification.app_name : notification.title;

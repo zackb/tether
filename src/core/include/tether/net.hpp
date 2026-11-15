@@ -108,6 +108,9 @@ namespace tether {
     void set_popup_previews_enabled(bool enabled);
     bool popup_previews_enabled();
 
+    // Adds or removes an iPhone app from the popup mute list and pushes bt_status.
+    void set_app_muted(const std::string& app_id, const std::string& app_name, bool muted);
+
     // Whether a local copy is pushed to paired devices. Off shares only on clipboard_send.
     void set_clipboard_auto_share(bool enabled);
     bool clipboard_auto_share();

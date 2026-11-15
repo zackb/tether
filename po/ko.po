@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: tether\n"
 "Report-Msgid-Bugs-To: zack@bartel.com\n"
-"POT-Creation-Date: 2026-11-06 17:42-0800\n"
+"POT-Creation-Date: 2026-11-15 11:58-0800\n"
 "PO-Revision-Date: 2026-08-23\n"
 "Last-Translator: Tether project\n"
 "Language-Team: Korean\n"
@@ -200,6 +200,18 @@ msgstr "앱뿐 아니라 알림의 제목과 본문도 미러링합니다."
 
 #: src/cli/main.cpp
 msgid ""
+"Stop desktop popups from an iPhone app, by name or bundle id. It still lists "
+"in --bt-notifications."
+msgstr ""
+"iPhone 앱의 데스크톱 팝업을 중지합니다(이름 또는 번들 ID로 지정). --bt-"
+"notifications에는 계속 표시됩니다."
+
+#: src/cli/main.cpp
+msgid "Show desktop popups from a muted iPhone app again."
+msgstr "음소거한 iPhone 앱의 데스크톱 팝업을 다시 표시합니다."
+
+#: src/cli/main.cpp
+msgid ""
 "How message history and contacts are kept on disk. Encrypted uses a key from "
 "the desktop keyring; none deletes what is stored and keeps nothing further."
 msgstr ""
@@ -343,7 +355,10 @@ msgid ""
 "The Flatpak cannot see any browser or mail client yet. For each one you use, "
 "run its line, then run this again:\n"
 "\n"
-msgstr "Flatpak에서 아직 브라우저나 메일 클라이언트를 볼 수 없습니다. 사용하는 각 프로그램의 줄을 실행한 다음 이 명령을 다시 실행하세요:\n\n"
+msgstr ""
+"Flatpak에서 아직 브라우저나 메일 클라이언트를 볼 수 없습니다. 사용하는 각 프"
+"로그램의 줄을 실행한 다음 이 명령을 다시 실행하세요:\n"
+"\n"
 
 #: src/cli/main.cpp
 #, c-format
@@ -474,6 +489,10 @@ msgstr "미러링 켬"
 #: src/cli/main.cpp
 msgid "mirroring off (tether --bt-ancs on)"
 msgstr "미러링 끔 (tether --bt-ancs on)"
+
+#: src/cli/main.cpp
+msgid "Muted"
+msgstr "음소거됨"
 
 #: src/cli/main.cpp src/daemon/main.cpp src/gtk/main.cpp
 #: src/gtk/tether-gtk.desktop.in
@@ -749,6 +768,35 @@ msgstr "데몬에서 알림을 읽지 못했습니다.\n"
 #, c-format
 msgid "No notifications yet. Check 'tether --bt-connection'.\n"
 msgstr "아직 알림이 없습니다. 'tether --bt-connection'을 확인하십시오.\n"
+
+#: src/cli/main.cpp
+#, c++-format
+msgid "Expected an app, e.g. {} Signal\n"
+msgstr "앱을 지정하세요. 예: {} Signal\n"
+
+#: src/cli/main.cpp
+#, c++-format
+msgid ""
+"No mirrored notification from '{}'. Use its bundle id, e.g. "
+"org.whispersystems.signal\n"
+msgstr ""
+"'{}'의 미러링된 알림이 없습니다. 번들 ID를 사용하세요. 예: "
+"org.whispersystems.signal\n"
+
+#: src/cli/main.cpp
+#, c++-format
+msgid "'{}' is not muted.\n"
+msgstr "'{}'은(는) 음소거되어 있지 않습니다.\n"
+
+#: src/cli/main.cpp src/tui/notifications.cpp
+#, c++-format
+msgid "Popups from {} muted."
+msgstr "{} 팝업을 음소거했습니다."
+
+#: src/cli/main.cpp
+#, c++-format
+msgid "Popups from {} unmuted."
+msgstr "{} 팝업 음소거를 해제했습니다."
 
 #: src/cli/main.cpp
 msgid "Could not read conversations from the daemon.\n"
@@ -1967,6 +2015,11 @@ msgstr "코드 복사"
 msgid "Open in {}"
 msgstr "{}에서 열기"
 
+#: src/daemon/notification.cpp
+#, c++-format
+msgid "Mute {}"
+msgstr "{} 음소거"
+
 #: src/gtk/calls_view.cpp src/tui/calls.cpp
 msgid "Unknown caller"
 msgstr "알 수 없는 발신자"
@@ -2781,6 +2834,16 @@ msgstr "보내기"
 msgid "Retry"
 msgstr "다시 시도"
 
+#: src/gtk/notifications_view.cpp
+msgid "Stop popups from this app. Undo in Settings."
+msgstr "이 앱의 팝업을 중지합니다. 설정에서 되돌릴 수 있습니다."
+
+#. TRANSLATORS: Spoken name of the button that stops desktop popups from the named app.
+#: src/gtk/notifications_view.cpp src/tui/notifications.cpp
+#, c++-format
+msgid "Mute {} popups"
+msgstr "{} 팝업 음소거"
+
 #: src/gtk/notifications_view.cpp src/tui/notifications.cpp
 msgid "Dismiss on the iPhone"
 msgstr "iPhone에서 지우기"
@@ -2806,6 +2869,14 @@ msgstr "아직 알림이 없습니다."
 #: src/gtk/notifications_view.cpp src/tui/notifications.cpp
 msgid "Notification mirroring is unavailable."
 msgstr "알림 미러링을 사용할 수 없습니다."
+
+#: src/gtk/settings_view.cpp
+msgid "Unmute"
+msgstr "음소거 해제"
+
+#: src/gtk/settings_view.cpp
+msgid "Popups muted"
+msgstr "팝업 음소거됨"
 
 #: src/gtk/settings_view.cpp src/tui/settings.cpp
 msgid ""
@@ -3160,6 +3231,15 @@ msgstr ""
 #: src/tui/main.cpp
 msgid "tether-tui needs a terminal."
 msgstr "tether-tui에는 터미널이 필요합니다."
+
+#: src/tui/settings.cpp
+msgid "Muted apps"
+msgstr "음소거된 앱"
+
+#: src/tui/settings.cpp
+#, c++-format
+msgid "Unmute {}"
+msgstr "{} 음소거 해제"
 
 #: src/tui/settings.cpp
 #, c++-format

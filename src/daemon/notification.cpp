@@ -109,6 +109,7 @@ namespace tether {
         // Set once during startup, before any notification exists.
         std::function<void(const std::string&, const std::string&)> g_copy_handler;
         std::function<void(const std::string&, const std::string&)> g_reply_handler;
+        std::function<void(const std::string&, const std::string&)> g_mute_handler;
 
         // Server notification id -> conversation, for notifications showing an
         // inline reply field. Touched only on the notifier's thread.
@@ -249,6 +250,12 @@ namespace tether {
                 }
             }
             return {};
+        }
+
+        void on_mute_action(NotifyNotification*, char*, gpointer user_data) {
+            auto* action = static_cast<NotificationActionData*>(user_data);
+            if (action && g_mute_handler)
+                g_mute_handler(action->payload, action->handle);
         }
 
         void on_open_app_action(NotifyNotification*, char*, gpointer user_data) {
@@ -447,6 +454,16 @@ namespace tether {
                                                free_action_data);
             }
 
+            if (spec->ancs_uid >= 0 && !spec->app_id.empty() && g_mute_handler) {
+                const std::string label = tr_format(_("Mute {}"), spec->app_name);
+                notify_notification_add_action(notification,
+                                               "mute-app",
+                                               label.c_str(),
+                                               on_mute_action,
+                                               new NotificationActionData{spec->app_id, spec->app_name},
+                                               free_action_data);
+            }
+
             GError* error = nullptr;
             if (!notify_notification_show(notification, &error)) {
                 debug::log(ERR, "Failed to show notification: {}", error ? error->message : "unknown");
@@ -544,6 +561,11 @@ namespace tether {
         });
         impl_->initialized = true;
         return true;
+    }
+
+    void DesktopNotifier::set_mute_handler(
+        std::function<void(const std::string& app_id, const std::string& app_name)> handler) {
+        g_mute_handler = std::move(handler);
     }
 
     void DesktopNotifier::set_copy_handler(
