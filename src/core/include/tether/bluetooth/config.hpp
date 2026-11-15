@@ -3,6 +3,7 @@
 #include "tether/bluetooth/bearer_supervisor.hpp"
 #include "tether/secret_store.hpp"
 
+#include <map>
 #include <string>
 
 namespace tether::bluetooth {
@@ -65,6 +66,8 @@ namespace tether::bluetooth {
         bool clipboard_auto_share = true;
         // Whether threads from senders who are not contacts are hidden. Codes still pop up and autofill.
         bool hide_unknown_senders = false;
+        // iPhone apps whose mirrored notifications never pop up, bundle id -> display name.
+        std::map<std::string, std::string> muted_apps;
         // Whether Tether manages AirPods at all. Off until asked.
         bool airpods_enabled = false;
         // Whether removing an AirPod pauses local playback.

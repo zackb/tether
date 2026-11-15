@@ -245,6 +245,13 @@ TEST(BluetoothConfig, VersionedFileKeepsTheStoredChoice) {
     EXPECT_TRUE(on.ancs_content_enabled);
 }
 
+TEST(BluetoothConfig, MutedAppsRoundTrip) {
+    Config config;
+    config.muted_apps["org.whispersystems.signal"] = "Signal";
+    EXPECT_EQ(deserialize_config(serialize_config(config)).muted_apps, config.muted_apps);
+    EXPECT_TRUE(deserialize_config("{}").muted_apps.empty());
+}
+
 TEST(BluetoothConfig, SerializeStampsTheVersion) {
     Config config;
     config.ancs_content_enabled = false;

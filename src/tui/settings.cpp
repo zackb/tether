@@ -183,6 +183,17 @@ namespace tether::tui {
                                      Tone::Bad));
                     }
                 }
+                if (std::string(setting->id) == "popups") {
+                    const json muted = status_.value("muted_apps", json::array());
+                    if (!muted.empty())
+                        rows.push_back(heading(_("Muted apps")));
+                    for (const auto& app : muted) {
+                        const std::string app_id = app.value("app_id", "");
+                        rows.push_back(action_row(tr_format(_("Unmute {}"), app.value("app_name", app_id)), [app_id] {
+                            app::send({{"command", "bt_mute_app"}, {"app_id", app_id}, {"muted", false}});
+                        }));
+                    }
+                }
                 return rows;
             }
 

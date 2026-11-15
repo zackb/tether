@@ -2,6 +2,7 @@
 
 #include <ctime>
 #include <message_format.hpp>
+#include <tether/bluetooth/ancs/protocol.hpp>
 #include <tether/i18n.hpp>
 #include <ui_text.hpp>
 
@@ -55,10 +56,21 @@ namespace tether::tui {
                 rows.push_back(main);
                 if (const std::string more = secondary(*n); !more.empty())
                     rows.push_back(text_row(more));
-                if (n->value("negative_action", false)) {
+                const bool dismissable = n->value("negative_action", false);
+                const std::string app_id = n->value("app_id", "");
+                const bool mutable_app = !app_id.empty() && app_id != bluetooth::ancs::APP_ID_MESSAGES;
+                if (dismissable || mutable_app)
                     rows.push_back(blank_row());
+                if (dismissable) {
                     const uint32_t uid = n->value("uid", static_cast<uint32_t>(0));
                     rows.push_back(action_row(_("Dismiss on the iPhone"), [this, uid] { dismiss(uid); }));
+                }
+                if (mutable_app) {
+                    const std::string app_name = n->value("app_name", app_id);
+                    rows.push_back(action_row(tr_format(_("Mute {} popups"), app_name), [app_id, app_name] {
+                        app::send({{"command", "bt_mute_app"}, {"app_id", app_id}, {"app_name", app_name}, {"muted", true}});
+                        app::status(tr_format(_("Popups from {} muted."), app_name));
+                    }));
                 }
                 return rows;
             }

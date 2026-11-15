@@ -18,6 +18,7 @@
 
 #include "tether/base64.hpp"
 #include "tether/bluetooth/airpods.hpp"
+#include "tether/bluetooth/ancs/notifications.hpp"
 #include "tether/bluetooth/config.hpp"
 #include "tether/bluetooth/connection.hpp"
 #include "tether/bluetooth/contacts.hpp"
@@ -433,6 +434,9 @@ namespace tether {
         status["popup_previews_enabled"] = config.popup_previews_enabled;
         status["clipboard_auto_share"] = config.clipboard_auto_share;
         status["hide_unknown_senders"] = config.hide_unknown_senders;
+        status["muted_apps"] = nlohmann::json::array();
+        for (const auto& [app_id, app_name] : config.muted_apps)
+            status["muted_apps"].push_back({{"app_id", app_id}, {"app_name", app_name}});
         status["airpods_enabled"] = config.airpods_enabled;
         status["airpods_pause"] = to_string(config.airpods_pause);
         status["airpods_handoff"] = config.airpods_handoff;
@@ -477,6 +481,18 @@ namespace tether {
     bool popup_previews_enabled() { return g_popup_previews_enabled.load(); }
 
     void set_popup_previews_enabled(bool enabled) { g_popup_previews_enabled.store(enabled); }
+
+    void set_app_muted(const std::string& app_id, const std::string& app_name, bool muted) {
+        if (app_id.empty())
+            return;
+        auto config = bluetooth::load_config();
+        if (muted)
+            config.muted_apps[app_id] = app_name.empty() ? bluetooth::ancs::derive_app_name(app_id) : app_name;
+        else
+            config.muted_apps.erase(app_id);
+        bluetooth::save_config(config);
+        broadcast_local_event(build_bt_status().dump());
+    }
 
     static std::atomic<bool> g_clipboard_auto_share{true};
 
@@ -1588,6 +1604,8 @@ namespace tether {
                         bluetooth::save_config(config);
                         broadcast_local_event(build_bt_status().dump());
                         broadcast_local_event(build_bt_threads().dump());
+                    } else if (j.contains("command") && j["command"] == "bt_mute_app") {
+                        set_app_muted(j.value("app_id", ""), j.value("app_name", ""), j.value("muted", true));
                     } else if (j.contains("command") && j["command"] == "bt_list_calls") {
                         nlohmann::json payload;
                         payload["command"] = "bt_calls";

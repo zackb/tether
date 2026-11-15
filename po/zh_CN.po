@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: tether\n"
 "Report-Msgid-Bugs-To: zack@bartel.com\n"
-"POT-Creation-Date: 2026-11-06 17:42-0800\n"
+"POT-Creation-Date: 2026-11-15 11:58-0800\n"
 "PO-Revision-Date: 2026-08-23\n"
 "Last-Translator: Tether project\n"
 "Language-Team: Simplified Chinese\n"
@@ -192,6 +192,18 @@ msgstr "镜像通知的标题和正文，而不只是所属 App。"
 
 #: src/cli/main.cpp
 msgid ""
+"Stop desktop popups from an iPhone app, by name or bundle id. It still lists "
+"in --bt-notifications."
+msgstr ""
+"停止某个 iPhone 应用的桌面弹窗，可按名称或 bundle id 指定。它仍会列在 --bt-"
+"notifications 中。"
+
+#: src/cli/main.cpp
+msgid "Show desktop popups from a muted iPhone app again."
+msgstr "重新显示已静音 iPhone 应用的桌面弹窗。"
+
+#: src/cli/main.cpp
+msgid ""
 "How message history and contacts are kept on disk. Encrypted uses a key from "
 "the desktop keyring; none deletes what is stored and keeps nothing further."
 msgstr ""
@@ -330,7 +342,10 @@ msgid ""
 "The Flatpak cannot see any browser or mail client yet. For each one you use, "
 "run its line, then run this again:\n"
 "\n"
-msgstr "Flatpak 目前还看不到任何浏览器或邮件客户端。请为你使用的每一个运行对应的那一行，然后再次运行此命令：\n\n"
+msgstr ""
+"Flatpak 目前还看不到任何浏览器或邮件客户端。请为你使用的每一个运行对应的那一"
+"行，然后再次运行此命令：\n"
+"\n"
 
 #: src/cli/main.cpp
 #, c-format
@@ -460,6 +475,10 @@ msgstr "镜像已启用"
 #: src/cli/main.cpp
 msgid "mirroring off (tether --bt-ancs on)"
 msgstr "镜像已停用 (tether --bt-ancs on)"
+
+#: src/cli/main.cpp
+msgid "Muted"
+msgstr "已静音"
 
 #: src/cli/main.cpp src/daemon/main.cpp src/gtk/main.cpp
 #: src/gtk/tether-gtk.desktop.in
@@ -730,6 +749,34 @@ msgstr "无法从守护进程读取通知。\n"
 #, c-format
 msgid "No notifications yet. Check 'tether --bt-connection'.\n"
 msgstr "暂无通知。请检查 'tether --bt-connection'。\n"
+
+#: src/cli/main.cpp
+#, c++-format
+msgid "Expected an app, e.g. {} Signal\n"
+msgstr "需要指定应用，例如 {} Signal\n"
+
+#: src/cli/main.cpp
+#, c++-format
+msgid ""
+"No mirrored notification from '{}'. Use its bundle id, e.g. "
+"org.whispersystems.signal\n"
+msgstr ""
+"没有来自“{}”的镜像通知。请使用其 bundle id，例如 org.whispersystems.signal\n"
+
+#: src/cli/main.cpp
+#, c++-format
+msgid "'{}' is not muted.\n"
+msgstr "“{}”未静音。\n"
+
+#: src/cli/main.cpp src/tui/notifications.cpp
+#, c++-format
+msgid "Popups from {} muted."
+msgstr "已静音 {} 的弹窗。"
+
+#: src/cli/main.cpp
+#, c++-format
+msgid "Popups from {} unmuted."
+msgstr "已取消静音 {} 的弹窗。"
 
 #: src/cli/main.cpp
 msgid "Could not read conversations from the daemon.\n"
@@ -1912,6 +1959,11 @@ msgstr "复制验证码"
 msgid "Open in {}"
 msgstr "在 {} 中打开"
 
+#: src/daemon/notification.cpp
+#, c++-format
+msgid "Mute {}"
+msgstr "静音 {}"
+
 #: src/gtk/calls_view.cpp src/tui/calls.cpp
 msgid "Unknown caller"
 msgstr "未知来电者"
@@ -2715,6 +2767,16 @@ msgstr "发送"
 msgid "Retry"
 msgstr "重试"
 
+#: src/gtk/notifications_view.cpp
+msgid "Stop popups from this app. Undo in Settings."
+msgstr "停止此应用的弹窗。可在设置中撤销。"
+
+#. TRANSLATORS: Spoken name of the button that stops desktop popups from the named app.
+#: src/gtk/notifications_view.cpp src/tui/notifications.cpp
+#, c++-format
+msgid "Mute {} popups"
+msgstr "静音 {} 的弹窗"
+
 #: src/gtk/notifications_view.cpp src/tui/notifications.cpp
 msgid "Dismiss on the iPhone"
 msgstr "在 iPhone 上清除"
@@ -2740,6 +2802,14 @@ msgstr "暂无通知。"
 #: src/gtk/notifications_view.cpp src/tui/notifications.cpp
 msgid "Notification mirroring is unavailable."
 msgstr "通知镜像不可用。"
+
+#: src/gtk/settings_view.cpp
+msgid "Unmute"
+msgstr "取消静音"
+
+#: src/gtk/settings_view.cpp
+msgid "Popups muted"
+msgstr "弹窗已静音"
 
 #: src/gtk/settings_view.cpp src/tui/settings.cpp
 msgid ""
@@ -3083,6 +3153,15 @@ msgstr ""
 #: src/tui/main.cpp
 msgid "tether-tui needs a terminal."
 msgstr "tether-tui 需要在终端中运行。"
+
+#: src/tui/settings.cpp
+msgid "Muted apps"
+msgstr "已静音的应用"
+
+#: src/tui/settings.cpp
+#, c++-format
+msgid "Unmute {}"
+msgstr "取消静音 {}"
 
 #: src/tui/settings.cpp
 #, c++-format

@@ -198,6 +198,16 @@ Turn notification mirroring on or off.
 \fB\-\-bt-ancs-content\fR \fIon\fR|\fIoff\fR
 Mirror notification titles and bodies, not just the app.
 .TP
+\fB\-\-bt-ancs-mute\fR \fIapp\fR
+Stop desktop popups from an iPhone app, for apps that also run on this desktop.
+\fIapp\fR is the name shown in \fB\-\-bt-notifications\fR or the bundle id, such
+as \fIorg.whispersystems.signal\fR; a name only matches an app that has already
+sent a notification. Muted apps are still listed and still give up one-time
+codes. \fB\-\-bt-status\fR lists them.
+.TP
+\fB\-\-bt-ancs-unmute\fR \fIapp\fR
+Show desktop popups from a muted app again.
+.TP
 \fB\-\-bt-calls\fR
 List calls on the iPhone: what is ringing, dialing, or connected.
 .TP
@@ -256,6 +266,10 @@ tether \-f document.pdf
 See what Bluetooth still needs before pairing an iPhone:
 .IP
 tether \-\-bt-setup
+.PP
+Stop Signal popups mirrored from the iPhone when Signal Desktop already shows them:
+.IP
+tether \-\-bt-ancs-mute Signal
 .PP
 The same things, as subcommands:
 .IP

@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: tether\n"
 "Report-Msgid-Bugs-To: zack@bartel.com\n"
-"POT-Creation-Date: 2026-11-06 17:42-0800\n"
+"POT-Creation-Date: 2026-11-15 11:58-0800\n"
 "PO-Revision-Date: 2026-08-23\n"
 "Last-Translator: Tether project\n"
 "Language-Team: Turkish\n"
@@ -201,6 +201,20 @@ msgstr ""
 
 #: src/cli/main.cpp
 msgid ""
+"Stop desktop popups from an iPhone app, by name or bundle id. It still lists "
+"in --bt-notifications."
+msgstr ""
+"Bir iPhone uygulamasının masaüstü açılır bildirimlerini durdurur; ad veya "
+"bundle id ile. --bt-notifications içinde listelenmeye devam eder."
+
+#: src/cli/main.cpp
+msgid "Show desktop popups from a muted iPhone app again."
+msgstr ""
+"Sessize alınmış bir iPhone uygulamasının masaüstü açılır bildirimlerini "
+"yeniden gösterir."
+
+#: src/cli/main.cpp
+msgid ""
 "How message history and contacts are kept on disk. Encrypted uses a key from "
 "the desktop keyring; none deletes what is stored and keeps nothing further."
 msgstr ""
@@ -349,7 +363,11 @@ msgid ""
 "The Flatpak cannot see any browser or mail client yet. For each one you use, "
 "run its line, then run this again:\n"
 "\n"
-msgstr "Flatpak henüz hiçbir tarayıcıyı veya e-posta istemcisini göremiyor. Kullandığınız her biri için ilgili satırı çalıştırın, ardından bunu yeniden çalıştırın:\n\n"
+msgstr ""
+"Flatpak henüz hiçbir tarayıcıyı veya e-posta istemcisini göremiyor. "
+"Kullandığınız her biri için ilgili satırı çalıştırın, ardından bunu yeniden "
+"çalıştırın:\n"
+"\n"
 
 #: src/cli/main.cpp
 #, c-format
@@ -483,6 +501,10 @@ msgstr "yansıtma açık"
 #: src/cli/main.cpp
 msgid "mirroring off (tether --bt-ancs on)"
 msgstr "yansıtma kapalı (tether --bt-ancs on)"
+
+#: src/cli/main.cpp
+msgid "Muted"
+msgstr "Sessizde"
 
 #: src/cli/main.cpp src/daemon/main.cpp src/gtk/main.cpp
 #: src/gtk/tether-gtk.desktop.in
@@ -760,6 +782,35 @@ msgstr "Bildirimler arka plan hizmetinden okunamadı.\n"
 #, c-format
 msgid "No notifications yet. Check 'tether --bt-connection'.\n"
 msgstr "Henüz bildirim yok. 'tether --bt-connection' komutunu denetleyin.\n"
+
+#: src/cli/main.cpp
+#, c++-format
+msgid "Expected an app, e.g. {} Signal\n"
+msgstr "Bir uygulama bekleniyordu, örn. {} Signal\n"
+
+#: src/cli/main.cpp
+#, c++-format
+msgid ""
+"No mirrored notification from '{}'. Use its bundle id, e.g. "
+"org.whispersystems.signal\n"
+msgstr ""
+"'{}' kaynaklı yansıtılmış bildirim yok. Bundle id kullanın, örn. "
+"org.whispersystems.signal\n"
+
+#: src/cli/main.cpp
+#, c++-format
+msgid "'{}' is not muted.\n"
+msgstr "'{}' sessize alınmamış.\n"
+
+#: src/cli/main.cpp src/tui/notifications.cpp
+#, c++-format
+msgid "Popups from {} muted."
+msgstr "{} açılır bildirimleri sessize alındı."
+
+#: src/cli/main.cpp
+#, c++-format
+msgid "Popups from {} unmuted."
+msgstr "{} açılır bildirimlerinin sesi açıldı."
 
 #: src/cli/main.cpp
 msgid "Could not read conversations from the daemon.\n"
@@ -1993,6 +2044,11 @@ msgstr "Kodu kopyala"
 msgid "Open in {}"
 msgstr "{} ile aç"
 
+#: src/daemon/notification.cpp
+#, c++-format
+msgid "Mute {}"
+msgstr "{} sessize al"
+
 #: src/gtk/calls_view.cpp src/tui/calls.cpp
 msgid "Unknown caller"
 msgstr "Bilinmeyen arayan"
@@ -2814,6 +2870,17 @@ msgstr "Gönder"
 msgid "Retry"
 msgstr "Yeniden dene"
 
+#: src/gtk/notifications_view.cpp
+msgid "Stop popups from this app. Undo in Settings."
+msgstr ""
+"Bu uygulamanın açılır bildirimlerini durdurur. Ayarlar'dan geri alınabilir."
+
+#. TRANSLATORS: Spoken name of the button that stops desktop popups from the named app.
+#: src/gtk/notifications_view.cpp src/tui/notifications.cpp
+#, c++-format
+msgid "Mute {} popups"
+msgstr "{} açılır bildirimlerini sessize al"
+
 #: src/gtk/notifications_view.cpp src/tui/notifications.cpp
 msgid "Dismiss on the iPhone"
 msgstr "iPhone'da kapat"
@@ -2839,6 +2906,14 @@ msgstr "Henüz bildirim yok."
 #: src/gtk/notifications_view.cpp src/tui/notifications.cpp
 msgid "Notification mirroring is unavailable."
 msgstr "Bildirim yansıtma kullanılamıyor."
+
+#: src/gtk/settings_view.cpp
+msgid "Unmute"
+msgstr "Sesi aç"
+
+#: src/gtk/settings_view.cpp
+msgid "Popups muted"
+msgstr "Açılır bildirimler sessizde"
 
 #: src/gtk/settings_view.cpp src/tui/settings.cpp
 msgid ""
@@ -3199,6 +3274,15 @@ msgstr ""
 #: src/tui/main.cpp
 msgid "tether-tui needs a terminal."
 msgstr "tether-tui bir uçbirim gerektirir."
+
+#: src/tui/settings.cpp
+msgid "Muted apps"
+msgstr "Sessize alınan uygulamalar"
+
+#: src/tui/settings.cpp
+#, c++-format
+msgid "Unmute {}"
+msgstr "{} sesini aç"
 
 #: src/tui/settings.cpp
 #, c++-format

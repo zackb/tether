@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: tether\n"
 "Report-Msgid-Bugs-To: zack@bartel.com\n"
-"POT-Creation-Date: 2026-11-06 17:42-0800\n"
+"POT-Creation-Date: 2026-11-15 11:58-0800\n"
 "PO-Revision-Date: 2026-08-22\n"
 "Last-Translator: Tether project\n"
 "Language-Team: Spanish\n"
@@ -205,6 +205,19 @@ msgstr "Duplicar títulos y contenido de las notificaciones, no solo la app."
 
 #: src/cli/main.cpp
 msgid ""
+"Stop desktop popups from an iPhone app, by name or bundle id. It still lists "
+"in --bt-notifications."
+msgstr ""
+"Deja de mostrar avisos del escritorio de una app del iPhone, por nombre o "
+"bundle id. Sigue apareciendo en --bt-notifications."
+
+#: src/cli/main.cpp
+msgid "Show desktop popups from a muted iPhone app again."
+msgstr ""
+"Vuelve a mostrar avisos del escritorio de una app del iPhone silenciada."
+
+#: src/cli/main.cpp
+msgid ""
 "How message history and contacts are kept on disk. Encrypted uses a key from "
 "the desktop keyring; none deletes what is stored and keeps nothing further."
 msgstr ""
@@ -356,7 +369,10 @@ msgid ""
 "The Flatpak cannot see any browser or mail client yet. For each one you use, "
 "run its line, then run this again:\n"
 "\n"
-msgstr "El Flatpak aún no ve ningún navegador ni cliente de correo. Para cada uno que uses, ejecuta su línea y luego vuelve a ejecutar esto:\n\n"
+msgstr ""
+"El Flatpak aún no ve ningún navegador ni cliente de correo. Para cada uno "
+"que uses, ejecuta su línea y luego vuelve a ejecutar esto:\n"
+"\n"
 
 #: src/cli/main.cpp
 #, c-format
@@ -492,6 +508,10 @@ msgstr "duplicación activada"
 #: src/cli/main.cpp
 msgid "mirroring off (tether --bt-ancs on)"
 msgstr "duplicación desactivada (tether --bt-ancs on)"
+
+#: src/cli/main.cpp
+msgid "Muted"
+msgstr "Silenciadas"
 
 #: src/cli/main.cpp src/daemon/main.cpp src/gtk/main.cpp
 #: src/gtk/tether-gtk.desktop.in
@@ -773,6 +793,35 @@ msgstr "No se pudieron leer las notificaciones del daemon.\n"
 #, c-format
 msgid "No notifications yet. Check 'tether --bt-connection'.\n"
 msgstr "Aún no hay notificaciones. Compruebe 'tether --bt-connection'.\n"
+
+#: src/cli/main.cpp
+#, c++-format
+msgid "Expected an app, e.g. {} Signal\n"
+msgstr "Se esperaba una app, p. ej. {} Signal\n"
+
+#: src/cli/main.cpp
+#, c++-format
+msgid ""
+"No mirrored notification from '{}'. Use its bundle id, e.g. "
+"org.whispersystems.signal\n"
+msgstr ""
+"No hay ninguna notificación reflejada de '{}'. Usa su bundle id, p. ej. "
+"org.whispersystems.signal\n"
+
+#: src/cli/main.cpp
+#, c++-format
+msgid "'{}' is not muted.\n"
+msgstr "'{}' no está silenciada.\n"
+
+#: src/cli/main.cpp src/tui/notifications.cpp
+#, c++-format
+msgid "Popups from {} muted."
+msgstr "Avisos de {} silenciados."
+
+#: src/cli/main.cpp
+#, c++-format
+msgid "Popups from {} unmuted."
+msgstr "Avisos de {} reactivados."
 
 #: src/cli/main.cpp
 msgid "Could not read conversations from the daemon.\n"
@@ -2027,6 +2076,11 @@ msgstr "Copiar código"
 msgid "Open in {}"
 msgstr "Abrir en {}"
 
+#: src/daemon/notification.cpp
+#, c++-format
+msgid "Mute {}"
+msgstr "Silenciar {}"
+
 #: src/gtk/calls_view.cpp src/tui/calls.cpp
 msgid "Unknown caller"
 msgstr "Llamante desconocido"
@@ -2864,6 +2918,16 @@ msgstr "Enviar"
 msgid "Retry"
 msgstr "Reintentar"
 
+#: src/gtk/notifications_view.cpp
+msgid "Stop popups from this app. Undo in Settings."
+msgstr "Deja de mostrar avisos de esta app. Se deshace en Ajustes."
+
+#. TRANSLATORS: Spoken name of the button that stops desktop popups from the named app.
+#: src/gtk/notifications_view.cpp src/tui/notifications.cpp
+#, c++-format
+msgid "Mute {} popups"
+msgstr "Silenciar avisos de {}"
+
 #: src/gtk/notifications_view.cpp src/tui/notifications.cpp
 msgid "Dismiss on the iPhone"
 msgstr "Descartar en el iPhone"
@@ -2889,6 +2953,14 @@ msgstr "Aún no hay notificaciones."
 #: src/gtk/notifications_view.cpp src/tui/notifications.cpp
 msgid "Notification mirroring is unavailable."
 msgstr "La duplicación de notificaciones no está disponible."
+
+#: src/gtk/settings_view.cpp
+msgid "Unmute"
+msgstr "Reactivar"
+
+#: src/gtk/settings_view.cpp
+msgid "Popups muted"
+msgstr "Avisos silenciados"
 
 #: src/gtk/settings_view.cpp src/tui/settings.cpp
 msgid ""
@@ -3250,6 +3322,15 @@ msgstr ""
 #: src/tui/main.cpp
 msgid "tether-tui needs a terminal."
 msgstr "tether-tui necesita una terminal."
+
+#: src/tui/settings.cpp
+msgid "Muted apps"
+msgstr "Apps silenciadas"
+
+#: src/tui/settings.cpp
+#, c++-format
+msgid "Unmute {}"
+msgstr "Reactivar {}"
 
 #: src/tui/settings.cpp
 #, c++-format

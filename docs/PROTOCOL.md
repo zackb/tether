@@ -668,6 +668,13 @@ retained or replayed. See `BLUETOOTH.md` for the on-disk format.
 ANCS offers positive and negative actions only — there is no free-text reply on a mirrored
 notification. Answers with `bt_notification_action_result`.
 
+#### `bt_mute_app` (Client -> Daemon, broadcast)
+**Payload**: `{"command": "bt_mute_app", "app_id": "org.whispersystems.signal", "app_name": "Signal", "muted": true}`
+Stops or restores desktop popups for one iPhone app, keyed on its ANCS bundle id. Muted apps
+are still listed in `bt_notifications` and still feed OTP. `app_name` is the label to show;
+when empty the daemon derives one from the bundle id. Persisted, and answered with a
+`bt_status` broadcast whose `muted_apps` is an array of `{"app_id", "app_name"}`.
+
 ### Diagnostics
 
 #### `bt_diagnostics` (Client -> Daemon, answered directly)

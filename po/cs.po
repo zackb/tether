@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: tether\n"
 "Report-Msgid-Bugs-To: zack@bartel.com\n"
-"POT-Creation-Date: 2026-11-06 17:42-0800\n"
+"POT-Creation-Date: 2026-11-15 11:58-0800\n"
 "PO-Revision-Date: 2026-08-23\n"
 "Last-Translator: Tether project\n"
 "Language-Team: Czech\n"
@@ -201,6 +201,18 @@ msgstr "Zrcadlit názvy a text oznámení, nejen aplikaci."
 
 #: src/cli/main.cpp
 msgid ""
+"Stop desktop popups from an iPhone app, by name or bundle id. It still lists "
+"in --bt-notifications."
+msgstr ""
+"Zastaví vyskakovací oznámení z aplikace v iPhonu, podle názvu nebo bundle "
+"id. V --bt-notifications zůstane uvedena."
+
+#: src/cli/main.cpp
+msgid "Show desktop popups from a muted iPhone app again."
+msgstr "Znovu zobrazovat vyskakovací oznámení ze ztlumené aplikace v iPhonu."
+
+#: src/cli/main.cpp
+msgid ""
 "How message history and contacts are kept on disk. Encrypted uses a key from "
 "the desktop keyring; none deletes what is stored and keeps nothing further."
 msgstr ""
@@ -347,7 +359,10 @@ msgid ""
 "The Flatpak cannot see any browser or mail client yet. For each one you use, "
 "run its line, then run this again:\n"
 "\n"
-msgstr "Flatpak zatím nevidí žádný prohlížeč ani poštovního klienta. Pro každý, který používáte, spusťte jeho řádek a pak spusťte tento příkaz znovu:\n\n"
+msgstr ""
+"Flatpak zatím nevidí žádný prohlížeč ani poštovního klienta. Pro každý, "
+"který používáte, spusťte jeho řádek a pak spusťte tento příkaz znovu:\n"
+"\n"
 
 #: src/cli/main.cpp
 #, c-format
@@ -484,6 +499,10 @@ msgstr "zrcadlení zapnuto"
 #: src/cli/main.cpp
 msgid "mirroring off (tether --bt-ancs on)"
 msgstr "zrcadlení vypnuto (tether --bt-ancs on)"
+
+#: src/cli/main.cpp
+msgid "Muted"
+msgstr "Ztlumené"
 
 #: src/cli/main.cpp src/daemon/main.cpp src/gtk/main.cpp
 #: src/gtk/tether-gtk.desktop.in
@@ -763,6 +782,35 @@ msgstr "Nepodařilo se načíst oznámení od démona.\n"
 #, c-format
 msgid "No notifications yet. Check 'tether --bt-connection'.\n"
 msgstr "Zatím žádná oznámení. Zkontrolujte 'tether --bt-connection'.\n"
+
+#: src/cli/main.cpp
+#, c++-format
+msgid "Expected an app, e.g. {} Signal\n"
+msgstr "Očekávána aplikace, např. {} Signal\n"
+
+#: src/cli/main.cpp
+#, c++-format
+msgid ""
+"No mirrored notification from '{}'. Use its bundle id, e.g. "
+"org.whispersystems.signal\n"
+msgstr ""
+"Žádné zrcadlené oznámení od '{}'. Použijte bundle id, např. "
+"org.whispersystems.signal\n"
+
+#: src/cli/main.cpp
+#, c++-format
+msgid "'{}' is not muted.\n"
+msgstr "'{}' není ztlumená.\n"
+
+#: src/cli/main.cpp src/tui/notifications.cpp
+#, c++-format
+msgid "Popups from {} muted."
+msgstr "Vyskakovací oznámení z {} ztlumena."
+
+#: src/cli/main.cpp
+#, c++-format
+msgid "Popups from {} unmuted."
+msgstr "Vyskakovací oznámení z {} obnovena."
 
 #: src/cli/main.cpp
 msgid "Could not read conversations from the daemon.\n"
@@ -1998,6 +2046,11 @@ msgstr "Kopírovat kód"
 msgid "Open in {}"
 msgstr "Otevřít v {}"
 
+#: src/daemon/notification.cpp
+#, c++-format
+msgid "Mute {}"
+msgstr "Ztlumit {}"
+
 #: src/gtk/calls_view.cpp src/tui/calls.cpp
 msgid "Unknown caller"
 msgstr "Neznámý volající"
@@ -2821,6 +2874,16 @@ msgstr "Odeslat"
 msgid "Retry"
 msgstr "Zkusit znovu"
 
+#: src/gtk/notifications_view.cpp
+msgid "Stop popups from this app. Undo in Settings."
+msgstr "Zastaví vyskakovací oznámení z této aplikace. Vrátit lze v Nastavení."
+
+#. TRANSLATORS: Spoken name of the button that stops desktop popups from the named app.
+#: src/gtk/notifications_view.cpp src/tui/notifications.cpp
+#, c++-format
+msgid "Mute {} popups"
+msgstr "Ztlumit vyskakovací oznámení z {}"
+
 #: src/gtk/notifications_view.cpp src/tui/notifications.cpp
 msgid "Dismiss on the iPhone"
 msgstr "Zavřít na iPhonu"
@@ -2846,6 +2909,14 @@ msgstr "Zatím žádná oznámení."
 #: src/gtk/notifications_view.cpp src/tui/notifications.cpp
 msgid "Notification mirroring is unavailable."
 msgstr "Zrcadlení oznámení není dostupné."
+
+#: src/gtk/settings_view.cpp
+msgid "Unmute"
+msgstr "Zrušit ztlumení"
+
+#: src/gtk/settings_view.cpp
+msgid "Popups muted"
+msgstr "Vyskakovací oznámení ztlumena"
 
 #: src/gtk/settings_view.cpp src/tui/settings.cpp
 msgid ""
@@ -3199,6 +3270,15 @@ msgstr ""
 #: src/tui/main.cpp
 msgid "tether-tui needs a terminal."
 msgstr "tether-tui potřebuje terminál."
+
+#: src/tui/settings.cpp
+msgid "Muted apps"
+msgstr "Ztlumené aplikace"
+
+#: src/tui/settings.cpp
+#, c++-format
+msgid "Unmute {}"
+msgstr "Zrušit ztlumení {}"
 
 #: src/tui/settings.cpp
 #, c++-format
