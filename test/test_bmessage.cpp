@@ -249,6 +249,14 @@ TEST(MessageStore, RejectsMessagesWithoutHandle) {
     EXPECT_EQ(store.size(), 0u);
 }
 
+TEST(MessageStore, ReportsTheNewestTimestampHeld) {
+    MessageStore store;
+    EXPECT_FALSE(store.newest_timestamp().has_value());
+    store.add(make("a", "tel:+1111", 300));
+    store.add(make("b", "tel:+2222", 100));
+    EXPECT_EQ(store.newest_timestamp(), 300);
+}
+
 TEST(MessageStore, GroupsThreadsNewestFirst) {
     MessageStore store;
     store.add(make("a", "tel:+1111", 100));

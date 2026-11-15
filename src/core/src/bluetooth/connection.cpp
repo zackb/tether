@@ -696,6 +696,7 @@ namespace tether::bluetooth {
         BluezMonitor* monitor = nullptr;
         ConnectionManager::StatusFn on_change;
         ConnectionManager::MessageFn on_message;
+        ConnectionManager::BackfillFn on_backfill;
 
         std::unique_ptr<BluezBearerOps> bearer_ops;
         std::unique_ptr<ObexProfileOps> profile_ops;
@@ -1005,8 +1006,11 @@ namespace tether::bluetooth {
         };
 
         std::vector<Pending> unseen;
+        std::optional<int64_t> newest_known;
         {
             std::lock_guard<std::mutex> lock(g_messages_mutex);
+            if (map_session_backfill)
+                newest_known = g_messages.newest_timestamp();
             for (const auto& listing : listings) {
                 Message message = message_from_listing(listing);
                 if (message.thread_key.empty()) {
@@ -1105,6 +1109,8 @@ namespace tether::bluetooth {
             if (on_message)
                 on_message(message, backfill);
         }
+        if (backfill && !fresh.empty() && on_backfill)
+            on_backfill(fresh, newest_known);
     }
 
     // Pulls the phonebook once per PBAP session. Contacts change far more slowly
@@ -1612,6 +1618,10 @@ namespace tether::bluetooth {
     }
 
     void ConnectionManager::set_call_handler(CallsFn on_calls) { state_->on_calls = std::move(on_calls); }
+
+    void ConnectionManager::set_backfill_handler(BackfillFn on_backfill) {
+        state_->on_backfill = std::move(on_backfill);
+    }
 
     void ConnectionManager::refresh_calls() { state_->sync_calls(); }
 

@@ -30,6 +30,8 @@ namespace tether::ui {
             GtkWidget* sw_popups = nullptr;
             GtkWidget* row_previews = nullptr;
             GtkWidget* sw_previews = nullptr;
+            GtkWidget* row_missed = nullptr;
+            GtkWidget* sw_missed = nullptr;
             GtkWidget* list_popups = nullptr;
             std::vector<GtkWidget*> muted_rows;
             nlohmann::json muted_apps = nlohmann::json::array();
@@ -148,6 +150,10 @@ namespace tether::ui {
             daemon_send({{"command", "set_popup_previews"}, {"enabled", gtk_switch_get_active(widget) == TRUE}});
         }
 
+        void on_missed_toggled(GtkSwitch* widget, GParamSpec*, gpointer) {
+            daemon_send({{"command", "set_missed_message_popups"}, {"enabled", gtk_switch_get_active(widget) == TRUE}});
+        }
+
         void on_clipboard_share_toggled(GtkSwitch* widget, GParamSpec*, gpointer) {
             daemon_send({{"command", "set_clipboard_auto_share"}, {"enabled", gtk_switch_get_active(widget) == TRUE}});
         }
@@ -255,6 +261,10 @@ namespace tether::ui {
             set_switch(g_settings.sw_previews,
                        reinterpret_cast<gpointer>(on_previews_toggled),
                        status.value("popup_previews_enabled", true));
+            gtk_widget_set_sensitive(g_settings.row_missed, popups_on);
+            set_switch(g_settings.sw_missed,
+                       reinterpret_cast<gpointer>(on_missed_toggled),
+                       status.value("missed_message_popups", true));
             update_muted_rows(status.value("muted_apps", nlohmann::json::array()));
 
             set_switch(g_settings.sw_lock_away,
@@ -389,6 +399,14 @@ namespace tether::ui {
             g_signal_connect(g_settings.sw_previews, "notify::active", G_CALLBACK(on_previews_toggled), nullptr);
             g_settings.row_previews =
                 add_row(popups, _("Show message previews"), _("Off shows only the sender."), g_settings.sw_previews);
+
+            g_settings.sw_missed = new_switch();
+            g_signal_connect(g_settings.sw_missed, "notify::active", G_CALLBACK(on_missed_toggled), nullptr);
+            g_settings.row_missed = add_row(popups,
+                                            _("Show messages missed while away"),
+                                            _("When the iPhone reconnects, unread messages that arrived meanwhile "
+                                              "pop up. More than three become one summary."),
+                                            g_settings.sw_missed);
             g_settings.list_popups = popups;
 
             // Security

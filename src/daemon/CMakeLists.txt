@@ -1,6 +1,7 @@
 add_executable(tetherd
     main.cpp
     notification.cpp
+    message_popups.cpp
 )
 
 pkg_check_modules(LIBNOTIFY REQUIRED IMPORTED_TARGET libnotify)

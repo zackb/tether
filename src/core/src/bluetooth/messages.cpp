@@ -131,6 +131,14 @@ namespace tether::bluetooth {
         return it == by_handle_.end() ? nullptr : &it->second;
     }
 
+    std::optional<int64_t> MessageStore::newest_timestamp() const {
+        std::optional<int64_t> newest;
+        for (const auto& [handle, message] : by_handle_)
+            if (!newest || message.timestamp > *newest)
+                newest = message.timestamp;
+        return newest;
+    }
+
     void MessageStore::trim() {
         while (order_.size() > max_messages_) {
             by_handle_.erase(order_.front());

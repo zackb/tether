@@ -12,6 +12,7 @@
 #include <memory>
 #include <mutex>
 #include <nlohmann/json.hpp>
+#include <optional>
 #include <string>
 #include <vector>
 
@@ -31,6 +32,13 @@ namespace tether::bluetooth {
         // after a MAP session opens (phone's existing inbox), so they belong in the UI but must not each do desktop
         // notification.
         using MessageFn = std::function<void(const Message& message, bool backfill)>;
+        // Called once after a backfill listing that added anything, with every
+        // message it added, after each has gone through MessageFn. Lets the
+        // caller announce what arrived while the phone was away as one batch.
+        // `newest_known` is the newest timestamp held before the listing, empty
+        // when nothing was: a first sync, or a journal that could not be read.
+        using BackfillFn =
+            std::function<void(const std::vector<Message>& messages, std::optional<int64_t> newest_known)>;
         // Called once per mirrored notification, and when one is dismissed on
         // the phone.
         using NotificationFn = std::function<void(const ancs::Notification&)>;
@@ -44,6 +52,9 @@ namespace tether::bluetooth {
         // never started, so a caller that cannot show notifications does not pay
         // for a GATT session it will not use.
         void set_notification_handlers(NotificationFn on_notification, WithdrawFn on_withdraw);
+
+        // Set before start(); the supervisor thread reads it unguarded.
+        void set_backfill_handler(BackfillFn on_backfill);
 
         // Turns notification mirroring on or off in place, on the next supervisor tick.
         void set_ancs_enabled(bool enabled);

@@ -432,6 +432,7 @@ namespace tether {
         status["retention_ready"] = secret::have_key();
         status["desktop_popups_enabled"] = config.desktop_popups_enabled;
         status["popup_previews_enabled"] = config.popup_previews_enabled;
+        status["missed_message_popups"] = config.missed_message_popups;
         status["clipboard_auto_share"] = config.clipboard_auto_share;
         status["hide_unknown_senders"] = config.hide_unknown_senders;
         status["muted_apps"] = nlohmann::json::array();
@@ -1597,6 +1598,11 @@ namespace tether {
                         config.clipboard_auto_share = j.value("enabled", true);
                         bluetooth::save_config(config);
                         set_clipboard_auto_share(config.clipboard_auto_share);
+                        broadcast_local_event(build_bt_status().dump());
+                    } else if (j.contains("command") && j["command"] == "set_missed_message_popups") {
+                        auto config = bluetooth::load_config();
+                        config.missed_message_popups = j.value("enabled", true);
+                        bluetooth::save_config(config);
                         broadcast_local_event(build_bt_status().dump());
                     } else if (j.contains("command") && j["command"] == "set_hide_unknown_senders") {
                         auto config = bluetooth::load_config();

@@ -1,3 +1,4 @@
+#include "message_popups.hpp"
 #include "notification.hpp"
 #ifdef TETHER_CAMERA
 #include "camera.hpp"
@@ -285,49 +286,11 @@ int main(int argc, char** argv) {
 
             // ANCS deliberately shows no popup for Messages, because MAP is the
             // copy whose read state stays in sync with the phone. This is that popup.
-            if (backfill || message.outgoing || message.read)
+            // A backfill is announced as a batch, by the backfill handler.
+            if (backfill)
                 return;
-
-            const bool hide_unknown = tether::bluetooth::load_config().hide_unknown_senders;
-            std::string who;
-            bool unknown = false;
-            bool hidden = false;
-            {
-                std::lock_guard<std::mutex> lock(tether::bluetooth::message_store_mutex());
-                who = tether::bluetooth::contact_store().name_for(message.thread_key);
-                const auto& removed = tether::bluetooth::removed_threads();
-                hidden = removed.hides(message);
-                if (hide_unknown) {
-                    const auto thread = tether::bluetooth::message_store().messages(
-                        message.thread_key, 200, [&removed](const auto& m) { return !removed.hides(m); });
-                    const bool replied =
-                        std::any_of(thread.begin(), thread.end(), [](const auto& m) { return m.outgoing; });
-                    unknown = tether::bluetooth::contact_store().is_unknown_sender(message.thread_key, replied);
-                }
-            }
-            // hidden sender still pops up with a code,
-            if (unknown && otp.empty() && !tether::bluetooth::is_short_code(message.thread_key))
-                return;
-            if (hidden && otp.empty())
-                return;
-            if (who.empty())
-                who = message.peer_name.empty() ? message.peer_address : message.peer_name;
-            tether::bluetooth::ancs::Notification as_notification;
-            as_notification.app_id = tether::bluetooth::ancs::APP_ID_MESSAGES;
-            // The reply action is only offered for a thread that has a route back.
-            tether::bluetooth::Recipient recipient;
-            std::string reply_error;
-            const bool repliable =
-                !unknown && tether::bluetooth::recipient_from_thread_key(message.thread_key, recipient, reply_error);
-            notifier.notify({_("Messages"),
-                             who.empty() ? "iPhone" : who,
-                             tether::popup_previews_enabled() ? message.body : std::string{},
-                             tether::bluetooth::ancs::icon_candidates(as_notification),
-                             false,
-                             repliable ? message.thread_key : std::string{},
-                             otp,
-                             "",
-                             message.handle});
+            if (auto popup = tether::message_popup(message, otp))
+                notifier.notify(*popup);
         });
 
     auto bt_config = tether::bluetooth::load_config();
@@ -783,6 +746,11 @@ int main(int argc, char** argv) {
             event["calls"] = history;
             tether::broadcast_local_event(event.dump(-1, ' ', false, nlohmann::json::error_handler_t::replace));
         });
+
+        connections.set_backfill_handler(
+            [&notifier](const std::vector<tether::bluetooth::Message>& messages, std::optional<int64_t> newest_known) {
+                tether::announce_missed_messages(notifier, messages, newest_known);
+            });
 
         connections.start(tether::bluetooth::supervised_address(bt_config), bt_config.ancs_enabled);
     } else {
