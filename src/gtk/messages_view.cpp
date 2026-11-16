@@ -1252,6 +1252,9 @@ namespace tether::ui {
         // Without a border the box floats in the panel with nothing marking it as
         // somewhere to type.
         gtk_scrolled_window_set_shadow_type(GTK_SCROLLED_WINDOW(composer_frame), GTK_SHADOW_NONE);
+        // max-content-height does nothing unless the natural height is propagated,
+        // so without this the box never grew past its minimum.
+        gtk_scrolled_window_set_propagate_natural_height(GTK_SCROLLED_WINDOW(composer_frame), TRUE);
         gtk_scrolled_window_set_max_content_height(GTK_SCROLLED_WINDOW(composer_frame), 140);
         gtk_container_add(GTK_CONTAINER(composer_frame), g_messages.composer);
         gtk_box_pack_start(GTK_BOX(composer_box), composer_frame, TRUE, TRUE, 0);
