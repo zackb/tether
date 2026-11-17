@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: tether\n"
 "Report-Msgid-Bugs-To: zack@bartel.com\n"
-"POT-Creation-Date: 2026-11-15 11:58-0800\n"
+"POT-Creation-Date: 2026-11-16 22:00-0800\n"
 "PO-Revision-Date: 2026-08-23\n"
 "Last-Translator: Tether project\n"
 "Language-Team: Japanese\n"
@@ -2740,7 +2740,7 @@ msgstr "サイドバーを折りたたむ"
 msgid "Settings"
 msgstr "設定"
 
-#: src/gtk/main.cpp src/tui/main.cpp
+#: src/gtk/main.cpp src/gtk/tray.cpp src/tui/main.cpp
 msgid "Quit"
 msgstr "終了"
 
@@ -2866,6 +2866,14 @@ msgstr "電話番号またはメールアドレス"
 #: src/gtk/messages_view.cpp
 msgid "Remove Conversation"
 msgstr "スレッドを一覧から外す"
+
+#: src/gtk/messages_view.cpp
+msgid "Insert emoji (Ctrl+.)"
+msgstr "絵文字を挿入 (Ctrl+.)"
+
+#: src/gtk/messages_view.cpp
+msgid "Insert emoji"
+msgstr "絵文字を挿入"
 
 #: src/gtk/messages_view.cpp
 msgid "Send"
@@ -3119,6 +3127,22 @@ msgid ""
 msgstr ""
 "iPhone の音楽やサウンドをここで再生します。オフにすると iPhone に戻ります。通"
 "話には影響しません。"
+
+#. TRANSLATORS: {} is the iPhone's name. Stops Bluetooth without unpairing.
+#: src/gtk/tray.cpp
+#, c++-format
+msgid "Disconnect {}"
+msgstr "{} を切断"
+
+#. TRANSLATORS: {} is the iPhone's name.
+#: src/gtk/tray.cpp
+#, c++-format
+msgid "Connect {}"
+msgstr "{} に接続"
+
+#: src/gtk/tray.cpp
+msgid "Show Tether"
+msgstr "Tether を表示"
 
 #: src/gtk/tray.cpp src/gtk/ui_util.cpp src/tui/main.cpp
 msgid "connected"
