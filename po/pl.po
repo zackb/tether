@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: tether\n"
 "Report-Msgid-Bugs-To: zack@bartel.com\n"
-"POT-Creation-Date: 2026-11-15 11:58-0800\n"
+"POT-Creation-Date: 2026-11-16 22:00-0800\n"
 "PO-Revision-Date: 2026-08-23\n"
 "Last-Translator: Tether project\n"
 "Language-Team: Polish\n"
@@ -2767,7 +2767,7 @@ msgstr "Zwiń panel boczny"
 msgid "Settings"
 msgstr "Ustawienia"
 
-#: src/gtk/main.cpp src/tui/main.cpp
+#: src/gtk/main.cpp src/gtk/tray.cpp src/tui/main.cpp
 msgid "Quit"
 msgstr "Zakończ"
 
@@ -2894,6 +2894,14 @@ msgstr "Numer telefonu lub e-mail"
 #: src/gtk/messages_view.cpp
 msgid "Remove Conversation"
 msgstr "Usuń wątek"
+
+#: src/gtk/messages_view.cpp
+msgid "Insert emoji (Ctrl+.)"
+msgstr "Wstaw emoji (Ctrl+.)"
+
+#: src/gtk/messages_view.cpp
+msgid "Insert emoji"
+msgstr "Wstaw emoji"
 
 #: src/gtk/messages_view.cpp
 msgid "Send"
@@ -3149,6 +3157,22 @@ msgid ""
 msgstr ""
 "Muzyka i dźwięki z iPhone'a są odtwarzane tutaj. Wyłączenie odsyła je na "
 "iPhone'a. Nie dotyczy to połączeń."
+
+#. TRANSLATORS: {} is the iPhone's name. Stops Bluetooth without unpairing.
+#: src/gtk/tray.cpp
+#, c++-format
+msgid "Disconnect {}"
+msgstr "Rozłącz {}"
+
+#. TRANSLATORS: {} is the iPhone's name.
+#: src/gtk/tray.cpp
+#, c++-format
+msgid "Connect {}"
+msgstr "Połącz {}"
+
+#: src/gtk/tray.cpp
+msgid "Show Tether"
+msgstr "Pokaż Tether"
 
 #: src/gtk/tray.cpp src/gtk/ui_util.cpp src/tui/main.cpp
 msgid "connected"

@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: tether\n"
 "Report-Msgid-Bugs-To: zack@bartel.com\n"
-"POT-Creation-Date: 2026-11-15 11:58-0800\n"
+"POT-Creation-Date: 2026-11-16 22:00-0800\n"
 "PO-Revision-Date: 2026-08-23\n"
 "Last-Translator: Tether project\n"
 "Language-Team: Czech\n"
@@ -2739,7 +2739,7 @@ msgstr "Sbalit postranní panel"
 msgid "Settings"
 msgstr "Nastavení"
 
-#: src/gtk/main.cpp src/tui/main.cpp
+#: src/gtk/main.cpp src/gtk/tray.cpp src/tui/main.cpp
 msgid "Quit"
 msgstr "Ukončit"
 
@@ -2865,6 +2865,14 @@ msgstr "Telefonní číslo nebo e-mail"
 #: src/gtk/messages_view.cpp
 msgid "Remove Conversation"
 msgstr "Odebrat konverzaci"
+
+#: src/gtk/messages_view.cpp
+msgid "Insert emoji (Ctrl+.)"
+msgstr "Vložit emoji (Ctrl+.)"
+
+#: src/gtk/messages_view.cpp
+msgid "Insert emoji"
+msgstr "Vložit emoji"
 
 #: src/gtk/messages_view.cpp
 msgid "Send"
@@ -3113,6 +3121,22 @@ msgid ""
 msgstr ""
 "Hudba a zvuky z iPhonu hrají zde. Vypnuto je vrátí do iPhonu. Hovory to "
 "neovlivní."
+
+#. TRANSLATORS: {} is the iPhone's name. Stops Bluetooth without unpairing.
+#: src/gtk/tray.cpp
+#, c++-format
+msgid "Disconnect {}"
+msgstr "Odpojit {}"
+
+#. TRANSLATORS: {} is the iPhone's name.
+#: src/gtk/tray.cpp
+#, c++-format
+msgid "Connect {}"
+msgstr "Připojit {}"
+
+#: src/gtk/tray.cpp
+msgid "Show Tether"
+msgstr "Zobrazit Tether"
 
 #: src/gtk/tray.cpp src/gtk/ui_util.cpp src/tui/main.cpp
 msgid "connected"

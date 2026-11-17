@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: tether\n"
 "Report-Msgid-Bugs-To: zack@bartel.com\n"
-"POT-Creation-Date: 2026-11-15 11:58-0800\n"
+"POT-Creation-Date: 2026-11-16 22:00-0800\n"
 "PO-Revision-Date: 2026-08-23\n"
 "Last-Translator: Tether project\n"
 "Language-Team: Korean\n"
@@ -2700,7 +2700,7 @@ msgstr "사이드바 접기"
 msgid "Settings"
 msgstr "설정"
 
-#: src/gtk/main.cpp src/tui/main.cpp
+#: src/gtk/main.cpp src/gtk/tray.cpp src/tui/main.cpp
 msgid "Quit"
 msgstr "종료"
 
@@ -2825,6 +2825,14 @@ msgstr "전화번호 또는 이메일"
 #: src/gtk/messages_view.cpp
 msgid "Remove Conversation"
 msgstr "대화 제거"
+
+#: src/gtk/messages_view.cpp
+msgid "Insert emoji (Ctrl+.)"
+msgstr "이모지 삽입 (Ctrl+.)"
+
+#: src/gtk/messages_view.cpp
+msgid "Insert emoji"
+msgstr "이모지 삽입"
 
 #: src/gtk/messages_view.cpp
 msgid "Send"
@@ -3074,6 +3082,22 @@ msgid ""
 msgstr ""
 "iPhone의 음악과 소리가 여기에서 재생됩니다. 끄면 iPhone으로 돌아갑니다. 통화"
 "에는 영향이 없습니다."
+
+#. TRANSLATORS: {} is the iPhone's name. Stops Bluetooth without unpairing.
+#: src/gtk/tray.cpp
+#, c++-format
+msgid "Disconnect {}"
+msgstr "{} 연결 해제"
+
+#. TRANSLATORS: {} is the iPhone's name.
+#: src/gtk/tray.cpp
+#, c++-format
+msgid "Connect {}"
+msgstr "{} 연결"
+
+#: src/gtk/tray.cpp
+msgid "Show Tether"
+msgstr "Tether 표시"
 
 #: src/gtk/tray.cpp src/gtk/ui_util.cpp src/tui/main.cpp
 msgid "connected"
