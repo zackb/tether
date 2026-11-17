@@ -1508,6 +1508,9 @@ namespace tether::ui {
         }
         if (command == "bt_status") {
             g_devices.bt_status = event;
+            tray_set_bluetooth(event.value("available", false),
+                               !event.value("device_address", std::string()).empty(),
+                               event.value("enabled", true));
             devices_view_refresh();
             update_right_pane();
             return true;
