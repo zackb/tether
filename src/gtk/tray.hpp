@@ -22,6 +22,9 @@ namespace tether::ui {
     // The supervised iPhone's battery for the tooltip; empty hides the line.
     void tray_set_phone(const std::string& name, const std::string& battery);
 
+    // Bluetooth supervision state from bt_status; drives the tray menu's connect/disconnect item.
+    void tray_set_bluetooth(bool available, bool bonded, bool enabled);
+
     // Repaints from cached state, for when the daemon returns before any route event.
     void tray_refresh();
 
