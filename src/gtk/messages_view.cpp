@@ -34,6 +34,7 @@ namespace tether::ui {
             GtkWidget* conversation_scroll = nullptr;
             GtkWidget* composer = nullptr;
             GtkWidget* send_button = nullptr;
+            GtkWidget* emoji_button = nullptr;
             GtkWidget* placeholder_stack = nullptr;
             GtkWidget* placeholder_icon = nullptr;
             GtkWidget* placeholder_label = nullptr;
@@ -652,6 +653,7 @@ namespace tether::ui {
             // only the button waits for there to be something in it.
             const bool composer_live = can_send && !g_messages.sending;
             gtk_widget_set_sensitive(g_messages.composer, composer_live);
+            gtk_widget_set_sensitive(g_messages.emoji_button, composer_live);
             gtk_widget_set_sensitive(g_messages.send_button, composer_live && !composer_text().empty());
 
             const char* reason = nullptr;
@@ -1259,10 +1261,29 @@ namespace tether::ui {
         gtk_container_add(GTK_CONTAINER(composer_frame), g_messages.composer);
         gtk_box_pack_start(GTK_BOX(composer_box), composer_frame, TRUE, TRUE, 0);
 
+        // GTK's own emoji chooser, the one Ctrl+. opens; the button just makes it findable.
+        g_messages.emoji_button = gtk_button_new_from_icon_name("face-smile-symbolic", GTK_ICON_SIZE_LARGE_TOOLBAR);
+        gtk_button_set_relief(GTK_BUTTON(g_messages.emoji_button), GTK_RELIEF_NONE);
+        gtk_widget_set_valign(g_messages.emoji_button, GTK_ALIGN_CENTER);
+        gtk_widget_set_tooltip_text(g_messages.emoji_button, _("Insert emoji (Ctrl+.)"));
+        set_accessible_name(g_messages.emoji_button, _("Insert emoji"));
+        g_signal_connect(g_messages.emoji_button,
+                         "clicked",
+                         G_CALLBACK(+[](GtkButton*, gpointer) {
+                             gtk_widget_grab_focus(g_messages.composer);
+                             g_signal_emit_by_name(g_messages.composer, "insert-emoji");
+                         }),
+                         nullptr);
+        // Both buttons sit at the bottom as the box grows, centered on each other.
+        GtkWidget* composer_actions = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, 4);
+        gtk_widget_set_valign(composer_actions, GTK_ALIGN_END);
+        gtk_box_pack_start(GTK_BOX(composer_actions), g_messages.emoji_button, FALSE, FALSE, 0);
+
         g_messages.send_button = gtk_button_new_with_label(_("Send"));
-        gtk_widget_set_valign(g_messages.send_button, GTK_ALIGN_END);
+        gtk_widget_set_valign(g_messages.send_button, GTK_ALIGN_CENTER);
         gtk_style_context_add_class(gtk_widget_get_style_context(g_messages.send_button), "suggested-action");
-        gtk_box_pack_start(GTK_BOX(composer_box), g_messages.send_button, FALSE, FALSE, 0);
+        gtk_box_pack_start(GTK_BOX(composer_actions), g_messages.send_button, FALSE, FALSE, 0);
+        gtk_box_pack_start(GTK_BOX(composer_box), composer_actions, FALSE, FALSE, 0);
 
         g_signal_connect(g_messages.send_button, "clicked", G_CALLBACK(on_send_clicked), nullptr);
         g_signal_connect(g_messages.composer, "key-press-event", G_CALLBACK(on_composer_key), nullptr);
