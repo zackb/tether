@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: tether\n"
 "Report-Msgid-Bugs-To: zack@bartel.com\n"
-"POT-Creation-Date: 2026-11-15 11:58-0800\n"
+"POT-Creation-Date: 2026-11-15 17:18-0600\n"
 "PO-Revision-Date: 2026-08-23\n"
 "Last-Translator: Tether project\n"
 "Language-Team: Ukrainian\n"
@@ -1766,9 +1766,9 @@ msgstr ""
 
 #. TRANSLATORS: the feature name Tether shows for this profile.
 #: src/core/src/bluetooth/profile_supervisor.cpp src/daemon/main.cpp
-#: src/gtk/devices_view.cpp src/gtk/main.cpp src/gtk/messages_view.cpp
-#: src/gtk/settings_view.cpp src/tui/devices.cpp src/tui/messages.cpp
-#: src/tui/settings.cpp
+#: src/daemon/message_popups.cpp src/gtk/devices_view.cpp src/gtk/main.cpp
+#: src/gtk/messages_view.cpp src/gtk/settings_view.cpp src/tui/devices.cpp
+#: src/tui/messages.cpp src/tui/settings.cpp
 msgid "Messages"
 msgstr "Повідомлення"
 
@@ -2021,6 +2021,27 @@ msgid ""
 msgstr ""
 "avahi-daemon не запущено, тому Tether не може оголосити себе в мережі. "
 "Запустіть його командою: sudo systemctl enable --now avahi-daemon"
+
+#: src/daemon/message_popups.cpp
+#, c++-format
+msgid "{0} and {1} other"
+msgid_plural "{0} and {1} others"
+msgstr[0] "{0} і ще {1}"
+msgstr[1] "{0} і ще {1}"
+msgstr[2] "{0} і ще {1}"
+
+#: src/daemon/message_popups.cpp
+#, c++-format
+msgid "{0} and {1}"
+msgstr "{0} і {1}"
+
+#: src/daemon/message_popups.cpp
+#, c++-format
+msgid "{} new message"
+msgid_plural "{} new messages"
+msgstr[0] "{} нове повідомлення"
+msgstr[1] "{} нові повідомлення"
+msgstr[2] "{} нових повідомлень"
 
 #: src/daemon/notification.cpp
 #, c++-format
@@ -3032,6 +3053,18 @@ msgstr "Показувати текст повідомлень"
 #: src/gtk/settings_view.cpp src/tui/settings.cpp
 msgid "Off shows only the sender."
 msgstr "Якщо вимкнено, показується лише відправник."
+
+#: src/gtk/settings_view.cpp src/tui/settings.cpp
+msgid "Show messages missed while away"
+msgstr "Показувати повідомлення, пропущені за час відсутності"
+
+#: src/gtk/settings_view.cpp src/tui/settings.cpp
+msgid ""
+"When the iPhone reconnects, unread messages that arrived meanwhile pop up. "
+"More than three become one summary."
+msgstr ""
+"Коли iPhone знову під'єднується, показуються непрочитані повідомлення, що "
+"надійшли за цей час. Якщо їх більше трьох, вони об'єднуються в один підсумок."
 
 #: src/gtk/settings_view.cpp src/tui/settings.cpp
 msgid "Security"

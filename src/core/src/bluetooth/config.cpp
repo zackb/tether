@@ -85,6 +85,7 @@ namespace tether::bluetooth {
         j["retention"] = to_string(config.retention);
         j["desktop_popups_enabled"] = config.desktop_popups_enabled;
         j["popup_previews_enabled"] = config.popup_previews_enabled;
+        j["missed_message_popups"] = config.missed_message_popups;
         j["clipboard_auto_share"] = config.clipboard_auto_share;
         j["hide_unknown_senders"] = config.hide_unknown_senders;
         j["muted_apps"] = config.muted_apps;
@@ -119,6 +120,7 @@ namespace tether::bluetooth {
             config.retention = retention_from_string(j.value("retention", "encrypted"));
             config.desktop_popups_enabled = j.value("desktop_popups_enabled", true);
             config.popup_previews_enabled = j.value("popup_previews_enabled", true);
+            config.missed_message_popups = j.value("missed_message_popups", true);
             config.clipboard_auto_share = j.value("clipboard_auto_share", true);
             config.hide_unknown_senders = j.value("hide_unknown_senders", false);
             config.muted_apps = j.value("muted_apps", std::map<std::string, std::string>{});

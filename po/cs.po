@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: tether\n"
 "Report-Msgid-Bugs-To: zack@bartel.com\n"
-"POT-Creation-Date: 2026-11-15 11:58-0800\n"
+"POT-Creation-Date: 2026-11-15 17:18-0600\n"
 "PO-Revision-Date: 2026-08-23\n"
 "Last-Translator: Tether project\n"
 "Language-Team: Czech\n"
@@ -1749,9 +1749,9 @@ msgstr ""
 
 #. TRANSLATORS: the feature name Tether shows for this profile.
 #: src/core/src/bluetooth/profile_supervisor.cpp src/daemon/main.cpp
-#: src/gtk/devices_view.cpp src/gtk/main.cpp src/gtk/messages_view.cpp
-#: src/gtk/settings_view.cpp src/tui/devices.cpp src/tui/messages.cpp
-#: src/tui/settings.cpp
+#: src/daemon/message_popups.cpp src/gtk/devices_view.cpp src/gtk/main.cpp
+#: src/gtk/messages_view.cpp src/gtk/settings_view.cpp src/tui/devices.cpp
+#: src/tui/messages.cpp src/tui/settings.cpp
 msgid "Messages"
 msgstr "Zprávy"
 
@@ -2004,6 +2004,27 @@ msgid ""
 msgstr ""
 "avahi-daemon neběží, takže se Tether nemůže v síti oznamovat. Spusťte jej "
 "příkazem: sudo systemctl enable --now avahi-daemon"
+
+#: src/daemon/message_popups.cpp
+#, c++-format
+msgid "{0} and {1} other"
+msgid_plural "{0} and {1} others"
+msgstr[0] "{0} a {1} další"
+msgstr[1] "{0} a {1} další"
+msgstr[2] "{0} a {1} dalších"
+
+#: src/daemon/message_popups.cpp
+#, c++-format
+msgid "{0} and {1}"
+msgstr "{0} a {1}"
+
+#: src/daemon/message_popups.cpp
+#, c++-format
+msgid "{} new message"
+msgid_plural "{} new messages"
+msgstr[0] "{} nová zpráva"
+msgstr[1] "{} nové zprávy"
+msgstr[2] "{} nových zpráv"
 
 #: src/daemon/notification.cpp
 #, c++-format
@@ -3004,6 +3025,18 @@ msgstr "Zobrazovat náhledy zpráv"
 #: src/gtk/settings_view.cpp src/tui/settings.cpp
 msgid "Off shows only the sender."
 msgstr "Vypnuto zobrazí jen odesílatele."
+
+#: src/gtk/settings_view.cpp src/tui/settings.cpp
+msgid "Show messages missed while away"
+msgstr "Zobrazovat zprávy zmeškané během nepřítomnosti"
+
+#: src/gtk/settings_view.cpp src/tui/settings.cpp
+msgid ""
+"When the iPhone reconnects, unread messages that arrived meanwhile pop up. "
+"More than three become one summary."
+msgstr ""
+"Po opětovném připojení iPhonu se zobrazí nepřečtené zprávy, které mezitím "
+"přišly. Více než tři se spojí do jednoho souhrnu."
 
 #: src/gtk/settings_view.cpp src/tui/settings.cpp
 msgid "Security"

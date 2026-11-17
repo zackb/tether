@@ -6,6 +6,7 @@
 #include <functional>
 #include <map>
 #include <nlohmann/json.hpp>
+#include <optional>
 #include <string>
 #include <vector>
 
@@ -83,6 +84,9 @@ namespace tether::bluetooth {
             messages(const std::string& thread_key, size_t limit = 200, const Visible& visible = {}) const;
 
         size_t size() const { return by_handle_.size(); }
+
+        // Timestamp of the newest message held, or empty when there are none.
+        std::optional<int64_t> newest_timestamp() const;
 
     private:
         void trim();

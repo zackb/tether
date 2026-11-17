@@ -62,6 +62,8 @@ namespace tether::bluetooth {
         bool desktop_popups_enabled = true;
         // Whether popups include the message text. Off shows only the sender.
         bool popup_previews_enabled = true;
+        // Whether a reconnect announces the unread messages that arrived while the phone was away.
+        bool missed_message_popups = true;
         // Whether a local copy is pushed to paired devices. Off shares only on clipboard_send.
         bool clipboard_auto_share = true;
         // Whether threads from senders who are not contacts are hidden. Codes still pop up and autofill.

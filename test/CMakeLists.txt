@@ -19,6 +19,7 @@ add_executable(tether_test
     test_vcard.cpp
     test_journal.cpp
     test_removed_threads.cpp
+    test_catch_up.cpp
     test_crypto.cpp
     test_secret_store.cpp
     secret_test_env.cpp

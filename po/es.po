@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: tether\n"
 "Report-Msgid-Bugs-To: zack@bartel.com\n"
-"POT-Creation-Date: 2026-11-15 11:58-0800\n"
+"POT-Creation-Date: 2026-11-15 17:18-0600\n"
 "PO-Revision-Date: 2026-08-22\n"
 "Last-Translator: Tether project\n"
 "Language-Team: Spanish\n"
@@ -1777,9 +1777,9 @@ msgstr ""
 
 #. TRANSLATORS: the feature name Tether shows for this profile.
 #: src/core/src/bluetooth/profile_supervisor.cpp src/daemon/main.cpp
-#: src/gtk/devices_view.cpp src/gtk/main.cpp src/gtk/messages_view.cpp
-#: src/gtk/settings_view.cpp src/tui/devices.cpp src/tui/messages.cpp
-#: src/tui/settings.cpp
+#: src/daemon/message_popups.cpp src/gtk/devices_view.cpp src/gtk/main.cpp
+#: src/gtk/messages_view.cpp src/gtk/settings_view.cpp src/tui/devices.cpp
+#: src/tui/messages.cpp src/tui/settings.cpp
 msgid "Messages"
 msgstr "Mensajes"
 
@@ -2035,6 +2035,25 @@ msgid ""
 msgstr ""
 "avahi-daemon no se está ejecutando, por lo que Tether no puede anunciarse en "
 "la red. Inícielo con: sudo systemctl enable --now avahi-daemon"
+
+#: src/daemon/message_popups.cpp
+#, c++-format
+msgid "{0} and {1} other"
+msgid_plural "{0} and {1} others"
+msgstr[0] "{0} y {1} más"
+msgstr[1] "{0} y {1} más"
+
+#: src/daemon/message_popups.cpp
+#, c++-format
+msgid "{0} and {1}"
+msgstr "{0} y {1}"
+
+#: src/daemon/message_popups.cpp
+#, c++-format
+msgid "{} new message"
+msgid_plural "{} new messages"
+msgstr[0] "{} mensaje nuevo"
+msgstr[1] "{} mensajes nuevos"
 
 #: src/daemon/notification.cpp
 #, c++-format
@@ -3050,6 +3069,18 @@ msgstr "Mostrar vista previa de mensajes"
 #: src/gtk/settings_view.cpp src/tui/settings.cpp
 msgid "Off shows only the sender."
 msgstr "Desactivado muestra solo el remitente."
+
+#: src/gtk/settings_view.cpp src/tui/settings.cpp
+msgid "Show messages missed while away"
+msgstr "Mostrar mensajes perdidos durante la ausencia"
+
+#: src/gtk/settings_view.cpp src/tui/settings.cpp
+msgid ""
+"When the iPhone reconnects, unread messages that arrived meanwhile pop up. "
+"More than three become one summary."
+msgstr ""
+"Cuando el iPhone se vuelve a conectar, aparecen los mensajes no leídos que "
+"llegaron mientras tanto. Más de tres se agrupan en un resumen."
 
 #: src/gtk/settings_view.cpp src/tui/settings.cpp
 msgid "Security"

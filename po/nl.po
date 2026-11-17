@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: tether\n"
 "Report-Msgid-Bugs-To: zack@bartel.com\n"
-"POT-Creation-Date: 2026-11-15 11:58-0800\n"
+"POT-Creation-Date: 2026-11-15 17:18-0600\n"
 "PO-Revision-Date: 2026-08-23\n"
 "Last-Translator: Tether project\n"
 "Language-Team: Dutch\n"
@@ -1768,9 +1768,9 @@ msgstr ""
 
 #. TRANSLATORS: the feature name Tether shows for this profile.
 #: src/core/src/bluetooth/profile_supervisor.cpp src/daemon/main.cpp
-#: src/gtk/devices_view.cpp src/gtk/main.cpp src/gtk/messages_view.cpp
-#: src/gtk/settings_view.cpp src/tui/devices.cpp src/tui/messages.cpp
-#: src/tui/settings.cpp
+#: src/daemon/message_popups.cpp src/gtk/devices_view.cpp src/gtk/main.cpp
+#: src/gtk/messages_view.cpp src/gtk/settings_view.cpp src/tui/devices.cpp
+#: src/tui/messages.cpp src/tui/settings.cpp
 msgid "Messages"
 msgstr "Berichten"
 
@@ -2025,6 +2025,25 @@ msgid ""
 msgstr ""
 "avahi-daemon draait niet, dus Tether kan zichzelf niet op het netwerk "
 "aankondigen. Start het met: sudo systemctl enable --now avahi-daemon"
+
+#: src/daemon/message_popups.cpp
+#, c++-format
+msgid "{0} and {1} other"
+msgid_plural "{0} and {1} others"
+msgstr[0] "{0} en {1} ander"
+msgstr[1] "{0} en {1} anderen"
+
+#: src/daemon/message_popups.cpp
+#, c++-format
+msgid "{0} and {1}"
+msgstr "{0} en {1}"
+
+#: src/daemon/message_popups.cpp
+#, c++-format
+msgid "{} new message"
+msgid_plural "{} new messages"
+msgstr[0] "{} nieuw bericht"
+msgstr[1] "{} nieuwe berichten"
 
 #: src/daemon/notification.cpp
 #, c++-format
@@ -3034,6 +3053,18 @@ msgstr "Berichtvoorbeeld tonen"
 #: src/gtk/settings_view.cpp src/tui/settings.cpp
 msgid "Off shows only the sender."
 msgstr "Uit toont alleen de afzender."
+
+#: src/gtk/settings_view.cpp src/tui/settings.cpp
+msgid "Show messages missed while away"
+msgstr "Gemiste berichten tonen"
+
+#: src/gtk/settings_view.cpp src/tui/settings.cpp
+msgid ""
+"When the iPhone reconnects, unread messages that arrived meanwhile pop up. "
+"More than three become one summary."
+msgstr ""
+"Als de iPhone opnieuw verbindt, verschijnen ongelezen berichten die intussen "
+"zijn binnengekomen. Meer dan drie worden één samenvatting."
 
 #: src/gtk/settings_view.cpp src/tui/settings.cpp
 msgid "Security"

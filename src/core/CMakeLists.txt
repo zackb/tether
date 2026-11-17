@@ -30,6 +30,7 @@ add_library(tether STATIC
     src/bluetooth/map_session.cpp
     src/bluetooth/contacts.cpp
     src/bluetooth/removed_threads.cpp
+    src/bluetooth/catch_up.cpp
     src/bluetooth/journal.cpp
     src/bluetooth/pbap_session.cpp
     src/bluetooth/phone_audio.cpp

@@ -561,6 +561,17 @@ codes still reach the vault. Their popup is shown only when it carries a code or
 a short code or sender ID, and offers no reply. Answered with `bt_status` and `bt_threads`
 broadcasts; reported as `hide_unknown_senders` in `bt_status`.
 
+#### `set_missed_message_popups` (Client -> Daemon, broadcast)
+**Payload**: `{"command": "set_missed_message_popups", "enabled": true}`
+Persisted, on by default. When a MAP session opens, the first listing brings in what arrived
+while the phone was away. Each such message still reaches clients as a `bt_message`; this
+decides whether the desktop announces the ones still unread on the phone and newer than the
+newest message the daemon already held. Up to three get a popup each, under the same rules as
+a live message, without a code to copy; more become a single summary naming the
+conversations. With no history held (a first sync, or a journal that could not be read)
+nothing is announced, since nothing tells new from old. Answered with a `bt_status` broadcast; reported as
+`missed_message_popups` in `bt_status`.
+
 #### `bt_remove_thread` (Client -> Daemon, broadcast)
 **Payload**: `{"command": "bt_remove_thread", "thread": "tel:+15035550101", "before": 1792951200}`
 Local to this computer and display only: nothing is deleted from the phone or the journal.

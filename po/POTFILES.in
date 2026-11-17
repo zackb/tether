@@ -9,6 +9,7 @@ src/core/src/bluetooth/profile_supervisor.cpp
 src/core/src/bluetooth/telephony.cpp
 src/core/src/net.cpp
 src/daemon/main.cpp
+src/daemon/message_popups.cpp
 src/daemon/notification.cpp
 src/gtk/calls_view.cpp
 src/gtk/contacts_view.cpp
