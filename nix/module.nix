@@ -1,6 +1,7 @@
 {
   config,
   lib,
+  options,
   pkgs,
   ...
 }:
@@ -106,11 +107,26 @@ with lib;
       services.avahi = {
         enable = true;
         openFirewall = mkDefault false;
-        publish = {
-          enable = true;
-          userServices = true;
-        };
-      };
+      }
+      # nixpkgs replaced publish.* with a freeform `settings` and warns on the
+      # old names; keep them for releases that predate `settings`.
+      // (
+        if options.services.avahi ? settings then
+          {
+            settings.publish = {
+              disable-publishing = false;
+              disable-user-service-publishing = false;
+              publish-addresses = true;
+            };
+          }
+        else
+          {
+            publish = {
+              enable = true;
+              userServices = true;
+            };
+          }
+      );
     })
 
     (mkIf (cfg.enable && cfg.wifi.openFirewall) {
