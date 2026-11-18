@@ -50,6 +50,7 @@ namespace tether::ui {
 .tether-app .tether-list row { padding: 0; margin: 3px 0; border-radius: 12px; border: 1px solid transparent; }
 .tether-app .tether-list row:hover { background-color: alpha(@theme_fg_color, 0.055); }
 .tether-app .tether-list row:selected { background-color: alpha(@theme_selected_bg_color, 0.14); border-color: alpha(@theme_selected_bg_color, 0.28); color: @theme_fg_color; }
+.tether-app .tether-list row:selected label { color: @theme_fg_color; }
 .tether-avatar { min-width: 36px; min-height: 36px; border-radius: 24px; background-color: alpha(@theme_selected_bg_color, 0.15); color: @theme_fg_color; font-size: 12pt; font-weight: bold; }
 .tether-app .tether-feed { padding: 12px 24px 24px; }
 .tether-app .tether-feed row { background-color: mix(@theme_bg_color, @theme_fg_color, 0.035); border: 1px solid alpha(@theme_fg_color, 0.09); border-radius: 14px; margin: 0 0 10px; padding: 8px; }
