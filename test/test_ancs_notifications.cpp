@@ -257,3 +257,37 @@ TEST(BluetoothConfig, SerializeStampsTheVersion) {
     config.ancs_content_enabled = false;
     EXPECT_FALSE(deserialize_config(serialize_config(config)).ancs_content_enabled);
 }
+
+namespace {
+
+    SourceEvent event(EventId id, uint32_t uid) {
+        SourceEvent e;
+        e.event = id;
+        e.uid = uid;
+        return e;
+    }
+
+} // namespace
+
+TEST(AncsFetchOrder, AdditionsAreNewestFirst) {
+    const auto out = fetch_order({event(EventId::Added, 1), event(EventId::Added, 3), event(EventId::Added, 2)});
+    ASSERT_EQ(out.size(), 3u);
+    EXPECT_EQ(out[0].uid, 3u);
+    EXPECT_EQ(out[1].uid, 2u);
+    EXPECT_EQ(out[2].uid, 1u);
+}
+
+TEST(AncsFetchOrder, RemovalsAndModificationsKeepTheirPlaceAheadOfAdditions) {
+    const auto out = fetch_order(
+        {event(EventId::Added, 5), event(EventId::Removed, 9), event(EventId::Added, 7), event(EventId::Modified, 2)});
+    ASSERT_EQ(out.size(), 4u);
+    EXPECT_EQ(out[0].event, EventId::Removed);
+    EXPECT_EQ(out[1].event, EventId::Modified);
+    EXPECT_EQ(out[2].uid, 7u);
+    EXPECT_EQ(out[3].uid, 5u);
+}
+
+TEST(AncsFetchOrder, EmptyAndSingleAreUnchanged) {
+    EXPECT_TRUE(fetch_order({}).empty());
+    EXPECT_EQ(fetch_order({event(EventId::Added, 4)}).size(), 1u);
+}

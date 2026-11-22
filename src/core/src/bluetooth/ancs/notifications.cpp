@@ -137,6 +137,13 @@ namespace tether::bluetooth::ancs {
         return name;
     }
 
+    std::vector<SourceEvent> fetch_order(std::vector<SourceEvent> events) {
+        const auto first_added = std::stable_partition(
+            events.begin(), events.end(), [](const SourceEvent& e) { return e.event != EventId::Added; });
+        std::sort(first_added, events.end(), [](const SourceEvent& a, const SourceEvent& b) { return a.uid > b.uid; });
+        return events;
+    }
+
     bool should_show_desktop_popup(const Notification& notification) {
         return !notification.pre_existing && notification.app_id != APP_ID_MESSAGES;
     }

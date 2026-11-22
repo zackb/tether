@@ -706,6 +706,8 @@ namespace tether::bluetooth {
         std::atomic<bool> running{false};
         std::mutex mutex;
         std::condition_variable wake;
+        // Set under `mutex` when the ANCS client has something to process before the next tick.
+        bool ancs_pending = false;
 
         // Serializes start/stop/set_device
         std::mutex lifecycle;
@@ -1295,6 +1297,15 @@ namespace tether::bluetooth {
                 publish();
             });
         client->set_content_enabled(ancs_content_wanted.load());
+        // An iPhone answers a fetch in about 200 ms; waiting for the next one-second tick to process the reply and
+        // send the next request made a replay of Notification Center take minutes.
+        client->set_inbox_wake([this] {
+            {
+                std::lock_guard<std::mutex> lock(mutex);
+                ancs_pending = true;
+            }
+            wake.notify_all();
+        });
         std::lock_guard<std::mutex> lock(ancs_mutex);
         ancs_client = std::move(client);
     }
@@ -1443,8 +1454,16 @@ namespace tether::bluetooth {
             sync_ancs(now);
             sync_calls();
 
+            // Until the next tick, only the ANCS client is woken early, to process what the phone just sent.
+            const auto next_tick = steady_clock::now() + seconds(SUPERVISOR_TICK_SECONDS);
             std::unique_lock<std::mutex> lock(mutex);
-            wake.wait_for(lock, seconds(SUPERVISOR_TICK_SECONDS), [this] { return !running; });
+            while (wake.wait_until(lock, next_tick, [this] { return !running || ancs_pending; }) && running) {
+                ancs_pending = false;
+                lock.unlock();
+                if (auto client = ancs())
+                    client->pump(duration_cast<seconds>(steady_clock::now() - started).count());
+                lock.lock();
+            }
         }
     }
 

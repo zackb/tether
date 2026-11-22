@@ -80,6 +80,12 @@ namespace tether::bluetooth::ancs {
     // phone is muted or in a Focus mode, which means "make no noise", not "hide".
     bool should_show_desktop_popup(const Notification& notification);
 
+    // The order to ask the phone about events that arrived together. A session starts with iOS replaying all of
+    // Notification Center, more entries than the client queues, so the ones fetched should be the newest. Within a
+    // session UIDs grow, so the newest additions are last in the replay: everything that is not an addition keeps
+    // its place at the front, then additions newest first.
+    std::vector<SourceEvent> fetch_order(std::vector<SourceEvent> events);
+
     // Freedesktop icon names to try for a notification, best first: the app's
     // own logo, then something generic for its category.
     std::vector<std::string> icon_candidates(const Notification& notification);
