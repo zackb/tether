@@ -56,19 +56,35 @@ namespace tether {
                 }
                 roots.emplace_back("/usr/share/pixmaps");
 
+                // follow symlinks (nix link whole themes) but check for recursion,
+                // different themes link to each other or to itself
+                std::unordered_set<std::string> visited;
                 std::error_code ec;
                 for (const auto& root : roots) {
-                    auto it = std::filesystem::recursive_directory_iterator(
-                        root, std::filesystem::directory_options::skip_permission_denied, ec);
-                    if (ec) {
+                    const auto real_root = std::filesystem::canonical(root, ec);
+                    if (ec || !visited.insert(real_root.string()).second) {
                         ec.clear();
                         continue;
                     }
-                    for (const auto& entry : it) {
+                    auto it = std::filesystem::recursive_directory_iterator(
+                        root,
+                        std::filesystem::directory_options::skip_permission_denied |
+                            std::filesystem::directory_options::follow_directory_symlink,
+                        ec);
+                    for (; !ec && it != std::filesystem::recursive_directory_iterator(); it.increment(ec)) {
+                        const auto& entry = *it;
+                        std::error_code entry_ec;
+                        if (entry.is_directory(entry_ec)) {
+                            const auto real = std::filesystem::canonical(entry.path(), entry_ec);
+                            if (entry_ec || !visited.insert(real.string()).second)
+                                it.disable_recursion_pending();
+                            continue;
+                        }
                         const auto ext = entry.path().extension();
                         if (ext == ".png" || ext == ".svg" || ext == ".xpm")
                             found.insert(entry.path().stem().string());
                     }
+                    ec.clear();
                 }
                 debug::log(INFO, "Found {} icon names across the installed themes", found.size());
                 return found;
