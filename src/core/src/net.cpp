@@ -272,6 +272,47 @@ namespace tether {
         return true;
     }
 
+    // What each paired peer last received (or sent) as clipboard text, by certificate fingerprint. iOS closes the
+    // connection when the app leaves the foreground, so a copy made on this computer while the phone is away
+    // is delivered when it reconnects instead of being lost.
+    static std::mutex g_clip_delivered_mutex;
+    static std::map<std::string, std::string> g_clip_delivered;
+
+    static void note_clipboard_delivered(const std::string& fingerprint, const std::string& text) {
+        if (fingerprint.empty())
+            return;
+        std::lock_guard<std::mutex> lock(g_clip_delivered_mutex);
+        g_clip_delivered[fingerprint] = text;
+    }
+
+    static bool clipboard_needs_delivery(const std::string& fingerprint, const std::string& text) {
+        if (fingerprint.empty() || text.empty())
+            return false;
+        std::lock_guard<std::mutex> lock(g_clip_delivered_mutex);
+        auto it = g_clip_delivered.find(fingerprint);
+        return it == g_clip_delivered.end() || it->second != text;
+    }
+
+    void broadcast_clipboard_text(const std::string& text, int exclude_fd) {
+        nlohmann::json j;
+        j["command"] = "clipboard_updated";
+        j["content"] = text;
+        // replace bad UTF-8 instead of throwing: a clipboard app can still mislabel binary as text/plain
+        std::string packet = j.dump(-1, ' ', false, nlohmann::json::error_handler_t::replace) + "\n";
+
+        std::lock_guard<std::mutex> lock(g_sessions_mutex);
+        for (auto const& [fd, session] : active_sessions) {
+            if (fd == exclude_fd)
+                continue;
+            if (session.ssl) {
+                robust_ssl_write(session.ssl, packet.c_str(), packet.size());
+                note_clipboard_delivered(session.fingerprint, text);
+            } else {
+                robust_plain_write(fd, packet.c_str(), packet.size());
+            }
+        }
+    }
+
     void broadcast_message(const std::string& msg, int exclude_fd) {
         std::string packet = msg;
         if (!packet.empty() && packet.back() != '\n')
@@ -1734,10 +1775,7 @@ namespace tether {
                         resp["content"] = g_wayland ? g_wayland->get_clipboard() : std::string{};
                         // with an image selected the cached text is stale don't push it
                         if (image.empty() && !resp["content"].get_ref<const std::string&>().empty()) {
-                            nlohmann::json bc;
-                            bc["command"] = "clipboard_updated";
-                            bc["content"] = resp["content"];
-                            broadcast_message(bc.dump(-1, ' ', false, nlohmann::json::error_handler_t::replace));
+                            broadcast_clipboard_text(resp["content"].get<std::string>());
                         }
                         write_plain_packet(client_fd,
                                            resp.dump(-1, ' ', false, nlohmann::json::error_handler_t::replace) + "\n");
@@ -2410,11 +2448,15 @@ namespace tether {
                         std::string content = j["content"];
                         if (g_wayland)
                             g_wayland->copy_to_clipboard(content);
-                        // Broadcast to everyone (including sender) to ensure robust transport
-                        nlohmann::json bc;
-                        bc["command"] = "clipboard_updated";
-                        bc["content"] = content;
-                        broadcast_message(bc.dump(), client_fd);
+                        {
+                            // the sender already has this text
+                            std::lock_guard<std::mutex> lock(g_sessions_mutex);
+                            auto it = active_sessions.find(client_fd);
+                            if (it != active_sessions.end())
+                                note_clipboard_delivered(it->second.fingerprint, content);
+                        }
+                        // Broadcast to the other peers
+                        broadcast_clipboard_text(content, client_fd);
                     } else if (j.contains("command") && j["command"] == "hello") {
                         // feature negotiation. old daemons answer "OK"
                         const auto features = j.value("features", nlohmann::json::array());
@@ -2445,6 +2487,28 @@ namespace tether {
                         }
                         std::string payload = resp.dump() + "\n";
                         robust_ssl_write(ssl, payload.c_str(), payload.size());
+
+                        // The app only stays connected while it is in the foreground: hand over what was copied
+                        // on this computer in the meantime, once.
+                        if (clipboard_auto_share() && g_wayland && g_wayland->get_clipboard_image().empty()) {
+                            const std::string text = g_wayland->get_clipboard();
+                            std::string fingerprint;
+                            {
+                                std::lock_guard<std::mutex> lock(g_sessions_mutex);
+                                auto it = active_sessions.find(client_fd);
+                                if (it != active_sessions.end())
+                                    fingerprint = it->second.fingerprint;
+                            }
+                            if (clipboard_needs_delivery(fingerprint, text)) {
+                                nlohmann::json bc;
+                                bc["command"] = "clipboard_updated";
+                                bc["content"] = text;
+                                const std::string packet =
+                                    bc.dump(-1, ' ', false, nlohmann::json::error_handler_t::replace) + "\n";
+                                robust_ssl_write(ssl, packet.c_str(), packet.size());
+                                note_clipboard_delivered(fingerprint, text);
+                            }
+                        }
                         continue;
                     } else if (j.contains("command") && j["command"] == "camera_start") {
                         if (!camera_handler_) {

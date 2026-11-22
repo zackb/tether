@@ -190,12 +190,7 @@ int main(int argc, char** argv) {
     wayland_srv.set_clipboard_callback([](const std::string& text) {
         if (!tether::clipboard_auto_share())
             return;
-        nlohmann::json j;
-        j["command"] = "clipboard_updated";
-        j["content"] = text;
-        // replace bad UTF-8 instead of throwing; a clipboard
-        // app can still mislabel binary as text/plain. Don't abort the daemon.
-        tether::broadcast_message(j.dump(-1, ' ', false, nlohmann::json::error_handler_t::replace));
+        tether::broadcast_clipboard_text(text);
     });
     wayland_srv.set_clipboard_image_callback([](const std::string& png) {
         if (tether::clipboard_auto_share())

@@ -28,6 +28,9 @@ namespace tether {
     void register_client_ssl(int fd, SSL* ssl, const std::string& fingerprint);
     void unregister_client_fd(int fd);
     void broadcast_message(const std::string& msg, int exclude_fd = -1);
+    // Sends clipboard text to every connected peer and remembers it as delivered to each, so a peer
+    // that reconnects later is only caught up on what it has not seen.
+    void broadcast_clipboard_text(const std::string& text, int exclude_fd = -1);
     void register_local_subscriber(int fd);
     void unregister_local_subscriber(int fd);
     void broadcast_local_event(const std::string& msg, int exclude_fd = -1);

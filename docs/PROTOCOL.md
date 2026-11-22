@@ -94,6 +94,8 @@ The clipboard capabilities allow seamless copying and pasting between the Host (
 
 **Daemon Behavior**: Fired asynchronously whenever the `wlr_data_control_device` `setDataOffer` informs the daemon that the primary clipboard selection has rotated. Not sent when `clipboard_auto_share` is off; then only `clipboard_send` shares the Host clipboard.
 
+**Catch-up**: A phone can be away when the clipboard changes: iOS closes the connection when the app leaves the foreground. The daemon remembers, per paired peer (by certificate fingerprint), the last clipboard text it sent to or received from that peer. When a paired client's `hello` arrives, the daemon follows its answer with one `clipboard_updated` carrying the current Host clipboard text if that peer has not already got it. It is skipped when `clipboard_auto_share` is off or the clipboard holds an image.
+
 ---
 
 ### `clipboard_send` (Local client -> Daemon)
