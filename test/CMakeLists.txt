@@ -81,3 +81,8 @@ find_program(XGETTEXT_EXECUTABLE xgettext)
 if(XGETTEXT_EXECUTABLE)
     add_test(NAME po_template COMMAND "${CMAKE_SOURCE_DIR}/po/update-pot.sh" --check)
 endif()
+
+if(TETHER_X11)
+    # Live tests run against $TETHER_TEST_X11_DISPLAY (Xvfb/Xephyr) and skip without it.
+    target_sources(tether_test PRIVATE test_x11_clipboard.cpp)
+endif()
