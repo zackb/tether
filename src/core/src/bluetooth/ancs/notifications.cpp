@@ -72,6 +72,24 @@ namespace tether::bluetooth::ancs {
         order_.clear();
     }
 
+    void ReplayBurst::start(Clock::time_point at) {
+        active_ = true;
+        seen_ = false;
+        started_ = at;
+    }
+
+    bool ReplayBurst::contains(const SourceEvent& event, Clock::time_point at) {
+        if (!active_ || event.event != EventId::Added)
+            return false;
+        if (at - (seen_ ? last_ : started_) > (seen_ ? GAP : START)) {
+            active_ = false;
+            return false;
+        }
+        seen_ = true;
+        last_ = at;
+        return true;
+    }
+
     bool NotificationRegistry::store(const Notification& notification) {
         bool replaced = false;
         for (auto it = notifications_.begin(); it != notifications_.end();) {
