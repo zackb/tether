@@ -326,7 +326,7 @@ int main(int argc, char** argv) {
                              false,
                              repliable ? message.thread_key : std::string{},
                              otp,
-                             "",
+                             as_notification.app_id,
                              message.handle});
         });
 

@@ -104,9 +104,34 @@ namespace tether {
             return {};
         }
 
+        // Asked per notification, like the capabilities: the server can change while tetherd runs.
+        bool server_is_gnome_shell() {
+            char* name = nullptr;
+            if (!notify_get_server_info(&name, nullptr, nullptr, nullptr))
+                return false;
+            const bool gnome = g_strcmp0(name, "gnome-shell") == 0;
+            g_free(name);
+            return gnome;
+        }
+
         // Identifies the sending application to the notification server. Without
         // this KDE shows the popup and then forgets it.
-        void set_identity(NotifyNotification* notification, const std::string& app_name) {
+        void set_identity(NotifyNotification* notification,
+                          const std::string& app_name,
+                          bool from_iphone_app,
+                          const std::string& icon) {
+            // GNOME titles a popup after its desktop entry, so iPhone apps go without one.
+            if (from_iphone_app && !app_name.empty() && server_is_gnome_shell()) {
+                notify_notification_set_app_name(notification, app_name.c_str());
+#if NOTIFY_CHECK_VERSION(0, 8, 4)
+                if (!icon.empty())
+                    notify_notification_set_app_icon(notification, icon.c_str());
+#else
+                (void)icon;
+#endif
+                return;
+            }
+
             notify_notification_set_hint(notification, "desktop-entry", g_variant_new_string(DESKTOP_ENTRY));
             if (!app_name.empty()) {
                 // Keeps history and configuration grouped under Tether while the
@@ -366,7 +391,7 @@ namespace tether {
             NotifyNotification* notification =
                 notify_notification_new(_("File arrived"), file.filename().c_str(), "document-save");
 
-            set_identity(notification, "");
+            set_identity(notification, "", false, "");
             notify_notification_set_hint(notification, "resident", g_variant_new_boolean(TRUE));
             notify_notification_set_timeout(notification, NOTIFY_EXPIRES_DEFAULT);
 
@@ -410,7 +435,7 @@ namespace tether {
             if (!notification)
                 return G_SOURCE_REMOVE;
 
-            set_identity(notification, spec->app_name);
+            set_identity(notification, spec->app_name, !spec->app_id.empty(), icon);
             notify_notification_set_urgency(notification, spec->quiet ? NOTIFY_URGENCY_LOW : NOTIFY_URGENCY_NORMAL);
 
             const AppLauncher launcher = spec->app_id.empty() ? AppLauncher{} : resolve_launcher(spec->app_id);
