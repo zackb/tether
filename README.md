@@ -261,7 +261,7 @@ On Debian/Ubuntu:
 
 ```bash
 sudo apt install build-essential cmake ninja-build pkg-config git \
-    libwayland-dev libx11-dev libxfixes-dev libavahi-client-dev libssl-dev libsecret-1-dev \
+    libwayland-dev libavahi-client-dev libssl-dev libsecret-1-dev \
     libglib2.0-dev libgtk-3-dev libgtk-layer-shell-dev libnotify-dev \
     libncurses-dev libavcodec-dev libpipewire-0.3-dev npm zip
 ```
@@ -417,7 +417,7 @@ flowchart LR
 ## Requirements
 
 ### Linux
-- For clipboard sync, one of: a Wayland compositor with `wlr-data-control` or `ext-data-control` (Hyprland, Sway, KDE, [Fenriz](https://github.com/zackb/fenriz) etc.), or an X11 session, including a Wayland desktop that runs XWayland and bridges its clipboard to X11 (GNOME on Xorg and on Wayland, XFCE). The X11 backend needs `libx11` and `libxfixes`.
+- Clipboard sync: a Wayland compositor with `wlr-data-control` or `ext-data-control` (Hyprland, Sway, KDE, [Fenriz](https://github.com/zackb/fenriz) etc.), or X11/XWayland (GNOME, XFCE)
 - Build tools: cmake, ninja, pkg-config
 - x86_64 or aarch64 (Asahi, Raspberry Pi OS Trixie+). 32-bit ARM is not supported.
 

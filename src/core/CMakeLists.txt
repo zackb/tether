@@ -80,6 +80,6 @@ target_link_libraries(tether PUBLIC
 
 if(TETHER_X11)
     target_sources(tether PRIVATE src/x11_clipboard.cpp)
-    target_compile_definitions(tether PUBLIC TETHER_X11)
-    target_link_libraries(tether PUBLIC PkgConfig::X11)
+    target_compile_definitions(tether PRIVATE TETHER_X11)
+    target_link_libraries(tether PRIVATE PkgConfig::X11)
 endif()

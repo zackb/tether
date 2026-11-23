@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: tether\n"
 "Report-Msgid-Bugs-To: zack@bartel.com\n"
-"POT-Creation-Date: 2026-11-16 22:00-0800\n"
+"POT-Creation-Date: 2026-11-22 18:43-0800\n"
 "PO-Revision-Date: 2026-08-22\n"
 "Last-Translator: Tether project\n"
 "Language-Team: Spanish\n"
@@ -935,8 +935,8 @@ msgid "syncing"
 msgstr "sincronizando"
 
 #: src/cli/main.cpp
-msgid "off, no Wayland session on this machine"
-msgstr "desactivado, no hay sesión de Wayland en esta máquina"
+msgid "off, no Wayland data-control or X11 session"
+msgstr "desactivado, no hay data-control de Wayland ni sesión X11"
 
 #: src/cli/main.cpp
 msgid "mDNS"
@@ -3463,6 +3463,9 @@ msgstr "Empareje dispositivos y sincronice el portapapeles a través de la red"
 #: src/gtk/tether-gtk.desktop.in
 msgid "iPhone;iOS;SMS;Messages;Clipboard;Files;Notifications;Calls;AirPods;"
 msgstr "iPhone;iOS;SMS;Mensajes;Portapapeles;Archivos;Notificaciones;Llamadas;AirPods;"
+
+#~ msgid "off, no Wayland session on this machine"
+#~ msgstr "desactivado, no hay sesión de Wayland en esta máquina"
 
 #~ msgid ""
 #~ "Connected. BlueZ is not exposing an LE bearer, so notifications are "

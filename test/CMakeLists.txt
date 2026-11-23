@@ -85,4 +85,5 @@ endif()
 if(TETHER_X11)
     # Live tests run against $TETHER_TEST_X11_DISPLAY (Xvfb/Xephyr) and skip without it.
     target_sources(tether_test PRIVATE test_x11_clipboard.cpp)
+    target_link_libraries(tether_test PRIVATE PkgConfig::X11)
 endif()
