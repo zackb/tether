@@ -1264,6 +1264,7 @@ namespace tether::ui {
         // GTK's own emoji chooser, the one Ctrl+. opens; the button just makes it findable.
         g_messages.emoji_button = gtk_button_new_from_icon_name("face-smile-symbolic", GTK_ICON_SIZE_LARGE_TOOLBAR);
         gtk_button_set_relief(GTK_BUTTON(g_messages.emoji_button), GTK_RELIEF_NONE);
+        gtk_style_context_add_class(gtk_widget_get_style_context(g_messages.emoji_button), "tether-emoji-button");
         gtk_widget_set_valign(g_messages.emoji_button, GTK_ALIGN_CENTER);
         gtk_widget_set_tooltip_text(g_messages.emoji_button, _("Insert emoji (Ctrl+.)"));
         set_accessible_name(g_messages.emoji_button, _("Insert emoji"));
