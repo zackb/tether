@@ -37,6 +37,7 @@ TEST_F(PathsTest, FallsBackToTheDefaultsWhenNoXdgVariableIsSet) {
     EXPECT_EQ(tether::paths::config_dir(), home_ / ".config/tether");
     EXPECT_EQ(tether::paths::data_dir(), home_ / ".local/share/tether");
     EXPECT_EQ(tether::paths::state_dir(), home_ / ".local/state/tether");
+    EXPECT_EQ(tether::paths::cache_dir(), home_ / ".cache/tether");
 }
 
 TEST_F(PathsTest, HonorsTheXdgVariables) {
@@ -44,10 +45,12 @@ TEST_F(PathsTest, HonorsTheXdgVariables) {
     tether::testing::ScopedEnv config("XDG_CONFIG_HOME", xdg_ / "config");
     tether::testing::ScopedEnv data("XDG_DATA_HOME", xdg_ / "data");
     tether::testing::ScopedEnv state("XDG_STATE_HOME", xdg_ / "state");
+    tether::testing::ScopedEnv cache("XDG_CACHE_HOME", xdg_ / "cache");
 
     EXPECT_EQ(tether::paths::config_dir(), xdg_ / "config/tether");
     EXPECT_EQ(tether::paths::data_dir(), xdg_ / "data/tether");
     EXPECT_EQ(tether::paths::state_dir(), xdg_ / "state/tether");
+    EXPECT_EQ(tether::paths::cache_dir(), xdg_ / "cache/tether");
 }
 
 TEST_F(PathsTest, IgnoresAnEmptyOrRelativeXdgValue) {

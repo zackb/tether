@@ -49,6 +49,8 @@ Drag and drop files from Linux directly into the iPhone app, or receive files au
 ### Messages and Notifications
 Read and reply to SMS and iMessage conversations, and see notifications from any app on the phone, on the Linux desktop.
 
+Notifications can show each app's real icon: turn on *Show real app icons* in Settings, or run `tether --bt-app-icons on`. Tether then downloads each app's icon once from Apple's App Store, sending only the app's bundle identifier. It is off by default.
+
 ### Device Pairing
 There are two ways tether communicates with the iPhone:
 - WiFi: for clipboard sync, file transfer, and OTP handling

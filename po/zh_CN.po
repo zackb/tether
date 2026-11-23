@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: tether\n"
 "Report-Msgid-Bugs-To: zack@bartel.com\n"
-"POT-Creation-Date: 2026-11-22 18:43-0800\n"
+"POT-Creation-Date: 2026-11-23 16:42+0100\n"
 "PO-Revision-Date: 2026-08-23\n"
 "Last-Translator: Tether project\n"
 "Language-Team: Simplified Chinese\n"
@@ -189,6 +189,12 @@ msgstr "开启或关闭通知镜像。"
 #: src/cli/main.cpp
 msgid "Mirror notification titles and bodies, not just the app."
 msgstr "镜像通知的标题和正文，而不只是所属 App。"
+
+#: src/cli/main.cpp
+msgid ""
+"Download each notifying app's real icon from Apple's App Store. Only the "
+"app's identifier is sent."
+msgstr "从 Apple 的 App Store 下载每个发送通知的应用的真实图标。只会发送应用的标识符。"
 
 #: src/cli/main.cpp
 msgid ""
@@ -1204,6 +1210,14 @@ msgstr "通知镜像已启用。"
 #: src/cli/main.cpp
 msgid "Notification mirroring disabled."
 msgstr "通知镜像已停用。"
+
+#: src/cli/main.cpp
+msgid "Real app icons enabled."
+msgstr "已启用真实应用图标。"
+
+#: src/cli/main.cpp
+msgid "Real app icons disabled."
+msgstr "已停用真实应用图标。"
 
 #: src/cli/main.cpp
 msgid "Expected encrypted, plaintext or none, e.g. --bt-retention encrypted\n"
@@ -2877,6 +2891,16 @@ msgstr "包含通知正文"
 #: src/gtk/settings_view.cpp src/tui/settings.cpp
 msgid "Title and message content are shown, not just which app sent it."
 msgstr "显示标题和正文，而不只是发送它的应用。"
+
+#: src/gtk/settings_view.cpp src/tui/settings.cpp
+msgid "Show real app icons"
+msgstr "显示真实应用图标"
+
+#: src/gtk/settings_view.cpp src/tui/settings.cpp
+msgid ""
+"Downloads each app's icon from Apple's App Store once. Only the app's "
+"identifier is sent."
+msgstr "从 Apple 的 App Store 为每个应用下载一次图标。只会发送应用的标识符。"
 
 #: src/gtk/settings_view.cpp src/tui/settings.cpp
 msgid "Desktop popups"

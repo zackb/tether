@@ -1,13 +1,16 @@
 #include "notification.hpp"
 
+#include <tether/app_icons.hpp>
 #include <tether/i18n.hpp>
 
+#include <gdk-pixbuf/gdk-pixbuf.h>
 #include <gio/gdesktopappinfo.h>
 #include <gio/gio.h>
 #include <glib.h>
 #include <libnotify/notify.h>
 
 #include <chrono>
+#include <filesystem>
 #include <functional>
 #include <mutex>
 #include <string>
@@ -27,6 +30,37 @@ namespace tether {
         struct NotificationRequest {
             std::filesystem::path path;
         };
+
+        // Cuts a downloaded icon to the iPhone icon shape; empty keeps the original.
+        std::string shape_app_icon(const std::string& png) {
+            GdkPixbufLoader* loader = gdk_pixbuf_loader_new_with_type("png", nullptr);
+            if (!loader)
+                return {};
+            const bool written =
+                gdk_pixbuf_loader_write(loader, reinterpret_cast<const guchar*>(png.data()), png.size(), nullptr);
+            const bool closed = gdk_pixbuf_loader_close(loader, nullptr);
+
+            std::string out;
+            GdkPixbuf* decoded = written && closed ? gdk_pixbuf_loader_get_pixbuf(loader) : nullptr;
+            if (decoded && gdk_pixbuf_get_bits_per_sample(decoded) == 8) {
+                // Always yields an 8-bit RGBA copy, with or without source alpha.
+                if (GdkPixbuf* rgba = gdk_pixbuf_add_alpha(decoded, FALSE, 0, 0, 0)) {
+                    tether::app_icons::apply_icon_shape(gdk_pixbuf_get_pixels(rgba),
+                                                        gdk_pixbuf_get_width(rgba),
+                                                        gdk_pixbuf_get_height(rgba),
+                                                        gdk_pixbuf_get_rowstride(rgba));
+                    gchar* buffer = nullptr;
+                    gsize size = 0;
+                    if (gdk_pixbuf_save_to_buffer(rgba, &buffer, &size, "png", nullptr, nullptr)) {
+                        out.assign(buffer, size);
+                        g_free(buffer);
+                    }
+                    g_object_unref(rgba);
+                }
+            }
+            g_object_unref(loader);
+            return out;
+        }
 
         // Every icon name installed by any theme on this machine.
         // scanned once and cached for the life of the process.
@@ -94,10 +128,16 @@ namespace tether {
 
         // The first candidate this machine can actually draw. Handing the server
         // a name no theme has leaves the popup with no icon at all, which is
-        // worse than a generic one.
+        // worse than a generic one. Candidates are icon file paths or theme names.
         std::string resolve_icon(const std::vector<std::string>& candidates) {
             const auto& installed = installed_icons();
             for (const auto& name : candidates) {
+                if (!name.empty() && name.front() == '/') {
+                    std::error_code ec;
+                    if (std::filesystem::is_regular_file(name, ec))
+                        return name;
+                    continue;
+                }
                 if (installed.count(name))
                     return name;
             }
@@ -570,6 +610,8 @@ namespace tether {
             debug::log(ERR, "Failed to initialize libnotify");
             return false;
         }
+
+        tether::app_icons::set_image_filter(shape_app_icon);
 
         impl_->context = g_main_context_new();
         impl_->loop = g_main_loop_new(impl_->context, FALSE);

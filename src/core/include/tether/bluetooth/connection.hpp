@@ -51,6 +51,7 @@ namespace tether::bluetooth {
         // Whether mirrored notifications carry their title and body, or only
         // which app sent them. Takes effect on the next notification.
         void set_ancs_content_enabled(bool enabled);
+        void set_app_icons_enabled(bool enabled);
 
         // Whether the session locks when the phone drops out of range.
         void set_lock_on_away(bool enabled, int grace_seconds);

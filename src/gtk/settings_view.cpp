@@ -26,6 +26,8 @@ namespace tether::ui {
             GtkWidget* sw_ancs = nullptr;
             GtkWidget* row_content = nullptr;
             GtkWidget* sw_content = nullptr;
+            GtkWidget* row_app_icons = nullptr;
+            GtkWidget* sw_app_icons = nullptr;
 
             GtkWidget* sw_popups = nullptr;
             GtkWidget* row_previews = nullptr;
@@ -140,6 +142,10 @@ namespace tether::ui {
             daemon_send({{"command", "bt_set_ancs_content"}, {"enabled", gtk_switch_get_active(widget) == TRUE}});
         }
 
+        void on_app_icons_toggled(GtkSwitch* widget, GParamSpec*, gpointer) {
+            daemon_send({{"command", "bt_set_app_icons"}, {"enabled", gtk_switch_get_active(widget) == TRUE}});
+        }
+
         void on_popups_toggled(GtkSwitch* widget, GParamSpec*, gpointer) {
             daemon_send({{"command", "set_desktop_popups"}, {"enabled", gtk_switch_get_active(widget) == TRUE}});
         }
@@ -231,6 +237,7 @@ namespace tether::ui {
 
             gtk_widget_set_sensitive(g_settings.row_ancs, usable);
             gtk_widget_set_sensitive(g_settings.row_content, usable && ancs_on);
+            gtk_widget_set_sensitive(g_settings.row_app_icons, usable && ancs_on);
             gtk_widget_set_sensitive(g_settings.row_retention, available && bonded);
             gtk_widget_set_sensitive(g_settings.row_calls, usable);
 
@@ -238,6 +245,9 @@ namespace tether::ui {
             set_switch(g_settings.sw_content,
                        reinterpret_cast<gpointer>(on_content_toggled),
                        status.value("ancs_content_enabled", true));
+            set_switch(g_settings.sw_app_icons,
+                       reinterpret_cast<gpointer>(on_app_icons_toggled),
+                       status.value("app_icons_enabled", false));
             set_switch(g_settings.sw_calls,
                        reinterpret_cast<gpointer>(on_calls_toggled),
                        status.value("calls_enabled", false));
@@ -373,6 +383,14 @@ namespace tether::ui {
                                              _("Title and message content are shown, not just which app sent "
                                                "it."),
                                              g_settings.sw_content);
+
+            g_settings.sw_app_icons = new_switch();
+            g_signal_connect(g_settings.sw_app_icons, "notify::active", G_CALLBACK(on_app_icons_toggled), nullptr);
+            g_settings.row_app_icons = add_row(ancs,
+                                               _("Show real app icons"),
+                                               _("Downloads each app's icon from Apple's App Store once. Only the "
+                                                 "app's identifier is sent."),
+                                               g_settings.sw_app_icons);
 
             // Desktop popups
             GtkWidget* popups =

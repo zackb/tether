@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: tether 0.3.6\n"
 "Report-Msgid-Bugs-To: zack@bartel.com\n"
-"POT-Creation-Date: 2026-11-22 18:43-0800\n"
+"POT-Creation-Date: 2026-11-23 16:42+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -186,6 +186,12 @@ msgstr ""
 
 #: src/cli/main.cpp
 msgid "Mirror notification titles and bodies, not just the app."
+msgstr ""
+
+#: src/cli/main.cpp
+msgid ""
+"Download each notifying app's real icon from Apple's App Store. Only the "
+"app's identifier is sent."
 msgstr ""
 
 #: src/cli/main.cpp
@@ -1141,6 +1147,14 @@ msgstr ""
 
 #: src/cli/main.cpp
 msgid "Notification mirroring disabled."
+msgstr ""
+
+#: src/cli/main.cpp
+msgid "Real app icons enabled."
+msgstr ""
+
+#: src/cli/main.cpp
+msgid "Real app icons disabled."
 msgstr ""
 
 #: src/cli/main.cpp
@@ -2714,6 +2728,16 @@ msgstr ""
 
 #: src/gtk/settings_view.cpp src/tui/settings.cpp
 msgid "Title and message content are shown, not just which app sent it."
+msgstr ""
+
+#: src/gtk/settings_view.cpp src/tui/settings.cpp
+msgid "Show real app icons"
+msgstr ""
+
+#: src/gtk/settings_view.cpp src/tui/settings.cpp
+msgid ""
+"Downloads each app's icon from Apple's App Store once. Only the app's "
+"identifier is sent."
 msgstr ""
 
 #: src/gtk/settings_view.cpp src/tui/settings.cpp

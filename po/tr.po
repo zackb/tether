@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: tether\n"
 "Report-Msgid-Bugs-To: zack@bartel.com\n"
-"POT-Creation-Date: 2026-11-22 18:43-0800\n"
+"POT-Creation-Date: 2026-11-23 16:42+0100\n"
 "PO-Revision-Date: 2026-08-23\n"
 "Last-Translator: Tether project\n"
 "Language-Team: Turkish\n"
@@ -198,6 +198,12 @@ msgstr "Bildirim yansıtmayı aç ya da kapat."
 msgid "Mirror notification titles and bodies, not just the app."
 msgstr ""
 "Yalnızca uygulamayı değil, bildirimlerin başlığını ve metnini de yansıt."
+
+#: src/cli/main.cpp
+msgid ""
+"Download each notifying app's real icon from Apple's App Store. Only the "
+"app's identifier is sent."
+msgstr "Bildirim gönderen her uygulamanın gerçek simgesini Apple'ın App Store'undan indirir. Yalnızca uygulamanın tanımlayıcısı gönderilir."
 
 #: src/cli/main.cpp
 msgid ""
@@ -1251,6 +1257,14 @@ msgstr "Bildirim yansıtma etkinleştirildi."
 #: src/cli/main.cpp
 msgid "Notification mirroring disabled."
 msgstr "Bildirim yansıtma devre dışı bırakıldı."
+
+#: src/cli/main.cpp
+msgid "Real app icons enabled."
+msgstr "Gerçek uygulama simgeleri açıldı."
+
+#: src/cli/main.cpp
+msgid "Real app icons disabled."
+msgstr "Gerçek uygulama simgeleri kapatıldı."
 
 #: src/cli/main.cpp
 msgid "Expected encrypted, plaintext or none, e.g. --bt-retention encrypted\n"
@@ -2986,6 +3000,16 @@ msgstr "Bildirim metnini de al"
 msgid "Title and message content are shown, not just which app sent it."
 msgstr ""
 "Yalnızca gönderen uygulama değil, başlık ve ileti içeriği de gösterilir."
+
+#: src/gtk/settings_view.cpp src/tui/settings.cpp
+msgid "Show real app icons"
+msgstr "Gerçek uygulama simgelerini göster"
+
+#: src/gtk/settings_view.cpp src/tui/settings.cpp
+msgid ""
+"Downloads each app's icon from Apple's App Store once. Only the app's "
+"identifier is sent."
+msgstr "Her uygulamanın simgesini Apple'ın App Store'undan bir kez indirir. Yalnızca uygulamanın tanımlayıcısı gönderilir."
 
 #: src/gtk/settings_view.cpp src/tui/settings.cpp
 msgid "Desktop popups"

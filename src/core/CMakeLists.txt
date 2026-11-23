@@ -4,6 +4,7 @@ add_library(tether STATIC
     src/event_loop.cpp
     src/net.cpp
     src/base64.cpp
+    src/app_icons.cpp
     src/paths.cpp
     src/session_bus_watcher.cpp
     src/otp.cpp

@@ -222,6 +222,8 @@ static const Opt kOptions[] = {
     {"--bt-enable <on|off>", N_("Connect to the iPhone over Bluetooth, or stop.")},
     {"--bt-ancs <on|off>", N_("Turn notification mirroring on or off.")},
     {"--bt-ancs-content <on|off>", N_("Mirror notification titles and bodies, not just the app.")},
+    {"--bt-app-icons <on|off>",
+     N_("Download each notifying app's real icon from Apple's App Store. Only the app's identifier is sent.")},
     {"--bt-ancs-mute <app>",
      N_("Stop desktop popups from an iPhone app, by name or bundle id. It still lists in --bt-notifications.")},
     {"--bt-ancs-unmute <app>", N_("Show desktop popups from a muted iPhone app again.")},
@@ -1535,6 +1537,10 @@ int main(int argc, char* argv[]) {
             action = "bt_ancs_content";
             if (i + 1 < argc && argv[i + 1][0] != '-')
                 arg_val = argv[++i];
+        } else if (arg == "--bt-app-icons") {
+            action = "bt_app_icons";
+            if (i + 1 < argc && argv[i + 1][0] != '-')
+                arg_val = argv[++i];
         } else if (arg == "--bt-ancs-mute" || arg == "--bt-ancs-unmute") {
             action = arg == "--bt-ancs-mute" ? "bt_ancs_mute" : "bt_ancs_unmute";
             if (i + 1 < argc)
@@ -1949,6 +1955,19 @@ int main(int argc, char* argv[]) {
                 "%s\n",
                 content ? (on ? _("Notification contents enabled.") : _("Notification contents disabled."))
                         : (on ? _("Notification mirroring enabled.") : _("Notification mirroring disabled.")));
+    } else if (action == "bt_app_icons") {
+        if (arg_val != "on" && arg_val != "off") {
+            debug::log(ERR, _("Expected on or off, e.g. {} on\n"), "--bt-app-icons");
+            return 1;
+        }
+        nlohmann::json request;
+        request["command"] = "bt_set_app_icons";
+        request["enabled"] = arg_val == "on";
+        if (!client.send(request.dump() + "\n")) {
+            debug::log(ERR, _("Could not reach the daemon.\n"));
+            return 1;
+        }
+        fprintf(stdout, "%s\n", arg_val == "on" ? _("Real app icons enabled.") : _("Real app icons disabled."));
     } else if (action == "bt_ancs_mute" || action == "bt_ancs_unmute") {
         return set_app_muted(client, arg_val, action == "bt_ancs_mute");
     } else if (action == "bt_retention") {

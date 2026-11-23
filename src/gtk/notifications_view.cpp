@@ -6,6 +6,7 @@
 
 #include <ctime>
 #include <string>
+#include <tether/app_icons.hpp>
 #include <tether/bluetooth/ancs/notifications.hpp>
 
 namespace tether::ui {
@@ -34,6 +35,20 @@ namespace tether::ui {
             bluetooth::ancs::Notification resolved;
             resolved.app_id = notification.value("app_id", "");
             resolved.category = static_cast<bluetooth::ancs::CategoryId>(notification.value("category", 0));
+
+            // The app's real icon, when the daemon has cached one.
+            if (const auto cached = app_icons::cached_icon(resolved.app_id); !cached.empty()) {
+                int size = 24;
+                gtk_icon_size_lookup(GTK_ICON_SIZE_LARGE_TOOLBAR, &size, nullptr);
+                // Loaded at 2x and set as a scale-2 surface for HiDPI.
+                if (GdkPixbuf* pixbuf = gdk_pixbuf_new_from_file_at_size(cached.c_str(), size * 2, size * 2, nullptr)) {
+                    cairo_surface_t* surface = gdk_cairo_surface_create_from_pixbuf(pixbuf, 2, nullptr);
+                    GtkWidget* image = gtk_image_new_from_surface(surface);
+                    cairo_surface_destroy(surface);
+                    g_object_unref(pixbuf);
+                    return image;
+                }
+            }
 
             GtkIconTheme* theme = gtk_icon_theme_get_default();
             for (const auto& name : bluetooth::ancs::icon_candidates(resolved)) {

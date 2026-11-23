@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: tether\n"
 "Report-Msgid-Bugs-To: zack@bartel.com\n"
-"POT-Creation-Date: 2026-11-22 18:43-0800\n"
+"POT-Creation-Date: 2026-11-23 16:42+0100\n"
 "PO-Revision-Date: 2026-08-23\n"
 "Last-Translator: Tether project\n"
 "Language-Team: Ukrainian\n"
@@ -202,6 +202,12 @@ msgstr "Увімкнути або вимкнути дублювання спов
 #: src/cli/main.cpp
 msgid "Mirror notification titles and bodies, not just the app."
 msgstr "Дублювати заголовки та текст сповіщень, а не лише програму."
+
+#: src/cli/main.cpp
+msgid ""
+"Download each notifying app's real icon from Apple's App Store. Only the "
+"app's identifier is sent."
+msgstr "Завантажує справжній значок кожного застосунку, що надсилає сповіщення, з App Store Apple. Надсилається лише ідентифікатор застосунку."
 
 #: src/cli/main.cpp
 msgid ""
@@ -1265,6 +1271,14 @@ msgstr "Дублювання сповіщень увімкнено."
 #: src/cli/main.cpp
 msgid "Notification mirroring disabled."
 msgstr "Дублювання сповіщень вимкнено."
+
+#: src/cli/main.cpp
+msgid "Real app icons enabled."
+msgstr "Справжні значки застосунків увімкнено."
+
+#: src/cli/main.cpp
+msgid "Real app icons disabled."
+msgstr "Справжні значки застосунків вимкнено."
 
 #: src/cli/main.cpp
 msgid "Expected encrypted, plaintext or none, e.g. --bt-retention encrypted\n"
@@ -3014,6 +3028,16 @@ msgstr "Долучати текст сповіщення"
 #: src/gtk/settings_view.cpp src/tui/settings.cpp
 msgid "Title and message content are shown, not just which app sent it."
 msgstr "Показуються заголовок і текст, а не лише програма-відправник."
+
+#: src/gtk/settings_view.cpp src/tui/settings.cpp
+msgid "Show real app icons"
+msgstr "Показувати справжні значки застосунків"
+
+#: src/gtk/settings_view.cpp src/tui/settings.cpp
+msgid ""
+"Downloads each app's icon from Apple's App Store once. Only the app's "
+"identifier is sent."
+msgstr "Один раз завантажує значок кожного застосунку з App Store Apple. Надсилається лише ідентифікатор застосунку."
 
 #: src/gtk/settings_view.cpp src/tui/settings.cpp
 msgid "Desktop popups"

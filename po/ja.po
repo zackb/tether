@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: tether\n"
 "Report-Msgid-Bugs-To: zack@bartel.com\n"
-"POT-Creation-Date: 2026-11-22 18:43-0800\n"
+"POT-Creation-Date: 2026-11-23 16:42+0100\n"
 "PO-Revision-Date: 2026-08-23\n"
 "Last-Translator: Tether project\n"
 "Language-Team: Japanese\n"
@@ -201,6 +201,12 @@ msgstr "通知のミラーリングをオンまたはオフにします。"
 #: src/cli/main.cpp
 msgid "Mirror notification titles and bodies, not just the app."
 msgstr "アプリ名だけでなく、通知のタイトルと本文もミラーリングします。"
+
+#: src/cli/main.cpp
+msgid ""
+"Download each notifying app's real icon from Apple's App Store. Only the "
+"app's identifier is sent."
+msgstr "通知を送る各アプリの本物のアイコンを Apple の App Store からダウンロードします。送信されるのはアプリの識別子だけです。"
 
 #: src/cli/main.cpp
 msgid ""
@@ -1251,6 +1257,14 @@ msgstr "通知のミラーリングを有効にしました。"
 #: src/cli/main.cpp
 msgid "Notification mirroring disabled."
 msgstr "通知のミラーリングを無効にしました。"
+
+#: src/cli/main.cpp
+msgid "Real app icons enabled."
+msgstr "本物のアプリアイコンを有効にしました。"
+
+#: src/cli/main.cpp
+msgid "Real app icons disabled."
+msgstr "本物のアプリアイコンを無効にしました。"
 
 #: src/cli/main.cpp
 msgid "Expected encrypted, plaintext or none, e.g. --bt-retention encrypted\n"
@@ -2988,6 +3002,16 @@ msgstr "通知の本文を含める"
 #: src/gtk/settings_view.cpp src/tui/settings.cpp
 msgid "Title and message content are shown, not just which app sent it."
 msgstr "送信元アプリだけでなく、タイトルと本文も表示されます。"
+
+#: src/gtk/settings_view.cpp src/tui/settings.cpp
+msgid "Show real app icons"
+msgstr "本物のアプリアイコンを表示"
+
+#: src/gtk/settings_view.cpp src/tui/settings.cpp
+msgid ""
+"Downloads each app's icon from Apple's App Store once. Only the app's "
+"identifier is sent."
+msgstr "各アプリのアイコンを Apple の App Store から一度だけダウンロードします。送信されるのはアプリの識別子だけです。"
 
 #: src/gtk/settings_view.cpp src/tui/settings.cpp
 msgid "Desktop popups"

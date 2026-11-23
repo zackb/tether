@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: tether\n"
 "Report-Msgid-Bugs-To: zack@bartel.com\n"
-"POT-Creation-Date: 2026-11-22 18:43-0800\n"
+"POT-Creation-Date: 2026-11-23 16:42+0100\n"
 "PO-Revision-Date: 2026-08-23\n"
 "Last-Translator: Tether project\n"
 "Language-Team: Swedish\n"
@@ -200,6 +200,12 @@ msgstr "Slå på eller av spegling av aviseringar."
 #: src/cli/main.cpp
 msgid "Mirror notification titles and bodies, not just the app."
 msgstr "Spegla aviseringarnas rubrik och text, inte bara appen."
+
+#: src/cli/main.cpp
+msgid ""
+"Download each notifying app's real icon from Apple's App Store. Only the "
+"app's identifier is sent."
+msgstr "Hämtar den riktiga ikonen för varje app som skickar aviseringar från Apples App Store. Bara appens identifierare skickas."
 
 #: src/cli/main.cpp
 msgid ""
@@ -1252,6 +1258,14 @@ msgstr "Spegling av aviseringar aktiverad."
 #: src/cli/main.cpp
 msgid "Notification mirroring disabled."
 msgstr "Spegling av aviseringar avaktiverad."
+
+#: src/cli/main.cpp
+msgid "Real app icons enabled."
+msgstr "Riktiga appikoner på."
+
+#: src/cli/main.cpp
+msgid "Real app icons disabled."
+msgstr "Riktiga appikoner av."
 
 #: src/cli/main.cpp
 msgid "Expected encrypted, plaintext or none, e.g. --bt-retention encrypted\n"
@@ -2989,6 +3003,16 @@ msgstr "Ta med aviseringens text"
 #: src/gtk/settings_view.cpp src/tui/settings.cpp
 msgid "Title and message content are shown, not just which app sent it."
 msgstr "Titel och innehåll visas, inte bara vilken app som skickade det."
+
+#: src/gtk/settings_view.cpp src/tui/settings.cpp
+msgid "Show real app icons"
+msgstr "Visa riktiga appikoner"
+
+#: src/gtk/settings_view.cpp src/tui/settings.cpp
+msgid ""
+"Downloads each app's icon from Apple's App Store once. Only the app's "
+"identifier is sent."
+msgstr "Hämtar varje apps ikon en gång från Apples App Store. Bara appens identifierare skickas."
 
 #: src/gtk/settings_view.cpp src/tui/settings.cpp
 msgid "Desktop popups"

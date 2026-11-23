@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: tether\n"
 "Report-Msgid-Bugs-To: zack@bartel.com\n"
-"POT-Creation-Date: 2026-11-22 18:43-0800\n"
+"POT-Creation-Date: 2026-11-23 16:42+0100\n"
 "PO-Revision-Date: 2026-08-22\n"
 "Last-Translator: Tether project\n"
 "Language-Team: Spanish\n"
@@ -202,6 +202,12 @@ msgstr "Activar o desactivar la duplicación de notificaciones."
 #: src/cli/main.cpp
 msgid "Mirror notification titles and bodies, not just the app."
 msgstr "Duplicar títulos y contenido de las notificaciones, no solo la app."
+
+#: src/cli/main.cpp
+msgid ""
+"Download each notifying app's real icon from Apple's App Store. Only the "
+"app's identifier is sent."
+msgstr "Descarga el icono real de cada aplicación que envía notificaciones desde la App Store de Apple. Solo se envía el identificador de la aplicación."
 
 #: src/cli/main.cpp
 msgid ""
@@ -1268,6 +1274,14 @@ msgstr "Duplicación de notificaciones activada."
 #: src/cli/main.cpp
 msgid "Notification mirroring disabled."
 msgstr "Duplicación de notificaciones desactivada."
+
+#: src/cli/main.cpp
+msgid "Real app icons enabled."
+msgstr "Iconos reales de aplicaciones activados."
+
+#: src/cli/main.cpp
+msgid "Real app icons disabled."
+msgstr "Iconos reales de aplicaciones desactivados."
 
 #: src/cli/main.cpp
 msgid "Expected encrypted, plaintext or none, e.g. --bt-retention encrypted\n"
@@ -3032,6 +3046,16 @@ msgstr "Incluir el texto de la notificación"
 #: src/gtk/settings_view.cpp src/tui/settings.cpp
 msgid "Title and message content are shown, not just which app sent it."
 msgstr "Se muestran el título y el mensaje, no solo qué aplicación lo envió."
+
+#: src/gtk/settings_view.cpp src/tui/settings.cpp
+msgid "Show real app icons"
+msgstr "Mostrar los iconos reales de las aplicaciones"
+
+#: src/gtk/settings_view.cpp src/tui/settings.cpp
+msgid ""
+"Downloads each app's icon from Apple's App Store once. Only the app's "
+"identifier is sent."
+msgstr "Descarga una vez el icono de cada aplicación desde la App Store de Apple. Solo se envía el identificador de la aplicación."
 
 #: src/gtk/settings_view.cpp src/tui/settings.cpp
 msgid "Desktop popups"

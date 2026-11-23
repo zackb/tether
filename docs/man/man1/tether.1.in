@@ -198,6 +198,11 @@ Turn notification mirroring on or off.
 \fB\-\-bt-ancs-content\fR \fIon\fR|\fIoff\fR
 Mirror notification titles and bodies, not just the app.
 .TP
+\fB\-\-bt-app-icons\fR \fIon\fR|\fIoff\fR
+Download each notifying app's real icon from Apple's App Store, once per app, into
+\fI$XDG_CACHE_HOME/tether/app-icons\fR. Only the app's bundle identifier and the store
+country are sent. Off by default.
+.TP
 \fB\-\-bt-ancs-mute\fR \fIapp\fR
 Stop desktop popups from an iPhone app, for apps that also run on this desktop.
 \fIapp\fR is the name shown in \fB\-\-bt-notifications\fR or the bundle id, such

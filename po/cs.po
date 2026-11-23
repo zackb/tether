@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: tether\n"
 "Report-Msgid-Bugs-To: zack@bartel.com\n"
-"POT-Creation-Date: 2026-11-22 18:43-0800\n"
+"POT-Creation-Date: 2026-11-23 16:42+0100\n"
 "PO-Revision-Date: 2026-08-23\n"
 "Last-Translator: Tether project\n"
 "Language-Team: Czech\n"
@@ -198,6 +198,12 @@ msgstr "Zapnout nebo vypnout zrcadlení oznámení."
 #: src/cli/main.cpp
 msgid "Mirror notification titles and bodies, not just the app."
 msgstr "Zrcadlit názvy a text oznámení, nejen aplikaci."
+
+#: src/cli/main.cpp
+msgid ""
+"Download each notifying app's real icon from Apple's App Store. Only the "
+"app's identifier is sent."
+msgstr "Stáhne skutečnou ikonu každé aplikace, která posílá oznámení, z App Storu společnosti Apple. Odesílá se jen identifikátor aplikace."
 
 #: src/cli/main.cpp
 msgid ""
@@ -1254,6 +1260,14 @@ msgstr "Zrcadlení oznámení zapnuto."
 #: src/cli/main.cpp
 msgid "Notification mirroring disabled."
 msgstr "Zrcadlení oznámení vypnuto."
+
+#: src/cli/main.cpp
+msgid "Real app icons enabled."
+msgstr "Skutečné ikony aplikací zapnuty."
+
+#: src/cli/main.cpp
+msgid "Real app icons disabled."
+msgstr "Skutečné ikony aplikací vypnuty."
 
 #: src/cli/main.cpp
 msgid "Expected encrypted, plaintext or none, e.g. --bt-retention encrypted\n"
@@ -2988,6 +3002,16 @@ msgstr "Zahrnout text oznámení"
 #: src/gtk/settings_view.cpp src/tui/settings.cpp
 msgid "Title and message content are shown, not just which app sent it."
 msgstr "Zobrazí se nadpis a text, nejen odesílající aplikace."
+
+#: src/gtk/settings_view.cpp src/tui/settings.cpp
+msgid "Show real app icons"
+msgstr "Zobrazovat skutečné ikony aplikací"
+
+#: src/gtk/settings_view.cpp src/tui/settings.cpp
+msgid ""
+"Downloads each app's icon from Apple's App Store once. Only the app's "
+"identifier is sent."
+msgstr "Ikonu každé aplikace jednou stáhne z App Storu společnosti Apple. Odesílá se jen identifikátor aplikace."
 
 #: src/gtk/settings_view.cpp src/tui/settings.cpp
 msgid "Desktop popups"

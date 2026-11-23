@@ -78,6 +78,7 @@ namespace tether::bluetooth {
         j["auth_strategy"] = to_string(config.auth_strategy);
         j["ancs_enabled"] = config.ancs_enabled;
         j["ancs_content_enabled"] = config.ancs_content_enabled;
+        j["app_icons_enabled"] = config.app_icons_enabled;
         j["group_messages_enabled"] = config.group_messages_enabled;
         j["calls_enabled"] = config.calls_enabled;
         j["enabled"] = config.enabled;
@@ -112,6 +113,7 @@ namespace tether::bluetooth {
             config.ancs_enabled = j.value("ancs_enabled", true);
             const int version = j.value("config_version", 0);
             config.ancs_content_enabled = version < 1 ? true : j.value("ancs_content_enabled", true);
+            config.app_icons_enabled = j.value("app_icons_enabled", false);
             config.group_messages_enabled = j.value("group_messages_enabled", false);
             config.calls_enabled = j.value("calls_enabled", false);
             config.enabled = j.value("enabled", true);

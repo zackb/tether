@@ -767,6 +767,7 @@ namespace tether::bluetooth {
 
         std::atomic<bool> ancs_wanted{true};
         std::atomic<bool> ancs_content_wanted{true};
+        std::atomic<bool> app_icons_wanted{false};
 
         std::shared_ptr<TelephonyClient> telephony;
         mutable std::mutex telephony_mutex;
@@ -1297,6 +1298,7 @@ namespace tether::bluetooth {
                 publish();
             });
         client->set_content_enabled(ancs_content_wanted.load());
+        client->set_app_icons_enabled(app_icons_wanted.load());
         // An iPhone answers a fetch in about 200 ms; waiting for the next one-second tick to process the reply and
         // send the next request made a replay of Notification Center take minutes.
         client->set_inbox_wake([this] {
@@ -1314,8 +1316,10 @@ namespace tether::bluetooth {
         ancs_preference = ancs_wanted.load();
         const bool effective = ancs_preference && !hold_ancs.load() && ancs_available();
         if (effective == ancs_enabled) {
-            if (auto client = ancs())
+            if (auto client = ancs()) {
                 client->set_content_enabled(ancs_content_wanted.load());
+                client->set_app_icons_enabled(app_icons_wanted.load());
+            }
             return;
         }
 
@@ -1499,6 +1503,7 @@ namespace tether::bluetooth {
         state_->ancs_wanted = ancs_enabled;
         const Config config = load_config();
         state_->ancs_content_wanted = config.ancs_content_enabled;
+        state_->app_icons_wanted = config.app_icons_enabled;
         state_->calls_wanted = config.calls_enabled;
         state_->lock_on_away = config.lock_on_away;
         state_->lock_away_seconds = config.lock_away_seconds;
@@ -1614,6 +1619,8 @@ namespace tether::bluetooth {
     }
 
     void ConnectionManager::set_ancs_content_enabled(bool enabled) { state_->ancs_content_wanted = enabled; }
+
+    void ConnectionManager::set_app_icons_enabled(bool enabled) { state_->app_icons_wanted = enabled; }
 
     bool ConnectionManager::perform_notification_action(uint32_t uid, ancs::ActionId action) {
         auto client = state_->ancs();

@@ -32,6 +32,13 @@ namespace tether::tui {
              "bt_set_ancs_content",
              "ancs_content_enabled",
              true},
+            {"app_icons",
+             N_("iPhone notifications"),
+             N_("Show real app icons"),
+             N_("Downloads each app's icon from Apple's App Store once. Only the app's identifier is sent."),
+             "bt_set_app_icons",
+             "app_icons_enabled",
+             false},
             {"popups",
              N_("Desktop popups"),
              N_("Show desktop popups"),
@@ -264,7 +271,7 @@ namespace tether::tui {
                 const std::string id = setting.id;
                 if (id == "ancs" || id == "calls" || id == "phoneaudio")
                     return available && bonded && bt_on;
-                if (id == "content")
+                if (id == "content" || id == "app_icons")
                     return available && bonded && bt_on && status_.value("ancs_enabled", true);
                 if (id == "retention")
                     return available && bonded;

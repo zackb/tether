@@ -44,4 +44,6 @@ namespace tether::paths {
 
     std::filesystem::path state_dir() { return xdg_dir("XDG_STATE_HOME", ".local/state"); }
 
+    std::filesystem::path cache_dir() { return xdg_dir("XDG_CACHE_HOME", ".cache"); }
+
 } // namespace tether::paths

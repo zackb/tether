@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: tether\n"
 "Report-Msgid-Bugs-To: zack@bartel.com\n"
-"POT-Creation-Date: 2026-11-22 18:43-0800\n"
+"POT-Creation-Date: 2026-11-23 16:42+0100\n"
 "PO-Revision-Date: 2026-08-23\n"
 "Last-Translator: Tether project\n"
 "Language-Team: Dutch\n"
@@ -202,6 +202,12 @@ msgstr "Het spiegelen van meldingen in- of uitschakelen."
 #: src/cli/main.cpp
 msgid "Mirror notification titles and bodies, not just the app."
 msgstr "Titels en tekst van meldingen spiegelen, niet alleen de app."
+
+#: src/cli/main.cpp
+msgid ""
+"Download each notifying app's real icon from Apple's App Store. Only the "
+"app's identifier is sent."
+msgstr "Downloadt het echte pictogram van elke app die meldingen stuurt uit de App Store van Apple. Alleen de identificatie van de app wordt verstuurd."
 
 #: src/cli/main.cpp
 msgid ""
@@ -1263,6 +1269,14 @@ msgstr "Spiegelen van meldingen ingeschakeld."
 #: src/cli/main.cpp
 msgid "Notification mirroring disabled."
 msgstr "Spiegelen van meldingen uitgeschakeld."
+
+#: src/cli/main.cpp
+msgid "Real app icons enabled."
+msgstr "Echte app-pictogrammen ingeschakeld."
+
+#: src/cli/main.cpp
+msgid "Real app icons disabled."
+msgstr "Echte app-pictogrammen uitgeschakeld."
 
 #: src/cli/main.cpp
 msgid "Expected encrypted, plaintext or none, e.g. --bt-retention encrypted\n"
@@ -3017,6 +3031,16 @@ msgstr "De meldingstekst meesturen"
 #: src/gtk/settings_view.cpp src/tui/settings.cpp
 msgid "Title and message content are shown, not just which app sent it."
 msgstr "Titel en tekst worden getoond, niet alleen welke app het stuurde."
+
+#: src/gtk/settings_view.cpp src/tui/settings.cpp
+msgid "Show real app icons"
+msgstr "Echte app-pictogrammen tonen"
+
+#: src/gtk/settings_view.cpp src/tui/settings.cpp
+msgid ""
+"Downloads each app's icon from Apple's App Store once. Only the app's "
+"identifier is sent."
+msgstr "Downloadt het pictogram van elke app één keer uit de App Store van Apple. Alleen de identificatie van de app wordt verstuurd."
 
 #: src/gtk/settings_view.cpp src/tui/settings.cpp
 msgid "Desktop popups"

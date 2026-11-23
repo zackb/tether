@@ -426,6 +426,7 @@ namespace tether {
         status["ancs_enabled"] = config.ancs_enabled;
         status["adapter"] = config.adapter;
         status["ancs_content_enabled"] = config.ancs_content_enabled;
+        status["app_icons_enabled"] = config.app_icons_enabled;
         status["calls_enabled"] = config.calls_enabled;
         status["enabled"] = config.enabled;
         status["retention"] = to_string(config.retention);
@@ -1527,6 +1528,13 @@ namespace tether {
                         // follows this toggle.
                         bluetooth::set_group_replies_enabled(config.group_messages_enabled &&
                                                              config.ancs_content_enabled && config.ancs_enabled);
+                        broadcast_local_event(build_bt_status().dump());
+                    } else if (j.contains("command") && j["command"] == "bt_set_app_icons") {
+                        auto config = bluetooth::load_config();
+                        config.app_icons_enabled = j.value("enabled", false);
+                        bluetooth::save_config(config);
+                        if (bluetooth::g_bt_connections)
+                            bluetooth::g_bt_connections->set_app_icons_enabled(config.app_icons_enabled);
                         broadcast_local_event(build_bt_status().dump());
                     } else if (j.contains("command") && j["command"] == "bt_set_calls") {
                         auto config = bluetooth::load_config();
