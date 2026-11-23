@@ -3,6 +3,7 @@
 #include "camera.hpp"
 #endif
 #include <algorithm>
+#include <atomic>
 #include <charconv>
 #include <csignal>
 #include <cstdio>
@@ -12,6 +13,7 @@
 #include <nlohmann/json.hpp>
 #include <optional>
 #include <string_view>
+#include <sys/eventfd.h>
 #include <sys/timerfd.h>
 #include <tether/audio.hpp>
 #include <tether/bluetooth/airpods.hpp>
@@ -34,10 +36,15 @@
 #include <tether/net.hpp>
 #include <tether/otp.hpp>
 #include <tether/secret_store.hpp>
+#include <tether/session_bus_watcher.hpp>
 #include <tether/wayland.hpp>
 #include <unistd.h>
 
 tether::EpollEventLoop* g_loop = nullptr;
+
+// Non-zero when tetherd stops because something it depends on went away, so that
+// systemd's Restart=on-failure starts it again.
+static std::atomic<int> g_exit_code{0};
 
 void signal_handler(int) {
     if (g_loop) {
@@ -108,6 +115,32 @@ int main(int argc, char** argv) {
     std::signal(SIGPIPE, SIG_IGN); // Ignore SIGPIPE to prevent crash on closed connections
 
     tether::EpollEventLoop loop;
+
+    // Exit with a failure when the session bus goes away so systemd restarts us on the new one.
+    const int session_bus_lost = eventfd(0, EFD_CLOEXEC | EFD_NONBLOCK);
+    // Declared before session_bus so the fd is closed only after the watcher thread has joined.
+    struct FdCloser {
+        int fd;
+        ~FdCloser() {
+            if (fd >= 0)
+                close(fd);
+        }
+    } session_bus_lost_closer{session_bus_lost};
+    if (session_bus_lost >= 0) {
+        loop.addFd(session_bus_lost, [&loop](int fd) {
+            uint64_t count = 0;
+            (void)!read(fd, &count, sizeof(count));
+            debug::log(WARN, "The session bus went away; stopping so that a fresh tetherd starts on the new one.");
+            loop.stop();
+        });
+    }
+    tether::SessionBusWatcher session_bus([session_bus_lost] {
+        g_exit_code = 1;
+        const uint64_t one = 1;
+        (void)!write(session_bus_lost, &one, sizeof(one));
+    });
+    if (session_bus_lost >= 0)
+        session_bus.start();
     g_loop = &loop;
 
     const uint16_t port = listen_port();
@@ -806,5 +839,5 @@ int main(int argc, char** argv) {
     tether::g_file_manager = nullptr;
     g_loop = nullptr;
 
-    return 0;
+    return g_exit_code;
 }
