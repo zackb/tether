@@ -1308,7 +1308,7 @@ static int print_status(tether::Client& client) {
     fields.emplace_back(_("Daemon"), _("running"));
     fields.emplace_back(_("Clipboard"),
                         snap.value("clipboard_available", false) ? _("syncing")
-                                                                 : _("off, no Wayland session on this machine"));
+                                                                 : _("off, no Wayland data-control or X11 session"));
     fields.emplace_back(_("mDNS"), snap.value("mdns_available", false) ? _("advertising") : _("unavailable"));
     fields.emplace_back(_("Firewall"), yn(snap.value("firewall_active", false)));
     fields.emplace_back(_("Paired devices"), std::to_string(paired.size()));

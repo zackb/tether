@@ -417,7 +417,7 @@ flowchart LR
 ## Requirements
 
 ### Linux
-- Wayland compositor with `wlr-data-control` protocol (Hyprland, Sway, [Fenriz](https://github.com/zackb/fenriz) etc.)
+- Clipboard sync: a Wayland compositor with `wlr-data-control` or `ext-data-control` (Hyprland, Sway, KDE, [Fenriz](https://github.com/zackb/fenriz) etc.), or X11/XWayland (GNOME, XFCE)
 - Build tools: cmake, ninja, pkg-config
 - x86_64 or aarch64 (Asahi, Raspberry Pi OS Trixie+). 32-bit ARM is not supported.
 

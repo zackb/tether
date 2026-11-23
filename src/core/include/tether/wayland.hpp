@@ -40,11 +40,19 @@ namespace tether {
         std::string get_clipboard();
         std::string get_clipboard_image();
 
+        // True when the clipboard runs on an X11 session rather than Wayland data-control.
+        bool clipboard_on_x11() const { return x11_; }
+
     private:
         bool connect_display();
         bool setup();
+        // Clipboard on the X11 session when there is no Wayland compositor (GNOME on Xorg, XFCE, ...).
+        bool setup_x11();
+        void attach_clipboard();
         void disconnect();
         void start_retry();
+        void stop_retry();
+        bool x11_ = false;
 
         std::mutex clip_mutex_;
         std::string cached_clipboard_;

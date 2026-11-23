@@ -77,3 +77,9 @@ target_link_libraries(tether PUBLIC
     PkgConfig::SECRET
     Intl::Intl
 )
+
+if(TETHER_X11)
+    target_sources(tether PRIVATE src/x11_clipboard.cpp)
+    target_compile_definitions(tether PRIVATE TETHER_X11)
+    target_link_libraries(tether PRIVATE PkgConfig::X11)
+endif()
