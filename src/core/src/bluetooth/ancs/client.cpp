@@ -56,6 +56,10 @@ namespace tether::bluetooth::ancs {
         std::deque<std::vector<uint8_t>> pending_data;
         std::deque<Request> pending_actions;
 
+        // Called, outside `inbox`, whenever something lands there, so the owner can drain it without waiting for
+        // the next tick. Set before the first tick, never changed after.
+        std::function<void()> on_inbox;
+
         // The registry is written by tick() and read by whichever thread answers
         // a "list notifications" command.
         mutable std::mutex registry_mutex;
@@ -84,6 +88,7 @@ namespace tether::bluetooth::ancs {
         void verify_subscription();
         void rebuild(const std::string& reason);
         bool link_alive() const;
+        void drain(int64_t now);
         void handle_source_event(const SourceEvent& event, int64_t now);
         void handle_response(const Request& request, const Response& response, int64_t now);
         std::string app_display_name(const std::string& app_id);
@@ -118,15 +123,21 @@ namespace tether::bluetooth::ancs {
 
             gsize length = 0;
             const guchar* bytes = static_cast<const guchar*>(g_variant_get_fixed_array(value, &length, 1));
+            bool queued = false;
             if (bytes && length) {
                 std::vector<uint8_t> copy(bytes, bytes + length);
                 std::lock_guard<std::mutex> lock(state->inbox);
-                if (state->notification_source_path == object_path)
+                if (state->notification_source_path == object_path) {
                     state->pending_source.push_back(std::move(copy));
-                else if (state->data_source_path == object_path)
+                    queued = true;
+                } else if (state->data_source_path == object_path) {
                     state->pending_data.push_back(std::move(copy));
+                    queued = true;
+                }
             }
             g_variant_unref(value);
+            if (queued && state->on_inbox)
+                state->on_inbox();
         }
 
     } // namespace
@@ -661,11 +672,61 @@ namespace tether::bluetooth::ancs {
             return false;
         // The sequencer belongs to tick()'s thread; handing it a request from a
         // command thread would race the queue it pops from. Queue it instead.
-        std::lock_guard<std::mutex> lock(state_->inbox);
-        if (state_->pending_actions.size() >= MAX_QUEUED_REQUESTS)
-            return false;
-        state_->pending_actions.push_back(build_action_request(uid, action));
+        {
+            std::lock_guard<std::mutex> lock(state_->inbox);
+            if (state_->pending_actions.size() >= MAX_QUEUED_REQUESTS)
+                return false;
+            state_->pending_actions.push_back(build_action_request(uid, action));
+        }
+        if (state_->on_inbox)
+            state_->on_inbox();
         return true;
+    }
+
+    void AncsClient::set_inbox_wake(std::function<void()> wake) { state_->on_inbox = std::move(wake); }
+
+    void AncsClient::pump(int64_t now) {
+        auto* s = state_.get();
+        if (s->device_path.empty() || !s->subscribed)
+            return;
+        s->drain(now);
+    }
+
+    // Hands the sequencer what the D-Bus and command threads queued. Runs on tick()'s thread only: from tick(), and
+    // from pump() as soon as something arrives, so a reply starts the next request without waiting for a tick.
+    void AncsClientState::drain(int64_t now) {
+        // Drain what the other threads buffered.
+        std::deque<std::vector<uint8_t>> source, data;
+        std::deque<Request> actions;
+        {
+            std::lock_guard<std::mutex> lock(inbox);
+            source.swap(pending_source);
+            data.swap(pending_data);
+            actions.swap(pending_actions);
+        }
+
+        for (auto& action : actions)
+            sequencer->submit(std::move(action));
+
+        for (const auto& packet : data)
+            sequencer->on_data_source(packet.data(), packet.size(), now);
+
+        // A session starts with iOS replaying all of Notification Center, more than the queue holds: ask about the
+        // newest additions first.
+        std::vector<SourceEvent> events;
+        events.reserve(source.size());
+        for (const auto& packet : source) {
+            SourceEvent event;
+            if (!parse_source_event(packet.data(), packet.size(), event)) {
+                debug::log(WARN, "ancs: discarding a malformed notification packet");
+                continue;
+            }
+            events.push_back(event);
+        }
+        for (const auto& event : fetch_order(std::move(events)))
+            handle_source_event(event, now);
+
+        sequencer->tick(now);
     }
 
     void AncsClient::tick(int64_t now) {
@@ -706,32 +767,7 @@ namespace tether::bluetooth::ancs {
             debug::log(INFO, "ancs: notification session {} started", session);
         }
 
-        // Drain what the other threads buffered.
-        std::deque<std::vector<uint8_t>> source, data;
-        std::deque<Request> actions;
-        {
-            std::lock_guard<std::mutex> lock(s->inbox);
-            source.swap(s->pending_source);
-            data.swap(s->pending_data);
-            actions.swap(s->pending_actions);
-        }
-
-        for (auto& action : actions)
-            s->sequencer->submit(std::move(action));
-
-        for (const auto& packet : data)
-            s->sequencer->on_data_source(packet.data(), packet.size(), now);
-
-        for (const auto& packet : source) {
-            SourceEvent event;
-            if (!parse_source_event(packet.data(), packet.size(), event)) {
-                debug::log(WARN, "ancs: discarding a malformed notification packet");
-                continue;
-            }
-            s->handle_source_event(event, now);
-        }
-
-        s->sequencer->tick(now);
+        s->drain(now);
 
         // A successful StartNotify proves only that the subscription exists, not
         // that iOS authorized notification access.

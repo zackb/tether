@@ -52,6 +52,13 @@ namespace tether::bluetooth::ancs {
 
         void tick(int64_t now);
 
+        // Processes what has arrived since the last tick (replies, notifications, queued actions) and sends the
+        // next request, without the rest of tick(). Same thread as tick().
+        void pump(int64_t now);
+
+        // Called from any thread when something arrives that pump() should process. Set before the first tick.
+        void set_inbox_wake(std::function<void()> wake);
+
         bool ready() const;
         const std::string& status_reason() const;
 
