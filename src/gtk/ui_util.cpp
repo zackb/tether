@@ -62,6 +62,8 @@ namespace tether::ui {
 .tether-composer { margin: 12px 16px 16px; border: 1px solid alpha(@theme_fg_color, 0.14); background-color: alpha(@theme_fg_color, 0.03); border-radius: 16px; padding: 8px; }
 .tether-composer scrolledwindow, .tether-composer textview, .tether-composer textview text { border: none; box-shadow: none; background: transparent; }
 .tether-composer button { border-radius: 10px; min-height: 32px; }
+.tether-emoji-button { color: mix(#e5a50a, @theme_fg_color, 0.3); }
+.tether-emoji-button:disabled { color: alpha(@theme_fg_color, 0.35); }
 .tether-settings { background-color: @theme_bg_color; }
 .tether-settings list { background-color: mix(@theme_bg_color, @theme_fg_color, 0.035); border: 1px solid alpha(@theme_fg_color, 0.10); border-radius: 14px; }
 .tether-settings list row { background: transparent; padding: 5px 8px; border-bottom: 1px solid alpha(@theme_fg_color, 0.06); }
