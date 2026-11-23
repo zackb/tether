@@ -85,6 +85,13 @@ namespace tether::bluetooth::ancs {
         case DataSourceAssembler::Result::NeedMore:
             return;
         case DataSourceAssembler::Result::Complete: {
+            // A late answer to a request that already timed out echoes its old uid;
+            // drop it and keep waiting for the current one.
+            if (current_.command == CommandId::GetNotificationAttributes &&
+                response.command == CommandId::GetNotificationAttributes && response.uid != current_.uid) {
+                assembler_.expect(current_.command, current_.attribute_ids);
+                return;
+            }
             Request done = current_;
             in_flight_ = false;
             if (on_complete_)

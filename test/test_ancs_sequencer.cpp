@@ -139,12 +139,9 @@ TEST(AncsSequencer, MatchesEachResponseToItsOwnRequest) {
     EXPECT_EQ(harness.completions[1].second.attribute(0), "com.example.second");
 }
 
-// Data Source responses carry no request identifier, so a response that arrives
-// after its own request timed out reassembles cleanly against whatever is in
-// flight by then. The sequencer cannot tell them apart -- the echoed uid is the
-// only thing that can, which is why the client compares it before filing the
-// attributes against a notification.
-TEST(AncsSequencer, ALateResponseIsDeliveredAgainstTheWrongRequest) {
+// A late response to a timed-out request must not be credited to the request now
+// in flight, which keeps waiting for its own answer.
+TEST(AncsSequencer, ALateResponseDoesNotConsumeTheRequestInFlight) {
     Harness harness;
     auto sequencer = harness.make();
 
@@ -152,7 +149,7 @@ TEST(AncsSequencer, ALateResponseIsDeliveredAgainstTheWrongRequest) {
     sequencer.submit(build_notification_request(22, {NotificationAttributeId::AppIdentifier}));
     sequencer.tick(0);
 
-    // The phone never answers for 11, so it is failed and 22 goes out.
+    // The phone does not answer for 11 in time, so it is failed and 22 goes out.
     sequencer.tick(REQUEST_TIMEOUT_SECONDS);
     ASSERT_EQ(harness.failures.size(), 1u);
     ASSERT_EQ(harness.writes.size(), 2u);
@@ -160,11 +157,15 @@ TEST(AncsSequencer, ALateResponseIsDeliveredAgainstTheWrongRequest) {
     // 11's answer turns up now, while 22 is the one in flight.
     auto late = notification_response(11, "com.example.first");
     sequencer.on_data_source(late.data(), late.size(), REQUEST_TIMEOUT_SECONDS + 1);
+    EXPECT_TRUE(harness.completions.empty()) << "the stale answer is not 22's";
+    EXPECT_TRUE(sequencer.in_flight()) << "22 keeps waiting";
 
+    auto own = notification_response(22, "com.example.second");
+    sequencer.on_data_source(own.data(), own.size(), REQUEST_TIMEOUT_SECONDS + 2);
     ASSERT_EQ(harness.completions.size(), 1u);
-    EXPECT_EQ(harness.completions[0].first.uid, 22u) << "the sequencer credits it to the live request";
-    EXPECT_EQ(harness.completions[0].second.uid, 11u) << "and the echoed uid is what gives it away";
-    EXPECT_NE(harness.completions[0].first.uid, harness.completions[0].second.uid);
+    EXPECT_EQ(harness.completions[0].first.uid, 22u);
+    EXPECT_EQ(harness.completions[0].second.uid, 22u);
+    EXPECT_FALSE(sequencer.in_flight());
 }
 
 // An action gets no Data Source response at all, so waiting for one would stall
