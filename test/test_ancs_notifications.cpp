@@ -210,6 +210,32 @@ TEST(AncsRegistry, AReplayUnderANewSessionReplacesTheStaleCopy) {
     EXPECT_EQ(registry.size(), 3u) << "identical notifications within one session are both real";
 }
 
+// iOS does not flag every replayed entry pre-existing; a copy of one from an earlier session is still backlog.
+TEST(AncsRegistry, StoreReportsACopyFromAnEarlierSession) {
+    NotificationRegistry registry;
+    Notification post = make(13, "com.burbn.instagram");
+    post.title = "Guille";
+    post.body = "Desde pequeñitos";
+    post.received = 100;
+    EXPECT_FALSE(registry.store(post));
+
+    registry.begin_session();
+
+    Notification replay = post;
+    replay.uid = 61;
+    EXPECT_TRUE(registry.store(replay)) << "an unflagged replay must read as backlog";
+
+    Notification fresh = post;
+    fresh.uid = 62;
+    fresh.body = "Otro mensaje";
+    fresh.received = 200;
+    EXPECT_FALSE(registry.store(fresh)) << "a new notification from the same app is not a replay";
+
+    Notification twin = replay;
+    twin.uid = 63;
+    EXPECT_FALSE(registry.store(twin)) << "only a copy from an earlier session counts";
+}
+
 TEST(AncsRegistry, RecentIsOrderedByDeliveryTime) {
     NotificationRegistry registry;
     // Stored in the order iOS replayed them, which bears no relation to when the

@@ -72,7 +72,8 @@ namespace tether::bluetooth::ancs {
         order_.clear();
     }
 
-    void NotificationRegistry::store(const Notification& notification) {
+    bool NotificationRegistry::store(const Notification& notification) {
+        bool replaced = false;
         for (auto it = notifications_.begin(); it != notifications_.end();) {
             const Notification& stored = it->second;
             if (stored.session != session_ && stored.app_id == notification.app_id &&
@@ -80,6 +81,7 @@ namespace tether::bluetooth::ancs {
                 stored.body == notification.body && stored.received == notification.received) {
                 order_.erase(std::remove(order_.begin(), order_.end(), it->first), order_.end());
                 it = notifications_.erase(it);
+                replaced = true;
             } else {
                 ++it;
             }
@@ -95,6 +97,7 @@ namespace tether::bluetooth::ancs {
             order_.erase(order_.begin());
             notifications_.erase(oldest);
         }
+        return replaced;
     }
 
     const Notification* NotificationRegistry::find(uint32_t uid) const {
