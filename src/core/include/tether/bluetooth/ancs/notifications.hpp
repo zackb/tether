@@ -38,6 +38,32 @@ namespace tether::bluetooth::ancs {
         Withdraw // removed on the phone: drop the desktop copy
     };
 
+    // Holds new notifications until their app's display name arrives or WAIT_SECONDS pass.
+    class HeldPopups {
+    public:
+        static constexpr int64_t WAIT_SECONDS = 2;
+
+        void hold(Notification notification, int64_t now);
+
+        // The notifications held for `app_id`, renamed to `name`, oldest first.
+        std::vector<Notification> release_app(const std::string& app_id, const std::string& name);
+
+        // The notifications that have waited long enough, oldest first.
+        std::vector<Notification> release_expired(int64_t now);
+
+        // Everything held, oldest first (the session is ending).
+        std::vector<Notification> release_all();
+
+        bool empty() const { return held_.empty(); }
+
+    private:
+        struct Held {
+            Notification notification;
+            int64_t deadline;
+        };
+        std::vector<Held> held_;
+    };
+
     // Applies the delivery rules that keep the desktop from being flooded.
     //
     // iOS replays every existing notification whenever the subscription comes
