@@ -54,6 +54,9 @@ namespace tether::bluetooth::ancs {
         // Everything held, oldest first (the session is ending).
         std::vector<Notification> release_all();
 
+        // Forgets `uid` without releasing it (removed on the phone).
+        void drop(uint32_t uid);
+
         bool empty() const { return held_.empty(); }
 
     private:
