@@ -293,6 +293,14 @@ namespace {
         return e;
     }
 
+    Notification held_notification(uint32_t uid, const std::string& app_id) {
+        Notification n;
+        n.uid = uid;
+        n.app_id = app_id;
+        n.app_name = derive_app_name(app_id);
+        return n;
+    }
+
 } // namespace
 
 TEST(AncsFetchOrder, AdditionsAreNewestFirst) {
@@ -316,4 +324,80 @@ TEST(AncsFetchOrder, RemovalsAndModificationsKeepTheirPlaceAheadOfAdditions) {
 TEST(AncsFetchOrder, EmptyAndSingleAreUnchanged) {
     EXPECT_TRUE(fetch_order({}).empty());
     EXPECT_EQ(fetch_order({event(EventId::Added, 4)}).size(), 1u);
+}
+
+TEST(AncsHeldPopups, ReleasedWithTheRealNameWhenItArrives) {
+    HeldPopups held;
+    held.hold(held_notification(1, "com.alibaba.iAliexpress"), 100);
+    held.hold(held_notification(2, "com.burbn.instagram"), 100);
+    held.hold(held_notification(3, "com.alibaba.iAliexpress"), 101);
+
+    const auto out = held.release_app("com.alibaba.iAliexpress", "AliExpress");
+    ASSERT_EQ(out.size(), 2u);
+    EXPECT_EQ(out[0].uid, 1u);
+    EXPECT_EQ(out[1].uid, 3u);
+    EXPECT_EQ(out[0].app_name, "AliExpress");
+    EXPECT_EQ(out[1].app_name, "AliExpress");
+    EXPECT_FALSE(held.empty());
+}
+
+TEST(AncsHeldPopups, ReleasedWithTheGuessAfterTheWait) {
+    HeldPopups held;
+    held.hold(held_notification(1, "com.alibaba.iAliexpress"), 100);
+    held.hold(held_notification(2, "com.burbn.instagram"), 101);
+
+    EXPECT_TRUE(held.release_expired(100 + HeldPopups::WAIT_SECONDS - 1).empty());
+
+    const auto first = held.release_expired(100 + HeldPopups::WAIT_SECONDS);
+    ASSERT_EQ(first.size(), 1u);
+    EXPECT_EQ(first[0].uid, 1u);
+    EXPECT_EQ(first[0].app_name, "IAliexpress");
+
+    const auto second = held.release_expired(101 + HeldPopups::WAIT_SECONDS);
+    ASSERT_EQ(second.size(), 1u);
+    EXPECT_EQ(second[0].uid, 2u);
+    EXPECT_TRUE(held.empty());
+}
+
+TEST(AncsHeldPopups, ReleaseAllEmptiesInOrder) {
+    HeldPopups held;
+    held.hold(held_notification(5, "a.b.c"), 100);
+    held.hold(held_notification(6, "d.e.f"), 100);
+    const auto out = held.release_all();
+    ASSERT_EQ(out.size(), 2u);
+    EXPECT_EQ(out[0].uid, 5u);
+    EXPECT_EQ(out[1].uid, 6u);
+    EXPECT_TRUE(held.empty());
+    EXPECT_TRUE(held.release_all().empty());
+}
+
+TEST(AncsHeldPopups, HoldingTheSameUidAgainReplacesIt) {
+    HeldPopups held;
+    held.hold(held_notification(1, "a.b.c"), 100);
+    auto again = held_notification(1, "a.b.c");
+    again.title = "second";
+    held.hold(std::move(again), 101);
+
+    const auto out = held.release_app("a.b.c", "C");
+    ASSERT_EQ(out.size(), 1u);
+    EXPECT_EQ(out[0].title, "second");
+}
+
+TEST(AncsHeldPopups, ReleasingAnotherAppLeavesTheRest) {
+    HeldPopups held;
+    held.hold(held_notification(1, "a.b.c"), 100);
+    EXPECT_TRUE(held.release_app("x.y.z", "X").empty());
+    EXPECT_FALSE(held.empty());
+}
+
+TEST(AncsHeldPopups, DroppedIsNeverReleased) {
+    HeldPopups held;
+    held.hold(held_notification(1, "a.b.c"), 100);
+    held.hold(held_notification(2, "a.b.c"), 100);
+    held.drop(1);
+    const auto out = held.release_app("a.b.c", "C");
+    ASSERT_EQ(out.size(), 1u);
+    EXPECT_EQ(out[0].uid, 2u);
+    held.drop(99);
+    EXPECT_TRUE(held.empty());
 }
