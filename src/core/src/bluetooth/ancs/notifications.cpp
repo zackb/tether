@@ -128,6 +128,52 @@ namespace tether::bluetooth::ancs {
         }
     }
 
+    void HeldPopups::hold(Notification notification, int64_t now) {
+        for (auto& held : held_) {
+            if (held.notification.uid == notification.uid) {
+                held.notification = std::move(notification);
+                return;
+            }
+        }
+        held_.push_back({std::move(notification), now + WAIT_SECONDS});
+    }
+
+    std::vector<Notification> HeldPopups::release_app(const std::string& app_id, const std::string& name) {
+        std::vector<Notification> out;
+        for (auto it = held_.begin(); it != held_.end();) {
+            if (it->notification.app_id == app_id) {
+                out.push_back(std::move(it->notification));
+                out.back().app_name = name;
+                it = held_.erase(it);
+            } else {
+                ++it;
+            }
+        }
+        return out;
+    }
+
+    std::vector<Notification> HeldPopups::release_expired(int64_t now) {
+        std::vector<Notification> out;
+        for (auto it = held_.begin(); it != held_.end();) {
+            if (now >= it->deadline) {
+                out.push_back(std::move(it->notification));
+                it = held_.erase(it);
+            } else {
+                ++it;
+            }
+        }
+        return out;
+    }
+
+    std::vector<Notification> HeldPopups::release_all() {
+        std::vector<Notification> out;
+        out.reserve(held_.size());
+        for (auto& held : held_)
+            out.push_back(std::move(held.notification));
+        held_.clear();
+        return out;
+    }
+
     std::string derive_app_name(const std::string& app_id) {
         const size_t dot = app_id.rfind('.');
         if (dot == std::string::npos || dot + 1 == app_id.size())
