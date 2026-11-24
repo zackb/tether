@@ -571,10 +571,13 @@ namespace tether::bluetooth::ancs {
             parse_map_timestamp(response.attribute(static_cast<uint8_t>(NotificationAttributeId::Date)));
         notification.received = delivered ? delivered : now;
 
+        bool replayed = false;
         {
             std::lock_guard<std::mutex> lock(registry_mutex);
-            registry.store(notification);
+            replayed = registry.store(notification);
         }
+        if (replayed)
+            notification.pre_existing = true;
         // Only a notification that would pop up is held.
         if (should_show_desktop_popup(notification) && !notification.app_id.empty() &&
             app_names[notification.app_id].empty()) {

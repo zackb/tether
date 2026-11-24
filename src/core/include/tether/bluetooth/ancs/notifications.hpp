@@ -83,7 +83,8 @@ namespace tether::bluetooth::ancs {
         void begin_session();
         uint64_t session() const { return session_; }
 
-        void store(const Notification& notification);
+        // True when it replaced a copy from an earlier session: a replay iOS did not flag pre-existing.
+        bool store(const Notification& notification);
         // Applies a display name resolved after the notifications were stored.
         void rename_app(const std::string& app_id, const std::string& name);
         const Notification* find(uint32_t uid) const;
