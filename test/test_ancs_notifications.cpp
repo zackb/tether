@@ -363,3 +363,15 @@ TEST(AncsHeldPopups, ReleasingAnotherAppLeavesTheRest) {
     EXPECT_TRUE(held.release_app("x.y.z", "X").empty());
     EXPECT_FALSE(held.empty());
 }
+
+TEST(AncsHeldPopups, DroppedIsNeverReleased) {
+    HeldPopups held;
+    held.hold(held_notification(1, "a.b.c"), 100);
+    held.hold(held_notification(2, "a.b.c"), 100);
+    held.drop(1);
+    const auto out = held.release_app("a.b.c", "C");
+    ASSERT_EQ(out.size(), 1u);
+    EXPECT_EQ(out[0].uid, 2u);
+    held.drop(99);
+    EXPECT_TRUE(held.empty());
+}

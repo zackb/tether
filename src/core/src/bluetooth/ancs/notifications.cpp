@@ -174,6 +174,10 @@ namespace tether::bluetooth::ancs {
         return out;
     }
 
+    void HeldPopups::drop(uint32_t uid) {
+        std::erase_if(held_, [uid](const Held& held) { return held.notification.uid == uid; });
+    }
+
     std::string derive_app_name(const std::string& app_id) {
         const size_t dot = app_id.rfind('.');
         if (dot == std::string::npos || dot + 1 == app_id.size())

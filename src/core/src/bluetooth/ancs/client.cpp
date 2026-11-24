@@ -478,6 +478,7 @@ namespace tether::bluetooth::ancs {
         case Decision::Withdraw:
             // A fetch still queued or in flight must not bring it back.
             in_progress.erase(event.uid);
+            held_popups.drop(event.uid);
             if (on_withdraw)
                 on_withdraw(event.uid);
             return;
