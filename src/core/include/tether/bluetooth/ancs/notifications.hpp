@@ -2,6 +2,7 @@
 
 #include "tether/bluetooth/ancs/protocol.hpp"
 
+#include <chrono>
 #include <cstdint>
 #include <map>
 #include <nlohmann/json.hpp>
@@ -65,6 +66,26 @@ namespace tether::bluetooth::ancs {
             int64_t deadline;
         };
         std::vector<Held> held_;
+    };
+
+    // The run of additions right after subscribing, when there is no earlier session to compare it with.
+    // iOS does not flag all of it pre-existing, but all of it is.
+    class ReplayBurst {
+    public:
+        using Clock = std::chrono::steady_clock;
+        // How soon the first addition must come, and the gap that ends the run.
+        static constexpr auto START = std::chrono::seconds(10);
+        static constexpr auto GAP = std::chrono::seconds(1);
+
+        void start(Clock::time_point at);
+        // Whether an addition arriving `at` belongs to the burst. Once it has ended, nothing does.
+        bool contains(const SourceEvent& event, Clock::time_point at);
+
+    private:
+        bool active_ = false;
+        bool seen_ = false;
+        Clock::time_point started_{};
+        Clock::time_point last_{};
     };
 
     // Applies the delivery rules that keep the desktop from being flooded.

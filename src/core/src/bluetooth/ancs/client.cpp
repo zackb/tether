@@ -82,6 +82,9 @@ namespace tether::bluetooth::ancs {
         // Popups waiting for their app's display name. Used from tick()'s thread only.
         HeldPopups held_popups;
 
+        // The opening replay of a session with an empty registry. tick()'s thread only.
+        ReplayBurst first_replay;
+
         bool write_control_point(const std::vector<uint8_t>& payload);
         void set_status(bool now_ready, const std::string& text);
         bool discover();
@@ -461,8 +464,11 @@ namespace tether::bluetooth::ancs {
         return true;
     }
 
-    void AncsClientState::handle_source_event(const SourceEvent& event, int64_t now) {
+    void AncsClientState::handle_source_event(const SourceEvent& incoming, int64_t now) {
         (void)now;
+        SourceEvent event = incoming;
+        if (first_replay.contains(event, ReplayBurst::Clock::now()))
+            event.flags |= FlagPreExisting;
         Decision decision;
         {
             std::lock_guard<std::mutex> lock(registry_mutex);
@@ -789,11 +795,15 @@ namespace tether::bluetooth::ancs {
             }
             s->subscribed = true;
             uint64_t session = 0;
+            bool nothing_to_compare = false;
             {
                 std::lock_guard<std::mutex> lock(s->registry_mutex);
+                nothing_to_compare = s->registry.size() == 0;
                 s->registry.begin_session();
                 session = s->registry.session();
             }
+            if (nothing_to_compare)
+                s->first_replay.start(ReplayBurst::Clock::now());
             debug::log(INFO, "ancs: notification session {} started", session);
         }
 
