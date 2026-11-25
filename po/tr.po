@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: tether\n"
 "Report-Msgid-Bugs-To: zack@bartel.com\n"
-"POT-Creation-Date: 2026-11-22 18:43-0800\n"
+"POT-Creation-Date: 2026-11-25 21:13+0100\n"
 "PO-Revision-Date: 2026-08-23\n"
 "Last-Translator: Tether project\n"
 "Language-Team: Turkish\n"
@@ -2407,6 +2407,10 @@ msgstr "Eşleşmiş hiçbir aygıt bağlı değil. Aygıtı açın ve aynı ağa
 #: src/gtk/devices_view.cpp src/tui/devices.cpp
 msgid "Unknown Device"
 msgstr "Bilinmeyen aygıt"
+
+#: src/gtk/devices_view.cpp
+msgid "File not sent"
+msgstr "Dosya gönderilmedi"
 
 #: src/gtk/devices_view.cpp
 msgid "Folders can't be sent — pick files instead."
