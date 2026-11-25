@@ -93,6 +93,11 @@ namespace tether::ui {
     color: @theme_selected_fg_color;
 }
 
+.tether-bubble-out link,
+.tether-bubble-out link:visited {
+    color: @theme_selected_fg_color;
+}
+
 .tether-route-bar {
     border-top: 1px solid alpha(@theme_fg_color, 0.09);
     padding: 5px 12px;
