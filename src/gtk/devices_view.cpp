@@ -729,15 +729,49 @@ namespace tether::ui {
             daemon_send(j);
         }
 
-        // The window may be hidden in the tray when a file manager starts a send.
-        void notify_if_hidden(const std::string& message) {
+        guint32 g_send_notification_id = 0;
+
+        void on_send_notification_shown(GObject* bus, GAsyncResult* result, gpointer) {
+            if (GVariant* reply = g_dbus_connection_call_finish(G_DBUS_CONNECTION(bus), result, nullptr)) {
+                g_variant_get(reply, "(u)", &g_send_notification_id);
+                g_variant_unref(reply);
+            }
+        }
+
+        // A send can start from a file manager while the window is hidden or behind it. This goes through the
+        // notification server directly: GNotification needs a desktop file named after the app id, and GNOME drops
+        // it without one.
+        void notify_unless_focused(const std::string& summary, const std::string& body = {}) {
             GtkWidget* window = main_window();
-            if (window && gtk_widget_get_visible(window))
+            if (window && gtk_widget_get_visible(window) && gtk_window_is_active(GTK_WINDOW(window)))
                 return;
-            GNotification* notification = g_notification_new("Tether");
-            g_notification_set_body(notification, message.c_str());
-            g_application_send_notification(g_application_get_default(), "tether-send", notification);
-            g_object_unref(notification);
+            GDBusConnection* bus = g_bus_get_sync(G_BUS_TYPE_SESSION, nullptr, nullptr);
+            if (!bus)
+                return;
+            GVariantBuilder hints;
+            g_variant_builder_init(&hints, G_VARIANT_TYPE("a{sv}"));
+            g_variant_builder_add(&hints, "{sv}", "desktop-entry", g_variant_new_string("tether-gtk"));
+            g_dbus_connection_call(bus,
+                                   "org.freedesktop.Notifications",
+                                   "/org/freedesktop/Notifications",
+                                   "org.freedesktop.Notifications",
+                                   "Notify",
+                                   g_variant_new("(susss@asa{sv}i)",
+                                                 "Tether",
+                                                 g_send_notification_id,
+                                                 "tether",
+                                                 summary.c_str(),
+                                                 body.c_str(),
+                                                 g_variant_new_strv(nullptr, 0),
+                                                 &hints,
+                                                 -1),
+                                   G_VARIANT_TYPE("(u)"),
+                                   G_DBUS_CALL_FLAGS_NONE,
+                                   -1,
+                                   nullptr,
+                                   on_send_notification_shown,
+                                   nullptr);
+            g_object_unref(bus);
         }
 
         // skipped counts items that came in with the batch but are not sendable
@@ -1029,7 +1063,7 @@ namespace tether::ui {
         });
         if (paths.empty()) {
             if (before > 0)
-                notify_if_hidden(_("Folders can't be sent — pick files instead."));
+                notify_unless_focused(_("File not sent"), _("Folders can't be sent — pick files instead."));
             return;
         }
         if (!g_devices.snapshot_seen) {
@@ -1052,7 +1086,7 @@ namespace tether::ui {
         if (devices.empty()) {
             const std::string message = _("No device is connected.");
             set_status_action(message);
-            notify_if_hidden(message);
+            notify_unless_focused(_("File not sent"), message);
             return;
         }
         if (devices.size() == 1)
@@ -1493,7 +1527,10 @@ namespace tether::ui {
                               P_("Skipped {} non-file item.", "Skipped {} non-file items.", g_devices.send_skipped),
                               g_devices.send_skipped);
             set_status_action(message);
-            notify_if_hidden(message);
+            if (g_devices.send_batch_total <= 1 && g_devices.send_failed > 0)
+                notify_unless_focused(_("File not sent"), message);
+            else
+                notify_unless_focused(message);
 
             g_devices.send_batch_total = 0;
             g_devices.send_failed = 0;
