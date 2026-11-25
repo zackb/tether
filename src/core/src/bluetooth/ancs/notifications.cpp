@@ -213,6 +213,10 @@ namespace tether::bluetooth::ancs {
         return !notification.pre_existing && notification.app_id != APP_ID_MESSAGES;
     }
 
+    bool clears_on_dismiss(const Notification& notification) {
+        return notification.has_negative_action && notification.category != CategoryId::IncomingCall;
+    }
+
     std::vector<std::string> icon_candidates(const Notification& notification) {
         std::vector<std::string> out;
         if (!notification.icon_file.empty())

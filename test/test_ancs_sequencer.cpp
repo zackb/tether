@@ -303,6 +303,24 @@ TEST(AncsNotifications, WithdrawsRemovedNotifications) {
     EXPECT_EQ(registry.classify(added), Decision::Fetch) << "the UID is free to be seen again";
 }
 
+TEST(AncsNotifications, DismissingClearsOnThePhoneExceptForIncomingCalls) {
+    Notification reminder;
+    reminder.category = CategoryId::Schedule;
+    reminder.has_negative_action = true;
+    EXPECT_TRUE(clears_on_dismiss(reminder));
+
+    Notification call = reminder;
+    call.category = CategoryId::IncomingCall;
+    EXPECT_FALSE(clears_on_dismiss(call)) << "the negative action would decline the call";
+
+    Notification missed = reminder;
+    missed.category = CategoryId::MissedCall;
+    EXPECT_TRUE(clears_on_dismiss(missed));
+
+    Notification no_action;
+    EXPECT_FALSE(clears_on_dismiss(no_action));
+}
+
 // MAP already delivers these with read state that stays in sync, so an ANCS
 // popup would be the second copy of the same message.
 TEST(AncsNotifications, SuppressesDesktopPopupsForMessages) {

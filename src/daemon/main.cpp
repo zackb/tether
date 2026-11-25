@@ -340,6 +340,14 @@ int main(int argc, char** argv) {
         }
     };
 
+    notifier.set_dismiss_handler([&loop](uint32_t uid) {
+        loop.post([uid] {
+            if (tether::bluetooth::g_bt_connections)
+                tether::bluetooth::g_bt_connections->perform_notification_action(
+                    uid, tether::bluetooth::ancs::ActionId::Negative);
+        });
+    });
+
     notifier.set_reply_handler([&notifier](const std::string& thread, const std::string& body) {
         tether::send_bt_message_async(thread, body, {}, [&notifier](bool sent, const std::string& error) {
             if (!sent)
@@ -876,7 +884,8 @@ int main(int argc, char** argv) {
                                      otp,
                                      notification.app_id,
                                      "",
-                                     notification.uid});
+                                     notification.uid,
+                                     tether::bluetooth::ancs::clears_on_dismiss(notification)});
                 },
                 [&notifier](uint32_t uid) {
                     notifier.withdraw(uid);

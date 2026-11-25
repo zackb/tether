@@ -202,6 +202,7 @@ namespace tether {
         std::function<void(const std::string&, bool)> g_network_trust_handler;
         // trust prompts by network key, so repeat raises the same popup
         std::unordered_map<std::string, NotifyNotification*> g_trust_popups;
+        std::function<void(uint32_t)> g_dismiss_handler;
 
         // Server notification id -> conversation, for notifications showing an
         // inline reply field. Touched only on the notifier's thread.
@@ -384,7 +385,20 @@ namespace tether {
 
         void on_notification_closed(NotifyNotification* notification, gpointer) {
             g_reply_threads.erase(notification_id(notification));
-            std::erase_if(g_ancs_popups, [notification](const auto& entry) { return entry.second == notification; });
+            // Only the user's own dismissal reaches the phone: not a timeout, nor a withdraw() after the phone cleared
+            // it.
+            const bool dismissed =
+                notify_notification_get_closed_reason(notification) == NOTIFY_CLOSED_REASON_DISMISSED &&
+                g_object_get_data(G_OBJECT(notification), "tether-clearable");
+            for (auto it = g_ancs_popups.begin(); it != g_ancs_popups.end();) {
+                if (it->second != notification) {
+                    ++it;
+                    continue;
+                }
+                if (dismissed && g_dismiss_handler)
+                    g_dismiss_handler(it->first);
+                it = g_ancs_popups.erase(it);
+            }
             std::erase_if(g_trust_popups, [notification](const auto& entry) { return entry.second == notification; });
             if (notification == g_file_popup)
                 g_file_popup = nullptr;
@@ -612,8 +626,11 @@ namespace tether {
             }
             if (inline_reply)
                 g_reply_threads[notification_id(notification)] = spec->reply_thread;
-            if (spec->ancs_uid >= 0)
+            if (spec->ancs_uid >= 0) {
                 g_ancs_popups[static_cast<uint32_t>(spec->ancs_uid)] = notification;
+                if (spec->clearable)
+                    g_object_set_data(G_OBJECT(notification), "tether-clearable", GINT_TO_POINTER(1));
+            }
             if (!has_actions)
                 g_object_unref(notification);
             return G_SOURCE_REMOVE;
@@ -707,6 +724,10 @@ namespace tether {
     void DesktopNotifier::set_mute_handler(
         std::function<void(const std::string& app_id, const std::string& app_name)> handler) {
         g_mute_handler = std::move(handler);
+    }
+
+    void DesktopNotifier::set_dismiss_handler(std::function<void(uint32_t ancs_uid)> handler) {
+        g_dismiss_handler = std::move(handler);
     }
 
     void DesktopNotifier::set_copy_handler(
