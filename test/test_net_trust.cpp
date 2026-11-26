@@ -95,3 +95,13 @@ TEST(NetTrust, IwdKeysWifiBySsidAndSecurity) {
     tether::apply_wifi_networks(twin, {{"wlan0", {"Home", "open"}}});
     EXPECT_NE(twin[0].key, nets[0].key);
 }
+
+// TETHER_LAN_SCOPE pins the scope for a container or headless box; anything else defers to config.
+TEST(NetTrust, EnvScopeOverridesTheSavedOne) {
+    using tether::bluetooth::LanScope;
+    EXPECT_EQ(tether::effective_lan_scope(LanScope::Trusted, "all"), LanScope::All);
+    EXPECT_EQ(tether::effective_lan_scope(LanScope::All, "trusted"), LanScope::Trusted);
+    EXPECT_EQ(tether::effective_lan_scope(LanScope::All, nullptr), LanScope::All);
+    EXPECT_EQ(tether::effective_lan_scope(LanScope::Trusted, ""), LanScope::Trusted);
+    EXPECT_EQ(tether::effective_lan_scope(LanScope::Trusted, "everywhere"), LanScope::Trusted);
+}

@@ -5,6 +5,7 @@
 #include "tether/log.hpp"
 
 #include <arpa/inet.h>
+#include <cstdlib>
 #include <cstring>
 #include <fstream>
 #include <gio/gio.h>
@@ -301,6 +302,17 @@ namespace tether {
 
     } // namespace
 
+    bluetooth::LanScope effective_lan_scope(bluetooth::LanScope saved, const char* env) {
+        if (!env)
+            return saved;
+        const std::string value = env;
+        if (value == "all")
+            return bluetooth::LanScope::All;
+        if (value == "trusted")
+            return bluetooth::LanScope::Trusted;
+        return saved;
+    }
+
     void lan_trust_refresh() {
         std::vector<LanNetwork> networks;
         if (!nm_networks(networks)) {
@@ -309,7 +321,8 @@ namespace tether {
         }
 
         const auto config = bluetooth::load_config();
-        const bool trust_all = config.lan_scope == bluetooth::LanScope::All;
+        const bool trust_all =
+            effective_lan_scope(config.lan_scope, std::getenv("TETHER_LAN_SCOPE")) == bluetooth::LanScope::All;
         apply_lan_trust(networks, trust_all, config.trusted_networks);
 
         std::function<void()> changed;

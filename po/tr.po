@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: tether\n"
 "Report-Msgid-Bugs-To: zack@bartel.com\n"
-"POT-Creation-Date: 2026-11-26 10:55-0800\n"
+"POT-Creation-Date: 2026-11-26 11:12-0800\n"
 "PO-Revision-Date: 2026-08-23\n"
 "Last-Translator: Tether project\n"
 "Language-Team: Turkish\n"
@@ -964,6 +964,24 @@ msgid "More than one device is named {}; pass its fingerprint instead.\n"
 msgstr "{} adında birden fazla aygıt var; bunun yerine parmak izini verin.\n"
 
 #: src/cli/main.cpp
+msgid "shown on every network"
+msgstr "tüm ağlarda görünür"
+
+#: src/cli/main.cpp
+#, c++-format
+msgid "shown on {}"
+msgstr "{} ağında görünür"
+
+#: src/cli/main.cpp
+#, c++-format
+msgid "hidden on {} (tether --trust-network)"
+msgstr "{} ağında gizli (tether --trust-network)"
+
+#: src/cli/main.cpp
+msgid "no network"
+msgstr "ağ yok"
+
+#: src/cli/main.cpp
 msgid "Version"
 msgstr "Sürüm"
 
@@ -998,6 +1016,10 @@ msgstr "yayınlanıyor"
 #: src/cli/main.cpp
 msgid "unavailable"
 msgstr "kullanılamıyor"
+
+#: src/cli/main.cpp src/gtk/settings_view.cpp src/tui/settings.cpp
+msgid "Networks"
+msgstr "Ağlar"
 
 #: src/cli/main.cpp
 msgid "Firewall"
@@ -3167,10 +3189,6 @@ msgstr "Panoyu otomatik paylaş"
 #: src/gtk/settings_view.cpp src/tui/settings.cpp
 msgid "Off sends it only from Send Clipboard or tether share."
 msgstr "Kapalıyken yalnızca Panoyu gönder veya tether share ile gönderilir."
-
-#: src/gtk/settings_view.cpp src/tui/settings.cpp
-msgid "Networks"
-msgstr "Ağlar"
 
 #: src/gtk/settings_view.cpp
 msgid "Where this computer can be found and reached over Wi-Fi or Ethernet."

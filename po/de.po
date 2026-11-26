@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: tether\n"
 "Report-Msgid-Bugs-To: zack@bartel.com\n"
-"POT-Creation-Date: 2026-11-26 10:55-0800\n"
+"POT-Creation-Date: 2026-11-26 11:12-0800\n"
 "PO-Revision-Date: 2026-08-22\n"
 "Last-Translator: Tether project\n"
 "Language-Team: German\n"
@@ -984,6 +984,24 @@ msgstr ""
 "Mehrere Geräte heißen {}; geben Sie stattdessen den Fingerabdruck an.\n"
 
 #: src/cli/main.cpp
+msgid "shown on every network"
+msgstr "in allen Netzwerken sichtbar"
+
+#: src/cli/main.cpp
+#, c++-format
+msgid "shown on {}"
+msgstr "sichtbar in {}"
+
+#: src/cli/main.cpp
+#, c++-format
+msgid "hidden on {} (tether --trust-network)"
+msgstr "verborgen in {} (tether --trust-network)"
+
+#: src/cli/main.cpp
+msgid "no network"
+msgstr "kein Netzwerk"
+
+#: src/cli/main.cpp
 msgid "Version"
 msgstr "Version"
 
@@ -1018,6 +1036,10 @@ msgstr "wird angekündigt"
 #: src/cli/main.cpp
 msgid "unavailable"
 msgstr "nicht verfügbar"
+
+#: src/cli/main.cpp src/gtk/settings_view.cpp src/tui/settings.cpp
+msgid "Networks"
+msgstr "Netzwerke"
 
 #: src/cli/main.cpp
 msgid "Firewall"
@@ -3241,10 +3263,6 @@ msgstr "Zwischenablage automatisch teilen"
 #: src/gtk/settings_view.cpp src/tui/settings.cpp
 msgid "Off sends it only from Send Clipboard or tether share."
 msgstr "Aus sendet sie nur über „Zwischenablage senden“ oder tether share."
-
-#: src/gtk/settings_view.cpp src/tui/settings.cpp
-msgid "Networks"
-msgstr "Netzwerke"
 
 #: src/gtk/settings_view.cpp
 msgid "Where this computer can be found and reached over Wi-Fi or Ethernet."

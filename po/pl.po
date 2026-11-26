@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: tether\n"
 "Report-Msgid-Bugs-To: zack@bartel.com\n"
-"POT-Creation-Date: 2026-11-26 10:55-0800\n"
+"POT-Creation-Date: 2026-11-26 11:12-0800\n"
 "PO-Revision-Date: 2026-08-23\n"
 "Last-Translator: Tether project\n"
 "Language-Team: Polish\n"
@@ -980,6 +980,24 @@ msgstr ""
 "Więcej niż jedno urządzenie nazywa się {}; podaj zamiast tego jego odcisk.\n"
 
 #: src/cli/main.cpp
+msgid "shown on every network"
+msgstr "widoczny we wszystkich sieciach"
+
+#: src/cli/main.cpp
+#, c++-format
+msgid "shown on {}"
+msgstr "widoczny w sieci {}"
+
+#: src/cli/main.cpp
+#, c++-format
+msgid "hidden on {} (tether --trust-network)"
+msgstr "ukryty w sieci {} (tether --trust-network)"
+
+#: src/cli/main.cpp
+msgid "no network"
+msgstr "brak sieci"
+
+#: src/cli/main.cpp
 msgid "Version"
 msgstr "Wersja"
 
@@ -1014,6 +1032,10 @@ msgstr "rozgłasza"
 #: src/cli/main.cpp
 msgid "unavailable"
 msgstr "niedostępne"
+
+#: src/cli/main.cpp src/gtk/settings_view.cpp src/tui/settings.cpp
+msgid "Networks"
+msgstr "Sieci"
 
 #: src/cli/main.cpp
 msgid "Firewall"
@@ -3200,10 +3222,6 @@ msgstr "Udostępniaj schowek automatycznie"
 #: src/gtk/settings_view.cpp src/tui/settings.cpp
 msgid "Off sends it only from Send Clipboard or tether share."
 msgstr "Wyłączone wysyła go tylko przez Wyślij schowek lub tether share."
-
-#: src/gtk/settings_view.cpp src/tui/settings.cpp
-msgid "Networks"
-msgstr "Sieci"
 
 #: src/gtk/settings_view.cpp
 msgid "Where this computer can be found and reached over Wi-Fi or Ethernet."

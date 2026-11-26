@@ -20,7 +20,9 @@ What you get, and what you do not:
 For a non-root Docker image, Compose example and persistent mounts, see
 [CONTAINER.md](CONTAINER.md). It reuses host BlueZ/Avahi and runs its own session
 bus and OBEX daemon. It is CLI-driven, not a web UI, and Bluetooth messaging
-still requires a nearby phone.
+still requires a nearby phone. Unlike a native install, it shows Tether on every
+network by default (`TETHER_LAN_SCOPE=all`), so the trust step below does not
+apply to it.
 
 ## Run the daemon under systemd
 
@@ -73,6 +75,18 @@ Hyprland, `exec tetherd` in Sway), or do nothing: a client starts `tetherd`
 when none is running.
 
 ## Pair the iPhone
+
+The daemon shows itself only on networks you have trusted, and a new install
+trusts none. Trust this one first; `tether status` and the log name the
+network it is hidden on:
+
+```bash
+tether --networks                 # the networks, and the key each one has
+tether --trust-network <key>      # show Tether there
+```
+
+For a machine that never leaves one network, `tether --lan-scope all`, or
+`TETHER_LAN_SCOPE=all` in the daemon's environment, shows it on every network.
 
 The daemon advertises itself over mDNS and the iOS app finds it. Both ends have
 to accept, and on the desktop that prompt is a GTK window you do not have here,

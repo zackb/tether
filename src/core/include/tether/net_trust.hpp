@@ -1,5 +1,7 @@
 #pragma once
 
+#include "tether/bluetooth/config.hpp"
+
 #include <functional>
 #include <map>
 #include <string>
@@ -45,6 +47,9 @@ namespace tether {
     // Name of the interface in `head` holding this local address, or empty. An IPv4-mapped
     // IPv6 address matches the IPv4 one.
     std::string ifname_for_local_addr(const sockaddr* addr, const ifaddrs* head);
+
+    // TETHER_LAN_SCOPE ("all" or "trusted") wins over the saved scope; anything else is ignored.
+    bluetooth::LanScope effective_lan_scope(bluetooth::LanScope saved, const char* env);
 
     // Watches for network changes on the loop and runs the first refresh.
     void lan_trust_start(EpollEventLoop& loop);

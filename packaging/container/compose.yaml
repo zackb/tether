@@ -17,6 +17,8 @@ services:
     stop_grace_period: 15s
     environment:
       TETHER_BLUEZ_SECURE_CONNECTIONS: ${TETHER_BLUEZ_SECURE_CONNECTIONS:?Confirm host Secure Connections is enabled}
+      # A container is a fixed box behind the host firewall, so it shows on every network.
+      TETHER_LAN_SCOPE: ${TETHER_LAN_SCOPE:-all}
     volumes:
       - type: bind
         source: ${TETHER_DATA_DIR:?Set an absolute private host data directory}

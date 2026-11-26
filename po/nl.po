@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: tether\n"
 "Report-Msgid-Bugs-To: zack@bartel.com\n"
-"POT-Creation-Date: 2026-11-26 10:55-0800\n"
+"POT-Creation-Date: 2026-11-26 11:12-0800\n"
 "PO-Revision-Date: 2026-08-23\n"
 "Last-Translator: Tether project\n"
 "Language-Team: Dutch\n"
@@ -975,6 +975,24 @@ msgstr ""
 "Meer dan één apparaat heet {}; geef in plaats daarvan de vingerafdruk op.\n"
 
 #: src/cli/main.cpp
+msgid "shown on every network"
+msgstr "zichtbaar op elk netwerk"
+
+#: src/cli/main.cpp
+#, c++-format
+msgid "shown on {}"
+msgstr "zichtbaar op {}"
+
+#: src/cli/main.cpp
+#, c++-format
+msgid "hidden on {} (tether --trust-network)"
+msgstr "verborgen op {} (tether --trust-network)"
+
+#: src/cli/main.cpp
+msgid "no network"
+msgstr "geen netwerk"
+
+#: src/cli/main.cpp
 msgid "Version"
 msgstr "Versie"
 
@@ -1009,6 +1027,10 @@ msgstr "adverteert"
 #: src/cli/main.cpp
 msgid "unavailable"
 msgstr "niet beschikbaar"
+
+#: src/cli/main.cpp src/gtk/settings_view.cpp src/tui/settings.cpp
+msgid "Networks"
+msgstr "Netwerken"
 
 #: src/cli/main.cpp
 msgid "Firewall"
@@ -3199,10 +3221,6 @@ msgstr "Klembord automatisch delen"
 #: src/gtk/settings_view.cpp src/tui/settings.cpp
 msgid "Off sends it only from Send Clipboard or tether share."
 msgstr "Uit verstuurt het alleen via Klembord versturen of tether share."
-
-#: src/gtk/settings_view.cpp src/tui/settings.cpp
-msgid "Networks"
-msgstr "Netwerken"
 
 #: src/gtk/settings_view.cpp
 msgid "Where this computer can be found and reached over Wi-Fi or Ethernet."

@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: tether 0.3.7\n"
 "Report-Msgid-Bugs-To: zack@bartel.com\n"
-"POT-Creation-Date: 2026-11-26 10:55-0800\n"
+"POT-Creation-Date: 2026-11-26 11:12-0800\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -883,6 +883,24 @@ msgid "More than one device is named {}; pass its fingerprint instead.\n"
 msgstr ""
 
 #: src/cli/main.cpp
+msgid "shown on every network"
+msgstr ""
+
+#: src/cli/main.cpp
+#, c++-format
+msgid "shown on {}"
+msgstr ""
+
+#: src/cli/main.cpp
+#, c++-format
+msgid "hidden on {} (tether --trust-network)"
+msgstr ""
+
+#: src/cli/main.cpp
+msgid "no network"
+msgstr ""
+
+#: src/cli/main.cpp
 msgid "Version"
 msgstr ""
 
@@ -916,6 +934,10 @@ msgstr ""
 
 #: src/cli/main.cpp
 msgid "unavailable"
+msgstr ""
+
+#: src/cli/main.cpp src/gtk/settings_view.cpp src/tui/settings.cpp
+msgid "Networks"
 msgstr ""
 
 #: src/cli/main.cpp
@@ -2884,10 +2906,6 @@ msgstr ""
 
 #: src/gtk/settings_view.cpp src/tui/settings.cpp
 msgid "Off sends it only from Send Clipboard or tether share."
-msgstr ""
-
-#: src/gtk/settings_view.cpp src/tui/settings.cpp
-msgid "Networks"
 msgstr ""
 
 #: src/gtk/settings_view.cpp

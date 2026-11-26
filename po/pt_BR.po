@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: tether\n"
 "Report-Msgid-Bugs-To: zack@bartel.com\n"
-"POT-Creation-Date: 2026-11-26 10:55-0800\n"
+"POT-Creation-Date: 2026-11-26 11:12-0800\n"
 "PO-Revision-Date: 2026-08-23\n"
 "Last-Translator: Tether project\n"
 "Language-Team: Brazilian Portuguese\n"
@@ -975,6 +975,24 @@ msgstr ""
 "Mais de um dispositivo se chama {}; informe a impressão digital dele.\n"
 
 #: src/cli/main.cpp
+msgid "shown on every network"
+msgstr "visível em todas as redes"
+
+#: src/cli/main.cpp
+#, c++-format
+msgid "shown on {}"
+msgstr "visível em {}"
+
+#: src/cli/main.cpp
+#, c++-format
+msgid "hidden on {} (tether --trust-network)"
+msgstr "oculto em {} (tether --trust-network)"
+
+#: src/cli/main.cpp
+msgid "no network"
+msgstr "nenhuma rede"
+
+#: src/cli/main.cpp
 msgid "Version"
 msgstr "Versão"
 
@@ -1009,6 +1027,10 @@ msgstr "anunciando"
 #: src/cli/main.cpp
 msgid "unavailable"
 msgstr "indisponível"
+
+#: src/cli/main.cpp src/gtk/settings_view.cpp src/tui/settings.cpp
+msgid "Networks"
+msgstr "Redes"
 
 #: src/cli/main.cpp
 msgid "Firewall"
@@ -2507,7 +2529,8 @@ msgstr ""
 #: src/gtk/devices_view.cpp src/tui/devices.cpp
 #, c++-format
 msgid "Tether is hidden on {}, a network you have not trusted."
-msgstr "O Tether está oculto em {}, uma rede que você não marcou como confiável."
+msgstr ""
+"O Tether está oculto em {}, uma rede que você não marcou como confiável."
 
 #: src/gtk/devices_view.cpp src/tui/devices.cpp
 msgid ""
@@ -3199,10 +3222,6 @@ msgstr "Compartilhar a área de transferência automaticamente"
 #: src/gtk/settings_view.cpp src/tui/settings.cpp
 msgid "Off sends it only from Send Clipboard or tether share."
 msgstr "Desligado, só envia por Enviar área de transferência ou tether share."
-
-#: src/gtk/settings_view.cpp src/tui/settings.cpp
-msgid "Networks"
-msgstr "Redes"
 
 #: src/gtk/settings_view.cpp
 msgid "Where this computer can be found and reached over Wi-Fi or Ethernet."

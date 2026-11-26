@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: tether\n"
 "Report-Msgid-Bugs-To: zack@bartel.com\n"
-"POT-Creation-Date: 2026-11-26 10:55-0800\n"
+"POT-Creation-Date: 2026-11-26 11:12-0800\n"
 "PO-Revision-Date: 2026-08-23\n"
 "Last-Translator: Tether project\n"
 "Language-Team: Simplified Chinese\n"
@@ -926,6 +926,24 @@ msgid "More than one device is named {}; pass its fingerprint instead.\n"
 msgstr "有多台设备名为 {}；请改为指定其指纹。\n"
 
 #: src/cli/main.cpp
+msgid "shown on every network"
+msgstr "在所有网络上可见"
+
+#: src/cli/main.cpp
+#, c++-format
+msgid "shown on {}"
+msgstr "在 {} 上可见"
+
+#: src/cli/main.cpp
+#, c++-format
+msgid "hidden on {} (tether --trust-network)"
+msgstr "在 {} 上隐藏 (tether --trust-network)"
+
+#: src/cli/main.cpp
+msgid "no network"
+msgstr "无网络"
+
+#: src/cli/main.cpp
 msgid "Version"
 msgstr "版本"
 
@@ -960,6 +978,10 @@ msgstr "正在广播"
 #: src/cli/main.cpp
 msgid "unavailable"
 msgstr "不可用"
+
+#: src/cli/main.cpp src/gtk/settings_view.cpp src/tui/settings.cpp
+msgid "Networks"
+msgstr "网络"
 
 #: src/cli/main.cpp
 msgid "Firewall"
@@ -3050,10 +3072,6 @@ msgstr "自动共享剪贴板"
 #: src/gtk/settings_view.cpp src/tui/settings.cpp
 msgid "Off sends it only from Send Clipboard or tether share."
 msgstr "关闭后仅通过“发送剪贴板”或 tether share 发送。"
-
-#: src/gtk/settings_view.cpp src/tui/settings.cpp
-msgid "Networks"
-msgstr "网络"
 
 #: src/gtk/settings_view.cpp
 msgid "Where this computer can be found and reached over Wi-Fi or Ethernet."

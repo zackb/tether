@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: tether\n"
 "Report-Msgid-Bugs-To: zack@bartel.com\n"
-"POT-Creation-Date: 2026-11-26 10:55-0800\n"
+"POT-Creation-Date: 2026-11-26 11:12-0800\n"
 "PO-Revision-Date: 2026-08-23\n"
 "Last-Translator: Tether project\n"
 "Language-Team: Italian\n"
@@ -975,6 +975,24 @@ msgid "More than one device is named {}; pass its fingerprint instead.\n"
 msgstr "Più dispositivi si chiamano {}; indica invece la sua impronta.\n"
 
 #: src/cli/main.cpp
+msgid "shown on every network"
+msgstr "visibile su tutte le reti"
+
+#: src/cli/main.cpp
+#, c++-format
+msgid "shown on {}"
+msgstr "visibile su {}"
+
+#: src/cli/main.cpp
+#, c++-format
+msgid "hidden on {} (tether --trust-network)"
+msgstr "nascosto su {} (tether --trust-network)"
+
+#: src/cli/main.cpp
+msgid "no network"
+msgstr "nessuna rete"
+
+#: src/cli/main.cpp
 msgid "Version"
 msgstr "Versione"
 
@@ -1009,6 +1027,10 @@ msgstr "in annuncio"
 #: src/cli/main.cpp
 msgid "unavailable"
 msgstr "non disponibile"
+
+#: src/cli/main.cpp src/gtk/settings_view.cpp src/tui/settings.cpp
+msgid "Networks"
+msgstr "Reti"
 
 #: src/cli/main.cpp
 msgid "Firewall"
@@ -3207,10 +3229,6 @@ msgstr "Condividi gli appunti automaticamente"
 #: src/gtk/settings_view.cpp src/tui/settings.cpp
 msgid "Off sends it only from Send Clipboard or tether share."
 msgstr "Se disattivato, li invia solo con Invia appunti o tether share."
-
-#: src/gtk/settings_view.cpp src/tui/settings.cpp
-msgid "Networks"
-msgstr "Reti"
 
 #: src/gtk/settings_view.cpp
 msgid "Where this computer can be found and reached over Wi-Fi or Ethernet."

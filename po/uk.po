@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: tether\n"
 "Report-Msgid-Bugs-To: zack@bartel.com\n"
-"POT-Creation-Date: 2026-11-26 10:55-0800\n"
+"POT-Creation-Date: 2026-11-26 11:12-0800\n"
 "PO-Revision-Date: 2026-08-23\n"
 "Last-Translator: Tether project\n"
 "Language-Team: Ukrainian\n"
@@ -976,6 +976,24 @@ msgid "More than one device is named {}; pass its fingerprint instead.\n"
 msgstr "Назву {} мають кілька пристроїв; вкажіть натомість його відбиток.\n"
 
 #: src/cli/main.cpp
+msgid "shown on every network"
+msgstr "видно в усіх мережах"
+
+#: src/cli/main.cpp
+#, c++-format
+msgid "shown on {}"
+msgstr "видно в мережі {}"
+
+#: src/cli/main.cpp
+#, c++-format
+msgid "hidden on {} (tether --trust-network)"
+msgstr "приховано в мережі {} (tether --trust-network)"
+
+#: src/cli/main.cpp
+msgid "no network"
+msgstr "немає мережі"
+
+#: src/cli/main.cpp
 msgid "Version"
 msgstr "Версія"
 
@@ -1010,6 +1028,10 @@ msgstr "оголошує"
 #: src/cli/main.cpp
 msgid "unavailable"
 msgstr "недоступно"
+
+#: src/cli/main.cpp src/gtk/settings_view.cpp src/tui/settings.cpp
+msgid "Networks"
+msgstr "Мережі"
 
 #: src/cli/main.cpp
 msgid "Firewall"
@@ -3197,10 +3219,6 @@ msgid "Off sends it only from Send Clipboard or tether share."
 msgstr ""
 "Якщо вимкнено, буфер надсилається лише кнопкою «Надіслати буфер обміну» або "
 "командою tether share."
-
-#: src/gtk/settings_view.cpp src/tui/settings.cpp
-msgid "Networks"
-msgstr "Мережі"
 
 #: src/gtk/settings_view.cpp
 msgid "Where this computer can be found and reached over Wi-Fi or Ethernet."

@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: tether\n"
 "Report-Msgid-Bugs-To: zack@bartel.com\n"
-"POT-Creation-Date: 2026-11-26 10:55-0800\n"
+"POT-Creation-Date: 2026-11-26 11:12-0800\n"
 "PO-Revision-Date: 2026-08-23\n"
 "Last-Translator: Tether project\n"
 "Language-Team: Czech\n"
@@ -967,6 +967,24 @@ msgid "More than one device is named {}; pass its fingerprint instead.\n"
 msgstr "Název {} má více zařízení; zadejte místo něj jeho otisk.\n"
 
 #: src/cli/main.cpp
+msgid "shown on every network"
+msgstr "viditelný ve všech sítích"
+
+#: src/cli/main.cpp
+#, c++-format
+msgid "shown on {}"
+msgstr "viditelný v síti {}"
+
+#: src/cli/main.cpp
+#, c++-format
+msgid "hidden on {} (tether --trust-network)"
+msgstr "skrytý v síti {} (tether --trust-network)"
+
+#: src/cli/main.cpp
+msgid "no network"
+msgstr "žádná síť"
+
+#: src/cli/main.cpp
 msgid "Version"
 msgstr "Verze"
 
@@ -1001,6 +1019,10 @@ msgstr "oznamuje se"
 #: src/cli/main.cpp
 msgid "unavailable"
 msgstr "nedostupné"
+
+#: src/cli/main.cpp src/gtk/settings_view.cpp src/tui/settings.cpp
+msgid "Networks"
+msgstr "Sítě"
 
 #: src/cli/main.cpp
 msgid "Firewall"
@@ -3168,10 +3190,6 @@ msgstr "Sdílet schránku automaticky"
 #: src/gtk/settings_view.cpp src/tui/settings.cpp
 msgid "Off sends it only from Send Clipboard or tether share."
 msgstr "Vypnuto ji odesílá jen přes Odeslat schránku nebo tether share."
-
-#: src/gtk/settings_view.cpp src/tui/settings.cpp
-msgid "Networks"
-msgstr "Sítě"
 
 #: src/gtk/settings_view.cpp
 msgid "Where this computer can be found and reached over Wi-Fi or Ethernet."

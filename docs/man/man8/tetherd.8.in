@@ -31,6 +31,12 @@ ask again for that network. You can also trust networks with
 \fBtether \-\-trust\-network\fR or under Networks in the settings, or go back
 to every network with \fBtether \-\-lan\-scope all\fR.
 
+\fBTETHER_LAN_SCOPE\fR=\fBall\fR or \fBtrusted\fR in the daemon's environment
+overrides the saved scope, for a container or a headless machine that never
+moves. Without a desktop, the prompt is a warning in the log naming the
+network and the command to trust it, and \fBtether status\fR shows where
+Tether is hidden.
+
 This covers only Tether's own record. \fBavahi-daemon\fR(8) still announces
 the host name on every interface unless \fBallow-interfaces\fR is set in
 \fBavahi-daemon.conf\fR(5).

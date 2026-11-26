@@ -1353,6 +1353,23 @@ static bool resolve_send_target(tether::Client& client, const std::string& wante
     return false;
 }
 
+// Where Tether shows itself, from the state snapshot.
+static std::string lan_summary(const nlohmann::json& snap) {
+    if (snap.value("lan_scope", "trusted") == "all")
+        return _("shown on every network");
+    std::string shown;
+    std::string hidden;
+    for (const auto& net : snap.value("lan_networks", nlohmann::json::array())) {
+        std::string& list = net.value("trusted", false) ? shown : hidden;
+        list += (list.empty() ? "" : ", ") + net.value("name", std::string{});
+    }
+    if (!shown.empty())
+        return tether::tr_format(_("shown on {}"), shown);
+    if (!hidden.empty())
+        return tether::tr_format(_("hidden on {} (tether --trust-network)"), hidden);
+    return _("no network");
+}
+
 static int print_status(tether::Client& client) {
     nlohmann::json snap;
     try {
@@ -1375,6 +1392,7 @@ static int print_status(tether::Client& client) {
                         snap.value("clipboard_available", false) ? _("syncing")
                                                                  : _("off, no Wayland data-control or X11 session"));
     fields.emplace_back(_("mDNS"), snap.value("mdns_available", false) ? _("advertising") : _("unavailable"));
+    fields.emplace_back(_("Networks"), lan_summary(snap));
     fields.emplace_back(_("Firewall"), yn(snap.value("firewall_active", false)));
     fields.emplace_back(_("Paired devices"), std::to_string(paired.size()));
     fields.emplace_back(_("Pending requests"), std::to_string(pending.size()));

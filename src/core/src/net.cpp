@@ -447,7 +447,7 @@ namespace tether {
         status["yield_when_inactive"] = config.yield_when_inactive;
         status["contacts_by_last_name"] = config.contacts_by_last_name;
         status["phone_audio"] = to_string(config.phone_audio);
-        status["lan_scope"] = to_string(config.lan_scope);
+        status["lan_scope"] = lan_trust_all() ? "all" : "trusted";
         status["lan_networks"] = nlohmann::json::array();
         for (const auto& net : lan_networks())
             status["lan_networks"].push_back(
@@ -510,6 +510,8 @@ namespace tether {
         auto config = bluetooth::load_config();
         if (command == "set_lan_scope") {
             config.lan_scope = bluetooth::lan_scope_from_string(j.value("scope", ""));
+            if (const char* env = std::getenv("TETHER_LAN_SCOPE"); env && *env)
+                debug::log(WARN, "TETHER_LAN_SCOPE={} is set and overrides the saved network scope", env);
         } else if (key.empty()) {
             return;
         } else if (command == "trust_network") {
@@ -1018,6 +1020,11 @@ namespace tether {
         }
 
         snapshot["mdns_available"] = g_mdns_available.load();
+        snapshot["lan_scope"] = lan_trust_all() ? "all" : "trusted";
+        snapshot["lan_networks"] = nlohmann::json::array();
+        for (const auto& net : lan_networks())
+            snapshot["lan_networks"].push_back(
+                {{"key", net.key}, {"name", net.name}, {"interface", net.ifname}, {"trusted", net.trusted}});
         snapshot["clipboard_available"] = g_wayland && g_wayland->clipboard_available();
         snapshot["firewall_active"] = firewall_active();
 

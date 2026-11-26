@@ -176,6 +176,19 @@ int main(int argc, char** argv) {
     gethostname(hostname, sizeof(hostname) - 1);
 
     tether::lan_trust_start(loop);
+    if (!tether::lan_trust_all()) {
+        std::string hidden;
+        bool any_trusted = false;
+        for (const auto& net : tether::lan_networks()) {
+            any_trusted |= net.trusted;
+            hidden += (hidden.empty() ? "" : ", ") + net.name + " (" + net.key + ")";
+        }
+        if (!any_trusted && !hidden.empty())
+            debug::log(WARN,
+                       "Tether is hidden on every current network: {}. Show it on one with "
+                       "tether --trust-network <key>, or everywhere with tether --lan-scope all",
+                       hidden);
+    }
 
     // Offers to trust a network
     std::function<void(int ifindex, const char* trigger)> suggest_network;
@@ -304,7 +317,7 @@ int main(int argc, char** argv) {
     std::map<std::string, std::chrono::steady_clock::time_point> suggested_networks;
     suggest_network = [&notifier, notifier_ready, &suggested_networks, SUGGEST_AGAIN_AFTER](int ifindex,
                                                                                             const char* trigger) {
-        if (!notifier_ready || tether::lan_trust_all())
+        if (tether::lan_trust_all())
             return;
         const auto config = tether::bluetooth::load_config();
         const auto now = std::chrono::steady_clock::now();
@@ -315,8 +328,15 @@ int main(int argc, char** argv) {
             if (last != suggested_networks.end() && now - last->second < SUGGEST_AGAIN_AFTER)
                 continue;
             suggested_networks[net.key] = now;
-            debug::log(INFO, "Network {} ({}): offering to trust it ({})", net.name, net.key, trigger);
-            notifier.notify_network_trust(net.key, net.name);
+            // The log is the only prompt a headless or container install gets.
+            debug::log(WARN,
+                       "Tether is hidden on {}, where a paired device is ({}). To show it there: "
+                       "tether --trust-network {} (or tether --lan-scope all)",
+                       net.name,
+                       trigger,
+                       net.key);
+            if (notifier_ready)
+                notifier.notify_network_trust(net.key, net.name);
         }
     };
 

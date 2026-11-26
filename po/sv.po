@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: tether\n"
 "Report-Msgid-Bugs-To: zack@bartel.com\n"
-"POT-Creation-Date: 2026-11-26 10:55-0800\n"
+"POT-Creation-Date: 2026-11-26 11:12-0800\n"
 "PO-Revision-Date: 2026-08-23\n"
 "Last-Translator: Tether project\n"
 "Language-Team: Swedish\n"
@@ -964,6 +964,24 @@ msgid "More than one device is named {}; pass its fingerprint instead.\n"
 msgstr "Fler än en enhet heter {}; ange dess fingeravtryck i stället.\n"
 
 #: src/cli/main.cpp
+msgid "shown on every network"
+msgstr "syns på alla nätverk"
+
+#: src/cli/main.cpp
+#, c++-format
+msgid "shown on {}"
+msgstr "syns på {}"
+
+#: src/cli/main.cpp
+#, c++-format
+msgid "hidden on {} (tether --trust-network)"
+msgstr "dold på {} (tether --trust-network)"
+
+#: src/cli/main.cpp
+msgid "no network"
+msgstr "inget nätverk"
+
+#: src/cli/main.cpp
 msgid "Version"
 msgstr "Version"
 
@@ -998,6 +1016,10 @@ msgstr "annonserar"
 #: src/cli/main.cpp
 msgid "unavailable"
 msgstr "otillgängligt"
+
+#: src/cli/main.cpp src/gtk/settings_view.cpp src/tui/settings.cpp
+msgid "Networks"
+msgstr "Nätverk"
 
 #: src/cli/main.cpp
 msgid "Firewall"
@@ -3168,10 +3190,6 @@ msgstr "Dela urklipp automatiskt"
 #: src/gtk/settings_view.cpp src/tui/settings.cpp
 msgid "Off sends it only from Send Clipboard or tether share."
 msgstr "Av skickar det bara via Skicka urklipp eller tether share."
-
-#: src/gtk/settings_view.cpp src/tui/settings.cpp
-msgid "Networks"
-msgstr "Nätverk"
 
 #: src/gtk/settings_view.cpp
 msgid "Where this computer can be found and reached over Wi-Fi or Ethernet."
