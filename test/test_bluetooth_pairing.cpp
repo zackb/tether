@@ -94,6 +94,9 @@ TEST(BluetoothConfig, RoundTrips) {
     config.lock_away_seconds = 45;
     config.lock_command = "hyprlock";
     config.airpods_enabled = true;
+    config.lan_scope = tether::bluetooth::LanScope::All;
+    config.trusted_networks = {{"3f1c-uuid", "Home WiFi"}};
+    config.declined_networks = {"9a2b-uuid"};
 
     EXPECT_EQ(deserialize_config(serialize_config(config)), config);
 }
@@ -119,6 +122,9 @@ TEST(BluetoothConfig, DefaultsToConnectFirstAndAncsEnabled) {
     EXPECT_FALSE(config.lock_on_away);
     EXPECT_EQ(config.lock_away_seconds, AWAY_LOCK_GRACE_SECONDS);
     EXPECT_TRUE(config.lock_command.empty());
+    // Upgraders too: no network is trusted until the user says so.
+    EXPECT_EQ(config.lan_scope, tether::bluetooth::LanScope::Trusted);
+    EXPECT_TRUE(config.trusted_networks.empty());
 }
 
 // A zero or negative grace would lock on the first flap.

@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: tether\n"
 "Report-Msgid-Bugs-To: zack@bartel.com\n"
-"POT-Creation-Date: 2026-11-25 21:13+0100\n"
+"POT-Creation-Date: 2026-11-26 10:20-0800\n"
 "PO-Revision-Date: 2026-08-23\n"
 "Last-Translator: Tether project\n"
 "Language-Team: Turkish\n"
@@ -77,6 +77,22 @@ msgstr "Keşif taramasının milisaniye cinsinden süresi (öntanımlı 3000)."
 #: src/cli/main.cpp
 msgid "List all paired connection devices."
 msgstr "Eşleşmiş tüm aygıtları listele."
+
+#: src/cli/main.cpp
+msgid "List the networks this computer is on and whether Tether shows on them."
+msgstr "Bu bilgisayarın bağlı olduğu ağları ve Tether'in bunlarda görünüp görünmediğini listele."
+
+#: src/cli/main.cpp
+msgid "Show Tether on a network. Without a key, the one hidden network."
+msgstr "Tether'i bir ağda göster. Anahtar verilmezse tek gizli ağda."
+
+#: src/cli/main.cpp
+msgid "Hide Tether on a network again."
+msgstr "Tether'i bir ağda yeniden gizle."
+
+#: src/cli/main.cpp
+msgid "Show Tether on trusted networks only, or on every network."
+msgstr "Tether'i yalnızca güvenilen ağlarda ya da tüm ağlarda göster."
 
 #: src/cli/main.cpp
 msgid "Show the one-time system setup Bluetooth still needs."
@@ -203,7 +219,9 @@ msgstr ""
 msgid ""
 "Download each notifying app's real icon from Apple's App Store. Only the "
 "app's identifier is sent."
-msgstr "Bildirim gönderen her uygulamanın gerçek simgesini Apple'ın App Store'undan indirir. Yalnızca uygulamanın tanımlayıcısı gönderilir."
+msgstr ""
+"Bildirim gönderen her uygulamanın gerçek simgesini Apple'ın App Store'undan "
+"indirir. Yalnızca uygulamanın tanımlayıcısı gönderilir."
 
 #: src/cli/main.cpp
 msgid ""
@@ -454,6 +472,46 @@ msgstr ""
 "Sonrasında doğrulamak için 'tether --bt-setup' komutunu yeniden çalıştırın.\n"
 
 #: src/cli/main.cpp
+msgid "Could not read status from the daemon.\n"
+msgstr "Arka plan hizmetinden durum okunamadı.\n"
+
+#: src/cli/main.cpp
+msgid "Tether shows on every network."
+msgstr "Tether tüm ağlarda görünür."
+
+#: src/cli/main.cpp
+msgid "Tether shows on trusted networks only."
+msgstr "Tether yalnızca güvenilen ağlarda görünür."
+
+#: src/cli/main.cpp
+msgid "shown "
+msgstr "görünür"
+
+#: src/cli/main.cpp
+msgid "hidden"
+msgstr "gizli"
+
+#: src/cli/main.cpp
+msgid "Expected trusted or all, e.g. --lan-scope trusted\n"
+msgstr "trusted veya all bekleniyordu, örn. --lan-scope trusted\n"
+
+#: src/cli/main.cpp
+msgid "No network to change.\n"
+msgstr "Değiştirilecek ağ yok.\n"
+
+#: src/cli/main.cpp
+msgid "More than one network; pass a key from --networks.\n"
+msgstr "Birden fazla ağ var; --networks çıktısından bir anahtar verin.\n"
+
+#: src/cli/main.cpp
+msgid "Could not reach the daemon.\n"
+msgstr "Arka plan hizmetine ulaşılamadı.\n"
+
+#: src/cli/main.cpp
+msgid "Done."
+msgstr "Tamam."
+
+#: src/cli/main.cpp
 msgid "Mode"
 msgstr "Kip"
 
@@ -608,10 +666,6 @@ msgstr ""
 "Bu bilgisayar kendisini Apple donanımı olarak tanıtmıyor, bu yüzden bir "
 "çağrıda AirPods bağlantısı kesilerek devredilir. /etc/bluetooth/main.conf "
 "içindeki DeviceID'ye bakın."
-
-#: src/cli/main.cpp
-msgid "Could not reach the daemon.\n"
-msgstr "Arka plan hizmetine ulaşılamadı.\n"
 
 #: src/cli/main.cpp
 #, c-format
@@ -2020,6 +2074,25 @@ msgstr ""
 
 #: src/daemon/notification.cpp
 #, c++-format
+msgid ""
+"A paired device is on {}. Tether stays hidden on networks you have not "
+"trusted."
+msgstr "Eşleştirilmiş bir cihaz {} ağında. Tether güvenmediğiniz ağlarda gizli kalır."
+
+#: src/daemon/notification.cpp
+msgid "Show Tether on this network?"
+msgstr "Tether bu ağda gösterilsin mi?"
+
+#: src/daemon/notification.cpp src/gtk/settings_view.cpp
+msgid "Trust"
+msgstr "Güven"
+
+#: src/daemon/notification.cpp
+msgid "Not now"
+msgstr "Şimdi değil"
+
+#: src/daemon/notification.cpp
+#, c++-format
 msgid "{} file arrived"
 msgid_plural "{} files arrived"
 msgstr[0] "{} dosya alındı"
@@ -2397,6 +2470,13 @@ msgstr ""
 "Dosyalar ve OTP bağlı. Bu bileştirici Tether'a pano erişimi vermiyor, bu "
 "yüzden pano eşitlemesi kapalı."
 
+#: src/gtk/devices_view.cpp
+#, c++-format
+msgid ""
+"Tether is hidden on {}, a network you have not trusted. Trust it in "
+"Settings, under Networks."
+msgstr "Tether, güvenmediğiniz {} ağında gizli. Ayarlar'daki Ağlar bölümünden bu ağa güvenin."
+
 #: src/gtk/devices_view.cpp src/tui/devices.cpp
 msgid ""
 "avahi-daemon isn't running, so other devices can't find this PC. Start it "
@@ -2736,7 +2816,7 @@ msgstr "Panoyu gönder"
 msgid "Clipboard sync requested..."
 msgstr "Pano eşzamanlaması istendi..."
 
-#: src/gtk/devices_view.cpp src/tui/devices.cpp
+#: src/gtk/devices_view.cpp src/gtk/settings_view.cpp src/tui/devices.cpp
 msgid "Forget"
 msgstr "Unut"
 
@@ -2934,6 +3014,22 @@ msgid "Notification mirroring is unavailable."
 msgstr "Bildirim yansıtma kullanılamıyor."
 
 #: src/gtk/settings_view.cpp
+msgid "Connected · Tether is shown"
+msgstr "Bağlı · Tether görünür"
+
+#: src/gtk/settings_view.cpp
+msgid "Connected · Tether is hidden"
+msgstr "Bağlı · Tether gizli"
+
+#: src/gtk/settings_view.cpp
+msgid "Hide"
+msgstr "Gizle"
+
+#: src/gtk/settings_view.cpp
+msgid "Trusted"
+msgstr "Güvenilen"
+
+#: src/gtk/settings_view.cpp
 msgid "Unmute"
 msgstr "Sesi aç"
 
@@ -3013,7 +3109,9 @@ msgstr "Gerçek uygulama simgelerini göster"
 msgid ""
 "Downloads each app's icon from Apple's App Store once. Only the app's "
 "identifier is sent."
-msgstr "Her uygulamanın simgesini Apple'ın App Store'undan bir kez indirir. Yalnızca uygulamanın tanımlayıcısı gönderilir."
+msgstr ""
+"Her uygulamanın simgesini Apple'ın App Store'undan bir kez indirir. Yalnızca "
+"uygulamanın tanımlayıcısı gönderilir."
 
 #: src/gtk/settings_view.cpp src/tui/settings.cpp
 msgid "Desktop popups"
@@ -3068,6 +3166,24 @@ msgstr "Panoyu otomatik paylaş"
 #: src/gtk/settings_view.cpp src/tui/settings.cpp
 msgid "Off sends it only from Send Clipboard or tether share."
 msgstr "Kapalıyken yalnızca Panoyu gönder veya tether share ile gönderilir."
+
+#: src/gtk/settings_view.cpp src/tui/settings.cpp
+msgid "Networks"
+msgstr "Ağlar"
+
+#: src/gtk/settings_view.cpp
+msgid "Where this computer can be found and reached over Wi-Fi or Ethernet."
+msgstr "Bu bilgisayarın Wi-Fi veya Ethernet üzerinden bulunabileceği ve erişilebileceği yerler."
+
+#: src/gtk/settings_view.cpp src/tui/settings.cpp
+msgid "Only on trusted networks"
+msgstr "Yalnızca güvenilen ağlarda"
+
+#: src/gtk/settings_view.cpp src/tui/settings.cpp
+msgid ""
+"Elsewhere Tether is not advertised and refuses connections. Bluetooth keeps "
+"working."
+msgstr "Diğer ağlarda Tether duyurulmaz ve bağlantıları reddeder. Bluetooth çalışmaya devam eder."
 
 #: src/gtk/settings_view.cpp
 msgid "SMS and iMessage conversations synced over Bluetooth."
@@ -3326,6 +3442,21 @@ msgstr ""
 #: src/tui/main.cpp
 msgid "tether-tui needs a terminal."
 msgstr "tether-tui bir uçbirim gerektirir."
+
+#: src/tui/settings.cpp
+#, c++-format
+msgid "Hide on {} (connected)"
+msgstr "{} ağında gizle (bağlı)"
+
+#: src/tui/settings.cpp
+#, c++-format
+msgid "Trust {} (connected)"
+msgstr "{} ağına güven (bağlı)"
+
+#: src/tui/settings.cpp
+#, c++-format
+msgid "Forget {}"
+msgstr "{} ağını unut"
 
 #: src/tui/settings.cpp
 msgid "Muted apps"

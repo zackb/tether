@@ -1,6 +1,7 @@
 #include "tether/bluetooth/lan_info.hpp"
 #include "tether/bluetooth/monitor.hpp"
 #include "tether/log.hpp"
+#include "tether/net_trust.hpp"
 
 #include <arpa/inet.h>
 #include <bit>
@@ -22,6 +23,9 @@ namespace tether::bluetooth {
         for (const ifaddrs* ifa = head; ifa; ifa = ifa->ifa_next) {
             if (!ifa->ifa_addr || !ifa->ifa_netmask || !(ifa->ifa_flags & IFF_UP) || (ifa->ifa_flags & IFF_LOOPBACK))
                 continue;
+            o
+                // phone would only be refused at the other end.
+                if (!ifa->ifa_name || !lan_ifname_trusted(ifa->ifa_name)) continue;
 
             char text[INET6_ADDRSTRLEN] = {};
             int prefix = 0;
@@ -127,7 +131,9 @@ namespace tether::bluetooth {
             g_variant_builder_add(&props, "{sv}", "UUID", g_variant_new_string(UUID_TETHER_LAN_SERVICE));
             g_variant_builder_add(&props, "{sv}", "Primary", g_variant_new_boolean(TRUE));
             g_variant_builder_add(&props, "{sv}", "Handle", g_variant_new_uint16(SERVICE_HANDLE));
-            g_variant_builder_add(&objects, "{o@a{sa{sv}}}", SERVICE_PATH,
+            g_variant_builder_add(&objects,
+                                  "{o@a{sa{sv}}}",
+                                  SERVICE_PATH,
                                   interfaces("org.bluez.GattService1", g_variant_builder_end(&props)));
 
             const gchar* flags[] = {"encrypt-read"};
@@ -135,7 +141,9 @@ namespace tether::bluetooth {
             g_variant_builder_add(&props, "{sv}", "UUID", g_variant_new_string(UUID_TETHER_LAN_INFO));
             g_variant_builder_add(&props, "{sv}", "Service", g_variant_new_object_path(SERVICE_PATH));
             g_variant_builder_add(&props, "{sv}", "Flags", g_variant_new_strv(flags, 1));
-            g_variant_builder_add(&objects, "{o@a{sa{sv}}}", CHAR_PATH,
+            g_variant_builder_add(&objects,
+                                  "{o@a{sa{sv}}}",
+                                  CHAR_PATH,
                                   interfaces("org.bluez.GattCharacteristic1", g_variant_builder_end(&props)));
 
             return g_variant_new("(@a{oa{sa{sv}}})", g_variant_builder_end(&objects));
@@ -160,8 +168,7 @@ namespace tether::bluetooth {
             g_variant_lookup(options, "offset", "q", &offset);
             g_variant_unref(options);
 
-            const std::string value =
-                encode_lan_info(state->name, state->port, state->fingerprint, lan_addresses());
+            const std::string value = encode_lan_info(state->name, state->port, state->fingerprint, lan_addresses());
             if (offset > value.size()) {
                 g_dbus_method_invocation_return_dbus_error(invocation, "org.bluez.Error.InvalidOffset", "");
                 return;
@@ -179,7 +186,8 @@ namespace tether::bluetooth {
             GVariant* reply = g_dbus_connection_call_finish(G_DBUS_CONNECTION(source), result, &error);
             if (reply) {
                 g_variant_unref(reply);
-                debug::log(INFO, "bluetooth: LAN info service registered on {}",
+                debug::log(INFO,
+                           "bluetooth: LAN info service registered on {}",
                            static_cast<LanInfoState*>(user_data)->registered_on);
                 return;
             }
@@ -196,10 +204,23 @@ namespace tether::bluetooth {
             debug::log(INFO, "bluetooth: LAN info service not registered: {}", message);
         }
 
-        void call_manager(LanInfoState* state, const std::string& adapter, const char* method, GVariant* args,
+        void call_manager(LanInfoState* state,
+                          const std::string& adapter,
+                          const char* method,
+                          GVariant* args,
                           GAsyncReadyCallback done) {
-            g_dbus_connection_call(state->conn, BLUEZ_NAME, adapter.c_str(), GATT_MANAGER, method, args, nullptr,
-                                   G_DBUS_CALL_FLAGS_NONE, 10000, state->cancellable, done, state);
+            g_dbus_connection_call(state->conn,
+                                   BLUEZ_NAME,
+                                   adapter.c_str(),
+                                   GATT_MANAGER,
+                                   method,
+                                   args,
+                                   nullptr,
+                                   G_DBUS_CALL_FLAGS_NONE,
+                                   10000,
+                                   state->cancellable,
+                                   done,
+                                   state);
         }
 
         // Monitor thread only. Calls are async because BlueZ answers RegisterApplication
@@ -208,15 +229,18 @@ namespace tether::bluetooth {
             if (!state->bluez_up || state->registered_on == state->wanted)
                 return;
             if (!state->registered_on.empty())
-                call_manager(state, state->registered_on, "UnregisterApplication",
-                             g_variant_new("(o)", APP_PATH), nullptr);
+                call_manager(
+                    state, state->registered_on, "UnregisterApplication", g_variant_new("(o)", APP_PATH), nullptr);
             state->registered_on = state->wanted;
             if (state->wanted.empty())
                 return;
             GVariantBuilder options;
             g_variant_builder_init(&options, G_VARIANT_TYPE("a{sv}"));
-            call_manager(state, state->wanted, "RegisterApplication",
-                         g_variant_new("(oa{sv})", APP_PATH, &options), on_registered);
+            call_manager(state,
+                         state->wanted,
+                         "RegisterApplication",
+                         g_variant_new("(oa{sv})", APP_PATH, &options),
+                         on_registered);
         }
 
         void on_bluez_appeared(GDBusConnection*, const gchar*, const gchar*, gpointer user_data) {
@@ -285,13 +309,23 @@ namespace tether::bluetooth {
 
             state->cancellable = g_cancellable_new();
             // Watches on this thread's context, so the callbacks run here too.
-            state->watch_id = g_bus_watch_name_on_connection(state->conn, BLUEZ_NAME, G_BUS_NAME_WATCHER_FLAGS_NONE,
-                                                             on_bluez_appeared, on_bluez_vanished, state, nullptr);
-            state->added_id = g_dbus_connection_signal_subscribe(state->conn, BLUEZ_NAME,
+            state->watch_id = g_bus_watch_name_on_connection(state->conn,
+                                                             BLUEZ_NAME,
+                                                             G_BUS_NAME_WATCHER_FLAGS_NONE,
+                                                             on_bluez_appeared,
+                                                             on_bluez_vanished,
+                                                             state,
+                                                             nullptr);
+            state->added_id = g_dbus_connection_signal_subscribe(state->conn,
+                                                                 BLUEZ_NAME,
                                                                  "org.freedesktop.DBus.ObjectManager",
-                                                                 "InterfacesAdded", "/", nullptr,
-                                                                 G_DBUS_SIGNAL_FLAGS_NONE, on_interfaces_added,
-                                                                 state, nullptr);
+                                                                 "InterfacesAdded",
+                                                                 "/",
+                                                                 nullptr,
+                                                                 G_DBUS_SIGNAL_FLAGS_NONE,
+                                                                 on_interfaces_added,
+                                                                 state,
+                                                                 nullptr);
         });
     }
 
@@ -305,10 +339,17 @@ namespace tether::bluetooth {
                 g_cancellable_cancel(state->cancellable);
 
             if (state->bluez_up && !state->registered_on.empty()) {
-                GVariant* reply = g_dbus_connection_call_sync(state->conn, BLUEZ_NAME, state->registered_on.c_str(),
-                                                              GATT_MANAGER, "UnregisterApplication",
-                                                              g_variant_new("(o)", APP_PATH), nullptr,
-                                                              G_DBUS_CALL_FLAGS_NONE, 2000, nullptr, nullptr);
+                GVariant* reply = g_dbus_connection_call_sync(state->conn,
+                                                              BLUEZ_NAME,
+                                                              state->registered_on.c_str(),
+                                                              GATT_MANAGER,
+                                                              "UnregisterApplication",
+                                                              g_variant_new("(o)", APP_PATH),
+                                                              nullptr,
+                                                              G_DBUS_CALL_FLAGS_NONE,
+                                                              2000,
+                                                              nullptr,
+                                                              nullptr);
                 if (reply)
                     g_variant_unref(reply);
             }
