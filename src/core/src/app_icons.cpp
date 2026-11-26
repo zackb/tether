@@ -127,7 +127,16 @@ namespace tether::app_icons {
             SSL* ssl = SSL_new(tls_context());
             SSL_set_fd(ssl, fd);
             SSL_set_tlsext_host_name(ssl, host.c_str());
-            SSL_set1_host(ssl, host.c_str());
+#if OPENSSL_VERSION_MAJOR >= 4
+            const int host_checked = SSL_set1_dnsname(ssl, host.c_str());
+#else
+            const int host_checked = SSL_set1_host(ssl, host.c_str());
+#endif
+            if (host_checked != 1) {
+                SSL_free(ssl);
+                close(fd);
+                return 0;
+            }
 
             std::string raw;
             const std::string request = "GET " + target + " HTTP/1.0\r\nHost: " + host +
