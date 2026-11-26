@@ -1,5 +1,5 @@
 pkgname=tether-git
-pkgver=r1.1234
+pkgver=0.3.7
 pkgrel=1
 pkgdesc="Bridge an iPhone to the Linux desktop: clipboard, files, messages, and notifications"
 arch=('x86_64' 'aarch64')
@@ -7,21 +7,22 @@ url="https://github.com/zackb/tether"
 license=('MIT')
 depends=('gtk3' 'gtk-layer-shell' 'libnotify' 'ncurses' 'openssl' 'wayland' 'avahi' 'glib2' 'libsecret' 'bluez' 'bluez-utils' 'bluez-obex' 'ffmpeg' 'pipewire')
 makedepends=('cmake' 'ninja' 'git')
-provides=('tether' 'tether-bin')
+provides=('tether')
 conflicts=('tether' 'tether-bin')
 install=packaging/tether.install
-source=("git+https://github.com/zackb/tether.git")
+source=("git+${url}.git")
 sha256sums=('SKIP')
 
 pkgver() {
-    cd tether
-    printf "r%s.%s" "$(git rev-list --count HEAD)" "$(git rev-parse --short HEAD)"
+    cd "${pkgname%-git}"
+    git describe --long --tags | sed 's/\([^-]*-g\)/r\1/;s/-/./g;s/^v//'
 }
 
 build() {
-    cmake -B build -S tether -G Ninja \
+    cmake -B build -S "${pkgname%-git}" -G Ninja \
         -DCMAKE_BUILD_TYPE=Release \
-        -DCMAKE_INSTALL_PREFIX=/usr
+        -DCMAKE_INSTALL_PREFIX=/usr \
+        -DTETHER_BUILD_EXTENSIONS=OFF
     cmake --build build
 }
 

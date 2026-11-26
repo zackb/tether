@@ -8,6 +8,7 @@
 #include <gtk/gtk.h>
 #include <nlohmann/json.hpp>
 #include <tether/log.hpp>
+#include <tether/service.hpp>
 #include <unistd.h>
 
 namespace tether::ui {
@@ -146,7 +147,7 @@ namespace tether::ui {
         bool g_bt_enabled = true;
 
         RouteState g_state[2];
-        std::string g_icon = "tether-offline";
+        std::string g_icon = icon_name("tether-offline");
         int g_unread = 0;
         std::string g_tooltip;
         std::string g_airpods_name;
@@ -170,7 +171,7 @@ namespace tether::ui {
         void resolve_icon_style() {
             if (g_icon_style == "color")
                 return;
-            if (gtk_icon_theme_has_icon(gtk_icon_theme_get_default(), "tether-symbolic"))
+            if (gtk_icon_theme_has_icon(gtk_icon_theme_get_default(), icon_name("tether-symbolic").c_str()))
                 g_icon_suffix = "-symbolic";
         }
 
@@ -573,8 +574,8 @@ namespace tether::ui {
             tooltip.pop_back();
 
         const bool any_up = g_state[0].ok || g_state[1].ok;
-        const std::string icon =
-            std::string(!any_up ? "tether-offline" : (g_unread > 0 ? "tether-unread" : "tether")) + g_icon_suffix;
+        const std::string icon = icon_name(
+            std::string(!any_up ? "tether-offline" : (g_unread > 0 ? "tether-unread" : "tether")) + g_icon_suffix);
 
         if (icon != g_icon) {
             g_icon = icon;

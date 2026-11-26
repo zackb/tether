@@ -63,6 +63,13 @@ namespace tether {
         return {};
     }
 
+    std::string icon_name(const std::string& name) {
+        static const std::string app_id = flatpak_app_id();
+        if (app_id.empty() || name.rfind("tether", 0) != 0)
+            return name;
+        return app_id + name.substr(6);
+    }
+
     std::string which_program(const std::string& name) {
         const char* path = std::getenv("PATH");
         if (!path || !*path)

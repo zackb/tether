@@ -76,6 +76,8 @@ modules:
       - -DFETCHCONTENT_FULLY_DISCONNECTED=ON
     post-install:
       - rm -rf /app/share/icons/hicolor/1024x1024
+      # flatpak exports only icons named after the app id
+      - for f in /app/share/icons/hicolor/*/apps/tether-*; do mv "$f" "${f%/*}/io.github.zackb.tether-${f##*/tether-}"; done
     sources:
       - type: dir
         path: ../..

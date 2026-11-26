@@ -9,6 +9,10 @@ namespace tether {
     // The application id flatpak uses in the running sandbox, empty outside one.
     std::string flatpak_app_id();
 
+    // Icon name that the desktop can resolve. In flatpak the leading "tether"
+    // becomes the app id, since flatpak exports only icons named after it.
+    std::string icon_name(const std::string& name);
+
     // Absolute path of a program on PATH, empty when it is not there.
     std::string which_program(const std::string& name);
 
