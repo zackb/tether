@@ -1,4 +1,5 @@
 #include "tether/bluetooth/ancs/notifications.hpp"
+#include "tether/service.hpp"
 
 #include <algorithm>
 #include <cctype>
@@ -272,13 +273,13 @@ namespace tether::bluetooth::ancs {
             if (found->second.theme)
                 out.emplace_back(found->second.theme);
             if (found->second.bundled)
-                out.emplace_back(found->second.bundled);
+                out.push_back(icon_name(found->second.bundled));
         }
 
         for (const char* name : category_icons(notification.category))
             out.emplace_back(name);
 
-        out.emplace_back("tether");
+        out.push_back(icon_name("tether"));
         return out;
     }
 

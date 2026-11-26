@@ -17,6 +17,7 @@
 #include <tether/bluetooth/ancs/notifications.hpp>
 #include <tether/log.hpp>
 #include <tether/net.hpp>
+#include <tether/service.hpp>
 #include <thread>
 #include <unordered_map>
 #include <unordered_set>
@@ -25,7 +26,14 @@ namespace tether {
 
     namespace {
 
-        constexpr const char* DESKTOP_ENTRY = "tether-gtk";
+        // flatpak renames the desktop file after the app id
+        const std::string& desktop_entry() {
+            static const std::string id = [] {
+                const std::string app_id = flatpak_app_id();
+                return app_id.empty() ? std::string("tether-gtk") : app_id;
+            }();
+            return id;
+        }
 
         struct NotificationRequest {
             std::filesystem::path path;
@@ -172,7 +180,7 @@ namespace tether {
                 return;
             }
 
-            notify_notification_set_hint(notification, "desktop-entry", g_variant_new_string(DESKTOP_ENTRY));
+            notify_notification_set_hint(notification, "desktop-entry", g_variant_new_string(desktop_entry().c_str()));
             if (!app_name.empty()) {
                 // Keeps history and configuration grouped under Tether while the
                 // header names the iPhone app the notification came from.
