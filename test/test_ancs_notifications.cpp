@@ -426,3 +426,52 @@ TEST(AncsIconCandidates, AnIconFileComesFirst) {
     EXPECT_EQ(icons.front(), n.icon_file);
     EXPECT_EQ(icons.size(), icon_candidates(held_notification(1, "com.burbn.instagram")).size() + 1);
 }
+
+namespace {
+
+    SourceEvent added(uint32_t uid) {
+        SourceEvent e;
+        e.event = EventId::Added;
+        e.uid = uid;
+        return e;
+    }
+
+} // namespace
+
+TEST(AncsReplayBurst, TheRunOfAdditionsAfterSubscribingIsTheReplay) {
+    using namespace std::chrono_literals;
+    ReplayBurst burst;
+    const auto t0 = ReplayBurst::Clock::time_point{} + 1h;
+    burst.start(t0);
+
+    EXPECT_TRUE(burst.contains(added(1), t0 + 2s));
+    EXPECT_TRUE(burst.contains(added(2), t0 + 2s + 300ms));
+    EXPECT_TRUE(burst.contains(added(3), t0 + 3s));
+    EXPECT_FALSE(burst.contains(added(4), t0 + 10s)) << "a notification after the replay is new";
+    EXPECT_FALSE(burst.contains(added(5), t0 + 10s + 100ms)) << "once over, the replay stays over";
+}
+
+TEST(AncsReplayBurst, NothingIsReplayWithoutAStartOrAfterTheStartWindow) {
+    using namespace std::chrono_literals;
+    const auto t0 = ReplayBurst::Clock::time_point{} + 1h;
+
+    ReplayBurst idle;
+    EXPECT_FALSE(idle.contains(added(1), t0));
+
+    ReplayBurst late;
+    late.start(t0);
+    EXPECT_FALSE(late.contains(added(1), t0 + ReplayBurst::START + 1s))
+        << "an empty Notification Center replays nothing";
+}
+
+TEST(AncsReplayBurst, OnlyAdditionsBelongToIt) {
+    using namespace std::chrono_literals;
+    const auto t0 = ReplayBurst::Clock::time_point{} + 1h;
+    ReplayBurst burst;
+    burst.start(t0);
+
+    SourceEvent removed = added(1);
+    removed.event = EventId::Removed;
+    EXPECT_FALSE(burst.contains(removed, t0 + 1s));
+    EXPECT_TRUE(burst.contains(added(2), t0 + 1s));
+}

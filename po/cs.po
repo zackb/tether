@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: tether\n"
 "Report-Msgid-Bugs-To: zack@bartel.com\n"
-"POT-Creation-Date: 2026-11-23 16:42+0100\n"
+"POT-Creation-Date: 2026-11-25 21:13+0100\n"
 "PO-Revision-Date: 2026-08-23\n"
 "Last-Translator: Tether project\n"
 "Language-Team: Czech\n"
@@ -2426,6 +2426,10 @@ msgstr ""
 #: src/gtk/devices_view.cpp src/tui/devices.cpp
 msgid "Unknown Device"
 msgstr "Neznámé zařízení"
+
+#: src/gtk/devices_view.cpp
+msgid "File not sent"
+msgstr "Soubor nebyl odeslán"
 
 #: src/gtk/devices_view.cpp
 msgid "Folders can't be sent — pick files instead."
