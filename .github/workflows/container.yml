@@ -24,7 +24,7 @@ jobs:
     runs-on: ${{ matrix.runner }}
     timeout-minutes: 30
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
       - name: Build and test (non-root, native architecture)
         shell: bash
         run: |
@@ -47,7 +47,7 @@ jobs:
             2>&1 | tee "$RUNNER_TEMP/tether-smoke.log"
       - name: Failure evidence (synthetic test data only)
         if: failure()
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: container-${{ matrix.arch }}-logs
           path: ${{ runner.temp }}/tether-*.log

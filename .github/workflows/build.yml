@@ -25,7 +25,7 @@ jobs:
             *debian*|*ubuntu*) apt-get update && apt-get install -y --no-install-recommends git ca-certificates ;;
           esac
 
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
 
       - name: dependencies
         run: ./scripts/ci-deps.sh

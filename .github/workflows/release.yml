@@ -65,7 +65,7 @@ jobs:
             *debian*|*ubuntu*) apt-get update && apt-get install -y --no-install-recommends git ca-certificates ;;
           esac
 
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
         with:
           fetch-depth: 0
 
@@ -88,7 +88,7 @@ jobs:
           . /etc/os-release
           for f in *.deb; do [ -e "$f" ] || continue; mv "$f" "${f%.deb}~${ID}${VERSION_ID}.deb"; done
 
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v7
         with:
           name: ${{ matrix.name }}
           path: |
@@ -111,7 +111,7 @@ jobs:
           apt-get update
           apt-get install -y --no-install-recommends git ca-certificates curl file
 
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
         with:
           fetch-depth: 0
 
@@ -125,7 +125,7 @@ jobs:
       - name: build
         run: ./packaging/appimage/build.sh
 
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v7
         with:
           name: appimage-${{ matrix.runner }}
           path: build/appimage/*.AppImage
@@ -138,7 +138,7 @@ jobs:
         runner: [ubuntu-latest, ubuntu-24.04-arm]
     runs-on: ${{ matrix.runner }}
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
         with:
           fetch-depth: 0
 
@@ -150,7 +150,7 @@ jobs:
       - name: build
         run: ./packaging/flatpak/build.sh
 
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v7
         with:
           name: flatpak-${{ matrix.runner }}
           path: build/flatpak/*.flatpak
@@ -159,7 +159,7 @@ jobs:
       - name: archive repo
         run: tar -C build/flatpak -cf "build/flatpak/flatpak-repo-$(uname -m).tar" repo
 
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v7
         with:
           name: flatpak-repo-${{ matrix.runner }}
           path: build/flatpak/flatpak-repo-*.tar
@@ -178,14 +178,14 @@ jobs:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
 
       - name: dependencies
         run: |
           sudo apt-get update
           sudo apt-get install -y flatpak ostree gnupg
 
-      - uses: actions/download-artifact@v4
+      - uses: actions/download-artifact@v8
         with:
           pattern: flatpak-repo-*
           path: dist
@@ -204,12 +204,12 @@ jobs:
           done
           ./packaging/flatpak/publish-repo.sh https://zackb.github.io/tether site "${repos[@]}"
 
-      - uses: actions/upload-pages-artifact@v4
+      - uses: actions/upload-pages-artifact@v5
         with:
           path: site
 
       - id: deployment
-        uses: actions/deploy-pages@v4
+        uses: actions/deploy-pages@v5
 
   copr:
     needs: [package]
@@ -234,7 +234,7 @@ jobs:
     if: github.ref_type == 'tag'
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/download-artifact@v4
+      - uses: actions/download-artifact@v8
         with:
           path: dist
           merge-multiple: true
