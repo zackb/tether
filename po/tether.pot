@@ -190,6 +190,12 @@ msgstr ""
 
 #: src/cli/main.cpp
 msgid ""
+"Download each notifying app's real icon from Apple's App Store. Only the "
+"app's identifier is sent."
+msgstr ""
+
+#: src/cli/main.cpp
+msgid ""
 "Stop desktop popups from an iPhone app, by name or bundle id. It still lists "
 "in --bt-notifications."
 msgstr ""
@@ -1141,6 +1147,14 @@ msgstr ""
 
 #: src/cli/main.cpp
 msgid "Notification mirroring disabled."
+msgstr ""
+
+#: src/cli/main.cpp
+msgid "Real app icons enabled."
+msgstr ""
+
+#: src/cli/main.cpp
+msgid "Real app icons disabled."
 msgstr ""
 
 #: src/cli/main.cpp
@@ -2718,6 +2732,16 @@ msgstr ""
 
 #: src/gtk/settings_view.cpp src/tui/settings.cpp
 msgid "Title and message content are shown, not just which app sent it."
+msgstr ""
+
+#: src/gtk/settings_view.cpp src/tui/settings.cpp
+msgid "Show real app icons"
+msgstr ""
+
+#: src/gtk/settings_view.cpp src/tui/settings.cpp
+msgid ""
+"Downloads each app's icon from Apple's App Store once. Only the app's "
+"identifier is sent."
 msgstr ""
 
 #: src/gtk/settings_view.cpp src/tui/settings.cpp

@@ -204,6 +204,12 @@ msgstr "アプリ名だけでなく、通知のタイトルと本文もミラー
 
 #: src/cli/main.cpp
 msgid ""
+"Download each notifying app's real icon from Apple's App Store. Only the "
+"app's identifier is sent."
+msgstr "通知を送る各アプリの本物のアイコンを Apple の App Store からダウンロードします。送信されるのはアプリの識別子だけです。"
+
+#: src/cli/main.cpp
+msgid ""
 "Stop desktop popups from an iPhone app, by name or bundle id. It still lists "
 "in --bt-notifications."
 msgstr ""
@@ -1251,6 +1257,14 @@ msgstr "通知のミラーリングを有効にしました。"
 #: src/cli/main.cpp
 msgid "Notification mirroring disabled."
 msgstr "通知のミラーリングを無効にしました。"
+
+#: src/cli/main.cpp
+msgid "Real app icons enabled."
+msgstr "本物のアプリアイコンを有効にしました。"
+
+#: src/cli/main.cpp
+msgid "Real app icons disabled."
+msgstr "本物のアプリアイコンを無効にしました。"
 
 #: src/cli/main.cpp
 msgid "Expected encrypted, plaintext or none, e.g. --bt-retention encrypted\n"
@@ -2992,6 +3006,16 @@ msgstr "通知の本文を含める"
 #: src/gtk/settings_view.cpp src/tui/settings.cpp
 msgid "Title and message content are shown, not just which app sent it."
 msgstr "送信元アプリだけでなく、タイトルと本文も表示されます。"
+
+#: src/gtk/settings_view.cpp src/tui/settings.cpp
+msgid "Show real app icons"
+msgstr "本物のアプリアイコンを表示"
+
+#: src/gtk/settings_view.cpp src/tui/settings.cpp
+msgid ""
+"Downloads each app's icon from Apple's App Store once. Only the app's "
+"identifier is sent."
+msgstr "各アプリのアイコンを Apple の App Store から一度だけダウンロードします。送信されるのはアプリの識別子だけです。"
 
 #: src/gtk/settings_view.cpp src/tui/settings.cpp
 msgid "Desktop popups"

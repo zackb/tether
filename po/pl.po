@@ -203,6 +203,12 @@ msgstr "Kopiuj tytuły i treść powiadomień, nie tylko aplikację."
 
 #: src/cli/main.cpp
 msgid ""
+"Download each notifying app's real icon from Apple's App Store. Only the "
+"app's identifier is sent."
+msgstr "Pobiera prawdziwą ikonę każdej aplikacji wysyłającej powiadomienia z App Store firmy Apple. Wysyłany jest tylko identyfikator aplikacji."
+
+#: src/cli/main.cpp
+msgid ""
 "Stop desktop popups from an iPhone app, by name or bundle id. It still lists "
 "in --bt-notifications."
 msgstr ""
@@ -1268,6 +1274,14 @@ msgstr "Kopiowanie powiadomień włączone."
 #: src/cli/main.cpp
 msgid "Notification mirroring disabled."
 msgstr "Kopiowanie powiadomień wyłączone."
+
+#: src/cli/main.cpp
+msgid "Real app icons enabled."
+msgstr "Prawdziwe ikony aplikacji włączone."
+
+#: src/cli/main.cpp
+msgid "Real app icons disabled."
+msgstr "Prawdziwe ikony aplikacji wyłączone."
 
 #: src/cli/main.cpp
 msgid "Expected encrypted, plaintext or none, e.g. --bt-retention encrypted\n"
@@ -3023,6 +3037,16 @@ msgstr "Dołącz treść powiadomienia"
 #: src/gtk/settings_view.cpp src/tui/settings.cpp
 msgid "Title and message content are shown, not just which app sent it."
 msgstr "Pokazywane są tytuł i treść, nie tylko aplikacja, która je wysłała."
+
+#: src/gtk/settings_view.cpp src/tui/settings.cpp
+msgid "Show real app icons"
+msgstr "Pokazuj prawdziwe ikony aplikacji"
+
+#: src/gtk/settings_view.cpp src/tui/settings.cpp
+msgid ""
+"Downloads each app's icon from Apple's App Store once. Only the app's "
+"identifier is sent."
+msgstr "Pobiera ikonę każdej aplikacji jednorazowo z App Store firmy Apple. Wysyłany jest tylko identyfikator aplikacji."
 
 #: src/gtk/settings_view.cpp src/tui/settings.cpp
 msgid "Desktop popups"

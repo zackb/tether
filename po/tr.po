@@ -201,6 +201,12 @@ msgstr ""
 
 #: src/cli/main.cpp
 msgid ""
+"Download each notifying app's real icon from Apple's App Store. Only the "
+"app's identifier is sent."
+msgstr "Bildirim gönderen her uygulamanın gerçek simgesini Apple'ın App Store'undan indirir. Yalnızca uygulamanın tanımlayıcısı gönderilir."
+
+#: src/cli/main.cpp
+msgid ""
 "Stop desktop popups from an iPhone app, by name or bundle id. It still lists "
 "in --bt-notifications."
 msgstr ""
@@ -1251,6 +1257,14 @@ msgstr "Bildirim yansıtma etkinleştirildi."
 #: src/cli/main.cpp
 msgid "Notification mirroring disabled."
 msgstr "Bildirim yansıtma devre dışı bırakıldı."
+
+#: src/cli/main.cpp
+msgid "Real app icons enabled."
+msgstr "Gerçek uygulama simgeleri açıldı."
+
+#: src/cli/main.cpp
+msgid "Real app icons disabled."
+msgstr "Gerçek uygulama simgeleri kapatıldı."
 
 #: src/cli/main.cpp
 msgid "Expected encrypted, plaintext or none, e.g. --bt-retention encrypted\n"
@@ -2990,6 +3004,16 @@ msgstr "Bildirim metnini de al"
 msgid "Title and message content are shown, not just which app sent it."
 msgstr ""
 "Yalnızca gönderen uygulama değil, başlık ve ileti içeriği de gösterilir."
+
+#: src/gtk/settings_view.cpp src/tui/settings.cpp
+msgid "Show real app icons"
+msgstr "Gerçek uygulama simgelerini göster"
+
+#: src/gtk/settings_view.cpp src/tui/settings.cpp
+msgid ""
+"Downloads each app's icon from Apple's App Store once. Only the app's "
+"identifier is sent."
+msgstr "Her uygulamanın simgesini Apple'ın App Store'undan bir kez indirir. Yalnızca uygulamanın tanımlayıcısı gönderilir."
 
 #: src/gtk/settings_view.cpp src/tui/settings.cpp
 msgid "Desktop popups"

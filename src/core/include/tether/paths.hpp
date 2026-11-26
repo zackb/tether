@@ -21,4 +21,7 @@ namespace tether::paths {
     // $XDG_STATE_HOME/tether, else ~/.local/state/tether.
     std::filesystem::path state_dir();
 
+    // $XDG_CACHE_HOME/tether, else ~/.cache/tether.
+    std::filesystem::path cache_dir();
+
 } // namespace tether::paths

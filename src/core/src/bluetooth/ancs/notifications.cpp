@@ -159,24 +159,17 @@ namespace tether::bluetooth::ancs {
         held_.push_back({std::move(notification), now + WAIT_SECONDS});
     }
 
-    std::vector<Notification> HeldPopups::release_app(const std::string& app_id, const std::string& name) {
-        std::vector<Notification> out;
-        for (auto it = held_.begin(); it != held_.end();) {
-            if (it->notification.app_id == app_id) {
-                out.push_back(std::move(it->notification));
-                out.back().app_name = name;
-                it = held_.erase(it);
-            } else {
-                ++it;
-            }
+    void HeldPopups::rename_app(const std::string& app_id, const std::string& name) {
+        for (auto& held : held_) {
+            if (held.notification.app_id == app_id)
+                held.notification.app_name = name;
         }
-        return out;
     }
 
-    std::vector<Notification> HeldPopups::release_expired(int64_t now) {
+    std::vector<Notification> HeldPopups::release(int64_t now, const std::function<bool(const Notification&)>& ready) {
         std::vector<Notification> out;
         for (auto it = held_.begin(); it != held_.end();) {
-            if (now >= it->deadline) {
+            if (now >= it->deadline || ready(it->notification)) {
                 out.push_back(std::move(it->notification));
                 it = held_.erase(it);
             } else {
@@ -221,6 +214,8 @@ namespace tether::bluetooth::ancs {
 
     std::vector<std::string> icon_candidates(const Notification& notification) {
         std::vector<std::string> out;
+        if (!notification.icon_file.empty())
+            out.push_back(notification.icon_file);
 
         // Theme names come first so a theme that carries brand logos (Papirus is
         // the common one) restyles them. Tether's bundled art is namespaced

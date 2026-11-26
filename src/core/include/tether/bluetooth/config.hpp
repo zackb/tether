@@ -46,6 +46,8 @@ namespace tether::bluetooth {
         // they came from. The iPhone's own notification-access toggle is the
         // consent gate, so this is on and stays available as an opt-out.
         bool ancs_content_enabled = true;
+        // Download each notifying app's icon from the App Store; off until chosen.
+        bool app_icons_enabled = false;
         // Group replies are off until deliberately enabled
         bool group_messages_enabled = false;
         // Call control over HFP, through whichever stack owns the profile:

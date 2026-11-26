@@ -1,4 +1,5 @@
 #include "tether/bluetooth/ancs/client.hpp"
+#include "tether/app_icons.hpp"
 #include "tether/bluetooth/ancs/sequencer.hpp"
 #include "tether/bluetooth/bmessage.hpp"
 #include "tether/bluetooth/monitor.hpp"
@@ -41,6 +42,7 @@ namespace tether::bluetooth::ancs {
 
         std::atomic<bool> ready{false};
         bool content_enabled = false;
+        bool app_icons_enabled = false;
         std::string reason = "Waiting for the iPhone's notification service.";
 
         int64_t next_discover = 0;
@@ -79,8 +81,10 @@ namespace tether::bluetooth::ancs {
         // request already in flight, so an app is asked about once per session.
         std::map<std::string, std::string> app_names;
 
-        // Popups waiting for their app's display name. Used from tick()'s thread only.
+        // Popups waiting for their app's display name and icon. Used from tick()'s thread only.
         HeldPopups held_popups;
+        bool popup_ready(const std::string& app_id) const;
+        void release_held(int64_t now);
 
         // The opening replay of a session with an empty registry. tick()'s thread only.
         ReplayBurst first_replay;
@@ -541,7 +545,8 @@ namespace tether::bluetooth::ancs {
                     std::lock_guard<std::mutex> lock(registry_mutex);
                     registry.rename_app(response.app_id, name);
                 }
-                emit(held_popups.release_app(response.app_id, shown));
+                held_popups.rename_app(response.app_id, shown);
+                release_held(now);
             }
             return;
         }
@@ -563,6 +568,8 @@ namespace tether::bluetooth::ancs {
         Notification notification;
         notification.uid = request.uid;
         notification.app_id = response.attribute(static_cast<uint8_t>(NotificationAttributeId::AppIdentifier));
+        if (app_icons_enabled)
+            app_icons::request(notification.app_id);
         notification.app_name = app_display_name(notification.app_id);
         notification.title = response.attribute(static_cast<uint8_t>(NotificationAttributeId::Title));
         notification.subtitle = response.attribute(static_cast<uint8_t>(NotificationAttributeId::Subtitle));
@@ -586,7 +593,7 @@ namespace tether::bluetooth::ancs {
             notification.pre_existing = true;
         // Only a notification that would pop up is held.
         if (should_show_desktop_popup(notification) && !notification.app_id.empty() &&
-            app_names[notification.app_id].empty()) {
+            !popup_ready(notification.app_id)) {
             held_popups.hold(std::move(notification), now);
             return;
         }
@@ -596,8 +603,30 @@ namespace tether::bluetooth::ancs {
     void AncsClientState::emit(const std::vector<Notification>& notifications) {
         if (!on_notification)
             return;
-        for (const auto& notification : notifications)
+        for (auto notification : notifications) {
+            if (app_icons_enabled)
+                notification.icon_file = app_icons::cached_icon(notification.app_id);
             on_notification(notification);
+        }
+    }
+
+    bool AncsClientState::popup_ready(const std::string& app_id) const {
+        const auto name = app_names.find(app_id);
+        return name != app_names.end() && !name->second.empty() && !(app_icons_enabled && app_icons::fetching(app_id));
+    }
+
+    void AncsClientState::release_held(int64_t now) {
+        if (held_popups.empty())
+            return;
+        const auto released =
+            held_popups.release(now, [this](const Notification& held) { return popup_ready(held.app_id); });
+        // No name came: keep the guess so later notifications do not wait.
+        for (const auto& notification : released) {
+            auto& name = app_names[notification.app_id];
+            if (name.empty())
+                name = notification.app_name;
+        }
+        emit(released);
     }
 
     AncsClient::AncsClient(BluezMonitor& monitor,
@@ -678,6 +707,8 @@ namespace tether::bluetooth::ancs {
     }
 
     void AncsClient::set_content_enabled(bool enabled) { state_->content_enabled = enabled; }
+
+    void AncsClient::set_app_icons_enabled(bool enabled) { state_->app_icons_enabled = enabled; }
 
     void AncsClient::drop_session(const std::string& reason) {
         if (state_->subscribed)
@@ -810,16 +841,7 @@ namespace tether::bluetooth::ancs {
         s->drain(now);
 
         // Wall-clock, because hold() was given wall-clock `now`.
-        if (!s->held_popups.empty()) {
-            const auto expired = s->held_popups.release_expired(static_cast<int64_t>(std::time(nullptr)));
-            // No name came: keep the guess so later notifications do not wait.
-            for (const auto& notification : expired) {
-                auto& name = s->app_names[notification.app_id];
-                if (name.empty())
-                    name = notification.app_name;
-            }
-            s->emit(expired);
-        }
+        s->release_held(static_cast<int64_t>(std::time(nullptr)));
 
         // A successful StartNotify proves only that the subscription exists, not
         // that iOS authorized notification access.

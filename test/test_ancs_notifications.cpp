@@ -17,6 +17,9 @@ namespace {
         return n;
     }
 
+    bool never_ready(const Notification&) { return false; }
+    bool always_ready(const Notification&) { return true; }
+
 } // namespace
 
 TEST(AncsAppName, DerivesTheLastBundleComponent) {
@@ -278,6 +281,14 @@ TEST(BluetoothConfig, MutedAppsRoundTrip) {
     EXPECT_TRUE(deserialize_config("{}").muted_apps.empty());
 }
 
+TEST(BluetoothConfig, AppIconsAreOffUntilChosen) {
+    EXPECT_FALSE(deserialize_config("{}").app_icons_enabled);
+
+    Config config;
+    config.app_icons_enabled = true;
+    EXPECT_TRUE(deserialize_config(serialize_config(config)).app_icons_enabled);
+}
+
 TEST(BluetoothConfig, SerializeStampsTheVersion) {
     Config config;
     config.ancs_content_enabled = false;
@@ -326,13 +337,16 @@ TEST(AncsFetchOrder, EmptyAndSingleAreUnchanged) {
     EXPECT_EQ(fetch_order({event(EventId::Added, 4)}).size(), 1u);
 }
 
-TEST(AncsHeldPopups, ReleasedWithTheRealNameWhenItArrives) {
+TEST(AncsHeldPopups, ReleasedOnceReadyWithTheRealName) {
     HeldPopups held;
     held.hold(held_notification(1, "com.alibaba.iAliexpress"), 100);
     held.hold(held_notification(2, "com.burbn.instagram"), 100);
     held.hold(held_notification(3, "com.alibaba.iAliexpress"), 101);
 
-    const auto out = held.release_app("com.alibaba.iAliexpress", "AliExpress");
+    held.rename_app("com.alibaba.iAliexpress", "AliExpress");
+    EXPECT_TRUE(held.release(100, never_ready).empty());
+
+    const auto out = held.release(100, [](const Notification& n) { return n.app_id == "com.alibaba.iAliexpress"; });
     ASSERT_EQ(out.size(), 2u);
     EXPECT_EQ(out[0].uid, 1u);
     EXPECT_EQ(out[1].uid, 3u);
@@ -346,14 +360,14 @@ TEST(AncsHeldPopups, ReleasedWithTheGuessAfterTheWait) {
     held.hold(held_notification(1, "com.alibaba.iAliexpress"), 100);
     held.hold(held_notification(2, "com.burbn.instagram"), 101);
 
-    EXPECT_TRUE(held.release_expired(100 + HeldPopups::WAIT_SECONDS - 1).empty());
+    EXPECT_TRUE(held.release(100 + HeldPopups::WAIT_SECONDS - 1, never_ready).empty());
 
-    const auto first = held.release_expired(100 + HeldPopups::WAIT_SECONDS);
+    const auto first = held.release(100 + HeldPopups::WAIT_SECONDS, never_ready);
     ASSERT_EQ(first.size(), 1u);
     EXPECT_EQ(first[0].uid, 1u);
     EXPECT_EQ(first[0].app_name, "IAliexpress");
 
-    const auto second = held.release_expired(101 + HeldPopups::WAIT_SECONDS);
+    const auto second = held.release(101 + HeldPopups::WAIT_SECONDS, never_ready);
     ASSERT_EQ(second.size(), 1u);
     EXPECT_EQ(second[0].uid, 2u);
     EXPECT_TRUE(held.empty());
@@ -378,16 +392,18 @@ TEST(AncsHeldPopups, HoldingTheSameUidAgainReplacesIt) {
     again.title = "second";
     held.hold(std::move(again), 101);
 
-    const auto out = held.release_app("a.b.c", "C");
+    const auto out = held.release(100, always_ready);
     ASSERT_EQ(out.size(), 1u);
     EXPECT_EQ(out[0].title, "second");
 }
 
-TEST(AncsHeldPopups, ReleasingAnotherAppLeavesTheRest) {
+TEST(AncsHeldPopups, RenamingAnotherAppLeavesTheRest) {
     HeldPopups held;
     held.hold(held_notification(1, "a.b.c"), 100);
-    EXPECT_TRUE(held.release_app("x.y.z", "X").empty());
-    EXPECT_FALSE(held.empty());
+    held.rename_app("x.y.z", "X");
+    const auto out = held.release(100, always_ready);
+    ASSERT_EQ(out.size(), 1u);
+    EXPECT_EQ(out[0].app_name, "C");
 }
 
 TEST(AncsHeldPopups, DroppedIsNeverReleased) {
@@ -395,11 +411,20 @@ TEST(AncsHeldPopups, DroppedIsNeverReleased) {
     held.hold(held_notification(1, "a.b.c"), 100);
     held.hold(held_notification(2, "a.b.c"), 100);
     held.drop(1);
-    const auto out = held.release_app("a.b.c", "C");
+    const auto out = held.release(100, always_ready);
     ASSERT_EQ(out.size(), 1u);
     EXPECT_EQ(out[0].uid, 2u);
     held.drop(99);
     EXPECT_TRUE(held.empty());
+}
+
+TEST(AncsIconCandidates, AnIconFileComesFirst) {
+    Notification n = held_notification(1, "com.burbn.instagram");
+    n.icon_file = "/home/u/.cache/tether/app-icons/com.burbn.instagram.png";
+    const auto icons = icon_candidates(n);
+    ASSERT_FALSE(icons.empty());
+    EXPECT_EQ(icons.front(), n.icon_file);
+    EXPECT_EQ(icons.size(), icon_candidates(held_notification(1, "com.burbn.instagram")).size() + 1);
 }
 
 namespace {

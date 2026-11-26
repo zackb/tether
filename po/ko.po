@@ -200,6 +200,12 @@ msgstr "앱뿐 아니라 알림의 제목과 본문도 미러링합니다."
 
 #: src/cli/main.cpp
 msgid ""
+"Download each notifying app's real icon from Apple's App Store. Only the "
+"app's identifier is sent."
+msgstr "알림을 보내는 각 앱의 실제 아이콘을 Apple App Store에서 다운로드합니다. 앱 식별자만 전송됩니다."
+
+#: src/cli/main.cpp
+msgid ""
 "Stop desktop popups from an iPhone app, by name or bundle id. It still lists "
 "in --bt-notifications."
 msgstr ""
@@ -1231,6 +1237,14 @@ msgstr "알림 미러링을 켰습니다."
 #: src/cli/main.cpp
 msgid "Notification mirroring disabled."
 msgstr "알림 미러링을 껐습니다."
+
+#: src/cli/main.cpp
+msgid "Real app icons enabled."
+msgstr "실제 앱 아이콘을 켰습니다."
+
+#: src/cli/main.cpp
+msgid "Real app icons disabled."
+msgstr "실제 앱 아이콘을 껐습니다."
 
 #: src/cli/main.cpp
 msgid "Expected encrypted, plaintext or none, e.g. --bt-retention encrypted\n"
@@ -2950,6 +2964,16 @@ msgstr "알림 본문 포함"
 #: src/gtk/settings_view.cpp src/tui/settings.cpp
 msgid "Title and message content are shown, not just which app sent it."
 msgstr "보낸 앱뿐 아니라 제목과 본문도 표시됩니다."
+
+#: src/gtk/settings_view.cpp src/tui/settings.cpp
+msgid "Show real app icons"
+msgstr "실제 앱 아이콘 표시"
+
+#: src/gtk/settings_view.cpp src/tui/settings.cpp
+msgid ""
+"Downloads each app's icon from Apple's App Store once. Only the app's "
+"identifier is sent."
+msgstr "각 앱의 아이콘을 Apple App Store에서 한 번만 다운로드합니다. 앱 식별자만 전송됩니다."
 
 #: src/gtk/settings_view.cpp src/tui/settings.cpp
 msgid "Desktop popups"

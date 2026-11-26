@@ -201,6 +201,12 @@ msgstr "Zrcadlit názvy a text oznámení, nejen aplikaci."
 
 #: src/cli/main.cpp
 msgid ""
+"Download each notifying app's real icon from Apple's App Store. Only the "
+"app's identifier is sent."
+msgstr "Stáhne skutečnou ikonu každé aplikace, která posílá oznámení, z App Storu společnosti Apple. Odesílá se jen identifikátor aplikace."
+
+#: src/cli/main.cpp
+msgid ""
 "Stop desktop popups from an iPhone app, by name or bundle id. It still lists "
 "in --bt-notifications."
 msgstr ""
@@ -1254,6 +1260,14 @@ msgstr "Zrcadlení oznámení zapnuto."
 #: src/cli/main.cpp
 msgid "Notification mirroring disabled."
 msgstr "Zrcadlení oznámení vypnuto."
+
+#: src/cli/main.cpp
+msgid "Real app icons enabled."
+msgstr "Skutečné ikony aplikací zapnuty."
+
+#: src/cli/main.cpp
+msgid "Real app icons disabled."
+msgstr "Skutečné ikony aplikací vypnuty."
 
 #: src/cli/main.cpp
 msgid "Expected encrypted, plaintext or none, e.g. --bt-retention encrypted\n"
@@ -2992,6 +3006,16 @@ msgstr "Zahrnout text oznámení"
 #: src/gtk/settings_view.cpp src/tui/settings.cpp
 msgid "Title and message content are shown, not just which app sent it."
 msgstr "Zobrazí se nadpis a text, nejen odesílající aplikace."
+
+#: src/gtk/settings_view.cpp src/tui/settings.cpp
+msgid "Show real app icons"
+msgstr "Zobrazovat skutečné ikony aplikací"
+
+#: src/gtk/settings_view.cpp src/tui/settings.cpp
+msgid ""
+"Downloads each app's icon from Apple's App Store once. Only the app's "
+"identifier is sent."
+msgstr "Ikonu každé aplikace jednou stáhne z App Storu společnosti Apple. Odesílá se jen identifikátor aplikace."
 
 #: src/gtk/settings_view.cpp src/tui/settings.cpp
 msgid "Desktop popups"

@@ -46,6 +46,9 @@ namespace tether::bluetooth::ancs {
         // Whether to ask for notification contents or only which app sent them.
         void set_content_enabled(bool enabled);
 
+        // Whether to fetch each app's icon and hold a popup briefly until it is ready.
+        void set_app_icons_enabled(bool enabled);
+
         // Ends a live subscription so the next tick resubscribes on whatever link
         // is up then. No-op when not subscribed.
         void drop_session(const std::string& reason);

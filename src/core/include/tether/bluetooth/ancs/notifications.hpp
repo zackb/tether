@@ -4,6 +4,7 @@
 
 #include <chrono>
 #include <cstdint>
+#include <functional>
 #include <map>
 #include <nlohmann/json.hpp>
 #include <string>
@@ -28,6 +29,8 @@ namespace tether::bluetooth::ancs {
         // Already on the phone when the subscription came up.
         bool pre_existing = false;
         uint64_t session = 0;
+        // A local image of the app's icon, when one is cached and app icons are on.
+        std::string icon_file;
 
         bool operator==(const Notification&) const = default;
     };
@@ -39,18 +42,18 @@ namespace tether::bluetooth::ancs {
         Withdraw // removed on the phone: drop the desktop copy
     };
 
-    // Holds new notifications until their app's display name arrives or WAIT_SECONDS pass.
+    // Holds new notifications until what they show (the app's name, its icon) is ready or WAIT_SECONDS pass.
     class HeldPopups {
     public:
         static constexpr int64_t WAIT_SECONDS = 2;
 
         void hold(Notification notification, int64_t now);
 
-        // The notifications held for `app_id`, renamed to `name`, oldest first.
-        std::vector<Notification> release_app(const std::string& app_id, const std::string& name);
+        // Gives the notifications held for `app_id` their display name.
+        void rename_app(const std::string& app_id, const std::string& name);
 
-        // The notifications that have waited long enough, oldest first.
-        std::vector<Notification> release_expired(int64_t now);
+        // The notifications that are ready or have waited long enough, oldest first.
+        std::vector<Notification> release(int64_t now, const std::function<bool(const Notification&)>& ready);
 
         // Everything held, oldest first (the session is ending).
         std::vector<Notification> release_all();
@@ -137,8 +140,8 @@ namespace tether::bluetooth::ancs {
     // its place at the front, then additions newest first.
     std::vector<SourceEvent> fetch_order(std::vector<SourceEvent> events);
 
-    // Freedesktop icon names to try for a notification, best first: the app's
-    // own logo, then something generic for its category.
+    // Icons to try for a notification, best first: its icon file, the app's own
+    // logo, then something generic for its category.
     std::vector<std::string> icon_candidates(const Notification& notification);
 
     // How to find the Linux counterpart of an iPhone app.
