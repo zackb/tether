@@ -1,5 +1,6 @@
 #include "app.hpp"
 
+#include <set>
 #include <tether/i18n.hpp>
 
 namespace tether::tui {
@@ -12,7 +13,7 @@ namespace tether::tui {
             const char* group;
             const char* title;
             const char* subtitle;
-            const char* command; // sent with {"enabled": bool}
+            const char* command; // sent with {"enabled": bool}; networks sends {"scope"}
             const char* status_key;
             bool fallback;
         };
@@ -67,6 +68,13 @@ namespace tether::tui {
              N_("Off sends it only from Send Clipboard or tether share."),
              "set_clipboard_auto_share",
              "clipboard_auto_share",
+             true},
+            {"networks",
+             N_("Networks"),
+             N_("Only on trusted networks"),
+             N_("Elsewhere Tether is not advertised and refuses connections. Bluetooth keeps working."),
+             "set_lan_scope",
+             "lan_scope",
              true},
             {"retention",
              N_("Messages"),
@@ -190,6 +198,27 @@ namespace tether::tui {
                                      Tone::Bad));
                     }
                 }
+                if (std::string(setting->id) == "networks" && value(*setting)) {
+                    std::set<std::string> current;
+                    for (const auto& net : status_.value("lan_networks", json::array())) {
+                        const std::string key = net.value("key", "");
+                        const std::string name = net.value("name", key);
+                        const bool trusted = net.value("trusted", false);
+                        current.insert(key);
+                        rows.push_back(action_row(
+                            tr_format(trusted ? _("Hide on {} (connected)") : _("Trust {} (connected)"), name),
+                            [key, trusted] {
+                                app::send({{"command", trusted ? "untrust_network" : "trust_network"}, {"key", key}});
+                            }));
+                    }
+                    for (const auto& net : status_.value("trusted_networks", json::array())) {
+                        const std::string key = net.value("key", "");
+                        if (!current.contains(key))
+                            rows.push_back(action_row(tr_format(_("Forget {}"), net.value("name", key)), [key] {
+                                app::send({{"command", "untrust_network"}, {"key", key}});
+                            }));
+                    }
+                }
                 if (std::string(setting->id) == "popups") {
                     const json muted = status_.value("muted_apps", json::array());
                     if (!muted.empty())
@@ -214,7 +243,7 @@ namespace tether::tui {
                                   "changed yet."));
                     return;
                 }
-                app::send({{"command", setting->command}, {"enabled", !value(*setting)}});
+                send(*setting, !value(*setting));
             }
 
             bool command(const std::string& name, const std::string& args) override {
@@ -236,7 +265,7 @@ namespace tether::tui {
                     app::status(tr_format(_("Settings: {}"), names));
                     return true;
                 }
-                app::send({{"command", setting->command}, {"enabled", !off}});
+                send(*setting, !off);
                 return true;
             }
 
@@ -247,6 +276,13 @@ namespace tether::tui {
             }
 
         private:
+            static void send(const Setting& setting, bool on) {
+                if (std::string(setting.id) == "networks")
+                    app::send({{"command", setting.command}, {"scope", on ? "trusted" : "all"}});
+                else
+                    app::send({{"command", setting.command}, {"enabled", on}});
+            }
+
             static const Setting* find(const std::string& id) {
                 for (const Setting& setting : SETTINGS)
                     if (id == setting.id)
@@ -260,6 +296,8 @@ namespace tether::tui {
                     const std::string route = status_.value("phone_audio_route", "unavailable");
                     return route == "unavailable" ? status_.value("phone_audio", "auto") == "here" : route == "here";
                 }
+                if (std::string(setting.id) == "networks")
+                    return status_.value("lan_scope", "trusted") != "all";
                 return status_.value(setting.status_key, setting.fallback);
             }
 

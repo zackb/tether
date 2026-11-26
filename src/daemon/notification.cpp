@@ -199,6 +199,9 @@ namespace tether {
         std::function<void(const std::string&, const std::string&)> g_copy_handler;
         std::function<void(const std::string&, const std::string&)> g_reply_handler;
         std::function<void(const std::string&, const std::string&)> g_mute_handler;
+        std::function<void(const std::string&, bool)> g_network_trust_handler;
+        // trust prompts by network key, so repeat raises the same popup
+        std::unordered_map<std::string, NotifyNotification*> g_trust_popups;
 
         // Server notification id -> conversation, for notifications showing an
         // inline reply field. Touched only on the notifier's thread.
@@ -382,9 +385,56 @@ namespace tether {
         void on_notification_closed(NotifyNotification* notification, gpointer) {
             g_reply_threads.erase(notification_id(notification));
             std::erase_if(g_ancs_popups, [notification](const auto& entry) { return entry.second == notification; });
+            std::erase_if(g_trust_popups, [notification](const auto& entry) { return entry.second == notification; });
             if (notification == g_file_popup)
                 g_file_popup = nullptr;
             g_object_unref(notification);
+        }
+
+        // payload is the network key; handle is "trust" or "decline".
+        void on_network_trust_action(NotifyNotification*, char*, gpointer user_data) {
+            auto* action = static_cast<NotificationActionData*>(user_data);
+            if (action && g_network_trust_handler)
+                g_network_trust_handler(action->payload, action->handle == "trust");
+        }
+
+        struct NetworkTrustRequest {
+            std::string key;
+            std::string name;
+        };
+
+        gboolean show_network_trust_on_main(gpointer user_data) {
+            std::unique_ptr<NetworkTrustRequest> request(static_cast<NetworkTrustRequest*>(user_data));
+            if (const auto open = g_trust_popups.find(request->key); open != g_trust_popups.end()) {
+                notify_notification_show(open->second, nullptr);
+                return G_SOURCE_REMOVE;
+            }
+            const std::string body = tr_format(
+                _("A paired device is on {}. Tether stays hidden on networks you have not trusted."), request->name);
+            NotifyNotification* notification =
+                notify_notification_new(_("Show Tether on this network?"), body.c_str(), "network-wireless");
+            set_identity(notification, "", false, "");
+            notify_notification_set_hint(notification, "resident", g_variant_new_boolean(TRUE));
+            g_signal_connect(notification, "closed", G_CALLBACK(on_notification_closed), nullptr);
+            notify_notification_add_action(notification,
+                                           "trust",
+                                           _("Trust"),
+                                           on_network_trust_action,
+                                           new NotificationActionData{request->key, "trust"},
+                                           free_action_data);
+            notify_notification_add_action(notification,
+                                           "decline",
+                                           _("Not now"),
+                                           on_network_trust_action,
+                                           new NotificationActionData{request->key, "decline"},
+                                           free_action_data);
+            if (!notify_notification_show(notification, nullptr)) {
+                debug::log(ERR, "Failed to show network trust notification");
+                g_object_unref(notification);
+            } else {
+                g_trust_popups[request->key] = notification;
+            }
+            return G_SOURCE_REMOVE;
         }
 
         gboolean withdraw_on_main(gpointer user_data) {
@@ -667,6 +717,20 @@ namespace tether {
     void DesktopNotifier::set_reply_handler(
         std::function<void(const std::string& thread, const std::string& body)> handler) {
         g_reply_handler = std::move(handler);
+    }
+
+    void DesktopNotifier::set_network_trust_handler(std::function<void(const std::string& key, bool trust)> handler) {
+        g_network_trust_handler = std::move(handler);
+    }
+
+    void DesktopNotifier::notify_network_trust(const std::string& key, const std::string& name) {
+        if (!impl_->initialized)
+            return;
+        g_main_context_invoke_full(impl_->context,
+                                   G_PRIORITY_DEFAULT,
+                                   show_network_trust_on_main,
+                                   new NetworkTrustRequest{key, name},
+                                   nullptr);
     }
 
     void DesktopNotifier::notify(const NotificationSpec& spec) {

@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: tether\n"
 "Report-Msgid-Bugs-To: zack@bartel.com\n"
-"POT-Creation-Date: 2026-11-25 21:13+0100\n"
+"POT-Creation-Date: 2026-11-26 11:12-0800\n"
 "PO-Revision-Date: 2026-08-23\n"
 "Last-Translator: Tether project\n"
 "Language-Team: Czech\n"
@@ -77,6 +77,24 @@ msgstr "Délka vyhledávání v milisekundách (výchozí 3000)."
 #: src/cli/main.cpp
 msgid "List all paired connection devices."
 msgstr "Vypsat všechna spárovaná zařízení."
+
+#: src/cli/main.cpp
+msgid "List the networks this computer is on and whether Tether shows on them."
+msgstr ""
+"Vypsat sítě, ke kterým je tento počítač připojen, a zda je na nich Tether "
+"vidět."
+
+#: src/cli/main.cpp
+msgid "Show Tether on a network. Without a key, the one hidden network."
+msgstr "Zobrazit Tether v síti. Bez klíče v jediné skryté síti."
+
+#: src/cli/main.cpp
+msgid "Hide Tether on a network again."
+msgstr "Znovu skrýt Tether v síti."
+
+#: src/cli/main.cpp
+msgid "Show Tether on trusted networks only, or on every network."
+msgstr "Zobrazovat Tether jen v důvěryhodných sítích, nebo ve všech."
 
 #: src/cli/main.cpp
 msgid "Show the one-time system setup Bluetooth still needs."
@@ -203,7 +221,9 @@ msgstr "Zrcadlit názvy a text oznámení, nejen aplikaci."
 msgid ""
 "Download each notifying app's real icon from Apple's App Store. Only the "
 "app's identifier is sent."
-msgstr "Stáhne skutečnou ikonu každé aplikace, která posílá oznámení, z App Storu společnosti Apple. Odesílá se jen identifikátor aplikace."
+msgstr ""
+"Stáhne skutečnou ikonu každé aplikace, která posílá oznámení, z App Storu "
+"společnosti Apple. Odesílá se jen identifikátor aplikace."
 
 #: src/cli/main.cpp
 msgid ""
@@ -452,6 +472,46 @@ msgstr ""
 "Poté pro potvrzení spusťte znovu 'tether --bt-setup'.\n"
 
 #: src/cli/main.cpp
+msgid "Could not read status from the daemon.\n"
+msgstr "Nepodařilo se načíst stav z démona.\n"
+
+#: src/cli/main.cpp
+msgid "Tether shows on every network."
+msgstr "Tether je vidět ve všech sítích."
+
+#: src/cli/main.cpp
+msgid "Tether shows on trusted networks only."
+msgstr "Tether je vidět jen v důvěryhodných sítích."
+
+#: src/cli/main.cpp
+msgid "shown "
+msgstr "viditelná"
+
+#: src/cli/main.cpp
+msgid "hidden"
+msgstr "skrytá"
+
+#: src/cli/main.cpp
+msgid "Expected trusted or all, e.g. --lan-scope trusted\n"
+msgstr "Očekáváno trusted nebo all, např. --lan-scope trusted\n"
+
+#: src/cli/main.cpp
+msgid "No network to change.\n"
+msgstr "Žádnou síť nelze změnit.\n"
+
+#: src/cli/main.cpp
+msgid "More than one network; pass a key from --networks.\n"
+msgstr "Více než jedna síť; zadejte klíč z --networks.\n"
+
+#: src/cli/main.cpp
+msgid "Could not reach the daemon.\n"
+msgstr "Nepodařilo se spojit s démonem.\n"
+
+#: src/cli/main.cpp
+msgid "Done."
+msgstr "Hotovo."
+
+#: src/cli/main.cpp
 msgid "Mode"
 msgstr "Režim"
 
@@ -607,10 +667,6 @@ msgid ""
 msgstr ""
 "Tento počítač se nehlásí jako hardware Apple, takže hovor předá AirPods "
 "jejich odpojením. Viz DeviceID v /etc/bluetooth/main.conf."
-
-#: src/cli/main.cpp
-msgid "Could not reach the daemon.\n"
-msgstr "Nepodařilo se spojit s démonem.\n"
 
 #: src/cli/main.cpp
 #, c-format
@@ -911,6 +967,24 @@ msgid "More than one device is named {}; pass its fingerprint instead.\n"
 msgstr "Název {} má více zařízení; zadejte místo něj jeho otisk.\n"
 
 #: src/cli/main.cpp
+msgid "shown on every network"
+msgstr "viditelný ve všech sítích"
+
+#: src/cli/main.cpp
+#, c++-format
+msgid "shown on {}"
+msgstr "viditelný v síti {}"
+
+#: src/cli/main.cpp
+#, c++-format
+msgid "hidden on {} (tether --trust-network)"
+msgstr "skrytý v síti {} (tether --trust-network)"
+
+#: src/cli/main.cpp
+msgid "no network"
+msgstr "žádná síť"
+
+#: src/cli/main.cpp
 msgid "Version"
 msgstr "Verze"
 
@@ -945,6 +1019,10 @@ msgstr "oznamuje se"
 #: src/cli/main.cpp
 msgid "unavailable"
 msgstr "nedostupné"
+
+#: src/cli/main.cpp src/gtk/settings_view.cpp src/tui/settings.cpp
+msgid "Networks"
+msgstr "Sítě"
 
 #: src/cli/main.cpp
 msgid "Firewall"
@@ -2021,6 +2099,27 @@ msgstr ""
 
 #: src/daemon/notification.cpp
 #, c++-format
+msgid ""
+"A paired device is on {}. Tether stays hidden on networks you have not "
+"trusted."
+msgstr ""
+"Spárované zařízení je v síti {}. V sítích, kterým nedůvěřujete, zůstává "
+"Tether skrytý."
+
+#: src/daemon/notification.cpp
+msgid "Show Tether on this network?"
+msgstr "Zobrazit Tether v této síti?"
+
+#: src/daemon/notification.cpp src/gtk/settings_view.cpp
+msgid "Trust"
+msgstr "Důvěřovat"
+
+#: src/daemon/notification.cpp
+msgid "Not now"
+msgstr "Teď ne"
+
+#: src/daemon/notification.cpp
+#, c++-format
 msgid "{} file arrived"
 msgid_plural "{} files arrived"
 msgstr[0] "{} soubor přijat"
@@ -2401,6 +2500,11 @@ msgstr ""
 "schránce, takže synchronizace schránky je vypnutá."
 
 #: src/gtk/devices_view.cpp src/tui/devices.cpp
+#, c++-format
+msgid "Tether is hidden on {}, a network you have not trusted."
+msgstr "Tether je skrytý v síti {}, které nedůvěřujete."
+
+#: src/gtk/devices_view.cpp src/tui/devices.cpp
 msgid ""
 "avahi-daemon isn't running, so other devices can't find this PC. Start it "
 "with: sudo systemctl enable --now avahi-daemon"
@@ -2741,7 +2845,7 @@ msgstr "Odeslat schránku"
 msgid "Clipboard sync requested..."
 msgstr "Vyžádána synchronizace schránky..."
 
-#: src/gtk/devices_view.cpp src/tui/devices.cpp
+#: src/gtk/devices_view.cpp src/gtk/settings_view.cpp src/tui/devices.cpp
 msgid "Forget"
 msgstr "Zapomenout"
 
@@ -2937,6 +3041,22 @@ msgid "Notification mirroring is unavailable."
 msgstr "Zrcadlení oznámení není dostupné."
 
 #: src/gtk/settings_view.cpp
+msgid "Connected · Tether is shown"
+msgstr "Připojeno · Tether je vidět"
+
+#: src/gtk/settings_view.cpp
+msgid "Connected · Tether is hidden"
+msgstr "Připojeno · Tether je skrytý"
+
+#: src/gtk/settings_view.cpp
+msgid "Hide"
+msgstr "Skrýt"
+
+#: src/gtk/settings_view.cpp
+msgid "Trusted"
+msgstr "Důvěryhodná"
+
+#: src/gtk/settings_view.cpp
 msgid "Unmute"
 msgstr "Zrušit ztlumení"
 
@@ -3015,7 +3135,9 @@ msgstr "Zobrazovat skutečné ikony aplikací"
 msgid ""
 "Downloads each app's icon from Apple's App Store once. Only the app's "
 "identifier is sent."
-msgstr "Ikonu každé aplikace jednou stáhne z App Storu společnosti Apple. Odesílá se jen identifikátor aplikace."
+msgstr ""
+"Ikonu každé aplikace jednou stáhne z App Storu společnosti Apple. Odesílá se "
+"jen identifikátor aplikace."
 
 #: src/gtk/settings_view.cpp src/tui/settings.cpp
 msgid "Desktop popups"
@@ -3068,6 +3190,21 @@ msgstr "Sdílet schránku automaticky"
 #: src/gtk/settings_view.cpp src/tui/settings.cpp
 msgid "Off sends it only from Send Clipboard or tether share."
 msgstr "Vypnuto ji odesílá jen přes Odeslat schránku nebo tether share."
+
+#: src/gtk/settings_view.cpp
+msgid "Where this computer can be found and reached over Wi-Fi or Ethernet."
+msgstr ""
+"Kde lze tento počítač najít a připojit se k němu přes Wi-Fi nebo Ethernet."
+
+#: src/gtk/settings_view.cpp src/tui/settings.cpp
+msgid "Only on trusted networks"
+msgstr "Jen v důvěryhodných sítích"
+
+#: src/gtk/settings_view.cpp src/tui/settings.cpp
+msgid ""
+"Elsewhere Tether is not advertised and refuses connections. Bluetooth keeps "
+"working."
+msgstr "Jinde se Tether neohlašuje a odmítá připojení. Bluetooth funguje dál."
 
 #: src/gtk/settings_view.cpp
 msgid "SMS and iMessage conversations synced over Bluetooth."
@@ -3165,6 +3302,12 @@ msgstr "Připojit {}"
 #: src/gtk/tray.cpp
 msgid "Show Tether"
 msgstr "Zobrazit Tether"
+
+#. TRANSLATORS: {} is a Wi-Fi or network connection name.
+#: src/gtk/tray.cpp src/gtk/ui_util.cpp src/tui/devices.cpp
+#, c++-format
+msgid "Show Tether on {}"
+msgstr "Zobrazit Tether v síti {}"
 
 #: src/gtk/tray.cpp src/gtk/ui_util.cpp src/tui/main.cpp
 msgid "connected"
@@ -3324,6 +3467,21 @@ msgid "tether-tui needs a terminal."
 msgstr "tether-tui potřebuje terminál."
 
 #: src/tui/settings.cpp
+#, c++-format
+msgid "Hide on {} (connected)"
+msgstr "Skrýt v síti {} (připojeno)"
+
+#: src/tui/settings.cpp
+#, c++-format
+msgid "Trust {} (connected)"
+msgstr "Důvěřovat síti {} (připojeno)"
+
+#: src/tui/settings.cpp
+#, c++-format
+msgid "Forget {}"
+msgstr "Zapomenout síť {}"
+
+#: src/tui/settings.cpp
 msgid "Muted apps"
 msgstr "Ztlumené aplikace"
 
@@ -3439,6 +3597,14 @@ msgstr "Spárujte zařízení a synchronizujte schránku po síti"
 #: src/gtk/tether-gtk.desktop.in
 msgid "iPhone;iOS;SMS;Messages;Clipboard;Files;Notifications;Calls;AirPods;"
 msgstr "iPhone;iOS;SMS;Zprávy;Schránka;Soubory;Oznámení;Hovory;AirPods;"
+
+#, fuzzy, c++-format
+#~ msgid ""
+#~ "Tether is hidden on {}, a network you have not trusted. Use Show Tether "
+#~ "on {} below, or Settings, under Networks."
+#~ msgstr ""
+#~ "Tether je skrytý v síti {}, které nedůvěřujete. Povolte ji v Nastavení v "
+#~ "části Sítě."
 
 #~ msgid "off, no Wayland session on this machine"
 #~ msgstr "vypnuto, na tomto počítači není relace Wayland"

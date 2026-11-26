@@ -125,12 +125,18 @@ namespace tether::ui {
             MENU_BLUETOOTH = 3,
             MENU_SEP_QUIT = 4,
             MENU_QUIT = 5,
+            MENU_TRUST = 6,
+            MENU_LAST = MENU_TRUST,
         };
 
         struct RouteState {
             bool ok = false;
             std::string detail;
         };
+
+        // The network Tether is hidden on while it is shown on none; empty hides the menu item.
+        std::string g_hidden_network_key;
+        std::string g_hidden_network_name;
 
         GDBusConnection* g_bus = nullptr;
         GDBusNodeInfo* g_node = nullptr;
@@ -284,15 +290,23 @@ namespace tether::ui {
                 case MENU_QUIT:
                     add_str("label", _("Quit"));
                     break;
+                case MENU_TRUST:
+                    // TRANSLATORS: {} is a Wi-Fi or network connection name.
+                    add_str("label", tether::tr_format(_("Show Tether on {}"), g_hidden_network_name));
+                    add_str("icon-name", "network-wireless-symbolic");
+                    g_variant_builder_add(
+                        &props, "{sv}", "visible", g_variant_new_boolean(!g_hidden_network_key.empty()));
+                    break;
                 default:
                     break;
             }
             return g_variant_builder_end(&props);
         }
 
-        constexpr gint32 MENU_CHILDREN[] = {MENU_SHOW, MENU_SEP_BT, MENU_BLUETOOTH, MENU_SEP_QUIT, MENU_QUIT};
+        constexpr gint32 MENU_CHILDREN[] = {
+            MENU_SHOW, MENU_TRUST, MENU_SEP_BT, MENU_BLUETOOTH, MENU_SEP_QUIT, MENU_QUIT};
 
-        bool menu_id_valid(gint32 id) { return id >= MENU_ROOT && id <= MENU_QUIT; }
+        bool menu_id_valid(gint32 id) { return id >= MENU_ROOT && id <= MENU_LAST; }
 
         GVariant* menu_layout(gint32 id, gint32 depth) {
             GVariantBuilder children;
@@ -321,6 +335,10 @@ namespace tether::ui {
             switch (id) {
                 case MENU_SHOW:
                     present_window();
+                    break;
+                case MENU_TRUST:
+                    if (!g_hidden_network_key.empty())
+                        daemon_send({{"command", "trust_network"}, {"key", g_hidden_network_key}});
                     break;
                 case MENU_BLUETOOTH: {
                     const bool enable = !g_bt_enabled;
@@ -392,7 +410,7 @@ namespace tether::ui {
                 g_variant_iter_free(ids);
                 // An empty request means every item.
                 if (!any) {
-                    for (gint32 all = MENU_ROOT; all <= MENU_QUIT; ++all)
+                    for (gint32 all = MENU_ROOT; all <= MENU_LAST; ++all)
                         g_variant_builder_add(&out, "(i@a{sv})", all, menu_item_props(all));
                 }
                 g_dbus_method_invocation_return_value(invocation, g_variant_new("(a(ia{sv}))", &out));
@@ -612,6 +630,14 @@ namespace tether::ui {
         g_bt_available = available;
         g_bt_bonded = bonded;
         g_bt_enabled = enabled;
+        menu_layout_changed();
+    }
+
+    void tray_set_hidden_network(const std::string& key, const std::string& name) {
+        if (key == g_hidden_network_key && name == g_hidden_network_name)
+            return;
+        g_hidden_network_key = key;
+        g_hidden_network_name = name;
         menu_layout_changed();
     }
 

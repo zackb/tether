@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: tether\n"
 "Report-Msgid-Bugs-To: zack@bartel.com\n"
-"POT-Creation-Date: 2026-11-25 21:13+0100\n"
+"POT-Creation-Date: 2026-11-26 11:12-0800\n"
 "PO-Revision-Date: 2026-08-23\n"
 "Last-Translator: Tether project\n"
 "Language-Team: Ukrainian\n"
@@ -81,6 +81,23 @@ msgstr "Тривалість пошуку в мілісекундах (типо�
 #: src/cli/main.cpp
 msgid "List all paired connection devices."
 msgstr "Показати всі спарені пристрої."
+
+#: src/cli/main.cpp
+msgid "List the networks this computer is on and whether Tether shows on them."
+msgstr ""
+"Показати мережі, до яких під'єднано комп'ютер, і чи видно в них Tether."
+
+#: src/cli/main.cpp
+msgid "Show Tether on a network. Without a key, the one hidden network."
+msgstr "Показувати Tether у мережі. Без ключа — у єдиній прихованій мережі."
+
+#: src/cli/main.cpp
+msgid "Hide Tether on a network again."
+msgstr "Знову приховати Tether у мережі."
+
+#: src/cli/main.cpp
+msgid "Show Tether on trusted networks only, or on every network."
+msgstr "Показувати Tether лише в довірених мережах або в усіх."
 
 #: src/cli/main.cpp
 msgid "Show the one-time system setup Bluetooth still needs."
@@ -207,7 +224,9 @@ msgstr "Дублювати заголовки та текст сповіщень
 msgid ""
 "Download each notifying app's real icon from Apple's App Store. Only the "
 "app's identifier is sent."
-msgstr "Завантажує справжній значок кожного застосунку, що надсилає сповіщення, з App Store Apple. Надсилається лише ідентифікатор застосунку."
+msgstr ""
+"Завантажує справжній значок кожного застосунку, що надсилає сповіщення, з "
+"App Store Apple. Надсилається лише ідентифікатор застосунку."
 
 #: src/cli/main.cpp
 msgid ""
@@ -458,6 +477,46 @@ msgstr ""
 "Потім запустіть 'tether --bt-setup' ще раз для підтвердження.\n"
 
 #: src/cli/main.cpp
+msgid "Could not read status from the daemon.\n"
+msgstr "Не вдалося отримати стан від демона.\n"
+
+#: src/cli/main.cpp
+msgid "Tether shows on every network."
+msgstr "Tether видно в усіх мережах."
+
+#: src/cli/main.cpp
+msgid "Tether shows on trusted networks only."
+msgstr "Tether видно лише в довірених мережах."
+
+#: src/cli/main.cpp
+msgid "shown "
+msgstr "видима"
+
+#: src/cli/main.cpp
+msgid "hidden"
+msgstr "прихована"
+
+#: src/cli/main.cpp
+msgid "Expected trusted or all, e.g. --lan-scope trusted\n"
+msgstr "Очікувалося trusted або all, наприклад --lan-scope trusted\n"
+
+#: src/cli/main.cpp
+msgid "No network to change.\n"
+msgstr "Немає мережі для зміни.\n"
+
+#: src/cli/main.cpp
+msgid "More than one network; pass a key from --networks.\n"
+msgstr "Мереж кілька; укажіть ключ із --networks.\n"
+
+#: src/cli/main.cpp
+msgid "Could not reach the daemon.\n"
+msgstr "Не вдалося зв'язатися з демоном.\n"
+
+#: src/cli/main.cpp
+msgid "Done."
+msgstr "Готово."
+
+#: src/cli/main.cpp
 msgid "Mode"
 msgstr "Режим"
 
@@ -614,10 +673,6 @@ msgstr ""
 "Цей комп'ютер не представляється обладнанням Apple, тому під час дзвінка "
 "AirPods передаються через відключення. Див. DeviceID у /etc/bluetooth/"
 "main.conf."
-
-#: src/cli/main.cpp
-msgid "Could not reach the daemon.\n"
-msgstr "Не вдалося зв'язатися з демоном.\n"
 
 #: src/cli/main.cpp
 #, c-format
@@ -921,6 +976,24 @@ msgid "More than one device is named {}; pass its fingerprint instead.\n"
 msgstr "Назву {} мають кілька пристроїв; вкажіть натомість його відбиток.\n"
 
 #: src/cli/main.cpp
+msgid "shown on every network"
+msgstr "видно в усіх мережах"
+
+#: src/cli/main.cpp
+#, c++-format
+msgid "shown on {}"
+msgstr "видно в мережі {}"
+
+#: src/cli/main.cpp
+#, c++-format
+msgid "hidden on {} (tether --trust-network)"
+msgstr "приховано в мережі {} (tether --trust-network)"
+
+#: src/cli/main.cpp
+msgid "no network"
+msgstr "немає мережі"
+
+#: src/cli/main.cpp
 msgid "Version"
 msgstr "Версія"
 
@@ -955,6 +1028,10 @@ msgstr "оголошує"
 #: src/cli/main.cpp
 msgid "unavailable"
 msgstr "недоступно"
+
+#: src/cli/main.cpp src/gtk/settings_view.cpp src/tui/settings.cpp
+msgid "Networks"
+msgstr "Мережі"
 
 #: src/cli/main.cpp
 msgid "Firewall"
@@ -2038,6 +2115,27 @@ msgstr ""
 
 #: src/daemon/notification.cpp
 #, c++-format
+msgid ""
+"A paired device is on {}. Tether stays hidden on networks you have not "
+"trusted."
+msgstr ""
+"Спарений пристрій перебуває в мережі {}. У недовірених мережах Tether "
+"залишається прихованим."
+
+#: src/daemon/notification.cpp
+msgid "Show Tether on this network?"
+msgstr "Показувати Tether у цій мережі?"
+
+#: src/daemon/notification.cpp src/gtk/settings_view.cpp
+msgid "Trust"
+msgstr "Довіряти"
+
+#: src/daemon/notification.cpp
+msgid "Not now"
+msgstr "Не зараз"
+
+#: src/daemon/notification.cpp
+#, c++-format
 msgid "{} file arrived"
 msgid_plural "{} files arrived"
 msgstr[0] "Отримано {} файл"
@@ -2421,6 +2519,11 @@ msgstr ""
 "обміну, тож синхронізація буфера обміну вимкнена."
 
 #: src/gtk/devices_view.cpp src/tui/devices.cpp
+#, c++-format
+msgid "Tether is hidden on {}, a network you have not trusted."
+msgstr "Tether приховано в мережі {}, якій ви не довіряєте."
+
+#: src/gtk/devices_view.cpp src/tui/devices.cpp
 msgid ""
 "avahi-daemon isn't running, so other devices can't find this PC. Start it "
 "with: sudo systemctl enable --now avahi-daemon"
@@ -2764,7 +2867,7 @@ msgstr "Надіслати буфер обміну"
 msgid "Clipboard sync requested..."
 msgstr "Запитано синхронізацію буфера обміну..."
 
-#: src/gtk/devices_view.cpp src/tui/devices.cpp
+#: src/gtk/devices_view.cpp src/gtk/settings_view.cpp src/tui/devices.cpp
 msgid "Forget"
 msgstr "Забути"
 
@@ -2963,6 +3066,22 @@ msgid "Notification mirroring is unavailable."
 msgstr "Дублювання сповіщень недоступне."
 
 #: src/gtk/settings_view.cpp
+msgid "Connected · Tether is shown"
+msgstr "Під'єднано · Tether видно"
+
+#: src/gtk/settings_view.cpp
+msgid "Connected · Tether is hidden"
+msgstr "Під'єднано · Tether приховано"
+
+#: src/gtk/settings_view.cpp
+msgid "Hide"
+msgstr "Приховати"
+
+#: src/gtk/settings_view.cpp
+msgid "Trusted"
+msgstr "Довірена"
+
+#: src/gtk/settings_view.cpp
 msgid "Unmute"
 msgstr "Увімкнути"
 
@@ -3041,7 +3160,9 @@ msgstr "Показувати справжні значки застосункі�
 msgid ""
 "Downloads each app's icon from Apple's App Store once. Only the app's "
 "identifier is sent."
-msgstr "Один раз завантажує значок кожного застосунку з App Store Apple. Надсилається лише ідентифікатор застосунку."
+msgstr ""
+"Один раз завантажує значок кожного застосунку з App Store Apple. "
+"Надсилається лише ідентифікатор застосунку."
 
 #: src/gtk/settings_view.cpp src/tui/settings.cpp
 msgid "Desktop popups"
@@ -3098,6 +3219,24 @@ msgid "Off sends it only from Send Clipboard or tether share."
 msgstr ""
 "Якщо вимкнено, буфер надсилається лише кнопкою «Надіслати буфер обміну» або "
 "командою tether share."
+
+#: src/gtk/settings_view.cpp
+msgid "Where this computer can be found and reached over Wi-Fi or Ethernet."
+msgstr ""
+"Де цей комп'ютер можна знайти й під'єднатися до нього через Wi-Fi або "
+"Ethernet."
+
+#: src/gtk/settings_view.cpp src/tui/settings.cpp
+msgid "Only on trusted networks"
+msgstr "Лише в довірених мережах"
+
+#: src/gtk/settings_view.cpp src/tui/settings.cpp
+msgid ""
+"Elsewhere Tether is not advertised and refuses connections. Bluetooth keeps "
+"working."
+msgstr ""
+"В інших мережах Tether не оголошується й відхиляє під'єднання. Bluetooth "
+"працює далі."
 
 #: src/gtk/settings_view.cpp
 msgid "SMS and iMessage conversations synced over Bluetooth."
@@ -3198,6 +3337,12 @@ msgstr "Під'єднати {}"
 #: src/gtk/tray.cpp
 msgid "Show Tether"
 msgstr "Показати Tether"
+
+#. TRANSLATORS: {} is a Wi-Fi or network connection name.
+#: src/gtk/tray.cpp src/gtk/ui_util.cpp src/tui/devices.cpp
+#, c++-format
+msgid "Show Tether on {}"
+msgstr "Показувати Tether у мережі {}"
 
 #: src/gtk/tray.cpp src/gtk/ui_util.cpp src/tui/main.cpp
 msgid "connected"
@@ -3358,6 +3503,21 @@ msgid "tether-tui needs a terminal."
 msgstr "Для tether-tui потрібен термінал."
 
 #: src/tui/settings.cpp
+#, c++-format
+msgid "Hide on {} (connected)"
+msgstr "Приховати в мережі {} (під'єднано)"
+
+#: src/tui/settings.cpp
+#, c++-format
+msgid "Trust {} (connected)"
+msgstr "Довіряти мережі {} (під'єднано)"
+
+#: src/tui/settings.cpp
+#, c++-format
+msgid "Forget {}"
+msgstr "Забути мережу {}"
+
+#: src/tui/settings.cpp
 msgid "Muted apps"
 msgstr "Приглушені застосунки"
 
@@ -3474,6 +3634,14 @@ msgstr "Створюйте пари пристроїв і синхронізуй
 msgid "iPhone;iOS;SMS;Messages;Clipboard;Files;Notifications;Calls;AirPods;"
 msgstr ""
 "iPhone;iOS;SMS;Повідомлення;Буфер обміну;Файли;Сповіщення;Дзвінки;AirPods;"
+
+#, fuzzy, c++-format
+#~ msgid ""
+#~ "Tether is hidden on {}, a network you have not trusted. Use Show Tether "
+#~ "on {} below, or Settings, under Networks."
+#~ msgstr ""
+#~ "Tether приховано в мережі {}, якій ви не довіряєте. Дозвольте її в "
+#~ "налаштуваннях, у розділі «Мережі»."
 
 #~ msgid "off, no Wayland session on this machine"
 #~ msgstr "вимкнено, на цій машині немає сеансу Wayland"

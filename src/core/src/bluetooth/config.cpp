@@ -64,6 +64,12 @@ namespace tether::bluetooth {
         return PhoneAudio::Auto;
     }
 
+    const char* to_string(LanScope scope) { return scope == LanScope::All ? "all" : "trusted"; }
+
+    LanScope lan_scope_from_string(const std::string& value) {
+        return value == "all" ? LanScope::All : LanScope::Trusted;
+    }
+
     std::string config_path() {
         const std::filesystem::path dir = paths::config_dir();
         if (dir.empty())
@@ -99,6 +105,9 @@ namespace tether::bluetooth {
         j["yield_idle_seconds"] = config.yield_idle_seconds;
         j["contacts_by_last_name"] = config.contacts_by_last_name;
         j["phone_audio"] = to_string(config.phone_audio);
+        j["lan_scope"] = to_string(config.lan_scope);
+        j["trusted_networks"] = config.trusted_networks;
+        j["declined_networks"] = config.declined_networks;
         return j.dump(2);
     }
 
@@ -137,6 +146,9 @@ namespace tether::bluetooth {
             config.lock_command = j.value("lock_command", "");
             config.contacts_by_last_name = j.value("contacts_by_last_name", false);
             config.phone_audio = phone_audio_from_string(j.value("phone_audio", ""));
+            config.lan_scope = lan_scope_from_string(j.value("lan_scope", ""));
+            config.trusted_networks = j.value("trusted_networks", std::map<std::string, std::string>{});
+            config.declined_networks = j.value("declined_networks", std::set<std::string>{});
         } catch (const std::exception&) {
             // A corrupt file must not stop the daemon; defaults are safe.
         }

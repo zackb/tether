@@ -12,6 +12,7 @@ namespace tether {
     struct DiscoveredAddress {
         std::string address; //< IPv4 or IPv6 address
         uint16_t port = 0;   //< TCP port
+        int ifindex = 0;     //< Interface it was seen on; 0 when unknown
     };
 
     // Raw per-interface mDNS result (one entry per resolved address).
@@ -20,6 +21,7 @@ namespace tether {
         std::string address;     //< Resolved IPv4/IPv6 address
         uint16_t port = 0;       //< TCP port the daemon is listening on
         std::string fingerprint; //< TLS certificate SHA-256 fingerprint from TXT record
+        int ifindex = 0;         //< Interface the record arrived on
     };
 
     // A logical device, grouping all network interfaces that share the same
@@ -62,6 +64,9 @@ namespace tether {
         //         asynchronous and waits for avahi-daemon, which need not be
         //         running yet; watch set_state_callback() for the outcome.
         bool publish(const std::string& name, uint16_t port, const std::string& fingerprint);
+
+        // Re-register on the interfaces lan_ifindex_trusted() allows. Any thread.
+        void republish();
 
         // Stop advertising this instance.  Called automatically by the destructor.
         void unpublish();

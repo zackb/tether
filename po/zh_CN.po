@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: tether\n"
 "Report-Msgid-Bugs-To: zack@bartel.com\n"
-"POT-Creation-Date: 2026-11-25 21:13+0100\n"
+"POT-Creation-Date: 2026-11-26 11:12-0800\n"
 "PO-Revision-Date: 2026-08-23\n"
 "Last-Translator: Tether project\n"
 "Language-Team: Simplified Chinese\n"
@@ -77,6 +77,22 @@ msgstr "搜索时长，单位毫秒（默认 3000）。"
 #: src/cli/main.cpp
 msgid "List all paired connection devices."
 msgstr "列出所有已配对的设备。"
+
+#: src/cli/main.cpp
+msgid "List the networks this computer is on and whether Tether shows on them."
+msgstr "列出此计算机所在的网络以及 Tether 是否在其中可见。"
+
+#: src/cli/main.cpp
+msgid "Show Tether on a network. Without a key, the one hidden network."
+msgstr "在某个网络上显示 Tether。不提供密钥时，作用于唯一隐藏的网络。"
+
+#: src/cli/main.cpp
+msgid "Hide Tether on a network again."
+msgstr "在某个网络上重新隐藏 Tether。"
+
+#: src/cli/main.cpp
+msgid "Show Tether on trusted networks only, or on every network."
+msgstr "仅在受信任的网络上显示 Tether，或在所有网络上显示。"
 
 #: src/cli/main.cpp
 msgid "Show the one-time system setup Bluetooth still needs."
@@ -194,7 +210,9 @@ msgstr "镜像通知的标题和正文，而不只是所属 App。"
 msgid ""
 "Download each notifying app's real icon from Apple's App Store. Only the "
 "app's identifier is sent."
-msgstr "从 Apple 的 App Store 下载每个发送通知的应用的真实图标。只会发送应用的标识符。"
+msgstr ""
+"从 Apple 的 App Store 下载每个发送通知的应用的真实图标。只会发送应用的标识"
+"符。"
 
 #: src/cli/main.cpp
 msgid ""
@@ -428,6 +446,46 @@ msgstr ""
 "之后请重新运行 'tether --bt-setup' 以确认。\n"
 
 #: src/cli/main.cpp
+msgid "Could not read status from the daemon.\n"
+msgstr "无法从守护进程读取状态。\n"
+
+#: src/cli/main.cpp
+msgid "Tether shows on every network."
+msgstr "Tether 在所有网络上可见。"
+
+#: src/cli/main.cpp
+msgid "Tether shows on trusted networks only."
+msgstr "Tether 仅在受信任的网络上可见。"
+
+#: src/cli/main.cpp
+msgid "shown "
+msgstr "可见"
+
+#: src/cli/main.cpp
+msgid "hidden"
+msgstr "隐藏"
+
+#: src/cli/main.cpp
+msgid "Expected trusted or all, e.g. --lan-scope trusted\n"
+msgstr "应为 trusted 或 all，例如 --lan-scope trusted\n"
+
+#: src/cli/main.cpp
+msgid "No network to change.\n"
+msgstr "没有可更改的网络。\n"
+
+#: src/cli/main.cpp
+msgid "More than one network; pass a key from --networks.\n"
+msgstr "有多个网络；请指定 --networks 中的密钥。\n"
+
+#: src/cli/main.cpp
+msgid "Could not reach the daemon.\n"
+msgstr "无法连接到守护进程。\n"
+
+#: src/cli/main.cpp
+msgid "Done."
+msgstr "完成。"
+
+#: src/cli/main.cpp
 msgid "Mode"
 msgstr "模式"
 
@@ -577,10 +635,6 @@ msgid ""
 msgstr ""
 "本机没有以 Apple 硬件的身份出现，因此通话时通过断开连接来移交 AirPods。参见 /"
 "etc/bluetooth/main.conf 中的 DeviceID。"
-
-#: src/cli/main.cpp
-msgid "Could not reach the daemon.\n"
-msgstr "无法连接到守护进程。\n"
 
 #: src/cli/main.cpp
 #, c-format
@@ -872,6 +926,24 @@ msgid "More than one device is named {}; pass its fingerprint instead.\n"
 msgstr "有多台设备名为 {}；请改为指定其指纹。\n"
 
 #: src/cli/main.cpp
+msgid "shown on every network"
+msgstr "在所有网络上可见"
+
+#: src/cli/main.cpp
+#, c++-format
+msgid "shown on {}"
+msgstr "在 {} 上可见"
+
+#: src/cli/main.cpp
+#, c++-format
+msgid "hidden on {} (tether --trust-network)"
+msgstr "在 {} 上隐藏 (tether --trust-network)"
+
+#: src/cli/main.cpp
+msgid "no network"
+msgstr "无网络"
+
+#: src/cli/main.cpp
 msgid "Version"
 msgstr "版本"
 
@@ -906,6 +978,10 @@ msgstr "正在广播"
 #: src/cli/main.cpp
 msgid "unavailable"
 msgstr "不可用"
+
+#: src/cli/main.cpp src/gtk/settings_view.cpp src/tui/settings.cpp
+msgid "Networks"
+msgstr "网络"
 
 #: src/cli/main.cpp
 msgid "Firewall"
@@ -1936,6 +2012,25 @@ msgstr ""
 
 #: src/daemon/notification.cpp
 #, c++-format
+msgid ""
+"A paired device is on {}. Tether stays hidden on networks you have not "
+"trusted."
+msgstr "已配对的设备位于 {}。在你未信任的网络上，Tether 会保持隐藏。"
+
+#: src/daemon/notification.cpp
+msgid "Show Tether on this network?"
+msgstr "要在此网络上显示 Tether 吗？"
+
+#: src/daemon/notification.cpp src/gtk/settings_view.cpp
+msgid "Trust"
+msgstr "信任"
+
+#: src/daemon/notification.cpp
+msgid "Not now"
+msgstr "暂不"
+
+#: src/daemon/notification.cpp
+#, c++-format
 msgid "{} file arrived"
 msgid_plural "{} files arrived"
 msgstr[0] "已收到 {} 个文件"
@@ -2311,6 +2406,11 @@ msgstr ""
 "闭。"
 
 #: src/gtk/devices_view.cpp src/tui/devices.cpp
+#, c++-format
+msgid "Tether is hidden on {}, a network you have not trusted."
+msgstr "Tether 在你未信任的网络 {} 上处于隐藏状态。"
+
+#: src/gtk/devices_view.cpp src/tui/devices.cpp
 msgid ""
 "avahi-daemon isn't running, so other devices can't find this PC. Start it "
 "with: sudo systemctl enable --now avahi-daemon"
@@ -2637,7 +2737,7 @@ msgstr "发送剪贴板"
 msgid "Clipboard sync requested..."
 msgstr "已请求剪贴板同步……"
 
-#: src/gtk/devices_view.cpp src/tui/devices.cpp
+#: src/gtk/devices_view.cpp src/gtk/settings_view.cpp src/tui/devices.cpp
 msgid "Forget"
 msgstr "忘记"
 
@@ -2830,6 +2930,22 @@ msgid "Notification mirroring is unavailable."
 msgstr "通知镜像不可用。"
 
 #: src/gtk/settings_view.cpp
+msgid "Connected · Tether is shown"
+msgstr "已连接 · Tether 可见"
+
+#: src/gtk/settings_view.cpp
+msgid "Connected · Tether is hidden"
+msgstr "已连接 · Tether 已隐藏"
+
+#: src/gtk/settings_view.cpp
+msgid "Hide"
+msgstr "隐藏"
+
+#: src/gtk/settings_view.cpp
+msgid "Trusted"
+msgstr "已信任"
+
+#: src/gtk/settings_view.cpp
 msgid "Unmute"
 msgstr "取消静音"
 
@@ -2958,6 +3074,20 @@ msgid "Off sends it only from Send Clipboard or tether share."
 msgstr "关闭后仅通过“发送剪贴板”或 tether share 发送。"
 
 #: src/gtk/settings_view.cpp
+msgid "Where this computer can be found and reached over Wi-Fi or Ethernet."
+msgstr "可以通过 Wi-Fi 或以太网找到并连接此计算机的位置。"
+
+#: src/gtk/settings_view.cpp src/tui/settings.cpp
+msgid "Only on trusted networks"
+msgstr "仅限受信任的网络"
+
+#: src/gtk/settings_view.cpp src/tui/settings.cpp
+msgid ""
+"Elsewhere Tether is not advertised and refuses connections. Bluetooth keeps "
+"working."
+msgstr "在其他网络上，Tether 不会被公布，并会拒绝连接。蓝牙仍可正常使用。"
+
+#: src/gtk/settings_view.cpp
 msgid "SMS and iMessage conversations synced over Bluetooth."
 msgstr "通过蓝牙同步的短信和 iMessage 会话。"
 
@@ -3048,6 +3178,12 @@ msgstr "连接 {}"
 #: src/gtk/tray.cpp
 msgid "Show Tether"
 msgstr "显示 Tether"
+
+#. TRANSLATORS: {} is a Wi-Fi or network connection name.
+#: src/gtk/tray.cpp src/gtk/ui_util.cpp src/tui/devices.cpp
+#, c++-format
+msgid "Show Tether on {}"
+msgstr "在 {} 上显示 Tether"
 
 #: src/gtk/tray.cpp src/gtk/ui_util.cpp src/tui/main.cpp
 msgid "connected"
@@ -3207,6 +3343,21 @@ msgid "tether-tui needs a terminal."
 msgstr "tether-tui 需要在终端中运行。"
 
 #: src/tui/settings.cpp
+#, c++-format
+msgid "Hide on {} (connected)"
+msgstr "在 {} 上隐藏（已连接）"
+
+#: src/tui/settings.cpp
+#, c++-format
+msgid "Trust {} (connected)"
+msgstr "信任 {}（已连接）"
+
+#: src/tui/settings.cpp
+#, c++-format
+msgid "Forget {}"
+msgstr "忘记 {}"
+
+#: src/tui/settings.cpp
 msgid "Muted apps"
 msgstr "已静音的应用"
 
@@ -3322,6 +3473,13 @@ msgstr "配对设备并通过网络同步剪贴板"
 #: src/gtk/tether-gtk.desktop.in
 msgid "iPhone;iOS;SMS;Messages;Clipboard;Files;Notifications;Calls;AirPods;"
 msgstr "iPhone;iOS;SMS;信息;剪贴板;文件;通知;通话;AirPods;"
+
+#, fuzzy, c++-format
+#~ msgid ""
+#~ "Tether is hidden on {}, a network you have not trusted. Use Show Tether "
+#~ "on {} below, or Settings, under Networks."
+#~ msgstr ""
+#~ "Tether 在你未信任的网络 {} 上处于隐藏状态。请在“设置”的“网络”中信任它。"
 
 #~ msgid "off, no Wayland session on this machine"
 #~ msgstr "已关闭，此机器上没有 Wayland 会话"

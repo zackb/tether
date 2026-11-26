@@ -13,6 +13,33 @@ The daemon advertises its presence on the local network using mDNS (Bonjour)
 and listens for incoming connections on TCP port 5134 by default. It also
 provides a UNIX domain socket at \fB$XDG_RUNTIME_DIR/tether/tetherd.sock\fR
 for local communication with the \fBtether\fR(1) CLI and \fBtether-gtk\fR(1) GUI.
+.SH TRUSTED NETWORKS
+By default the daemon shows itself only on networks you have trusted. On any
+other network it publishes no mDNS record and closes every connection before
+TLS, so a coffee shop or office network sees neither its name nor its
+fingerprint. Bluetooth is not affected, and loopback is always allowed.
+
+A network is a NetworkManager connection, identified by its UUID. Without
+NetworkManager, Wi\-Fi joined by \fBiwd\fR(8) is identified by its SSID and
+security type, so an open network with your home network's name is a different
+network. Anything else is identified by its interface name, so a Wi\-Fi card
+run by another tool counts as one network whatever it joins.
+
+When a paired device turns up on a network you have not trusted, the daemon
+asks once with a desktop notification. Choose \fBNot now\fR and it does not
+ask again for that network. You can also trust networks with
+\fBtether \-\-trust\-network\fR or under Networks in the settings, or go back
+to every network with \fBtether \-\-lan\-scope all\fR.
+
+\fBTETHER_LAN_SCOPE\fR=\fBall\fR or \fBtrusted\fR in the daemon's environment
+overrides the saved scope, for a container or a headless machine that never
+moves. Without a desktop, the prompt is a warning in the log naming the
+network and the command to trust it, and \fBtether status\fR shows where
+Tether is hidden.
+
+This covers only Tether's own record. \fBavahi-daemon\fR(8) still announces
+the host name on every interface unless \fBallow-interfaces\fR is set in
+\fBavahi-daemon.conf\fR(5).
 .SH FIREWALL
 Inbound \fB5134/tcp\fR must be reachable for the iPhone to connect, and
 \fB5353/udp\fR for mDNS discovery, which \fBavahi-daemon\fR(8) owns. A
@@ -37,6 +64,9 @@ The UNIX domain socket used for local communication.
 .TP
 \fB$XDG_RUNTIME_DIR/tether/tetherd.lock\fR
 Advisory lock file to ensure only one instance of the daemon is running.
+.TP
+\fB~/.config/tether/bluetooth.json\fR
+Settings, including \fBlan_scope\fR and \fBtrusted_networks\fR.
 .TP
 \fB~/.config/tether/\fR
 Directory containing the TLS certificate (\fBcert.pem\fR), private key (\fBkey.pem\fR),

@@ -16,6 +16,7 @@
 #include <map>
 #include <mutex>
 #include <tether/log.hpp>
+#include <tether/net_trust.hpp>
 #include <thread>
 
 namespace tether {
@@ -37,6 +38,7 @@ namespace tether {
         std::string pub_name;
         uint16_t pub_port = 0;
         std::string pub_fingerprint;
+        std::vector<AvahiIfIndex> pub_interfaces;
 
         // Discovery state (per-call, not persistent)
         std::mutex results_mutex;
@@ -110,6 +112,17 @@ namespace tether {
         }
     }
 
+    // Every interface when all are trusted, else each trusted one once.
+    static std::vector<AvahiIfIndex> publish_interfaces() {
+        if (lan_trust_all())
+            return {AVAHI_IF_UNSPEC};
+        std::vector<AvahiIfIndex> out;
+        for (const auto& net : lan_networks())
+            if (net.trusted && std::find(out.begin(), out.end(), net.ifindex) == out.end())
+                out.push_back(net.ifindex);
+        return out;
+    }
+
     static void create_services(DiscoveryImpl* impl) {
         if (!impl->pub_client)
             return;
@@ -124,14 +137,27 @@ namespace tether {
             }
         }
 
-        if (avahi_entry_group_is_empty(impl->pub_group)) {
-            std::string txt_fp = "fp=" + impl->pub_fingerprint;
-            std::string txt_ver = "v=1";
+        if (!avahi_entry_group_is_empty(impl->pub_group))
+            return;
 
-            int ret = 0;
-            for (int attempt = 0; attempt < 16; ++attempt) {
+        // one record per trusted interface
+        const std::vector<AvahiIfIndex> interfaces = publish_interfaces();
+        impl->pub_interfaces = interfaces;
+        if (interfaces.empty()) {
+            debug::log(INFO, "mDNS: No trusted network; not advertising");
+            return;
+        }
+
+        std::string txt_fp = "fp=" + impl->pub_fingerprint;
+        std::string txt_ver = "v=1";
+
+        int ret = 0;
+        int added = 0;
+        for (int attempt = 0; attempt < 16; ++attempt) {
+            added = 0;
+            for (AvahiIfIndex ifindex : interfaces) {
                 ret = avahi_entry_group_add_service(impl->pub_group,
-                                                    AVAHI_IF_UNSPEC,
+                                                    ifindex,
                                                     AVAHI_PROTO_UNSPEC,
                                                     (AvahiPublishFlags)0,
                                                     impl->pub_name.c_str(),
@@ -143,23 +169,28 @@ namespace tether {
                                                     txt_ver.c_str(),
                                                     nullptr // sentinel
                 );
-
-                if (ret != AVAHI_ERR_COLLISION)
+                if (ret == AVAHI_ERR_COLLISION)
                     break;
-
-                rename_on_collision(impl);
-                avahi_entry_group_reset(impl->pub_group);
+                // an interface that vanished since refresh does not keep the others dark
+                if (ret < 0)
+                    debug::log(ERR, "mDNS: Failed to add service on {}: {}", ifindex, avahi_strerror(ret));
+                else
+                    ++added;
             }
 
-            if (ret < 0) {
-                debug::log(ERR, "mDNS: Failed to add service: {}", avahi_strerror(ret));
-                return;
-            }
+            if (ret != AVAHI_ERR_COLLISION)
+                break;
 
-            ret = avahi_entry_group_commit(impl->pub_group);
-            if (ret < 0) {
-                debug::log(ERR, "mDNS: Failed to commit entry group: {}", avahi_strerror(ret));
-            }
+            rename_on_collision(impl);
+            avahi_entry_group_reset(impl->pub_group);
+        }
+
+        if (added == 0)
+            return;
+
+        ret = avahi_entry_group_commit(impl->pub_group);
+        if (ret < 0) {
+            debug::log(ERR, "mDNS: Failed to commit entry group: {}", avahi_strerror(ret));
         }
     }
 
@@ -228,7 +259,7 @@ namespace tether {
     };
 
     static void resolve_callback(AvahiServiceResolver* r,
-                                 AvahiIfIndex /*interface*/,
+                                 AvahiIfIndex interface,
                                  AvahiProtocol /*protocol*/,
                                  AvahiResolverEvent event,
                                  const char* name,
@@ -251,6 +282,7 @@ namespace tether {
             host.name = name ? name : "";
             host.address = addr_str;
             host.port = port;
+            host.ifindex = interface;
 
             // Extract fingerprint from TXT records
             for (AvahiStringList* item = txt; item; item = avahi_string_list_get_next(item)) {
@@ -501,6 +533,21 @@ namespace tether {
         return true;
     }
 
+    void Discovery::republish() {
+        if (!impl_->pub_poll)
+            return;
+        avahi_threaded_poll_lock(impl_->pub_poll);
+        if (publish_interfaces() == impl_->pub_interfaces) {
+            avahi_threaded_poll_unlock(impl_->pub_poll);
+            return;
+        }
+        if (impl_->pub_group)
+            avahi_entry_group_reset(impl_->pub_group);
+        if (impl_->pub_client && avahi_client_get_state(impl_->pub_client) == AVAHI_CLIENT_S_RUNNING)
+            create_services(impl_.get());
+        avahi_threaded_poll_unlock(impl_->pub_poll);
+    }
+
     void Discovery::unpublish() {
         if (impl_->pub_poll) {
             avahi_threaded_poll_stop(impl_->pub_poll);
@@ -660,10 +707,10 @@ namespace tether {
                 DiscoveredDevice dev;
                 dev.name = h.name;
                 dev.fingerprint = h.fingerprint;
-                dev.addresses.push_back({h.address, h.port});
+                dev.addresses.push_back({h.address, h.port, h.ifindex});
                 devices.push_back(std::move(dev));
             } else {
-                devices[it->second].addresses.push_back({h.address, h.port});
+                devices[it->second].addresses.push_back({h.address, h.port, h.ifindex});
             }
         }
 

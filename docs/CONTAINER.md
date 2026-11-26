@@ -114,6 +114,16 @@ socket is **not** exposed on the network.
 
 ### Wi-Fi
 
+The container shows Tether on every network the host is on, and the host
+firewall decides who reaches it. For a host that moves between networks, set
+`TETHER_LAN_SCOPE=trusted` in `.env`, then trust each network once (trust is
+kept in `/data`):
+
+```sh
+docker compose exec tether tether --networks
+docker compose exec tether tether --trust-network <key>
+```
+
 Open the Tether iPhone app on the same discoverable network, select this host,
 and compare the fingerprint before approving:
 

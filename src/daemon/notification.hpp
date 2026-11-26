@@ -55,6 +55,12 @@ namespace tether {
         // on the notifier's own thread.
         void set_mute_handler(std::function<void(const std::string& app_id, const std::string& app_name)> handler);
 
+        // Where the Trust / Not now actions on a network prompt go. Notifier's own thread.
+        void set_network_trust_handler(std::function<void(const std::string& key, bool trust)> handler);
+
+        // Asks whether to show Tether on this network. Shown even with popups off: it is a setting.
+        void notify_network_trust(const std::string& key, const std::string& name);
+
         void notify_file_arrived(const std::filesystem::path& path);
 
         void notify(const NotificationSpec& spec);

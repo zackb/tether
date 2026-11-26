@@ -5,13 +5,17 @@
 #include <algorithm>
 #include <atomic>
 #include <charconv>
+#include <chrono>
 #include <csignal>
 #include <cstdio>
 #include <cstdlib>
 #include <ctime>
+#include <map>
 #include <mutex>
+#include <net/if.h>
 #include <nlohmann/json.hpp>
 #include <optional>
+#include <set>
 #include <string_view>
 #include <sys/eventfd.h>
 #include <sys/timerfd.h>
@@ -34,6 +38,7 @@
 #include <tether/log.hpp>
 #include <tether/mpris.hpp>
 #include <tether/net.hpp>
+#include <tether/net_trust.hpp>
 #include <tether/otp.hpp>
 #include <tether/secret_store.hpp>
 #include <tether/session_bus_watcher.hpp>
@@ -170,6 +175,24 @@ int main(int argc, char** argv) {
     char hostname[256] = {};
     gethostname(hostname, sizeof(hostname) - 1);
 
+    tether::lan_trust_start(loop);
+    if (!tether::lan_trust_all()) {
+        std::string hidden;
+        bool any_trusted = false;
+        for (const auto& net : tether::lan_networks()) {
+            any_trusted |= net.trusted;
+            hidden += (hidden.empty() ? "" : ", ") + net.name + " (" + net.key + ")";
+        }
+        if (!any_trusted && !hidden.empty())
+            debug::log(WARN,
+                       "Tether is hidden on every current network: {}. Show it on one with "
+                       "tether --trust-network <key>, or everywhere with tether --lan-scope all",
+                       hidden);
+    }
+
+    // Offers to trust a network
+    std::function<void(int ifindex, const char* trigger)> suggest_network;
+
     // Advertise this daemon on the local network via mDNS
     tether::Discovery discovery;
     {
@@ -178,21 +201,32 @@ int main(int argc, char** argv) {
         discovery.set_state_callback([](bool available) { tether::set_mdns_available(available); });
         discovery.publish(hostname, port, my_fp);
 
-        discovery.start_continuous_browse([&loop, &tcp_srv](const std::vector<tether::DiscoveredDevice>& devices) {
-            // Reestablish sessions with peers we already trust.
+        discovery.start_continuous_browse([&loop, &tcp_srv, &suggest_network](
+                                              const std::vector<tether::DiscoveredDevice>& devices) {
+            // reestablish sessions with peers we already trust, on trusted networks only
             const std::string my_fp = tether::Crypto::instance().get_my_fingerprint();
             for (const auto& dev : devices) {
-                if (dev.addresses.empty())
-                    continue;
-                if (!tether::should_dial_peer(
-                        my_fp, dev.fingerprint, tether::Crypto::instance().is_host_known(dev.fingerprint)))
+                if (dev.addresses.empty() || !tether::Crypto::instance().is_host_known(dev.fingerprint))
                     continue;
 
-                // on avahi's poll thread
-                const auto& addr = dev.addresses.front();
-                loop.post([&tcp_srv, host = addr.address, port = addr.port, name = dev.name, fp = dev.fingerprint]() {
-                    tcp_srv.connect_peer(host, port, name, fp);
+                const auto trusted = std::find_if(dev.addresses.begin(), dev.addresses.end(), [](const auto& a) {
+                    return tether::lan_ifindex_trusted(a.ifindex);
                 });
+                // on avahi's poll thread
+                if (trusted == dev.addresses.end()) {
+                    loop.post([&suggest_network, ifindex = dev.addresses.front().ifindex] {
+                        if (suggest_network)
+                            suggest_network(ifindex, "peer seen");
+                    });
+                    continue;
+                }
+                if (!tether::should_dial_peer(my_fp, dev.fingerprint, true))
+                    continue;
+
+                loop.post(
+                    [&tcp_srv, host = trusted->address, port = trusted->port, name = dev.name, fp = dev.fingerprint]() {
+                        tcp_srv.connect_peer(host, port, name, fp);
+                    });
             }
 
             nlohmann::json payload;
@@ -216,6 +250,13 @@ int main(int argc, char** argv) {
         });
 
         tcp_srv.set_peers_changed_callback([&discovery] { discovery.refresh(); });
+
+        tether::set_lan_trust_changed_handler([&discovery] {
+            discovery.republish();
+            // dials known peers on a network that just became trusted
+            discovery.refresh();
+            tether::broadcast_local_event(tether::build_bt_status().dump());
+        });
     }
 
     tether::WaylandContext wayland_srv(loop);
@@ -264,6 +305,40 @@ int main(int argc, char** argv) {
     notifier.set_mute_handler([&loop](const std::string& app_id, const std::string& app_name) {
         loop.post([app_id, app_name] { tether::set_app_muted(app_id, app_name, true); });
     });
+
+    notifier.set_network_trust_handler([&loop](const std::string& key, bool trust) {
+        loop.post([key, trust] {
+            tether::update_lan_trust({{"command", trust ? "trust_network" : "decline_network"}, {"key", key}});
+        });
+    });
+
+    // missed popup is offered again on a later sighting. "Not now" stops it for good.
+    constexpr auto SUGGEST_AGAIN_AFTER = std::chrono::minutes(5);
+    std::map<std::string, std::chrono::steady_clock::time_point> suggested_networks;
+    suggest_network = [&notifier, notifier_ready, &suggested_networks, SUGGEST_AGAIN_AFTER](int ifindex,
+                                                                                            const char* trigger) {
+        if (tether::lan_trust_all())
+            return;
+        const auto config = tether::bluetooth::load_config();
+        const auto now = std::chrono::steady_clock::now();
+        for (const auto& net : tether::lan_networks()) {
+            if ((ifindex != 0 && net.ifindex != ifindex) || net.trusted || config.declined_networks.contains(net.key))
+                continue;
+            const auto last = suggested_networks.find(net.key);
+            if (last != suggested_networks.end() && now - last->second < SUGGEST_AGAIN_AFTER)
+                continue;
+            suggested_networks[net.key] = now;
+            // The log is the only prompt a headless or container install gets.
+            debug::log(WARN,
+                       "Tether is hidden on {}, where a paired device is ({}). To show it there: "
+                       "tether --trust-network {} (or tether --lan-scope all)",
+                       net.name,
+                       trigger,
+                       net.key);
+            if (notifier_ready)
+                notifier.notify_network_trust(net.key, net.name);
+        }
+    };
 
     notifier.set_reply_handler([&notifier](const std::string& thread, const std::string& body) {
         tether::send_bt_message_async(thread, body, {}, [&notifier](bool sent, const std::string& error) {
@@ -719,6 +794,17 @@ int main(int argc, char** argv) {
     if (bluez.start()) {
         tether::bluetooth::g_bluez = &bluez;
         lan_info.emplace(bluez, hostname, port, tether::Crypto::instance().get_my_fingerprint());
+        // bonded phone reads this only when it found no daemon on its network
+        lan_info->set_read_handler([&loop, &suggest_network] {
+            loop.post([&suggest_network] {
+                const auto networks = tether::lan_networks();
+                const bool any_trusted =
+                    std::any_of(networks.begin(), networks.end(), [](const auto& n) { return n.trusted; });
+                const std::string uplink = tether::default_route_ifname();
+                if (suggest_network && !any_trusted && !uplink.empty())
+                    suggest_network(static_cast<int>(if_nametoindex(uplink.c_str())), "bluetooth read");
+            });
+        });
         place_lan_info();
         tether::bluetooth::g_airpods = &airpods;
         tether::g_media = &media;
@@ -825,6 +911,7 @@ int main(int argc, char** argv) {
     debug::log(INFO, "tetherd is running. Press Ctrl-C to stop.");
     loop.run();
 
+    tether::set_lan_trust_changed_handler(nullptr);
     // discovery destructor calls unpublish() automatically
     debug::log(INFO, "tetherd shutdown complete.");
 

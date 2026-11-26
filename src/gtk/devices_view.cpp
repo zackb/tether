@@ -984,13 +984,29 @@ namespace tether::ui {
             queue_files(std::move(files), g_devices.selected_device_fp, skipped);
         }
 
+        // A current network Tether is hidden on, when it is shown on none: {key, name}.
+        std::pair<std::string, std::string> hidden_network() {
+            std::pair<std::string, std::string> hidden;
+            for (const auto& net : g_devices.bt_status.value("lan_networks", nlohmann::json::array())) {
+                if (net.value("trusted", false))
+                    return {};
+                if (hidden.first.empty())
+                    hidden = {net.value("key", ""), net.value("name", "")};
+            }
+            return hidden;
+        }
+
         void update_wifi_indicator() {
             const bool connected = !g_devices.connected_fps.empty();
+            const auto [hidden_key, hidden] = hidden_network();
+            set_hidden_network(hidden_key, hidden);
             if (connected)
                 g_devices.wifi_detail = g_devices.clipboard_ok
                                             ? _("Clipboard, files, and OTP are connected.")
                                             : _("Files and OTP are connected. This compositor does not give Tether "
                                                 "clipboard access, so clipboard sync is off.");
+            else if (!hidden.empty())
+                g_devices.wifi_detail = tr_format(_("Tether is hidden on {}, a network you have not trusted."), hidden);
             else if (!g_devices.mdns_ok)
                 g_devices.wifi_detail = _("avahi-daemon isn't running, so other devices can't find this PC. Start it "
                                           "with: sudo systemctl enable --now avahi-daemon");
@@ -1548,6 +1564,7 @@ namespace tether::ui {
             tray_set_bluetooth(event.value("available", false),
                                !event.value("device_address", std::string()).empty(),
                                event.value("enabled", true));
+            update_wifi_indicator();
             devices_view_refresh();
             update_right_pane();
             return true;

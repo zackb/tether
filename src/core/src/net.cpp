@@ -31,6 +31,7 @@
 #include "tether/crypto.hpp"
 #include "tether/discovery.hpp"
 #include "tether/file_transfer.hpp"
+#include "tether/net_trust.hpp"
 #include "tether/otp.hpp"
 #include "tether/paths.hpp"
 #include "tether/service.hpp"
@@ -446,6 +447,14 @@ namespace tether {
         status["yield_when_inactive"] = config.yield_when_inactive;
         status["contacts_by_last_name"] = config.contacts_by_last_name;
         status["phone_audio"] = to_string(config.phone_audio);
+        status["lan_scope"] = lan_trust_all() ? "all" : "trusted";
+        status["lan_networks"] = nlohmann::json::array();
+        for (const auto& net : lan_networks())
+            status["lan_networks"].push_back(
+                {{"key", net.key}, {"name", net.name}, {"interface", net.ifname}, {"trusted", net.trusted}});
+        status["trusted_networks"] = nlohmann::json::array();
+        for (const auto& [key, name] : config.trusted_networks)
+            status["trusted_networks"].push_back({{"key", key}, {"name", name}});
         if (bluetooth::g_bluez && bluetooth::g_bluez->running()) {
             const auto objects = bluetooth::g_bluez->snapshot();
             status["phone_audio_route"] = bluetooth::phone_audio_route(objects, config.device_address);
@@ -492,6 +501,33 @@ namespace tether {
         else
             config.muted_apps.erase(app_id);
         bluetooth::save_config(config);
+        broadcast_local_event(build_bt_status().dump());
+    }
+
+    void update_lan_trust(const nlohmann::json& j) {
+        const std::string command = j.value("command", "");
+        const std::string key = j.value("key", "");
+        auto config = bluetooth::load_config();
+        if (command == "set_lan_scope") {
+            config.lan_scope = bluetooth::lan_scope_from_string(j.value("scope", ""));
+            if (const char* env = std::getenv("TETHER_LAN_SCOPE"); env && *env)
+                debug::log(WARN, "TETHER_LAN_SCOPE={} is set and overrides the saved network scope", env);
+        } else if (key.empty()) {
+            return;
+        } else if (command == "trust_network") {
+            std::string name = key;
+            for (const auto& net : lan_networks())
+                if (net.key == key)
+                    name = net.name;
+            config.trusted_networks[key] = name;
+            config.declined_networks.erase(key);
+        } else if (command == "untrust_network") {
+            config.trusted_networks.erase(key);
+        } else if (command == "decline_network") {
+            config.declined_networks.insert(key);
+        }
+        bluetooth::save_config(config);
+        lan_trust_refresh();
         broadcast_local_event(build_bt_status().dump());
     }
 
@@ -984,6 +1020,11 @@ namespace tether {
         }
 
         snapshot["mdns_available"] = g_mdns_available.load();
+        snapshot["lan_scope"] = lan_trust_all() ? "all" : "trusted";
+        snapshot["lan_networks"] = nlohmann::json::array();
+        for (const auto& net : lan_networks())
+            snapshot["lan_networks"].push_back(
+                {{"key", net.key}, {"name", net.name}, {"interface", net.ifname}, {"trusted", net.trusted}});
         snapshot["clipboard_available"] = g_wayland && g_wayland->clipboard_available();
         snapshot["firewall_active"] = firewall_active();
 
@@ -1606,6 +1647,10 @@ namespace tether {
                         bluetooth::save_config(config);
                         set_clipboard_auto_share(config.clipboard_auto_share);
                         broadcast_local_event(build_bt_status().dump());
+                    } else if (j.contains("command") &&
+                               (j["command"] == "set_lan_scope" || j["command"] == "trust_network" ||
+                                j["command"] == "untrust_network" || j["command"] == "decline_network")) {
+                        update_lan_trust(j);
                     } else if (j.contains("command") && j["command"] == "set_hide_unknown_senders") {
                         auto config = bluetooth::load_config();
                         config.hide_unknown_senders = j.value("enabled", false);
@@ -2038,12 +2083,23 @@ namespace tether {
         if (client_fd < 0)
             return;
 
+        const std::string ip = peer_ip(client_addr, addrlen);
+
+        // local end says which network it came in on, untrusted ones never TLS
+        sockaddr_storage local{};
+        socklen_t local_len = sizeof(local);
+        if (getsockname(client_fd, reinterpret_cast<sockaddr*>(&local), &local_len) != 0 ||
+            !lan_local_addr_trusted(reinterpret_cast<sockaddr*>(&local))) {
+            debug::log(INFO, "TcpServer: Refused {}: not on a trusted network", ip);
+            close(client_fd);
+            return;
+        }
+
         // Set non-blocking
         int flags = fcntl(client_fd, F_GETFL, 0);
         fcntl(client_fd, F_SETFL, flags | O_NONBLOCK);
         enable_dead_peer_detection(client_fd);
 
-        const std::string ip = peer_ip(client_addr, addrlen);
         debug::log(INFO, "TcpServer: New connection from {} (fd: {})", ip, client_fd);
 
         // SSL Wrapping

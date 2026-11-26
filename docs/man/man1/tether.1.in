@@ -50,6 +50,22 @@ Discovery scan duration in milliseconds (default: 3000).
 \fB\-\-list-devices\fR
 List all paired connection devices and their fingerprints.
 .TP
+\fB\-\-networks\fR
+List the networks this computer is on, whether Tether shows on each, and the
+key the commands below take.
+.TP
+\fB\-\-trust\-network\fR [\fIKEY\fR]
+Show Tether on a network: advertise it there and accept connections. Without
+\fIKEY\fR, the one current network Tether is hidden on.
+.TP
+\fB\-\-untrust\-network\fR [\fIKEY\fR]
+Hide Tether on a network again. Without \fIKEY\fR, the one current trusted
+network.
+.TP
+\fB\-\-lan\-scope\fR \fBtrusted\fR|\fBall\fR
+Show Tether on trusted networks only (the default), or on every network. See
+\fBtetherd\fR(8).
+.TP
 \fB\-\-status\fR
 Print what the daemon is doing: version, clipboard and mDNS state, how many
 devices are paired, how many pairing requests wait, which peers are connected,

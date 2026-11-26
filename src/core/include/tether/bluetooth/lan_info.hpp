@@ -1,6 +1,7 @@
 #pragma once
 
 #include <cstdint>
+#include <functional>
 #include <memory>
 #include <string>
 #include <vector>
@@ -15,8 +16,8 @@ namespace tether::bluetooth {
     // ATT caps an attribute value at 512 bytes.
     inline constexpr size_t LAN_INFO_MAX_BYTES = 512;
 
-    // This host's addresses as "ip/prefix": interfaces that are up, without loopback or
-    // IPv6 link-local, IPv4 first.
+    // This host's addresses as "ip/prefix": trusted interfaces that are up, without loopback
+    // or IPv6 link-local, IPv4 first.
     std::vector<std::string> lan_addresses();
 
     // The characteristic value: compact JSON, addresses dropped from the tail until it fits.
@@ -39,6 +40,9 @@ namespace tether::bluetooth {
 
         // Moves the registration to this adapter; empty withdraws it. Cheap when unchanged.
         void set_adapter(const std::string& adapter_path);
+
+        // called on the monitor's thread each time the bonded phone reads the value
+        void set_read_handler(std::function<void()> handler);
 
     private:
         BluezMonitor& monitor_;

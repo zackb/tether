@@ -111,6 +111,9 @@ namespace tether {
     // Adds or removes an iPhone app from the popup mute list and pushes bt_status.
     void set_app_muted(const std::string& app_id, const std::string& app_name, bool muted);
 
+    // Applies set_lan_scope, trust_network, untrust_network or decline_network and pushes bt_status.
+    void update_lan_trust(const nlohmann::json& command);
+
     // Whether a local copy is pushed to paired devices. Off shares only on clipboard_send.
     void set_clipboard_auto_share(bool enabled);
     bool clipboard_auto_share();

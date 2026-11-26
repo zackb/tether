@@ -5,9 +5,10 @@
 #include "tray.hpp"
 #include "ui_util.hpp"
 
+#include <set>
 #include <string>
-#include <vector>
 #include <tether/i18n.hpp>
+#include <vector>
 
 namespace tether::ui {
 
@@ -49,6 +50,11 @@ namespace tether::ui {
 
             GtkWidget* sw_lock_away = nullptr;
             GtkWidget* sw_clipboard_share = nullptr;
+
+            GtkWidget* sw_trusted_only = nullptr;
+            GtkWidget* list_networks = nullptr;
+            std::vector<GtkWidget*> network_rows;
+            nlohmann::json networks = nlohmann::json::array();
 
             nlohmann::json bt_status = nlohmann::json::object();
         };
@@ -168,6 +174,63 @@ namespace tether::ui {
             gtk_widget_set_sensitive(GTK_WIDGET(button), FALSE);
         }
 
+        void on_trusted_only_toggled(GtkSwitch* widget, GParamSpec*, gpointer) {
+            daemon_send({{"command", "set_lan_scope"}, {"scope", gtk_switch_get_active(widget) ? "trusted" : "all"}});
+        }
+
+        void on_network_clicked(GtkButton* button, gpointer) {
+            const auto* key = static_cast<const char*>(g_object_get_data(G_OBJECT(button), "key"));
+            const auto* command = static_cast<const char*>(g_object_get_data(G_OBJECT(button), "command"));
+            daemon_send({{"command", command}, {"key", key}});
+            gtk_widget_set_sensitive(GTK_WIDGET(button), FALSE);
+        }
+
+        // Current networks with Trust or Hide, then saved ones this computer is not on with Forget.
+        void update_network_rows(const nlohmann::json& status) {
+            const nlohmann::json snapshot = {status.value("lan_scope", "trusted"),
+                                             status.value("lan_networks", nlohmann::json::array()),
+                                             status.value("trusted_networks", nlohmann::json::array())};
+            if (snapshot == g_settings.networks)
+                return;
+            g_settings.networks = snapshot;
+            for (GtkWidget* row : g_settings.network_rows)
+                gtk_widget_destroy(row);
+            g_settings.network_rows.clear();
+
+            const bool trust_all = snapshot[0] == "all";
+            std::set<std::string> current;
+            const auto add = [](const std::string& key,
+                                const std::string& title,
+                                const std::string& subtitle,
+                                const char* label,
+                                const char* command) {
+                GtkWidget* button = gtk_button_new_with_label(label);
+                g_object_set_data_full(G_OBJECT(button), "key", g_strdup(key.c_str()), g_free);
+                g_object_set_data(G_OBJECT(button), "command", const_cast<char*>(command));
+                g_signal_connect(button, "clicked", G_CALLBACK(on_network_clicked), nullptr);
+                GtkWidget* row = add_row(g_settings.list_networks, title, subtitle, button);
+                gtk_widget_show_all(row);
+                g_settings.network_rows.push_back(row);
+            };
+            for (const auto& net : snapshot[1]) {
+                const std::string key = net.value("key", "");
+                current.insert(key);
+                if (trust_all)
+                    continue;
+                const bool trusted = net.value("trusted", false);
+                add(key,
+                    net.value("name", key),
+                    trusted ? _("Connected · Tether is shown") : _("Connected · Tether is hidden"),
+                    trusted ? _("Hide") : _("Trust"),
+                    trusted ? "untrust_network" : "trust_network");
+            }
+            for (const auto& net : snapshot[2]) {
+                const std::string key = net.value("key", "");
+                if (!current.contains(key))
+                    add(key, net.value("name", key), _("Trusted"), _("Forget"), "untrust_network");
+            }
+        }
+
         // One row per muted iPhone app, below the popup switches.
         void update_muted_rows(const nlohmann::json& muted) {
             if (muted == g_settings.muted_apps)
@@ -274,6 +337,11 @@ namespace tether::ui {
                        reinterpret_cast<gpointer>(on_clipboard_share_toggled),
                        status.value("clipboard_auto_share", true));
 
+            set_switch(g_settings.sw_trusted_only,
+                       reinterpret_cast<gpointer>(on_trusted_only_toggled),
+                       status.value("lan_scope", "trusted") != "all");
+            update_network_rows(status);
+
             set_switch(g_settings.sw_hide_unknown,
                        reinterpret_cast<gpointer>(on_hide_unknown_toggled),
                        status.value("hide_unknown_senders", false));
@@ -321,6 +389,8 @@ namespace tether::ui {
                                  g_settings.window = nullptr;
                                  g_settings.muted_rows.clear();
                                  g_settings.muted_apps = nlohmann::json::array();
+                                 g_settings.network_rows.clear();
+                                 g_settings.networks = nlohmann::json::array();
                              }),
                              nullptr);
 
@@ -427,6 +497,18 @@ namespace tether::ui {
                     _("Share the clipboard automatically"),
                     _("Off sends it only from Send Clipboard or tether share."),
                     g_settings.sw_clipboard_share);
+
+            // Networks
+            g_settings.list_networks = add_group(
+                column, _("Networks"), _("Where this computer can be found and reached over Wi-Fi or Ethernet."));
+
+            g_settings.sw_trusted_only = new_switch();
+            g_signal_connect(
+                g_settings.sw_trusted_only, "notify::active", G_CALLBACK(on_trusted_only_toggled), nullptr);
+            add_row(g_settings.list_networks,
+                    _("Only on trusted networks"),
+                    _("Elsewhere Tether is not advertised and refuses connections. Bluetooth keeps working."),
+                    g_settings.sw_trusted_only);
 
             // Messages
             GtkWidget* messages =

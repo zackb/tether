@@ -1,5 +1,6 @@
 #include "ui_util.hpp"
 
+#include "daemon_client.hpp"
 #include "tray.hpp"
 
 #include <tether/i18n.hpp>
@@ -21,6 +22,10 @@ namespace tether::ui {
         };
 
         RouteIndicator g_routes[2];
+
+        // "Show on <network>" beside the Wi-Fi state while Tether is hidden on every network.
+        GtkWidget* g_trust_button = nullptr;
+        std::string g_hidden_network_key;
 
         RouteIndicator& indicator(Route route) { return g_routes[route == Route::WiFi ? 0 : 1]; }
 
@@ -458,6 +463,17 @@ namespace tether::ui {
         build(indicator(Route::Bluetooth), "Bluetooth", "bluetooth-active-symbolic", "bluetooth-disabled-symbolic");
 
         gtk_box_pack_start(GTK_BOX(bar), indicator(Route::WiFi).box, FALSE, FALSE, 0);
+        g_trust_button = gtk_button_new();
+        gtk_button_set_relief(GTK_BUTTON(g_trust_button), GTK_RELIEF_NONE);
+        gtk_widget_set_no_show_all(g_trust_button, TRUE);
+        g_signal_connect(g_trust_button,
+                         "clicked",
+                         G_CALLBACK(+[](GtkButton*, gpointer) {
+                             if (!g_hidden_network_key.empty())
+                                 daemon_send({{"command", "trust_network"}, {"key", g_hidden_network_key}});
+                         }),
+                         nullptr);
+        gtk_box_pack_start(GTK_BOX(indicator(Route::WiFi).box), g_trust_button, FALSE, FALSE, 0);
         gtk_box_pack_start(GTK_BOX(bar), indicator(Route::Bluetooth).box, FALSE, FALSE, 0);
 
         GtkWidget* version = gtk_label_new("v" TETHER_VERSION);
@@ -467,6 +483,20 @@ namespace tether::ui {
         set_route_status(Route::WiFi, false, _("Waiting for the Tether daemon."));
         set_route_status(Route::Bluetooth, false, _("Waiting for the Tether daemon."));
         return bar;
+    }
+
+    void set_hidden_network(const std::string& key, const std::string& name) {
+        tray_set_hidden_network(key, name);
+        g_hidden_network_key = key;
+        if (!g_trust_button)
+            return;
+        if (key.empty()) {
+            gtk_widget_hide(g_trust_button);
+            return;
+        }
+        // TRANSLATORS: {} is a Wi-Fi or network connection name.
+        gtk_button_set_label(GTK_BUTTON(g_trust_button), tr_format(_("Show Tether on {}"), name).c_str());
+        gtk_widget_show(g_trust_button);
     }
 
     void set_route_status(Route route, bool ok, const std::string& detail) {

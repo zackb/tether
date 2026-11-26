@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: tether\n"
 "Report-Msgid-Bugs-To: zack@bartel.com\n"
-"POT-Creation-Date: 2026-11-25 21:13+0100\n"
+"POT-Creation-Date: 2026-11-26 11:12-0800\n"
 "PO-Revision-Date: 2026-08-23\n"
 "Last-Translator: Tether project\n"
 "Language-Team: Korean\n"
@@ -77,6 +77,25 @@ msgstr "검색 시간(밀리초) (기본값 3000)."
 #: src/cli/main.cpp
 msgid "List all paired connection devices."
 msgstr "페어링된 모든 기기를 나열합니다."
+
+#: src/cli/main.cpp
+msgid "List the networks this computer is on and whether Tether shows on them."
+msgstr ""
+"이 컴퓨터가 연결된 네트워크와 각 네트워크에서 Tether가 표시되는지 나열합니다."
+
+#: src/cli/main.cpp
+msgid "Show Tether on a network. Without a key, the one hidden network."
+msgstr ""
+"네트워크에 Tether를 표시합니다. 키가 없으면 유일하게 숨겨진 네트워크가 대상입"
+"니다."
+
+#: src/cli/main.cpp
+msgid "Hide Tether on a network again."
+msgstr "네트워크에서 Tether를 다시 숨깁니다."
+
+#: src/cli/main.cpp
+msgid "Show Tether on trusted networks only, or on every network."
+msgstr "Tether를 신뢰하는 네트워크에만 표시하거나 모든 네트워크에 표시합니다."
 
 #: src/cli/main.cpp
 msgid "Show the one-time system setup Bluetooth still needs."
@@ -202,7 +221,9 @@ msgstr "앱뿐 아니라 알림의 제목과 본문도 미러링합니다."
 msgid ""
 "Download each notifying app's real icon from Apple's App Store. Only the "
 "app's identifier is sent."
-msgstr "알림을 보내는 각 앱의 실제 아이콘을 Apple App Store에서 다운로드합니다. 앱 식별자만 전송됩니다."
+msgstr ""
+"알림을 보내는 각 앱의 실제 아이콘을 Apple App Store에서 다운로드합니다. 앱 식"
+"별자만 전송됩니다."
 
 #: src/cli/main.cpp
 msgid ""
@@ -442,6 +463,46 @@ msgstr ""
 "그 후 확인을 위해 'tether --bt-setup'을 다시 실행하십시오.\n"
 
 #: src/cli/main.cpp
+msgid "Could not read status from the daemon.\n"
+msgstr "데몬에서 상태를 읽을 수 없습니다.\n"
+
+#: src/cli/main.cpp
+msgid "Tether shows on every network."
+msgstr "Tether가 모든 네트워크에 표시됩니다."
+
+#: src/cli/main.cpp
+msgid "Tether shows on trusted networks only."
+msgstr "Tether가 신뢰하는 네트워크에만 표시됩니다."
+
+#: src/cli/main.cpp
+msgid "shown "
+msgstr "표시됨"
+
+#: src/cli/main.cpp
+msgid "hidden"
+msgstr "숨김"
+
+#: src/cli/main.cpp
+msgid "Expected trusted or all, e.g. --lan-scope trusted\n"
+msgstr "trusted 또는 all이 필요합니다. 예: --lan-scope trusted\n"
+
+#: src/cli/main.cpp
+msgid "No network to change.\n"
+msgstr "변경할 네트워크가 없습니다.\n"
+
+#: src/cli/main.cpp
+msgid "More than one network; pass a key from --networks.\n"
+msgstr "네트워크가 둘 이상입니다. --networks의 키를 지정하세요.\n"
+
+#: src/cli/main.cpp
+msgid "Could not reach the daemon.\n"
+msgstr "데몬에 연결하지 못했습니다.\n"
+
+#: src/cli/main.cpp
+msgid "Done."
+msgstr "완료했습니다."
+
+#: src/cli/main.cpp
 msgid "Mode"
 msgstr "모드"
 
@@ -591,10 +652,6 @@ msgid ""
 msgstr ""
 "이 컴퓨터는 Apple 하드웨어로 표시되지 않으므로 통화 시 AirPods 연결을 끊어 넘"
 "깁니다. /etc/bluetooth/main.conf의 DeviceID를 참고하세요."
-
-#: src/cli/main.cpp
-msgid "Could not reach the daemon.\n"
-msgstr "데몬에 연결하지 못했습니다.\n"
 
 #: src/cli/main.cpp
 #, c-format
@@ -894,6 +951,24 @@ msgid "More than one device is named {}; pass its fingerprint instead.\n"
 msgstr "{}(이)라는 기기가 여러 대입니다. 대신 지문을 지정하십시오.\n"
 
 #: src/cli/main.cpp
+msgid "shown on every network"
+msgstr "모든 네트워크에 표시"
+
+#: src/cli/main.cpp
+#, c++-format
+msgid "shown on {}"
+msgstr "{}에 표시"
+
+#: src/cli/main.cpp
+#, c++-format
+msgid "hidden on {} (tether --trust-network)"
+msgstr "{}에서 숨김 (tether --trust-network)"
+
+#: src/cli/main.cpp
+msgid "no network"
+msgstr "네트워크 없음"
+
+#: src/cli/main.cpp
 msgid "Version"
 msgstr "버전"
 
@@ -928,6 +1003,10 @@ msgstr "브로드캐스트 중"
 #: src/cli/main.cpp
 msgid "unavailable"
 msgstr "사용 불가"
+
+#: src/cli/main.cpp src/gtk/settings_view.cpp src/tui/settings.cpp
+msgid "Networks"
+msgstr "네트워크"
 
 #: src/cli/main.cpp
 msgid "Firewall"
@@ -1992,6 +2071,27 @@ msgstr ""
 
 #: src/daemon/notification.cpp
 #, c++-format
+msgid ""
+"A paired device is on {}. Tether stays hidden on networks you have not "
+"trusted."
+msgstr ""
+"페어링된 기기가 {}에 있습니다. 신뢰하지 않은 네트워크에서는 Tether가 숨겨진 "
+"상태로 유지됩니다."
+
+#: src/daemon/notification.cpp
+msgid "Show Tether on this network?"
+msgstr "이 네트워크에 Tether를 표시할까요?"
+
+#: src/daemon/notification.cpp src/gtk/settings_view.cpp
+msgid "Trust"
+msgstr "신뢰"
+
+#: src/daemon/notification.cpp
+msgid "Not now"
+msgstr "나중에"
+
+#: src/daemon/notification.cpp
+#, c++-format
 msgid "{} file arrived"
 msgid_plural "{} files arrived"
 msgstr[0] "파일 {}개를 받았습니다"
@@ -2369,6 +2469,11 @@ msgstr ""
 "지 않으므로 클립보드 동기화가 꺼져 있습니다."
 
 #: src/gtk/devices_view.cpp src/tui/devices.cpp
+#, c++-format
+msgid "Tether is hidden on {}, a network you have not trusted."
+msgstr "Tether가 신뢰하지 않은 네트워크 {}에서 숨겨져 있습니다."
+
+#: src/gtk/devices_view.cpp src/tui/devices.cpp
 msgid ""
 "avahi-daemon isn't running, so other devices can't find this PC. Start it "
 "with: sudo systemctl enable --now avahi-daemon"
@@ -2702,7 +2807,7 @@ msgstr "클립보드 보내기"
 msgid "Clipboard sync requested..."
 msgstr "클립보드 동기화를 요청했습니다..."
 
-#: src/gtk/devices_view.cpp src/tui/devices.cpp
+#: src/gtk/devices_view.cpp src/gtk/settings_view.cpp src/tui/devices.cpp
 msgid "Forget"
 msgstr "삭제"
 
@@ -2897,6 +3002,22 @@ msgid "Notification mirroring is unavailable."
 msgstr "알림 미러링을 사용할 수 없습니다."
 
 #: src/gtk/settings_view.cpp
+msgid "Connected · Tether is shown"
+msgstr "연결됨 · Tether 표시 중"
+
+#: src/gtk/settings_view.cpp
+msgid "Connected · Tether is hidden"
+msgstr "연결됨 · Tether 숨김"
+
+#: src/gtk/settings_view.cpp
+msgid "Hide"
+msgstr "숨기기"
+
+#: src/gtk/settings_view.cpp
+msgid "Trusted"
+msgstr "신뢰함"
+
+#: src/gtk/settings_view.cpp
 msgid "Unmute"
 msgstr "음소거 해제"
 
@@ -2973,7 +3094,9 @@ msgstr "실제 앱 아이콘 표시"
 msgid ""
 "Downloads each app's icon from Apple's App Store once. Only the app's "
 "identifier is sent."
-msgstr "각 앱의 아이콘을 Apple App Store에서 한 번만 다운로드합니다. 앱 식별자만 전송됩니다."
+msgstr ""
+"각 앱의 아이콘을 Apple App Store에서 한 번만 다운로드합니다. 앱 식별자만 전송"
+"됩니다."
 
 #: src/gtk/settings_view.cpp src/tui/settings.cpp
 msgid "Desktop popups"
@@ -3026,6 +3149,22 @@ msgstr "클립보드 자동 공유"
 #: src/gtk/settings_view.cpp src/tui/settings.cpp
 msgid "Off sends it only from Send Clipboard or tether share."
 msgstr "끄면 클립보드 보내기 또는 tether share로만 보냅니다."
+
+#: src/gtk/settings_view.cpp
+msgid "Where this computer can be found and reached over Wi-Fi or Ethernet."
+msgstr "Wi-Fi 또는 이더넷으로 이 컴퓨터를 찾고 연결할 수 있는 곳입니다."
+
+#: src/gtk/settings_view.cpp src/tui/settings.cpp
+msgid "Only on trusted networks"
+msgstr "신뢰하는 네트워크에서만"
+
+#: src/gtk/settings_view.cpp src/tui/settings.cpp
+msgid ""
+"Elsewhere Tether is not advertised and refuses connections. Bluetooth keeps "
+"working."
+msgstr ""
+"그 외의 곳에서는 Tether가 알려지지 않고 연결을 거부합니다. 블루투스는 계속 작"
+"동합니다."
 
 #: src/gtk/settings_view.cpp
 msgid "SMS and iMessage conversations synced over Bluetooth."
@@ -3126,6 +3265,12 @@ msgstr "{} 연결"
 #: src/gtk/tray.cpp
 msgid "Show Tether"
 msgstr "Tether 표시"
+
+#. TRANSLATORS: {} is a Wi-Fi or network connection name.
+#: src/gtk/tray.cpp src/gtk/ui_util.cpp src/tui/devices.cpp
+#, c++-format
+msgid "Show Tether on {}"
+msgstr "{}에 Tether 표시"
 
 #: src/gtk/tray.cpp src/gtk/ui_util.cpp src/tui/main.cpp
 msgid "connected"
@@ -3285,6 +3430,21 @@ msgid "tether-tui needs a terminal."
 msgstr "tether-tui에는 터미널이 필요합니다."
 
 #: src/tui/settings.cpp
+#, c++-format
+msgid "Hide on {} (connected)"
+msgstr "{}에서 숨기기 (연결됨)"
+
+#: src/tui/settings.cpp
+#, c++-format
+msgid "Trust {} (connected)"
+msgstr "{} 신뢰 (연결됨)"
+
+#: src/tui/settings.cpp
+#, c++-format
+msgid "Forget {}"
+msgstr "{} 삭제"
+
+#: src/tui/settings.cpp
 msgid "Muted apps"
 msgstr "음소거된 앱"
 
@@ -3400,6 +3560,14 @@ msgstr "기기를 페어링하고 네트워크를 통해 클립보드를 동기�
 #: src/gtk/tether-gtk.desktop.in
 msgid "iPhone;iOS;SMS;Messages;Clipboard;Files;Notifications;Calls;AirPods;"
 msgstr "iPhone;iOS;SMS;메시지;클립보드;파일;알림;통화;AirPods;"
+
+#, fuzzy, c++-format
+#~ msgid ""
+#~ "Tether is hidden on {}, a network you have not trusted. Use Show Tether "
+#~ "on {} below, or Settings, under Networks."
+#~ msgstr ""
+#~ "Tether가 신뢰하지 않은 네트워크 {}에서 숨겨져 있습니다. 설정의 네트워크에"
+#~ "서 신뢰하세요."
 
 #~ msgid "off, no Wayland session on this machine"
 #~ msgstr "꺼짐, 이 컴퓨터에 Wayland 세션이 없습니다"

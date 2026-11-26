@@ -227,6 +227,12 @@ The iPhone app dials on launch and is therefore reachable either way.
 
 mDNS is multicast, so it resolves nothing across a VPN such as Tailscale, or on Wi-Fi with AP isolation. When discovery returns no match, the iPhone app dials the address its last session resolved to, provided that peer's fingerprint is still in `known_hosts.json`. A handshake fingerprint that does not match the expected one means the address has moved to another machine; the session is dropped without a pairing prompt.
 
+### Trusted networks
+
+By default a node shows itself only on networks the user has trusted. On any other network it publishes no `_tether._tcp` record, closes inbound connections before TLS, does not dial peers it resolves there, and leaves those addresses out of the Bluetooth discovery value below. Loopback is always allowed. A network is a NetworkManager connection UUID. Without NetworkManager, Wi-Fi joined by iwd is `iwd:<SSID as hex>:<Network.Type>`. Anything else is `if:<interface>`, as are interfaces NetworkManager only watches.
+
+The node still browses everywhere. When a pinned peer resolves only on an untrusted network, the daemon asks once with a desktop notification whether to trust that network.
+
 ### Bluetooth discovery
 
 When mDNS finds nothing, the iPhone app can read the daemon's addresses over the phone's existing
@@ -321,6 +327,13 @@ Removes a fingerprint from `known_hosts.json` and closes any live session holdin
 **Response**: `{"command":"forget_device_result","fingerprint":"...","forgotten":true}`, also broadcast
 to local subscribers. `forgotten` is false when the fingerprint was not pinned. Both ends must forget
 a peer: a node that still trusts it will keep dialling it (see §3).
+
+### `set_lan_scope`, `trust_network`, `untrust_network`, `decline_network` (Local Client -> Daemon)
+Change where the node shows itself (see §3, Trusted networks). Each one is followed by a `bt_status` broadcast.
+**Payload**: `{"command": "set_lan_scope", "scope": "trusted"}` (`"all"` shows it on every network), or
+`{"command": "trust_network", "key": "<key>"}`. `decline_network` stops the trust prompt for that key.
+`bt_status` carries `lan_scope`, `lan_networks` (`[{"key", "name", "interface", "trusted"}]`, the networks the node is on now)
+and `trusted_networks` (`[{"key", "name"}]`, the saved ones).
 
 ### `send_file` (Local Client -> Daemon)
 Offloads an entire file transfer to the daemon. The daemon spawns a thread to read the local filesystem and pushes the chunks sequence securely.

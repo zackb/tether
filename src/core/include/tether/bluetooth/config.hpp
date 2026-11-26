@@ -4,6 +4,7 @@
 #include "tether/secret_store.hpp"
 
 #include <map>
+#include <set>
 #include <string>
 
 namespace tether::bluetooth {
@@ -34,6 +35,12 @@ namespace tether::bluetooth {
 
     const char* to_string(PhoneAudio choice);
     PhoneAudio phone_audio_from_string(const std::string& value);
+
+    // Which networks tetherd advertises on and accepts connections from.
+    enum class LanScope { Trusted, All };
+
+    const char* to_string(LanScope scope);
+    LanScope lan_scope_from_string(const std::string& value);
 
     // Persisted at ~/.config/tether/bluetooth.json.
     struct Config {
@@ -90,6 +97,11 @@ namespace tether::bluetooth {
         bool contacts_by_last_name = false;
         // Applied to device_address once per Classic connection.
         PhoneAudio phone_audio = PhoneAudio::Auto;
+        LanScope lan_scope = LanScope::Trusted;
+        // Network key (NetworkManager connection UUID, or "if:<name>") -> display name.
+        std::map<std::string, std::string> trusted_networks;
+        // Networks the user said "Not now" to, so they are not suggested again.
+        std::set<std::string> declined_networks;
 
         bool operator==(const Config&) const = default;
     };

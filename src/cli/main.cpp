@@ -193,6 +193,10 @@ static const Opt kOptions[] = {
     {"--port <num>", N_("Connect over TCP port (default 5134).")},
     {"--timeout <ms>", N_("Discovery scan duration in milliseconds (default 3000).")},
     {"--list-devices", N_("List all paired connection devices.")},
+    {"--networks", N_("List the networks this computer is on and whether Tether shows on them.")},
+    {"--trust-network [key]", N_("Show Tether on a network. Without a key, the one hidden network.")},
+    {"--untrust-network [key]", N_("Hide Tether on a network again.")},
+    {"--lan-scope <trusted|all>", N_("Show Tether on trusted networks only, or on every network.")},
     {"--bt-setup", N_("Show the one-time system setup Bluetooth still needs.")},
     {"--bt-status", N_("Show Bluetooth adapter capability and delivery mode.")},
     {"--bt-devices", N_("List Bluetooth devices known to BlueZ.")},
@@ -449,6 +453,65 @@ static bool adapter_known(const nlohmann::json& status, const std::string& id) {
             return true;
     }
     return false;
+}
+
+// --networks, --trust-network, --untrust-network and --lan-scope.
+static int run_networks(tether::Client& client, const std::string& action, std::string key) {
+    nlohmann::json status;
+    try {
+        status = nlohmann::json::parse(client.send_and_wait("{\"command\":\"bt_status\"}\n"));
+    } catch (const std::exception&) {
+        debug::log(ERR, _("Could not read status from the daemon.\n"));
+        return 1;
+    }
+    const auto networks = status.value("lan_networks", nlohmann::json::array());
+
+    if (action == "networks") {
+        const bool all = status.value("lan_scope", "trusted") == "all";
+        fprintf(
+            stdout, "%s\n", all ? _("Tether shows on every network.") : _("Tether shows on trusted networks only."));
+        for (const auto& net : networks)
+            fprintf(stdout,
+                    "  %s  %s (%s)  %s\n",
+                    net.value("trusted", false) ? _("shown ") : _("hidden"),
+                    net.value("name", "").c_str(),
+                    net.value("interface", "").c_str(),
+                    net.value("key", "").c_str());
+        return 0;
+    }
+
+    nlohmann::json request;
+    if (action == "lan_scope") {
+        if (key != "trusted" && key != "all") {
+            debug::log(ERR, _("Expected trusted or all, e.g. --lan-scope trusted\n"));
+            return 1;
+        }
+        request = {{"command", "set_lan_scope"}, {"scope", key}};
+    } else {
+        const bool trust = action == "trust_network";
+        if (key.empty()) {
+            // The one current network in the other state, if there is exactly one.
+            std::vector<std::string> candidates;
+            for (const auto& net : networks)
+                if (net.value("trusted", false) != trust)
+                    candidates.push_back(net.value("key", ""));
+            if (candidates.size() != 1) {
+                debug::log(ERR,
+                           candidates.empty() ? _("No network to change.\n")
+                                              : _("More than one network; pass a key from --networks.\n"));
+                return 1;
+            }
+            key = candidates.front();
+        }
+        request = {{"command", trust ? "trust_network" : "untrust_network"}, {"key", key}};
+    }
+
+    if (!client.send(request.dump() + "\n")) {
+        debug::log(ERR, _("Could not reach the daemon.\n"));
+        return 1;
+    }
+    fprintf(stdout, "%s\n", _("Done."));
+    return 0;
 }
 
 static int print_bt_status(tether::Client& client) {
@@ -1290,6 +1353,23 @@ static bool resolve_send_target(tether::Client& client, const std::string& wante
     return false;
 }
 
+// Where Tether shows itself, from the state snapshot.
+static std::string lan_summary(const nlohmann::json& snap) {
+    if (snap.value("lan_scope", "trusted") == "all")
+        return _("shown on every network");
+    std::string shown;
+    std::string hidden;
+    for (const auto& net : snap.value("lan_networks", nlohmann::json::array())) {
+        std::string& list = net.value("trusted", false) ? shown : hidden;
+        list += (list.empty() ? "" : ", ") + net.value("name", std::string{});
+    }
+    if (!shown.empty())
+        return tether::tr_format(_("shown on {}"), shown);
+    if (!hidden.empty())
+        return tether::tr_format(_("hidden on {} (tether --trust-network)"), hidden);
+    return _("no network");
+}
+
 static int print_status(tether::Client& client) {
     nlohmann::json snap;
     try {
@@ -1312,6 +1392,7 @@ static int print_status(tether::Client& client) {
                         snap.value("clipboard_available", false) ? _("syncing")
                                                                  : _("off, no Wayland data-control or X11 session"));
     fields.emplace_back(_("mDNS"), snap.value("mdns_available", false) ? _("advertising") : _("unavailable"));
+    fields.emplace_back(_("Networks"), lan_summary(snap));
     fields.emplace_back(_("Firewall"), yn(snap.value("firewall_active", false)));
     fields.emplace_back(_("Paired devices"), std::to_string(paired.size()));
     fields.emplace_back(_("Pending requests"), std::to_string(pending.size()));
@@ -1575,6 +1656,14 @@ int main(int argc, char* argv[]) {
             action = "bt_call";
             if (i + 1 < argc && argv[i + 1][0] != '-')
                 arg_val = argv[++i];
+        } else if (arg == "--networks") {
+            action = "networks";
+        } else if (arg == "--trust-network" || arg == "--untrust-network" || arg == "--lan-scope") {
+            action = arg == "--trust-network"     ? "trust_network"
+                     : arg == "--untrust-network" ? "untrust_network"
+                                                  : "lan_scope";
+            if (i + 1 < argc && argv[i + 1][0] != '-')
+                arg_val = argv[++i];
         } else if (arg == "--bt-contacts-sort") {
             action = "bt_contacts_sort";
             if (i + 1 < argc && argv[i + 1][0] != '-')
@@ -1784,6 +1873,9 @@ int main(int argc, char* argv[]) {
         return print_bt_setup(client);
     } else if (action == "bt_status") {
         return print_bt_status(client);
+    } else if (action == "networks" || action == "trust_network" || action == "untrust_network" ||
+               action == "lan_scope") {
+        return run_networks(client, action, arg_val);
     } else if (action == "bt_devices") {
         return print_bt_devices(client);
     } else if (action == "bt_connection") {
