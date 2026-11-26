@@ -1,6 +1,7 @@
 #pragma once
 
 #include <cstdint>
+#include <functional>
 #include <memory>
 #include <string>
 #include <vector>
@@ -39,6 +40,9 @@ namespace tether::bluetooth {
 
         // Moves the registration to this adapter; empty withdraws it. Cheap when unchanged.
         void set_adapter(const std::string& adapter_path);
+
+        // called on the monitor's thread each time the bonded phone reads the value
+        void set_read_handler(std::function<void()> handler);
 
     private:
         BluezMonitor& monitor_;

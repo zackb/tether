@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: tether\n"
 "Report-Msgid-Bugs-To: zack@bartel.com\n"
-"POT-Creation-Date: 2026-11-26 10:20-0800\n"
+"POT-Creation-Date: 2026-11-26 10:55-0800\n"
 "PO-Revision-Date: 2026-08-22\n"
 "Last-Translator: Tether project\n"
 "Language-Team: German\n"
@@ -82,11 +82,15 @@ msgstr "Alle gekoppelten Geräte auflisten."
 
 #: src/cli/main.cpp
 msgid "List the networks this computer is on and whether Tether shows on them."
-msgstr "Die Netzwerke auflisten, in denen dieser Computer ist, und ob Tether dort sichtbar ist."
+msgstr ""
+"Die Netzwerke auflisten, in denen dieser Computer ist, und ob Tether dort "
+"sichtbar ist."
 
 #: src/cli/main.cpp
 msgid "Show Tether on a network. Without a key, the one hidden network."
-msgstr "Tether in einem Netzwerk zeigen. Ohne Schlüssel im einzigen verborgenen Netzwerk."
+msgstr ""
+"Tether in einem Netzwerk zeigen. Ohne Schlüssel im einzigen verborgenen "
+"Netzwerk."
 
 #: src/cli/main.cpp
 msgid "Hide Tether on a network again."
@@ -2128,7 +2132,9 @@ msgstr ""
 msgid ""
 "A paired device is on {}. Tether stays hidden on networks you have not "
 "trusted."
-msgstr "Ein gekoppeltes Gerät ist in {}. In Netzwerken, denen du nicht vertraust, bleibt Tether verborgen."
+msgstr ""
+"Ein gekoppeltes Gerät ist in {}. In Netzwerken, denen du nicht vertraust, "
+"bleibt Tether verborgen."
 
 #: src/daemon/notification.cpp
 msgid "Show Tether on this network?"
@@ -2530,12 +2536,10 @@ msgstr ""
 "Dateien und OTP sind verbunden. Dieser Compositor gibt Tether keinen Zugriff "
 "auf die Zwischenablage, daher ist die Zwischenablage-Synchronisierung aus."
 
-#: src/gtk/devices_view.cpp
+#: src/gtk/devices_view.cpp src/tui/devices.cpp
 #, c++-format
-msgid ""
-"Tether is hidden on {}, a network you have not trusted. Trust it in "
-"Settings, under Networks."
-msgstr "Tether ist in {} verborgen, einem Netzwerk, dem du nicht vertraust. Vertraue ihm in den Einstellungen unter Netzwerke."
+msgid "Tether is hidden on {}, a network you have not trusted."
+msgstr "Tether ist in {} verborgen, einem Netzwerk, dem du nicht vertraust."
 
 #: src/gtk/devices_view.cpp src/tui/devices.cpp
 msgid ""
@@ -3244,7 +3248,8 @@ msgstr "Netzwerke"
 
 #: src/gtk/settings_view.cpp
 msgid "Where this computer can be found and reached over Wi-Fi or Ethernet."
-msgstr "Wo dieser Computer über WLAN oder Ethernet gefunden und erreicht werden kann."
+msgstr ""
+"Wo dieser Computer über WLAN oder Ethernet gefunden und erreicht werden kann."
 
 #: src/gtk/settings_view.cpp src/tui/settings.cpp
 msgid "Only on trusted networks"
@@ -3254,7 +3259,9 @@ msgstr "Nur in vertrauenswürdigen Netzwerken"
 msgid ""
 "Elsewhere Tether is not advertised and refuses connections. Bluetooth keeps "
 "working."
-msgstr "Anderswo wird Tether nicht angekündigt und lehnt Verbindungen ab. Bluetooth funktioniert weiter."
+msgstr ""
+"Anderswo wird Tether nicht angekündigt und lehnt Verbindungen ab. Bluetooth "
+"funktioniert weiter."
 
 #: src/gtk/settings_view.cpp
 msgid "SMS and iMessage conversations synced over Bluetooth."
@@ -3358,6 +3365,12 @@ msgstr "{} verbinden"
 #: src/gtk/tray.cpp
 msgid "Show Tether"
 msgstr "Tether anzeigen"
+
+#. TRANSLATORS: {} is a Wi-Fi or network connection name.
+#: src/gtk/tray.cpp src/gtk/ui_util.cpp src/tui/devices.cpp
+#, c++-format
+msgid "Show Tether on {}"
+msgstr "Tether in {} zeigen"
 
 #: src/gtk/tray.cpp src/gtk/ui_util.cpp src/tui/main.cpp
 msgid "connected"
@@ -3648,6 +3661,14 @@ msgstr ""
 #: src/gtk/tether-gtk.desktop.in
 msgid "iPhone;iOS;SMS;Messages;Clipboard;Files;Notifications;Calls;AirPods;"
 msgstr "iPhone;iOS;SMS;Nachrichten;Zwischenablage;Dateien;Mitteilungen;Anrufe;AirPods;"
+
+#, fuzzy, c++-format
+#~ msgid ""
+#~ "Tether is hidden on {}, a network you have not trusted. Use Show Tether "
+#~ "on {} below, or Settings, under Networks."
+#~ msgstr ""
+#~ "Tether ist in {} verborgen, einem Netzwerk, dem du nicht vertraust. "
+#~ "Vertraue ihm in den Einstellungen unter Netzwerke."
 
 #~ msgid "off, no Wayland session on this machine"
 #~ msgstr "aus, auf diesem Rechner läuft keine Wayland-Sitzung"

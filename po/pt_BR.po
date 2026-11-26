@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: tether\n"
 "Report-Msgid-Bugs-To: zack@bartel.com\n"
-"POT-Creation-Date: 2026-11-26 10:20-0800\n"
+"POT-Creation-Date: 2026-11-26 10:55-0800\n"
 "PO-Revision-Date: 2026-08-23\n"
 "Last-Translator: Tether project\n"
 "Language-Team: Brazilian Portuguese\n"
@@ -85,7 +85,8 @@ msgstr "Listar todos os dispositivos pareados."
 
 #: src/cli/main.cpp
 msgid "List the networks this computer is on and whether Tether shows on them."
-msgstr "Listar as redes em que este computador está e se o Tether aparece nelas."
+msgstr ""
+"Listar as redes em que este computador está e se o Tether aparece nelas."
 
 #: src/cli/main.cpp
 msgid "Show Tether on a network. Without a key, the one hidden network."
@@ -2103,7 +2104,9 @@ msgstr ""
 msgid ""
 "A paired device is on {}. Tether stays hidden on networks you have not "
 "trusted."
-msgstr "Um dispositivo pareado está em {}. O Tether fica oculto em redes que você não marcou como confiáveis."
+msgstr ""
+"Um dispositivo pareado está em {}. O Tether fica oculto em redes que você "
+"não marcou como confiáveis."
 
 #: src/daemon/notification.cpp
 msgid "Show Tether on this network?"
@@ -2501,12 +2504,10 @@ msgstr ""
 "área de transferência, então a sincronização da área de transferência está "
 "desligada."
 
-#: src/gtk/devices_view.cpp
+#: src/gtk/devices_view.cpp src/tui/devices.cpp
 #, c++-format
-msgid ""
-"Tether is hidden on {}, a network you have not trusted. Trust it in "
-"Settings, under Networks."
-msgstr "O Tether está oculto em {}, uma rede que você não marcou como confiável. Confie nela em Configurações, em Redes."
+msgid "Tether is hidden on {}, a network you have not trusted."
+msgstr "O Tether está oculto em {}, uma rede que você não marcou como confiável."
 
 #: src/gtk/devices_view.cpp src/tui/devices.cpp
 msgid ""
@@ -3205,7 +3206,8 @@ msgstr "Redes"
 
 #: src/gtk/settings_view.cpp
 msgid "Where this computer can be found and reached over Wi-Fi or Ethernet."
-msgstr "Onde este computador pode ser encontrado e acessado por Wi-Fi ou Ethernet."
+msgstr ""
+"Onde este computador pode ser encontrado e acessado por Wi-Fi ou Ethernet."
 
 #: src/gtk/settings_view.cpp src/tui/settings.cpp
 msgid "Only on trusted networks"
@@ -3215,7 +3217,9 @@ msgstr "Apenas em redes confiáveis"
 msgid ""
 "Elsewhere Tether is not advertised and refuses connections. Bluetooth keeps "
 "working."
-msgstr "Em outras redes o Tether não é anunciado e recusa conexões. O Bluetooth continua funcionando."
+msgstr ""
+"Em outras redes o Tether não é anunciado e recusa conexões. O Bluetooth "
+"continua funcionando."
 
 #: src/gtk/settings_view.cpp
 msgid "SMS and iMessage conversations synced over Bluetooth."
@@ -3315,6 +3319,12 @@ msgstr "Conectar {}"
 #: src/gtk/tray.cpp
 msgid "Show Tether"
 msgstr "Mostrar Tether"
+
+#. TRANSLATORS: {} is a Wi-Fi or network connection name.
+#: src/gtk/tray.cpp src/gtk/ui_util.cpp src/tui/devices.cpp
+#, c++-format
+msgid "Show Tether on {}"
+msgstr "Mostrar o Tether em {}"
 
 #: src/gtk/tray.cpp src/gtk/ui_util.cpp src/tui/main.cpp
 msgid "connected"
@@ -3606,6 +3616,14 @@ msgid "iPhone;iOS;SMS;Messages;Clipboard;Files;Notifications;Calls;AirPods;"
 msgstr ""
 "iPhone;iOS;SMS;Mensagens;Área de "
 "transferência;Arquivos;Notificações;Chamadas;AirPods;"
+
+#, fuzzy, c++-format
+#~ msgid ""
+#~ "Tether is hidden on {}, a network you have not trusted. Use Show Tether "
+#~ "on {} below, or Settings, under Networks."
+#~ msgstr ""
+#~ "O Tether está oculto em {}, uma rede que você não marcou como confiável. "
+#~ "Confie nela em Configurações, em Redes."
 
 #~ msgid "off, no Wayland session on this machine"
 #~ msgstr "desativado, sem sessão Wayland nesta máquina"

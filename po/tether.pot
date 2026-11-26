@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: tether 0.3.7\n"
 "Report-Msgid-Bugs-To: zack@bartel.com\n"
-"POT-Creation-Date: 2026-11-26 10:20-0800\n"
+"POT-Creation-Date: 2026-11-26 10:55-0800\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -2244,11 +2244,9 @@ msgid ""
 "access, so clipboard sync is off."
 msgstr ""
 
-#: src/gtk/devices_view.cpp
+#: src/gtk/devices_view.cpp src/tui/devices.cpp
 #, c++-format
-msgid ""
-"Tether is hidden on {}, a network you have not trusted. Trust it in "
-"Settings, under Networks."
+msgid "Tether is hidden on {}, a network you have not trusted."
 msgstr ""
 
 #: src/gtk/devices_view.cpp src/tui/devices.cpp
@@ -2996,6 +2994,12 @@ msgstr ""
 
 #: src/gtk/tray.cpp
 msgid "Show Tether"
+msgstr ""
+
+#. TRANSLATORS: {} is a Wi-Fi or network connection name.
+#: src/gtk/tray.cpp src/gtk/ui_util.cpp src/tui/devices.cpp
+#, c++-format
+msgid "Show Tether on {}"
 msgstr ""
 
 #: src/gtk/tray.cpp src/gtk/ui_util.cpp src/tui/main.cpp

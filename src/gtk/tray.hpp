@@ -25,6 +25,9 @@ namespace tether::ui {
     // Bluetooth supervision state from bt_status; drives the tray menu's connect/disconnect item.
     void tray_set_bluetooth(bool available, bool bonded, bool enabled);
 
+    // The network Tether is hidden on; empty key removes the "Show Tether on" menu item.
+    void tray_set_hidden_network(const std::string& key, const std::string& name);
+
     // Repaints from cached state, for when the daemon returns before any route event.
     void tray_refresh();
 

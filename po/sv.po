@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: tether\n"
 "Report-Msgid-Bugs-To: zack@bartel.com\n"
-"POT-Creation-Date: 2026-11-26 10:20-0800\n"
+"POT-Creation-Date: 2026-11-26 10:55-0800\n"
 "PO-Revision-Date: 2026-08-23\n"
 "Last-Translator: Tether project\n"
 "Language-Team: Swedish\n"
@@ -2079,7 +2079,9 @@ msgstr ""
 msgid ""
 "A paired device is on {}. Tether stays hidden on networks you have not "
 "trusted."
-msgstr "En parkopplad enhet finns på {}. Tether förblir dold på nätverk du inte litar på."
+msgstr ""
+"En parkopplad enhet finns på {}. Tether förblir dold på nätverk du inte "
+"litar på."
 
 #: src/daemon/notification.cpp
 msgid "Show Tether on this network?"
@@ -2474,12 +2476,10 @@ msgstr ""
 "Filer och OTP är anslutna. Den här kompositorn ger inte Tether åtkomst till "
 "urklipp, så urklippssynkronisering är av."
 
-#: src/gtk/devices_view.cpp
+#: src/gtk/devices_view.cpp src/tui/devices.cpp
 #, c++-format
-msgid ""
-"Tether is hidden on {}, a network you have not trusted. Trust it in "
-"Settings, under Networks."
-msgstr "Tether är dold på {}, ett nätverk du inte litar på. Lita på det i Inställningar, under Nätverk."
+msgid "Tether is hidden on {}, a network you have not trusted."
+msgstr "Tether är dold på {}, ett nätverk du inte litar på."
 
 #: src/gtk/devices_view.cpp src/tui/devices.cpp
 msgid ""
@@ -3185,7 +3185,9 @@ msgstr "Bara på betrodda nätverk"
 msgid ""
 "Elsewhere Tether is not advertised and refuses connections. Bluetooth keeps "
 "working."
-msgstr "På andra ställen annonseras Tether inte och vägrar anslutningar. Bluetooth fortsätter att fungera."
+msgstr ""
+"På andra ställen annonseras Tether inte och vägrar anslutningar. Bluetooth "
+"fortsätter att fungera."
 
 #: src/gtk/settings_view.cpp
 msgid "SMS and iMessage conversations synced over Bluetooth."
@@ -3286,6 +3288,12 @@ msgstr "Anslut {}"
 #: src/gtk/tray.cpp
 msgid "Show Tether"
 msgstr "Visa Tether"
+
+#. TRANSLATORS: {} is a Wi-Fi or network connection name.
+#: src/gtk/tray.cpp src/gtk/ui_util.cpp src/tui/devices.cpp
+#, c++-format
+msgid "Show Tether on {}"
+msgstr "Visa Tether på {}"
 
 #: src/gtk/tray.cpp src/gtk/ui_util.cpp src/tui/main.cpp
 msgid "connected"
@@ -3575,6 +3583,14 @@ msgstr "Parkoppla enheter och synkronisera urklipp över nätverket"
 #: src/gtk/tether-gtk.desktop.in
 msgid "iPhone;iOS;SMS;Messages;Clipboard;Files;Notifications;Calls;AirPods;"
 msgstr "iPhone;iOS;SMS;Meddelanden;Urklipp;Filer;Notiser;Samtal;AirPods;"
+
+#, fuzzy, c++-format
+#~ msgid ""
+#~ "Tether is hidden on {}, a network you have not trusted. Use Show Tether "
+#~ "on {} below, or Settings, under Networks."
+#~ msgstr ""
+#~ "Tether är dold på {}, ett nätverk du inte litar på. Lita på det i "
+#~ "Inställningar, under Nätverk."
 
 #~ msgid "off, no Wayland session on this machine"
 #~ msgstr "av, ingen Wayland-session på den här maskinen"

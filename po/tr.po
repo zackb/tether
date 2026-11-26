@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: tether\n"
 "Report-Msgid-Bugs-To: zack@bartel.com\n"
-"POT-Creation-Date: 2026-11-26 10:20-0800\n"
+"POT-Creation-Date: 2026-11-26 10:55-0800\n"
 "PO-Revision-Date: 2026-08-23\n"
 "Last-Translator: Tether project\n"
 "Language-Team: Turkish\n"
@@ -80,7 +80,9 @@ msgstr "Eşleşmiş tüm aygıtları listele."
 
 #: src/cli/main.cpp
 msgid "List the networks this computer is on and whether Tether shows on them."
-msgstr "Bu bilgisayarın bağlı olduğu ağları ve Tether'in bunlarda görünüp görünmediğini listele."
+msgstr ""
+"Bu bilgisayarın bağlı olduğu ağları ve Tether'in bunlarda görünüp "
+"görünmediğini listele."
 
 #: src/cli/main.cpp
 msgid "Show Tether on a network. Without a key, the one hidden network."
@@ -2077,7 +2079,8 @@ msgstr ""
 msgid ""
 "A paired device is on {}. Tether stays hidden on networks you have not "
 "trusted."
-msgstr "Eşleştirilmiş bir cihaz {} ağında. Tether güvenmediğiniz ağlarda gizli kalır."
+msgstr ""
+"Eşleştirilmiş bir cihaz {} ağında. Tether güvenmediğiniz ağlarda gizli kalır."
 
 #: src/daemon/notification.cpp
 msgid "Show Tether on this network?"
@@ -2470,12 +2473,10 @@ msgstr ""
 "Dosyalar ve OTP bağlı. Bu bileştirici Tether'a pano erişimi vermiyor, bu "
 "yüzden pano eşitlemesi kapalı."
 
-#: src/gtk/devices_view.cpp
+#: src/gtk/devices_view.cpp src/tui/devices.cpp
 #, c++-format
-msgid ""
-"Tether is hidden on {}, a network you have not trusted. Trust it in "
-"Settings, under Networks."
-msgstr "Tether, güvenmediğiniz {} ağında gizli. Ayarlar'daki Ağlar bölümünden bu ağa güvenin."
+msgid "Tether is hidden on {}, a network you have not trusted."
+msgstr "Tether, güvenmediğiniz {} ağında gizli."
 
 #: src/gtk/devices_view.cpp src/tui/devices.cpp
 msgid ""
@@ -3173,7 +3174,9 @@ msgstr "Ağlar"
 
 #: src/gtk/settings_view.cpp
 msgid "Where this computer can be found and reached over Wi-Fi or Ethernet."
-msgstr "Bu bilgisayarın Wi-Fi veya Ethernet üzerinden bulunabileceği ve erişilebileceği yerler."
+msgstr ""
+"Bu bilgisayarın Wi-Fi veya Ethernet üzerinden bulunabileceği ve "
+"erişilebileceği yerler."
 
 #: src/gtk/settings_view.cpp src/tui/settings.cpp
 msgid "Only on trusted networks"
@@ -3183,7 +3186,9 @@ msgstr "Yalnızca güvenilen ağlarda"
 msgid ""
 "Elsewhere Tether is not advertised and refuses connections. Bluetooth keeps "
 "working."
-msgstr "Diğer ağlarda Tether duyurulmaz ve bağlantıları reddeder. Bluetooth çalışmaya devam eder."
+msgstr ""
+"Diğer ağlarda Tether duyurulmaz ve bağlantıları reddeder. Bluetooth "
+"çalışmaya devam eder."
 
 #: src/gtk/settings_view.cpp
 msgid "SMS and iMessage conversations synced over Bluetooth."
@@ -3284,6 +3289,12 @@ msgstr "{} cihazına bağlan"
 #: src/gtk/tray.cpp
 msgid "Show Tether"
 msgstr "Tether'i göster"
+
+#. TRANSLATORS: {} is a Wi-Fi or network connection name.
+#: src/gtk/tray.cpp src/gtk/ui_util.cpp src/tui/devices.cpp
+#, c++-format
+msgid "Show Tether on {}"
+msgstr "Tether'i {} ağında göster"
 
 #: src/gtk/tray.cpp src/gtk/ui_util.cpp src/tui/main.cpp
 msgid "connected"
@@ -3574,6 +3585,14 @@ msgstr "Aygıtları eşleştirin ve panoyu ağ üzerinden eşzamanlayın"
 #: src/gtk/tether-gtk.desktop.in
 msgid "iPhone;iOS;SMS;Messages;Clipboard;Files;Notifications;Calls;AirPods;"
 msgstr "iPhone;iOS;SMS;Mesajlar;Pano;Dosyalar;Bildirimler;Aramalar;AirPods;"
+
+#, fuzzy, c++-format
+#~ msgid ""
+#~ "Tether is hidden on {}, a network you have not trusted. Use Show Tether "
+#~ "on {} below, or Settings, under Networks."
+#~ msgstr ""
+#~ "Tether, güvenmediğiniz {} ağında gizli. Ayarlar'daki Ağlar bölümünden bu "
+#~ "ağa güvenin."
 
 #~ msgid "off, no Wayland session on this machine"
 #~ msgstr "kapalı, bu makinede Wayland oturumu yok"

@@ -6,6 +6,7 @@
 
 #include <arpa/inet.h>
 #include <cstring>
+#include <fstream>
 #include <gio/gio.h>
 #include <ifaddrs.h>
 #include <linux/netlink.h>
@@ -196,7 +197,6 @@ namespace tether {
         }
 
         // Without NetworkManager a network is its interface; iwd then names the Wi-Fi ones.
-        // ponytail: wpa_supplicant/connman Wi-Fi stays one network per card; add connman if asked.
         std::vector<LanNetwork> interface_networks() {
             std::vector<LanNetwork> out;
             ifaddrs* head = nullptr;
@@ -360,6 +360,18 @@ namespace tether {
             drain(fd);
             lan_trust_refresh();
         });
+    }
+
+    std::string default_route_ifname() {
+        std::ifstream routes("/proc/net/route");
+        std::string ifname, destination, header;
+        std::getline(routes, header);
+        while (routes >> ifname >> destination) {
+            if (destination == "00000000")
+                return ifname;
+            routes.ignore(1024, '\n');
+        }
+        return {};
     }
 
     void set_lan_trust_changed_handler(std::function<void()> handler) {

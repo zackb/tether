@@ -5,11 +5,14 @@
 #include <algorithm>
 #include <atomic>
 #include <charconv>
+#include <chrono>
 #include <csignal>
 #include <cstdio>
 #include <cstdlib>
 #include <ctime>
+#include <map>
 #include <mutex>
+#include <net/if.h>
 #include <nlohmann/json.hpp>
 #include <optional>
 #include <set>
@@ -175,7 +178,7 @@ int main(int argc, char** argv) {
     tether::lan_trust_start(loop);
 
     // Offers to trust a network
-    std::function<void(int ifindex)> suggest_network;
+    std::function<void(int ifindex, const char* trigger)> suggest_network;
 
     // Advertise this daemon on the local network via mDNS
     tether::Discovery discovery;
@@ -200,7 +203,7 @@ int main(int argc, char** argv) {
                 if (trusted == dev.addresses.end()) {
                     loop.post([&suggest_network, ifindex = dev.addresses.front().ifindex] {
                         if (suggest_network)
-                            suggest_network(ifindex);
+                            suggest_network(ifindex, "peer seen");
                     });
                     continue;
                 }
@@ -296,17 +299,24 @@ int main(int argc, char** argv) {
         });
     });
 
-    std::set<std::string> suggested_networks;
-    suggest_network = [&notifier, notifier_ready, &suggested_networks](int ifindex) {
+    // missed popup is offered again on a later sighting. "Not now" stops it for good.
+    constexpr auto SUGGEST_AGAIN_AFTER = std::chrono::minutes(5);
+    std::map<std::string, std::chrono::steady_clock::time_point> suggested_networks;
+    suggest_network = [&notifier, notifier_ready, &suggested_networks, SUGGEST_AGAIN_AFTER](int ifindex,
+                                                                                            const char* trigger) {
         if (!notifier_ready || tether::lan_trust_all())
             return;
         const auto config = tether::bluetooth::load_config();
+        const auto now = std::chrono::steady_clock::now();
         for (const auto& net : tether::lan_networks()) {
-            if (net.ifindex != ifindex || net.trusted || config.declined_networks.contains(net.key))
+            if ((ifindex != 0 && net.ifindex != ifindex) || net.trusted || config.declined_networks.contains(net.key))
                 continue;
-            // once per run
-            if (suggested_networks.insert(net.key).second)
-                notifier.notify_network_trust(net.key, net.name);
+            const auto last = suggested_networks.find(net.key);
+            if (last != suggested_networks.end() && now - last->second < SUGGEST_AGAIN_AFTER)
+                continue;
+            suggested_networks[net.key] = now;
+            debug::log(INFO, "Network {} ({}): offering to trust it ({})", net.name, net.key, trigger);
+            notifier.notify_network_trust(net.key, net.name);
         }
     };
 
@@ -764,6 +774,17 @@ int main(int argc, char** argv) {
     if (bluez.start()) {
         tether::bluetooth::g_bluez = &bluez;
         lan_info.emplace(bluez, hostname, port, tether::Crypto::instance().get_my_fingerprint());
+        // bonded phone reads this only when it found no daemon on its network
+        lan_info->set_read_handler([&loop, &suggest_network] {
+            loop.post([&suggest_network] {
+                const auto networks = tether::lan_networks();
+                const bool any_trusted =
+                    std::any_of(networks.begin(), networks.end(), [](const auto& n) { return n.trusted; });
+                const std::string uplink = tether::default_route_ifname();
+                if (suggest_network && !any_trusted && !uplink.empty())
+                    suggest_network(static_cast<int>(if_nametoindex(uplink.c_str())), "bluetooth read");
+            });
+        });
         place_lan_info();
         tether::bluetooth::g_airpods = &airpods;
         tether::g_media = &media;

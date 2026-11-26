@@ -360,6 +360,7 @@ namespace tether::tui {
                 }
                 if (command == "bt_status") {
                     bt_status_ = event;
+                    update_wifi_indicator();
                     reload_paired();
                     return true;
                 }
@@ -555,12 +556,27 @@ namespace tether::tui {
                     });
             }
 
+            // A current network Tether is hidden on, when it is shown on none: {key, name}.
+            std::pair<std::string, std::string> hidden_network() const {
+                std::pair<std::string, std::string> hidden;
+                for (const auto& net : bt_status_.value("lan_networks", json::array())) {
+                    if (net.value("trusted", false))
+                        return {};
+                    if (hidden.first.empty())
+                        hidden = {net.value("key", ""), net.value("name", "")};
+                }
+                return hidden;
+            }
+
             void update_wifi_indicator() {
                 const bool connected = !connected_fps_.empty();
+                const auto [hidden_key, hidden] = hidden_network();
                 if (connected)
                     wifi_detail_ = clipboard_ok_ ? _("Clipboard, files, and OTP are connected.")
                                                  : _("Files and OTP are connected. This compositor does not give "
                                                      "Tether clipboard access, so clipboard sync is off.");
+                else if (!hidden_key.empty())
+                    wifi_detail_ = tr_format(_("Tether is hidden on {}, a network you have not trusted."), hidden);
                 else if (!mdns_ok_)
                     wifi_detail_ = _("avahi-daemon isn't running, so other devices can't find this PC. Start it "
                                      "with: sudo systemctl enable --now avahi-daemon");
@@ -826,6 +842,9 @@ namespace tether::tui {
                 rows.push_back(blank_row());
                 rows.push_back(heading("Wi-Fi"));
                 rows.push_back(text_row(wifi_detail_.empty() ? _("Not connected yet.") : wifi_detail_));
+                if (const auto [key, name] = hidden_network(); !key.empty())
+                    rows.push_back(action_row(tr_format(_("Show Tether on {}"), name),
+                                              [key] { app::send({{"command", "trust_network"}, {"key", key}}); }));
                 rows.push_back(blank_row());
 
                 const bool bt_ok = bt_connection_.value("map_open", false) || bt_connection_.value("ancs_ready", false);

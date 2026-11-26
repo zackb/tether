@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: tether\n"
 "Report-Msgid-Bugs-To: zack@bartel.com\n"
-"POT-Creation-Date: 2026-11-26 10:20-0800\n"
+"POT-Creation-Date: 2026-11-26 10:55-0800\n"
 "PO-Revision-Date: 2026-08-23\n"
 "Last-Translator: Tether project\n"
 "Language-Team: Japanese\n"
@@ -83,11 +83,15 @@ msgstr "ペアリング済みのデバイスをすべて一覧表示します。
 
 #: src/cli/main.cpp
 msgid "List the networks this computer is on and whether Tether shows on them."
-msgstr "このコンピューターが接続しているネットワークと、そこで Tether が表示されるかを一覧表示します。"
+msgstr ""
+"このコンピューターが接続しているネットワークと、そこで Tether が表示されるか"
+"を一覧表示します。"
 
 #: src/cli/main.cpp
 msgid "Show Tether on a network. Without a key, the one hidden network."
-msgstr "ネットワークで Tether を表示します。キーを省略すると、唯一の非表示ネットワークが対象です。"
+msgstr ""
+"ネットワークで Tether を表示します。キーを省略すると、唯一の非表示ネットワー"
+"クが対象です。"
 
 #: src/cli/main.cpp
 msgid "Hide Tether on a network again."
@@ -95,7 +99,9 @@ msgstr "ネットワークで Tether を再び非表示にします。"
 
 #: src/cli/main.cpp
 msgid "Show Tether on trusted networks only, or on every network."
-msgstr "Tether を信頼済みネットワークだけで表示するか、すべてのネットワークで表示します。"
+msgstr ""
+"Tether を信頼済みネットワークだけで表示するか、すべてのネットワークで表示しま"
+"す。"
 
 #: src/cli/main.cpp
 msgid "Show the one-time system setup Bluetooth still needs."
@@ -2082,7 +2088,9 @@ msgstr ""
 msgid ""
 "A paired device is on {}. Tether stays hidden on networks you have not "
 "trusted."
-msgstr "ペアリング済みのデバイスが {} にあります。信頼していないネットワークでは Tether は非表示のままです。"
+msgstr ""
+"ペアリング済みのデバイスが {} にあります。信頼していないネットワークでは "
+"Tether は非表示のままです。"
 
 #: src/daemon/notification.cpp
 msgid "Show Tether on this network?"
@@ -2477,12 +2485,10 @@ msgstr ""
 "ファイルと OTP は接続されています。このコンポジターは Tether にクリップボード"
 "へのアクセスを許可しないため、クリップボード同期はオフです。"
 
-#: src/gtk/devices_view.cpp
+#: src/gtk/devices_view.cpp src/tui/devices.cpp
 #, c++-format
-msgid ""
-"Tether is hidden on {}, a network you have not trusted. Trust it in "
-"Settings, under Networks."
-msgstr "Tether は信頼していないネットワーク {} では非表示です。設定の「ネットワーク」で信頼してください。"
+msgid "Tether is hidden on {}, a network you have not trusted."
+msgstr "Tether は信頼していないネットワーク {} では非表示です。"
 
 #: src/gtk/devices_view.cpp src/tui/devices.cpp
 msgid ""
@@ -3176,7 +3182,8 @@ msgstr "ネットワーク"
 
 #: src/gtk/settings_view.cpp
 msgid "Where this computer can be found and reached over Wi-Fi or Ethernet."
-msgstr "Wi-Fi または Ethernet でこのコンピューターを見つけて接続できる場所です。"
+msgstr ""
+"Wi-Fi または Ethernet でこのコンピューターを見つけて接続できる場所です。"
 
 #: src/gtk/settings_view.cpp src/tui/settings.cpp
 msgid "Only on trusted networks"
@@ -3186,7 +3193,9 @@ msgstr "信頼済みネットワークのみ"
 msgid ""
 "Elsewhere Tether is not advertised and refuses connections. Bluetooth keeps "
 "working."
-msgstr "それ以外では Tether は告知されず、接続を拒否します。Bluetooth は引き続き動作します。"
+msgstr ""
+"それ以外では Tether は告知されず、接続を拒否します。Bluetooth は引き続き動作"
+"します。"
 
 #: src/gtk/settings_view.cpp
 msgid "SMS and iMessage conversations synced over Bluetooth."
@@ -3287,6 +3296,12 @@ msgstr "{} に接続"
 #: src/gtk/tray.cpp
 msgid "Show Tether"
 msgstr "Tether を表示"
+
+#. TRANSLATORS: {} is a Wi-Fi or network connection name.
+#: src/gtk/tray.cpp src/gtk/ui_util.cpp src/tui/devices.cpp
+#, c++-format
+msgid "Show Tether on {}"
+msgstr "{} で Tether を表示"
 
 #: src/gtk/tray.cpp src/gtk/ui_util.cpp src/tui/main.cpp
 msgid "connected"
@@ -3576,6 +3591,14 @@ msgstr "デバイスをペアリングし、ネットワーク越しにクリッ
 #: src/gtk/tether-gtk.desktop.in
 msgid "iPhone;iOS;SMS;Messages;Clipboard;Files;Notifications;Calls;AirPods;"
 msgstr "iPhone;iOS;SMS;メッセージ;クリップボード;ファイル;通知;通話;AirPods;"
+
+#, fuzzy, c++-format
+#~ msgid ""
+#~ "Tether is hidden on {}, a network you have not trusted. Use Show Tether "
+#~ "on {} below, or Settings, under Networks."
+#~ msgstr ""
+#~ "Tether は信頼していないネットワーク {} では非表示です。設定の「ネットワー"
+#~ "ク」で信頼してください。"
 
 #~ msgid "off, no Wayland session on this machine"
 #~ msgstr "オフ、このマシンには Wayland セッションがありません"

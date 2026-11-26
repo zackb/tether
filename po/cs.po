@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: tether\n"
 "Report-Msgid-Bugs-To: zack@bartel.com\n"
-"POT-Creation-Date: 2026-11-26 10:20-0800\n"
+"POT-Creation-Date: 2026-11-26 10:55-0800\n"
 "PO-Revision-Date: 2026-08-23\n"
 "Last-Translator: Tether project\n"
 "Language-Team: Czech\n"
@@ -80,7 +80,9 @@ msgstr "Vypsat všechna spárovaná zařízení."
 
 #: src/cli/main.cpp
 msgid "List the networks this computer is on and whether Tether shows on them."
-msgstr "Vypsat sítě, ke kterým je tento počítač připojen, a zda je na nich Tether vidět."
+msgstr ""
+"Vypsat sítě, ke kterým je tento počítač připojen, a zda je na nich Tether "
+"vidět."
 
 #: src/cli/main.cpp
 msgid "Show Tether on a network. Without a key, the one hidden network."
@@ -2078,7 +2080,9 @@ msgstr ""
 msgid ""
 "A paired device is on {}. Tether stays hidden on networks you have not "
 "trusted."
-msgstr "Spárované zařízení je v síti {}. V sítích, kterým nedůvěřujete, zůstává Tether skrytý."
+msgstr ""
+"Spárované zařízení je v síti {}. V sítích, kterým nedůvěřujete, zůstává "
+"Tether skrytý."
 
 #: src/daemon/notification.cpp
 msgid "Show Tether on this network?"
@@ -2473,12 +2477,10 @@ msgstr ""
 "Soubory a OTP jsou připojeny. Tento kompozitor nedává Tetheru přístup ke "
 "schránce, takže synchronizace schránky je vypnutá."
 
-#: src/gtk/devices_view.cpp
+#: src/gtk/devices_view.cpp src/tui/devices.cpp
 #, c++-format
-msgid ""
-"Tether is hidden on {}, a network you have not trusted. Trust it in "
-"Settings, under Networks."
-msgstr "Tether je skrytý v síti {}, které nedůvěřujete. Povolte ji v Nastavení v části Sítě."
+msgid "Tether is hidden on {}, a network you have not trusted."
+msgstr "Tether je skrytý v síti {}, které nedůvěřujete."
 
 #: src/gtk/devices_view.cpp src/tui/devices.cpp
 msgid ""
@@ -3173,7 +3175,8 @@ msgstr "Sítě"
 
 #: src/gtk/settings_view.cpp
 msgid "Where this computer can be found and reached over Wi-Fi or Ethernet."
-msgstr "Kde lze tento počítač najít a připojit se k němu přes Wi-Fi nebo Ethernet."
+msgstr ""
+"Kde lze tento počítač najít a připojit se k němu přes Wi-Fi nebo Ethernet."
 
 #: src/gtk/settings_view.cpp src/tui/settings.cpp
 msgid "Only on trusted networks"
@@ -3281,6 +3284,12 @@ msgstr "Připojit {}"
 #: src/gtk/tray.cpp
 msgid "Show Tether"
 msgstr "Zobrazit Tether"
+
+#. TRANSLATORS: {} is a Wi-Fi or network connection name.
+#: src/gtk/tray.cpp src/gtk/ui_util.cpp src/tui/devices.cpp
+#, c++-format
+msgid "Show Tether on {}"
+msgstr "Zobrazit Tether v síti {}"
 
 #: src/gtk/tray.cpp src/gtk/ui_util.cpp src/tui/main.cpp
 msgid "connected"
@@ -3570,6 +3579,14 @@ msgstr "Spárujte zařízení a synchronizujte schránku po síti"
 #: src/gtk/tether-gtk.desktop.in
 msgid "iPhone;iOS;SMS;Messages;Clipboard;Files;Notifications;Calls;AirPods;"
 msgstr "iPhone;iOS;SMS;Zprávy;Schránka;Soubory;Oznámení;Hovory;AirPods;"
+
+#, fuzzy, c++-format
+#~ msgid ""
+#~ "Tether is hidden on {}, a network you have not trusted. Use Show Tether "
+#~ "on {} below, or Settings, under Networks."
+#~ msgstr ""
+#~ "Tether je skrytý v síti {}, které nedůvěřujete. Povolte ji v Nastavení v "
+#~ "části Sítě."
 
 #~ msgid "off, no Wayland session on this machine"
 #~ msgstr "vypnuto, na tomto počítači není relace Wayland"

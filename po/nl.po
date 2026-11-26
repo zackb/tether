@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: tether\n"
 "Report-Msgid-Bugs-To: zack@bartel.com\n"
-"POT-Creation-Date: 2026-11-26 10:20-0800\n"
+"POT-Creation-Date: 2026-11-26 10:55-0800\n"
 "PO-Revision-Date: 2026-08-23\n"
 "Last-Translator: Tether project\n"
 "Language-Team: Dutch\n"
@@ -82,11 +82,13 @@ msgstr "Alle gekoppelde apparaten tonen."
 
 #: src/cli/main.cpp
 msgid "List the networks this computer is on and whether Tether shows on them."
-msgstr "De netwerken tonen waarop deze computer zit en of Tether daar zichtbaar is."
+msgstr ""
+"De netwerken tonen waarop deze computer zit en of Tether daar zichtbaar is."
 
 #: src/cli/main.cpp
 msgid "Show Tether on a network. Without a key, the one hidden network."
-msgstr "Tether op een netwerk tonen. Zonder sleutel op het enige verborgen netwerk."
+msgstr ""
+"Tether op een netwerk tonen. Zonder sleutel op het enige verborgen netwerk."
 
 #: src/cli/main.cpp
 msgid "Hide Tether on a network again."
@@ -2099,7 +2101,9 @@ msgstr ""
 msgid ""
 "A paired device is on {}. Tether stays hidden on networks you have not "
 "trusted."
-msgstr "Een gekoppeld apparaat zit op {}. Op netwerken die je niet vertrouwt, blijft Tether verborgen."
+msgstr ""
+"Een gekoppeld apparaat zit op {}. Op netwerken die je niet vertrouwt, blijft "
+"Tether verborgen."
 
 #: src/daemon/notification.cpp
 msgid "Show Tether on this network?"
@@ -2498,12 +2502,10 @@ msgstr ""
 "Bestanden en OTP zijn verbonden. Deze compositor geeft Tether geen toegang "
 "tot het klembord, dus klembordsynchronisatie staat uit."
 
-#: src/gtk/devices_view.cpp
+#: src/gtk/devices_view.cpp src/tui/devices.cpp
 #, c++-format
-msgid ""
-"Tether is hidden on {}, a network you have not trusted. Trust it in "
-"Settings, under Networks."
-msgstr "Tether is verborgen op {}, een netwerk dat je niet vertrouwt. Vertrouw het in Instellingen, onder Netwerken."
+msgid "Tether is hidden on {}, a network you have not trusted."
+msgstr "Tether is verborgen op {}, een netwerk dat je niet vertrouwt."
 
 #: src/gtk/devices_view.cpp src/tui/devices.cpp
 msgid ""
@@ -3204,7 +3206,8 @@ msgstr "Netwerken"
 
 #: src/gtk/settings_view.cpp
 msgid "Where this computer can be found and reached over Wi-Fi or Ethernet."
-msgstr "Waar deze computer via wifi of ethernet gevonden en bereikt kan worden."
+msgstr ""
+"Waar deze computer via wifi of ethernet gevonden en bereikt kan worden."
 
 #: src/gtk/settings_view.cpp src/tui/settings.cpp
 msgid "Only on trusted networks"
@@ -3214,7 +3217,9 @@ msgstr "Alleen op vertrouwde netwerken"
 msgid ""
 "Elsewhere Tether is not advertised and refuses connections. Bluetooth keeps "
 "working."
-msgstr "Elders wordt Tether niet aangekondigd en weigert het verbindingen. Bluetooth blijft werken."
+msgstr ""
+"Elders wordt Tether niet aangekondigd en weigert het verbindingen. Bluetooth "
+"blijft werken."
 
 #: src/gtk/settings_view.cpp
 msgid "SMS and iMessage conversations synced over Bluetooth."
@@ -3317,6 +3322,12 @@ msgstr "Verbinden met {}"
 #: src/gtk/tray.cpp
 msgid "Show Tether"
 msgstr "Tether tonen"
+
+#. TRANSLATORS: {} is a Wi-Fi or network connection name.
+#: src/gtk/tray.cpp src/gtk/ui_util.cpp src/tui/devices.cpp
+#, c++-format
+msgid "Show Tether on {}"
+msgstr "Tether op {} tonen"
 
 #: src/gtk/tray.cpp src/gtk/ui_util.cpp src/tui/main.cpp
 msgid "connected"
@@ -3606,6 +3617,14 @@ msgstr "Apparaten koppelen en het klembord over het netwerk synchroniseren"
 #: src/gtk/tether-gtk.desktop.in
 msgid "iPhone;iOS;SMS;Messages;Clipboard;Files;Notifications;Calls;AirPods;"
 msgstr "iPhone;iOS;SMS;Berichten;Klembord;Bestanden;Meldingen;Gesprekken;AirPods;"
+
+#, fuzzy, c++-format
+#~ msgid ""
+#~ "Tether is hidden on {}, a network you have not trusted. Use Show Tether "
+#~ "on {} below, or Settings, under Networks."
+#~ msgstr ""
+#~ "Tether is verborgen op {}, een netwerk dat je niet vertrouwt. Vertrouw "
+#~ "het in Instellingen, onder Netwerken."
 
 #~ msgid "off, no Wayland session on this machine"
 #~ msgstr "uit, geen Wayland-sessie op deze machine"

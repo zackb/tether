@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: tether\n"
 "Report-Msgid-Bugs-To: zack@bartel.com\n"
-"POT-Creation-Date: 2026-11-26 10:20-0800\n"
+"POT-Creation-Date: 2026-11-26 10:55-0800\n"
 "PO-Revision-Date: 2026-08-23\n"
 "Last-Translator: Tether project\n"
 "Language-Team: Korean\n"
@@ -80,11 +80,14 @@ msgstr "페어링된 모든 기기를 나열합니다."
 
 #: src/cli/main.cpp
 msgid "List the networks this computer is on and whether Tether shows on them."
-msgstr "이 컴퓨터가 연결된 네트워크와 각 네트워크에서 Tether가 표시되는지 나열합니다."
+msgstr ""
+"이 컴퓨터가 연결된 네트워크와 각 네트워크에서 Tether가 표시되는지 나열합니다."
 
 #: src/cli/main.cpp
 msgid "Show Tether on a network. Without a key, the one hidden network."
-msgstr "네트워크에 Tether를 표시합니다. 키가 없으면 유일하게 숨겨진 네트워크가 대상입니다."
+msgstr ""
+"네트워크에 Tether를 표시합니다. 키가 없으면 유일하게 숨겨진 네트워크가 대상입"
+"니다."
 
 #: src/cli/main.cpp
 msgid "Hide Tether on a network again."
@@ -2049,7 +2052,9 @@ msgstr ""
 msgid ""
 "A paired device is on {}. Tether stays hidden on networks you have not "
 "trusted."
-msgstr "페어링된 기기가 {}에 있습니다. 신뢰하지 않은 네트워크에서는 Tether가 숨겨진 상태로 유지됩니다."
+msgstr ""
+"페어링된 기기가 {}에 있습니다. 신뢰하지 않은 네트워크에서는 Tether가 숨겨진 "
+"상태로 유지됩니다."
 
 #: src/daemon/notification.cpp
 msgid "Show Tether on this network?"
@@ -2441,12 +2446,10 @@ msgstr ""
 "파일과 OTP는 연결되어 있습니다. 이 컴포지터는 Tether에 클립보드 접근을 허용하"
 "지 않으므로 클립보드 동기화가 꺼져 있습니다."
 
-#: src/gtk/devices_view.cpp
+#: src/gtk/devices_view.cpp src/tui/devices.cpp
 #, c++-format
-msgid ""
-"Tether is hidden on {}, a network you have not trusted. Trust it in "
-"Settings, under Networks."
-msgstr "Tether가 신뢰하지 않은 네트워크 {}에서 숨겨져 있습니다. 설정의 네트워크에서 신뢰하세요."
+msgid "Tether is hidden on {}, a network you have not trusted."
+msgstr "Tether가 신뢰하지 않은 네트워크 {}에서 숨겨져 있습니다."
 
 #: src/gtk/devices_view.cpp src/tui/devices.cpp
 msgid ""
@@ -3141,7 +3144,9 @@ msgstr "신뢰하는 네트워크에서만"
 msgid ""
 "Elsewhere Tether is not advertised and refuses connections. Bluetooth keeps "
 "working."
-msgstr "그 외의 곳에서는 Tether가 알려지지 않고 연결을 거부합니다. 블루투스는 계속 작동합니다."
+msgstr ""
+"그 외의 곳에서는 Tether가 알려지지 않고 연결을 거부합니다. 블루투스는 계속 작"
+"동합니다."
 
 #: src/gtk/settings_view.cpp
 msgid "SMS and iMessage conversations synced over Bluetooth."
@@ -3242,6 +3247,12 @@ msgstr "{} 연결"
 #: src/gtk/tray.cpp
 msgid "Show Tether"
 msgstr "Tether 표시"
+
+#. TRANSLATORS: {} is a Wi-Fi or network connection name.
+#: src/gtk/tray.cpp src/gtk/ui_util.cpp src/tui/devices.cpp
+#, c++-format
+msgid "Show Tether on {}"
+msgstr "{}에 Tether 표시"
 
 #: src/gtk/tray.cpp src/gtk/ui_util.cpp src/tui/main.cpp
 msgid "connected"
@@ -3531,6 +3542,14 @@ msgstr "기기를 페어링하고 네트워크를 통해 클립보드를 동기�
 #: src/gtk/tether-gtk.desktop.in
 msgid "iPhone;iOS;SMS;Messages;Clipboard;Files;Notifications;Calls;AirPods;"
 msgstr "iPhone;iOS;SMS;메시지;클립보드;파일;알림;통화;AirPods;"
+
+#, fuzzy, c++-format
+#~ msgid ""
+#~ "Tether is hidden on {}, a network you have not trusted. Use Show Tether "
+#~ "on {} below, or Settings, under Networks."
+#~ msgstr ""
+#~ "Tether가 신뢰하지 않은 네트워크 {}에서 숨겨져 있습니다. 설정의 네트워크에"
+#~ "서 신뢰하세요."
 
 #~ msgid "off, no Wayland session on this machine"
 #~ msgstr "꺼짐, 이 컴퓨터에 Wayland 세션이 없습니다"

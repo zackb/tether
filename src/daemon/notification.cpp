@@ -200,6 +200,8 @@ namespace tether {
         std::function<void(const std::string&, const std::string&)> g_reply_handler;
         std::function<void(const std::string&, const std::string&)> g_mute_handler;
         std::function<void(const std::string&, bool)> g_network_trust_handler;
+        // trust prompts by network key, so repeat raises the same popup
+        std::unordered_map<std::string, NotifyNotification*> g_trust_popups;
 
         // Server notification id -> conversation, for notifications showing an
         // inline reply field. Touched only on the notifier's thread.
@@ -383,6 +385,7 @@ namespace tether {
         void on_notification_closed(NotifyNotification* notification, gpointer) {
             g_reply_threads.erase(notification_id(notification));
             std::erase_if(g_ancs_popups, [notification](const auto& entry) { return entry.second == notification; });
+            std::erase_if(g_trust_popups, [notification](const auto& entry) { return entry.second == notification; });
             if (notification == g_file_popup)
                 g_file_popup = nullptr;
             g_object_unref(notification);
@@ -402,6 +405,10 @@ namespace tether {
 
         gboolean show_network_trust_on_main(gpointer user_data) {
             std::unique_ptr<NetworkTrustRequest> request(static_cast<NetworkTrustRequest*>(user_data));
+            if (const auto open = g_trust_popups.find(request->key); open != g_trust_popups.end()) {
+                notify_notification_show(open->second, nullptr);
+                return G_SOURCE_REMOVE;
+            }
             const std::string body = tr_format(
                 _("A paired device is on {}. Tether stays hidden on networks you have not trusted."), request->name);
             NotifyNotification* notification =
@@ -424,6 +431,8 @@ namespace tether {
             if (!notify_notification_show(notification, nullptr)) {
                 debug::log(ERR, "Failed to show network trust notification");
                 g_object_unref(notification);
+            } else {
+                g_trust_popups[request->key] = notification;
             }
             return G_SOURCE_REMOVE;
         }

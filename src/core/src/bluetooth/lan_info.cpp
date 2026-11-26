@@ -5,6 +5,7 @@
 
 #include <arpa/inet.h>
 #include <bit>
+#include <functional>
 #include <gio/gio.h>
 #include <ifaddrs.h>
 #include <net/if.h>
@@ -23,9 +24,9 @@ namespace tether::bluetooth {
         for (const ifaddrs* ifa = head; ifa; ifa = ifa->ifa_next) {
             if (!ifa->ifa_addr || !ifa->ifa_netmask || !(ifa->ifa_flags & IFF_UP) || (ifa->ifa_flags & IFF_LOOPBACK))
                 continue;
-            o
-                // phone would only be refused at the other end.
-                if (!ifa->ifa_name || !lan_ifname_trusted(ifa->ifa_name)) continue;
+            // The phone would only be refused at the other end.
+            if (!ifa->ifa_name || !lan_ifname_trusted(ifa->ifa_name))
+                continue;
 
             char text[INET6_ADDRSTRLEN] = {};
             int prefix = 0;
@@ -69,6 +70,8 @@ namespace tether::bluetooth {
 
     struct LanInfoState {
         GDBusConnection* conn = nullptr;
+        // Runs on the monitor's thread after each read.
+        std::function<void()> on_read;
         std::string name;
         uint16_t port = 0;
         std::string fingerprint;
@@ -176,6 +179,8 @@ namespace tether::bluetooth {
             GVariant* bytes = g_variant_new_fixed_array(
                 G_VARIANT_TYPE_BYTE, value.data() + offset, value.size() - offset, sizeof(guint8));
             g_dbus_method_invocation_return_value(invocation, g_variant_new_tuple(&bytes, 1));
+            if (state->on_read)
+                state->on_read();
         }
 
         const GDBusInterfaceVTable LAN_VTABLE = {handle_method, nullptr, nullptr, {nullptr}};
@@ -279,6 +284,10 @@ namespace tether::bluetooth {
         }
 
     } // namespace
+
+    void LanInfoService::set_read_handler(std::function<void()> handler) {
+        monitor_.invoke_sync([state = state_.get(), &handler] { state->on_read = std::move(handler); });
+    }
 
     LanInfoService::LanInfoService(BluezMonitor& monitor, std::string name, uint16_t port, std::string fingerprint)
         : monitor_(monitor), state_(std::make_unique<LanInfoState>()) {

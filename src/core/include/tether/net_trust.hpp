@@ -55,6 +55,9 @@ namespace tether {
     // Runs on the loop thread after a refresh that changed anything.
     void set_lan_trust_changed_handler(std::function<void()> handler);
 
+    // The interface holding the IPv4 default route, or empty: the network a phone can share.
+    std::string default_route_ifname();
+
     // The rest are safe from any thread.
     std::vector<LanNetwork> lan_networks();
     bool lan_trust_all();

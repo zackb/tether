@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: tether\n"
 "Report-Msgid-Bugs-To: zack@bartel.com\n"
-"POT-Creation-Date: 2026-11-26 10:20-0800\n"
+"POT-Creation-Date: 2026-11-26 10:55-0800\n"
 "PO-Revision-Date: 2026-08-23\n"
 "Last-Translator: Tether project\n"
 "Language-Team: Russian\n"
@@ -2098,7 +2098,9 @@ msgstr ""
 msgid ""
 "A paired device is on {}. Tether stays hidden on networks you have not "
 "trusted."
-msgstr "Сопряжённое устройство находится в сети {}. В недоверенных сетях Tether остаётся скрытым."
+msgstr ""
+"Сопряжённое устройство находится в сети {}. В недоверенных сетях Tether "
+"остаётся скрытым."
 
 #: src/daemon/notification.cpp
 msgid "Show Tether on this network?"
@@ -2497,12 +2499,10 @@ msgstr ""
 "Файлы и OTP подключены. Этот композитор не даёт Tether доступ к буферу "
 "обмена, поэтому синхронизация буфера обмена отключена."
 
-#: src/gtk/devices_view.cpp
+#: src/gtk/devices_view.cpp src/tui/devices.cpp
 #, c++-format
-msgid ""
-"Tether is hidden on {}, a network you have not trusted. Trust it in "
-"Settings, under Networks."
-msgstr "Tether скрыт в сети {}, которой вы не доверяете. Разрешите её в настройках, в разделе «Сети»."
+msgid "Tether is hidden on {}, a network you have not trusted."
+msgstr "Tether скрыт в сети {}, которой вы не доверяете."
 
 #: src/gtk/devices_view.cpp src/tui/devices.cpp
 msgid ""
@@ -3208,7 +3208,8 @@ msgstr "Сети"
 
 #: src/gtk/settings_view.cpp
 msgid "Where this computer can be found and reached over Wi-Fi or Ethernet."
-msgstr "Где этот компьютер можно найти и подключиться к нему по Wi-Fi или Ethernet."
+msgstr ""
+"Где этот компьютер можно найти и подключиться к нему по Wi-Fi или Ethernet."
 
 #: src/gtk/settings_view.cpp src/tui/settings.cpp
 msgid "Only on trusted networks"
@@ -3218,7 +3219,9 @@ msgstr "Только в доверенных сетях"
 msgid ""
 "Elsewhere Tether is not advertised and refuses connections. Bluetooth keeps "
 "working."
-msgstr "В других сетях Tether не объявляется и отклоняет подключения. Bluetooth продолжает работать."
+msgstr ""
+"В других сетях Tether не объявляется и отклоняет подключения. Bluetooth "
+"продолжает работать."
 
 #: src/gtk/settings_view.cpp
 msgid "SMS and iMessage conversations synced over Bluetooth."
@@ -3320,6 +3323,12 @@ msgstr "Подключить {}"
 #: src/gtk/tray.cpp
 msgid "Show Tether"
 msgstr "Показать Tether"
+
+#. TRANSLATORS: {} is a Wi-Fi or network connection name.
+#: src/gtk/tray.cpp src/gtk/ui_util.cpp src/tui/devices.cpp
+#, c++-format
+msgid "Show Tether on {}"
+msgstr "Показывать Tether в сети {}"
 
 #: src/gtk/tray.cpp src/gtk/ui_util.cpp src/tui/main.cpp
 msgid "connected"
@@ -3611,6 +3620,14 @@ msgstr "Создавайте пары устройств и синхронизи
 msgid "iPhone;iOS;SMS;Messages;Clipboard;Files;Notifications;Calls;AirPods;"
 msgstr ""
 "iPhone;iOS;SMS;Сообщения;Буфер обмена;Файлы;Уведомления;Звонки;AirPods;"
+
+#, fuzzy, c++-format
+#~ msgid ""
+#~ "Tether is hidden on {}, a network you have not trusted. Use Show Tether "
+#~ "on {} below, or Settings, under Networks."
+#~ msgstr ""
+#~ "Tether скрыт в сети {}, которой вы не доверяете. Разрешите её в "
+#~ "настройках, в разделе «Сети»."
 
 #~ msgid "off, no Wayland session on this machine"
 #~ msgstr "выключено, на этой машине нет сеанса Wayland"

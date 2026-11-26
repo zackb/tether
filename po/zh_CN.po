@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: tether\n"
 "Report-Msgid-Bugs-To: zack@bartel.com\n"
-"POT-Creation-Date: 2026-11-26 10:20-0800\n"
+"POT-Creation-Date: 2026-11-26 10:55-0800\n"
 "PO-Revision-Date: 2026-08-23\n"
 "Last-Translator: Tether project\n"
 "Language-Team: Simplified Chinese\n"
@@ -2383,12 +2383,10 @@ msgstr ""
 "文件和 OTP 已连接。此合成器不向 Tether 提供剪贴板访问权限，因此剪贴板同步已关"
 "闭。"
 
-#: src/gtk/devices_view.cpp
+#: src/gtk/devices_view.cpp src/tui/devices.cpp
 #, c++-format
-msgid ""
-"Tether is hidden on {}, a network you have not trusted. Trust it in "
-"Settings, under Networks."
-msgstr "Tether 在你未信任的网络 {} 上处于隐藏状态。请在“设置”的“网络”中信任它。"
+msgid "Tether is hidden on {}, a network you have not trusted."
+msgstr "Tether 在你未信任的网络 {} 上处于隐藏状态。"
 
 #: src/gtk/devices_view.cpp src/tui/devices.cpp
 msgid ""
@@ -3163,6 +3161,12 @@ msgstr "连接 {}"
 msgid "Show Tether"
 msgstr "显示 Tether"
 
+#. TRANSLATORS: {} is a Wi-Fi or network connection name.
+#: src/gtk/tray.cpp src/gtk/ui_util.cpp src/tui/devices.cpp
+#, c++-format
+msgid "Show Tether on {}"
+msgstr "在 {} 上显示 Tether"
+
 #: src/gtk/tray.cpp src/gtk/ui_util.cpp src/tui/main.cpp
 msgid "connected"
 msgstr "已连接"
@@ -3451,6 +3455,13 @@ msgstr "配对设备并通过网络同步剪贴板"
 #: src/gtk/tether-gtk.desktop.in
 msgid "iPhone;iOS;SMS;Messages;Clipboard;Files;Notifications;Calls;AirPods;"
 msgstr "iPhone;iOS;SMS;信息;剪贴板;文件;通知;通话;AirPods;"
+
+#, fuzzy, c++-format
+#~ msgid ""
+#~ "Tether is hidden on {}, a network you have not trusted. Use Show Tether "
+#~ "on {} below, or Settings, under Networks."
+#~ msgstr ""
+#~ "Tether 在你未信任的网络 {} 上处于隐藏状态。请在“设置”的“网络”中信任它。"
 
 #~ msgid "off, no Wayland session on this machine"
 #~ msgstr "已关闭，此机器上没有 Wayland 会话"

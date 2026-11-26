@@ -55,4 +55,8 @@ namespace tether::ui {
     // next step, so they are passed through verbatim rather than summarised.
     void set_route_status(Route route, bool ok, const std::string& detail);
 
+    // Offers to trust the network Tether is hidden on, in the status strip and the tray. Empty
+    // key withdraws the offer.
+    void set_hidden_network(const std::string& key, const std::string& name);
+
 } // namespace tether::ui
