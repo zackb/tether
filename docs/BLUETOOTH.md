@@ -4068,3 +4068,26 @@ restart the service registered again 6 ms after hci0 came back (14:32:03.942), b
 returned with ANCS at 14:32:13. A tap in between found nothing, as expected with LE down, and every
 tap after that worked.
 
+
+### 2026-11-27 - The backlog popped up again on every LE rebuild (#360)
+
+Reported on 0.3.7, BlueZ 5.88, with about 50 entries in Notification Center. The first session
+after the daemon starts stayed quiet (#349). A forced `Bearer.LE1 Disconnect` later in the day gave
+21 popups, all of them old.
+
+#349 ran `ReplayBurst` only when the registry was empty, which is true only for the first session.
+Every later session depended on #348: `store()` marks a notification as backlog when it replaces a
+copy from an earlier session. That copy was often missing:
+
+- `handle_source_event()` does not fetch a pre-existing event once the sequencer is half full, so
+  with a large backlog many entries are never stored.
+- `rebuild()` resets the sequencer and clears `in_progress`, so fetches still in flight are lost.
+  The reporter's logs showed about 50 `InProgress` control point failures around each rebuild.
+
+iOS then replays the entry without the pre-existing flag (#346), `store()` has nothing to match,
+and the entry pops up.
+
+Now the burst starts at the beginning of every session. The run of additions right after
+`StartNotify` is the replay whether or not a copy was kept. The `store()` match stays in place for
+unflagged entries that arrive after the burst ends. The trade-off from #349 now applies to every
+reconnect: a genuinely new notification that arrives inside the burst is listed without a popup.
