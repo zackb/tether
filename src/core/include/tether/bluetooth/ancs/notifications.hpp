@@ -71,7 +71,7 @@ namespace tether::bluetooth::ancs {
         std::vector<Held> held_;
     };
 
-    // The run of additions right after subscribing, when there is no earlier session to compare it with.
+    // The run of additions right after subscribing, whether or not an earlier session kept copies of them.
     // iOS does not flag all of it pre-existing, but all of it is.
     class ReplayBurst {
     public:
