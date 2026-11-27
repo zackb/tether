@@ -134,6 +134,10 @@ namespace tether::bluetooth::ancs {
     // phone is muted or in a Focus mode, which means "make no noise", not "hide".
     bool should_show_desktop_popup(const Notification& notification);
 
+    // Whether dismissing the desktop popup should clear the notification on the phone. Never for an incoming call,
+    // where the negative action declines it.
+    bool clears_on_dismiss(const Notification& notification);
+
     // The order to ask the phone about events that arrived together. A session starts with iOS replaying all of
     // Notification Center, more entries than the client queues, so the ones fetched should be the newest. Within a
     // session UIDs grow, so the newest additions are last in the replay: everything that is not an addition keeps

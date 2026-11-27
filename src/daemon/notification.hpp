@@ -28,6 +28,8 @@ namespace tether {
         std::string read_handle;
         // iPhone notification UID, or -1. Set, the popup closes on withdraw().
         int64_t ancs_uid = -1;
+        // The iPhone can clear it, so dismissing the popup clears it there too.
+        bool clearable = false;
     };
 
     class DesktopNotifier {
@@ -60,6 +62,10 @@ namespace tether {
 
         // Asks whether to show Tether on this network. Shown even with popups off: it is a setting.
         void notify_network_trust(const std::string& key, const std::string& name);
+
+        // Where a mirrored iPhone popup the user dismissed sends its UID. Called on
+        // the notifier's own thread.
+        void set_dismiss_handler(std::function<void(uint32_t ancs_uid)> handler);
 
         void notify_file_arrived(const std::filesystem::path& path);
 
