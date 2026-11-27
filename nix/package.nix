@@ -10,7 +10,6 @@
   gettext,
   nodejs,
   zip,
-  git,
   wrapGAppsHook3,
   wayland,
   avahi,
@@ -34,7 +33,10 @@
 
 stdenv.mkDerivation (finalAttrs: {
   pname = "tether";
-  version = "0.2.18";
+  # Read from CMakeLists.txt, where releases bump it, so this can't fall behind
+  version = lib.head (
+    builtins.match ".*project\\(tether VERSION ([0-9.]+) .*" (builtins.readFile ../CMakeLists.txt)
+  );
 
   src = lib.cleanSourceWith {
     name = "source";
@@ -85,7 +87,6 @@ stdenv.mkDerivation (finalAttrs: {
     nodejs
     npmConfigHook
     zip
-    git
     wrapGAppsHook3
   ];
 
