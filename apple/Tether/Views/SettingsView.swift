@@ -201,6 +201,13 @@ struct SettingsView: View {
                     Text("Connection")
                 }
 
+                // SPIKE #336 Phase 0
+                Section {
+                    NavigationLink("Doorbell log") { DoorbellLogView() }
+                } header: {
+                    Text("Doorbell spike")
+                }
+
                 // About
                 Section {
                     HStack {
@@ -280,4 +287,25 @@ private extension AppearancePreference {
     SettingsView()
         .environment(TetherViewModel())
         .preferredColorScheme(.dark)
+}
+
+// SPIKE #336 Phase 0
+private struct DoorbellLogView: View {
+    @State private var text = DoorbellSpike.readLog()
+
+    var body: some View {
+        ScrollView {
+            Text(text)
+                .font(.system(.caption2, design: .monospaced))
+                .textSelection(.enabled)
+                .frame(maxWidth: .infinity, alignment: .leading)
+                .padding()
+        }
+        .navigationTitle("Doorbell log")
+        .toolbar {
+            Button("Refresh") { text = DoorbellSpike.readLog() }
+            Button("Clear") { DoorbellSpike.clearLog(); text = DoorbellSpike.readLog() }
+            ShareLink(item: DoorbellSpike.logURL)
+        }
+    }
 }

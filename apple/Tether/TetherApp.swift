@@ -10,6 +10,7 @@ import TetherFramework
 
 @main
 struct TetherApp: App {
+    @UIApplicationDelegateAdaptor(DoorbellAppDelegate.self) private var appDelegate // SPIKE #336
     @State private var viewModel = TetherViewModel()
     @Environment(\.scenePhase) private var scenePhase
     @AppStorage(AppearancePreference.storageKey, store: AppearancePreference.sharedDefaults)
