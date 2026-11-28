@@ -344,3 +344,39 @@ extension ShareSender {
         return (host, UInt16(portInt))
     }
 }
+
+// MARK: - SPIKE (#336 Phase 0, not for merge)
+
+extension ShareSender {
+    /// Phase 0 spike: dial the last-known host and pull its clipboard text with
+    /// `clipboard_get`. No `hello`, so the daemon answers with text only.
+    public static func spikeFetchClipboardText(timeout: Double = 5) async -> Result<String, Error> {
+        let connection: TetherConnection
+        switch await connectToLastKnownHost() {
+        case .success(let conn):
+            connection = conn
+        case .failure(let error):
+            return .failure(error)
+        }
+        defer { connection.disconnect() }
+
+        let text: String? = await withCheckedContinuation { continuation in
+            var resumed = false
+            connection.onMessage = { message in
+                guard !resumed, message.parsedCommand == .clipboardContent else { return }
+                resumed = true
+                continuation.resume(returning: message.content ?? "")
+            }
+            connection.send(.clipboardGet())
+            Task {
+                try? await Task.sleep(for: .seconds(timeout))
+                if !resumed {
+                    resumed = true
+                    continuation.resume(returning: nil)
+                }
+            }
+        }
+        guard let text else { return .failure(ShareSenderError.timeout) }
+        return .success(text)
+    }
+}
