@@ -25,6 +25,7 @@
   nlohmann_json,
   gtest,
   bluez,
+  pulseaudio,
   runtimeShell,
   gnugrep,
   coreutils,
@@ -144,6 +145,16 @@ stdenv.mkDerivation (finalAttrs: {
       "$out/lib/thunderbird/native-messaging-hosts/com.tether.extension.json"; do
       test -f "$manifest"
     done
+  '';
+
+  # tetherd runs btmgmt, bluetoothctl, pactl and tether-gtk by name
+  preFixup = ''
+    gappsWrapperArgs+=(--prefix PATH : ${
+      lib.makeBinPath [
+        bluez
+        pulseaudio
+      ]
+    }:$out/bin)
   '';
 
   meta = {
