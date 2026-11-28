@@ -173,3 +173,51 @@ daemon outbox, because today a send with no peer fails with `no_connected_mobile
   - run `tether --bt-connection` before and after to confirm that holding the connection does
     not upset ANCS or bearer supervision;
   - two computers: only the last-connected one is pulled from.
+
+## Phase 0 status: Linux side (2026-11-27)
+
+- The spike daemon is running: fernando's `ef7794a` applied to `develop` `01927b4`, with
+  spike-only log lines. It lives in a scratch worktree (not committed) and was started by hand.
+  The running binary's sha256 starts `66aeb83b` (checked against `/proc/<pid>/exe`).
+- It is registered on hci0: the adapter lists service `ba7a69f7-…b5`. The iPhone ("Zack 18 Pro")
+  shows BR/EDR + LE + MAP up.
+- Characteristics:
+  - `…b6` LAN info, unchanged;
+  - `…b7` announce: `encrypt-read` + `notify`, value `{"v":1,"seq":N,"size":S,"trunc":false}`;
+  - `…b8` text: `encrypt-read`, up to 512 bytes.
+
+  The Phase 1 doorbell drops b8, but the spike keeps it so the Mac can also test a read in the
+  background.
+- Checked: `wl-copy` bumps seq (`spike336: clipboard seq=2 listeners=0`). No phone has subscribed
+  yet. The trust popup now fires only on b6 reads, not on b7 or b8.
+- Log lines to watch, in `~/.local/state/tether/tetherd.log`:
+  - `spike336: StartNotify on announce, listeners=1`: the phone subscribed;
+  - `spike336: clipboard seq=N listeners=1`: a notify went out;
+  - `spike336: ReadValue …char1/char2`: the phone read b7 or b8.
+- Run (f) first: if iOS doesn't list b7 under the service, toggle Bluetooth on the phone once
+  (the stale GATT cache, see BLUETOOTH.md 2026-11-05).
+
+## Phase 0 results so far
+
+**Run 1 (2026-11-27 19:19, phone locked, app attached to the Xcode debugger)**
+- `…b7` showed up without a Bluetooth toggle. The app read `…b6` (fingerprint matched), then
+  subscribed (`StartNotify` 19:18:38.304).
+- The ring at 19:19:48.104 reached the app (`RING seq=3 size=24`). The pull over mTLS opened at
+  .157 and returned `len=24` in 55 ms.
+- **The pasteboard write failed while locked.** Reads gave `PBErrorDomain Code=10 "Pasteboard …
+  is not available at this time"`, saves gave `Code=11 "… is not valid"`, and `changeCount`
+  stayed at 0. Both the direct write and the post-pull write failed. The general pasteboard looks
+  to be behind data protection while the device is locked.
+- Not proven: wake from suspension. `bgTime=inf` means the debugger kept the app alive. Run again
+  launched from the home screen, with no debugger attached, and read the logs in Console.app.
+
+**Run 2 (phone unlocked, app freshly backgrounded):** the same `Code=10`/`Code=11` errors. iOS
+(9 and later) blocks a background app from the general pasteboard, for reads and, on this
+evidence, for writes too.
+
+**Outcome:** a silent background clipboard write is not possible. The doorbell and the pull still
+work. Options:
+- the pulled text becomes a local notification, "Clipboard from <computer>: tap to copy", and
+  the app writes it when it comes to the foreground;
+- the doorbell is kept mainly for file sends, which need no pasteboard: save to Documents, then
+  notify.
