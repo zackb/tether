@@ -667,8 +667,8 @@ static int print_bt_airpods(tether::Client& client) {
     if (resp.value("address", "").empty()) {
         fprintf(stdout,
                 "%s",
-                status.value("airpods_enabled", false) ? _("AirPods management is off.\n")
-                                                       : _("No AirPods connected.\n"));
+                status.value("airpods_enabled", false) ? _("No AirPods connected.\n")
+                                                       : _("AirPods management is off.\n"));
         return 0;
     }
 

@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: tether\n"
 "Report-Msgid-Bugs-To: zack@bartel.com\n"
-"POT-Creation-Date: 2026-11-26 11:12-0800\n"
+"POT-Creation-Date: 2026-11-28 16:33-0500\n"
 "PO-Revision-Date: 2026-08-23\n"
 "Last-Translator: Tether project\n"
 "Language-Team: Dutch\n"
@@ -638,12 +638,12 @@ msgid "Could not read the AirPods battery from the daemon.\n"
 msgstr "Kon de accu van de AirPods niet uitlezen via de daemon.\n"
 
 #: src/cli/main.cpp
-msgid "AirPods management is off.\n"
-msgstr "AirPods-beheer staat uit.\n"
-
-#: src/cli/main.cpp
 msgid "No AirPods connected.\n"
 msgstr "Geen AirPods verbonden.\n"
+
+#: src/cli/main.cpp
+msgid "AirPods management is off.\n"
+msgstr "AirPods-beheer staat uit.\n"
 
 #: src/cli/main.cpp
 msgid "Left"
