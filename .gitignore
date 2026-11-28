@@ -9,3 +9,4 @@ _CPack_Packages
 *.tar.gz
 .idea
 packaging/container/.env
+.direnv/
